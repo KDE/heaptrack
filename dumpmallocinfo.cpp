@@ -75,7 +75,7 @@ void stop_dump_malloc_info()
         return;
     }
 
-    stop = 1;
+    stop = true;
     if (runner->joinable()) {
         runner->join();
     }
