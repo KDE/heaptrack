@@ -21,6 +21,7 @@
 #include <atomic>
 #include <iostream>
 #include <cstdlib>
+#include <chrono>
 
 #include <malloc.h>
 
@@ -31,19 +32,36 @@ using namespace std;
 unique_ptr<thread> runner;
 atomic_bool stop{false};
 
-void dump_malloc_info(unsigned int millisecond_interval)
+void dump_malloc_info()
+{
+    ///TODO: make output destination configurable
+    FILE* output = stderr;
+
+    static unsigned long id = 0;
+
+    auto duration = chrono::system_clock::now().time_since_epoch();
+    auto millis = chrono::duration_cast<chrono::milliseconds>(duration).count();
+
+    fprintf(output, "<snapshot id=\"%lu\" time=\"%lu\">\n", id++, millis);
+    malloc_info(0, output);
+    fprintf(output, "</snapshot>\n");
+}
+
+void thread_dump_malloc_info(unsigned int millisecond_interval)
 {
     while(!stop) {
-        malloc_info(0, stderr);
+        dump_malloc_info();
         this_thread::sleep_for(chrono::milliseconds(millisecond_interval));
     }
-    malloc_info(0, stderr);
+    // dump one last frame before going back to the main thread
+    dump_malloc_info();
 }
 
 void start_dump_malloc_info(unsigned int millisecond_interval)
 {
-    cerr << "Will dump malloc info every " << millisecond_interval << "ms" << endl;
-    malloc_info(0, stderr);
+    // dump an early first frame before starting up the thread
+    dump_malloc_info();
+
     if (runner) {
         stop_dump_malloc_info();
     }
