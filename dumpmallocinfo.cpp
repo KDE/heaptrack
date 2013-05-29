@@ -29,7 +29,7 @@
 
 using namespace std;
 
-unique_ptr<thread> runner;
+thread* runner = 0;
 atomic_bool stop{false};
 
 void dump_malloc_info()
@@ -66,7 +66,7 @@ void start_dump_malloc_info(unsigned int millisecond_interval)
         stop_dump_malloc_info();
     }
     stop = false;
-    runner.reset({new thread(dump_malloc_info, millisecond_interval)});
+    runner = new thread(thread_dump_malloc_info, millisecond_interval);
 }
 
 void stop_dump_malloc_info()
@@ -79,8 +79,8 @@ void stop_dump_malloc_info()
     if (runner->joinable()) {
         runner->join();
     }
-    runner.reset(0);
-    cerr << "Stopped dump malloc info" << endl;
+    delete runner;
+    runner = 0;
 }
 
 DumpMallocInfoOnStartup::DumpMallocInfoOnStartup()
