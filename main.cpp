@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 {
     cerr << "This is just a test utility. To use this debug utility, run your app like this:" << endl
          << endl
-         << "  DUMP_MALLOC_INFO_INTERVAL=100 LD_PRELOAD=./path/to/libdumpmallocinfo.cpp yourapp" << endl
+         << "  DUMP_MALLOC_INFO_INTERVAL=100 LD_PRELOAD=./path/to/libdumpmallocinfo.so yourapp" << endl
          << endl
          << "The above will output the XML malloc info every 100ms." << endl;
 
