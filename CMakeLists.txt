@@ -9,4 +9,6 @@ add_definitions("-std=c++11")
 add_executable(mallocinfo main.cpp)
 target_link_libraries(mallocinfo dumpmallocinfo)
 
+add_executable(test_c test.c)
+
 install(TARGETS mallocinfo RUNTIME DESTINATION bin)
