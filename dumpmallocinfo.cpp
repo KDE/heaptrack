@@ -36,11 +36,22 @@ void dump_malloc_info(FILE* output)
 {
     static unsigned long id = 0;
 
+    if (id == 0) {
+        fprintf(output, "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n");
+        //TODO: add info about program being investigated
+        fprintf(output, "<mallocinfo cmd=\"unknown\" descr=\"\">\n");
+    }
+
     auto duration = chrono::system_clock::now().time_since_epoch();
     auto millis = chrono::duration_cast<chrono::milliseconds>(duration).count();
 
     fprintf(output, "<snapshot id=\"%lu\" time=\"%lu\">\n", id++, millis);
     malloc_info(0, output);
+    ///TODO: the above does not contain information about what is actually in use :-/
+    ///      fallback to int-based interface until this gets added upstream
+    auto info = mallinfo();
+    fprintf(output, "<mallinfo used=\"%d\" mmap=\"%d\" kept=\"%d\" />\n",
+            info.uordblks, info.hblkhd, info.keepcost);
     fprintf(output, "</snapshot>\n");
 }
 
@@ -56,17 +67,18 @@ void thread_dump_malloc_info(FILE* output, unsigned int millisecond_interval)
 
 void start_dump_malloc_info(FILE* output, unsigned int millisecond_interval)
 {
+    if (runner) {
+        cerr << "malloc info is still running, stop it first before restarting it" << endl;
+        return;
+    }
     // dump an early first frame before starting up the thread
     dump_malloc_info(output);
 
-    if (runner) {
-        stop_dump_malloc_info();
-    }
     stop = false;
     runner = new thread(thread_dump_malloc_info, output, millisecond_interval);
 }
 
-void stop_dump_malloc_info()
+void stop_dump_malloc_info(FILE* output)
 {
     if (!runner) {
         return;
@@ -78,6 +90,7 @@ void stop_dump_malloc_info()
     }
     delete runner;
     runner = 0;
+    fprintf(output, "</mallocinfo>\n");
 }
 
 string env(const char* variable)
@@ -119,7 +132,7 @@ DumpMallocInfoOnStartup::DumpMallocInfoOnStartup()
 
 DumpMallocInfoOnStartup::~DumpMallocInfoOnStartup()
 {
-    stop_dump_malloc_info();
+    stop_dump_malloc_info(output);
 
     if (output && output != stderr && output != stdout) {
         fclose(output);
