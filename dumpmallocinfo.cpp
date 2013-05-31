@@ -32,11 +32,8 @@ using namespace std;
 thread* runner = 0;
 atomic_bool stop{false};
 
-void dump_malloc_info()
+void dump_malloc_info(FILE* output)
 {
-    ///TODO: make output destination configurable
-    FILE* output = stderr;
-
     static unsigned long id = 0;
 
     auto duration = chrono::system_clock::now().time_since_epoch();
@@ -47,26 +44,26 @@ void dump_malloc_info()
     fprintf(output, "</snapshot>\n");
 }
 
-void thread_dump_malloc_info(unsigned int millisecond_interval)
+void thread_dump_malloc_info(FILE* output, unsigned int millisecond_interval)
 {
     while(!stop) {
-        dump_malloc_info();
+        dump_malloc_info(output);
         this_thread::sleep_for(chrono::milliseconds(millisecond_interval));
     }
     // dump one last frame before going back to the main thread
-    dump_malloc_info();
+    dump_malloc_info(output);
 }
 
-void start_dump_malloc_info(unsigned int millisecond_interval)
+void start_dump_malloc_info(FILE* output, unsigned int millisecond_interval)
 {
     // dump an early first frame before starting up the thread
-    dump_malloc_info();
+    dump_malloc_info(output);
 
     if (runner) {
         stop_dump_malloc_info();
     }
     stop = false;
-    runner = new thread(thread_dump_malloc_info, millisecond_interval);
+    runner = new thread(thread_dump_malloc_info, output, millisecond_interval);
 }
 
 void stop_dump_malloc_info()
@@ -83,19 +80,20 @@ void stop_dump_malloc_info()
     runner = 0;
 }
 
-DumpMallocInfoOnStartup::DumpMallocInfoOnStartup()
+string env(const char* variable)
 {
-    const char* envVar = getenv("DUMP_MALLOC_INFO_INTERVAL");
-    if (!envVar) {
-        cerr << "DUMP_MALLOC_INFO_INTERVAL env var not set, not dumping malloc info" << endl;
-        return;
-    }
+    const char* value = getenv(variable);
+    return value ? string(value) : string();
+}
 
+DumpMallocInfoOnStartup::DumpMallocInfoOnStartup()
+: output(0)
+{
     unsigned int ms_interval = 0;
     try {
-        ms_interval = stoul(string(envVar));
+        ms_interval = stoul(env("DUMP_MALLOC_INFO_INTERVAL"));
     } catch(...) {
-        cerr << "unsigned integer expected for DUMP_MALLOC_INFO_INTERVAL env variable" << endl;
+        cerr << "unsigned integer expected for DUMP_MALLOC_INFO_INTERVAL env variable, not dumping anything now" << endl;
         return;
     }
 
@@ -103,10 +101,27 @@ DumpMallocInfoOnStartup::DumpMallocInfoOnStartup()
         return;
     }
 
-    start_dump_malloc_info(ms_interval);
+    const string outputType = env("DUMP_MALLOC_INFO_OUTPUT");
+    if (outputType.empty() || outputType == "stderr") {
+        output = stderr;
+    } else if (outputType == "stdout") {
+        output = stdout;
+    } else {
+        output = fopen(outputType.c_str(), "w+");
+        if (!output) {
+            cerr << "Cannot open file " << outputType << " for writing" << endl;
+            return;
+        }
+    }
+
+    start_dump_malloc_info(output, ms_interval);
 }
 
 DumpMallocInfoOnStartup::~DumpMallocInfoOnStartup()
 {
     stop_dump_malloc_info();
+
+    if (output && output != stderr && output != stdout) {
+        fclose(output);
+    }
 }

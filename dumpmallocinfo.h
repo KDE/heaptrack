@@ -19,16 +19,20 @@
 
 #ifndef DUMPMALLOCINFO_H
 #define DUMPMALLOCINFO_H
+#include <stdio.h>
 
 extern "C" {
 void start_dump_malloc_info(unsigned int millisecond_interval);
 void stop_dump_malloc_info();
 }
 
-struct DumpMallocInfoOnStartup
+class DumpMallocInfoOnStartup
 {
+public:
     DumpMallocInfoOnStartup();
     ~DumpMallocInfoOnStartup();
+private:
+    FILE* output;
 };
 
 static DumpMallocInfoOnStartup dumpMallocInfoOnStartup;
