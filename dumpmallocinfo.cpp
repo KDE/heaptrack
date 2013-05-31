@@ -50,7 +50,7 @@ void dump_malloc_info(FILE* output)
     ///TODO: the above does not contain information about what is actually in use :-/
     ///      fallback to int-based interface until this gets added upstream
     auto info = mallinfo();
-    fprintf(output, "<mallinfo used=\"%d\" mmap=\"%d\" kept=\"%d\" />\n",
+    fprintf(output, "<mallinfo used=\"%d\" mmap=\"%d\" kept=\"%d\"/>\n",
             info.uordblks, info.hblkhd, info.keepcost);
     fprintf(output, "</snapshot>\n");
 }
