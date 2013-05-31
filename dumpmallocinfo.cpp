@@ -103,6 +103,9 @@ string env(const char* variable)
 DumpMallocInfoOnStartup::DumpMallocInfoOnStartup()
 : output(0)
 {
+    // don't trace child apps
+    setenv("LD_PRELOAD", "", 1);
+
     unsigned int ms_interval = 0;
     try {
         ms_interval = stoul(env("DUMP_MALLOC_INFO_INTERVAL"));
