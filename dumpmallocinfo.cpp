@@ -24,6 +24,7 @@
 #include <chrono>
 
 #include <malloc.h>
+#include <unistd.h>
 
 #include "dumpmallocinfo.h"
 
@@ -120,9 +121,10 @@ DumpMallocInfoOnStartup::DumpMallocInfoOnStartup()
     } else if (outputType == "stdout") {
         output = stdout;
     } else {
-        output = fopen(outputType.c_str(), "w+");
+        string outputFileName = outputType + '.' + std::to_string(getpid());
+        output = fopen(outputFileName.c_str(), "w+");
         if (!output) {
-            cerr << "Cannot open file " << outputType << " for writing" << endl;
+            cerr << "Cannot open file " << outputFileName << " for writing" << endl;
             return;
         }
     }
