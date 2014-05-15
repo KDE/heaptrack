@@ -139,7 +139,9 @@ void print_caller()
             const bool skip = name[0] == '_' && name[1] == 'Z' && name[2] == 'n'
                         && name[4] == 'm' && name[5] == '\0'
                         && (name[3] == 'w' || name[3] == 'a');
-            const bool stop = !skip && (!strcmp(name, "main") || !strcmp(name, "_GLOBAL__sub_I_main"));
+            const bool stop = !skip && (!strcmp(name, "main")
+                                    || !strcmp(name, "_GLOBAL__sub_I_main")
+                                    || !strcmp(name, "_Z41__static_initialization_and_destruction_0ii"));
             const size_t id = next_cache_id++;
 
             // and store it in the cache
