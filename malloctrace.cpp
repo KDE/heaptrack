@@ -22,6 +22,8 @@
 #include <cstring>
 #include <cstdlib>
 
+#include <unordered_map>
+
 #include <dlfcn.h>
 
 #define UNW_LOCAL_ONLY
@@ -34,6 +36,17 @@ using free_t = void (*) (void*);
 
 malloc_t real_malloc = nullptr;
 free_t real_free = nullptr;
+
+
+const size_t BUF_SIZE = 256;
+struct Frame {
+    char name[BUF_SIZE];
+    unw_word_t offset;
+    bool skip;
+};
+
+thread_local std::unordered_map<unw_word_t, Frame> frames;
+thread_local bool in_handler;
 
 void print_caller(size_t size)
 {
@@ -48,22 +61,28 @@ void print_caller(size_t size)
         return;
     }
 
-    size_t BUF_SIZE = 256;
-    char name[BUF_SIZE];
-    unw_word_t offset;
-    unw_word_t ip;
-
-    printf("-----\n");
     while (unw_step(&cursor) > 0)
     {
-        name[0] = '\0';
-        unw_get_proc_name(&cursor, name, BUF_SIZE, &offset);
-        if (name[0] != '_' || name[1] != 'Z' ||
-            (strcmp(name, "_Znwm") && // operator new
-            strcmp(name, "_Znam")))   // operator new[]
-        {
-            unw_get_reg(&cursor, UNW_REG_IP, &ip);
-            printf("%s+0x%lx@0x%lx %ld\n", name, offset, ip, size);
+        unw_word_t ip;
+        unw_get_reg(&cursor, UNW_REG_IP, &ip);
+
+        auto it = frames.find(ip);
+        if (it == frames.end()) {
+
+            Frame frame;
+            frame.name[0] = '\0';
+            unw_get_proc_name(&cursor, frame.name, BUF_SIZE, &frame.offset);
+            // skip operator new (_Znwm) and operator new[] (_Znam)
+            frame.skip = frame.name[0] == '_' && frame.name[1] == 'Z' && frame.name[2] == 'n'
+                        && frame.name[4] == 'm' && frame.name[5] == '\0'
+                        && (frame.name[3] == 'w' || frame.name[3] == 'a');
+
+            it = frames.insert(it, std::make_pair(ip, frame));
+        }
+
+        const Frame& frame = it->second;
+        if (!frame.skip) {
+            printf("%s+0x%lx@0x%lx %ld\n", frame.name, frame.offset, ip, size);
             break;
         }
     }
@@ -84,7 +103,11 @@ void* malloc(size_t size)
     }
     assert(real_malloc);
     void* ret = real_malloc(size);
-    print_caller(size);
+    if (!in_handler) {
+        in_handler = true;
+        print_caller(size);
+        in_handler = false;
+    }
     return ret;
 }
 
@@ -97,8 +120,9 @@ void free(void* ptr)
             exit(1);
         }
     }
-    assert(real_free);
     real_free(ptr);
+
+    // TODO: actually handle this
 }
 
 }
