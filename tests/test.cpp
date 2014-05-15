@@ -13,6 +13,23 @@ struct Foo {
     int* i;
 };
 
+void asdf()
+{
+    int* i = new int;
+    printf("i in asdf: %p\n", i);
+    delete i;
+}
+
+void bar()
+{
+    asdf();
+}
+
+void laaa()
+{
+    bar();
+}
+
 static Foo foo;
 
 int main()
@@ -46,6 +63,11 @@ int main()
     posix_memalign(&buf, 16, 64);
     printf("posix_memalign: %p\n", buf);
     free(buf);
+
+    for (int i = 0; i < 10; ++i) {
+        laaa();
+    }
+    laaa();
 
     return 0;
 }
