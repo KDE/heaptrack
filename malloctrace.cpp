@@ -34,9 +34,11 @@ namespace {
 
 using malloc_t = void* (*) (size_t);
 using free_t = void (*) (void*);
+using realloc_t = void* (*) (void*, size_t);
 
 malloc_t real_malloc = nullptr;
 free_t real_free = nullptr;
+realloc_t real_realloc = nullptr;
 
 struct IPCacheEntry
 {
@@ -151,15 +153,28 @@ void init()
 
     real_malloc = findReal<malloc_t>("malloc");
     real_free = findReal<free_t>("free");
+    real_realloc = findReal<realloc_t>("realloc");
 
     in_handler = false;
+}
+
+void handleMalloc(void* ptr, size_t size)
+{
+    printf("+%ld:%p ", size, ptr);
+    print_caller();
+    printf("\n");
+}
+
+void handleFree(void* ptr)
+{
+    printf("-%p\n", ptr);
 }
 
 }
 
 extern "C" {
 
-/// TODO: realloc, calloc, memalign, ...
+/// TODO: calloc, memalign, ...
 
 void* malloc(size_t size)
 {
@@ -171,9 +186,7 @@ void* malloc(size_t size)
 
     if (!in_handler) {
         in_handler = true;
-        printf("+%ld:%p ", size, ret);
-        print_caller();
-        printf("\n");
+        handleMalloc(ret, size);
         in_handler = false;
     }
 
@@ -190,10 +203,27 @@ void free(void* ptr)
 
     if (!in_handler) {
         in_handler = true;
-        printf("-%p\n", ptr);
+        handleFree(ptr);
         in_handler = false;
     }
-    // TODO: actually handle this
+}
+
+void* realloc(void* ptr, size_t size)
+{
+    if (!real_realloc) {
+        init();
+    }
+
+    void* ret = real_realloc(ptr, size);
+
+    if (!in_handler) {
+        in_handler = true;
+        handleFree(ptr);
+        handleMalloc(ret, size);
+        in_handler = false;
+    }
+
+    return ret;
 }
 
 }
