@@ -89,9 +89,11 @@ void print_caller()
     unw_cursor_t cursor;
     unw_init_local (&cursor, &uc);
 
-    // skip malloc
-    if (unw_step(&cursor) <= 0) {
-        return;
+    // skip handleMalloc & malloc
+    for (int i = 0; i < 2; ++i) {
+        if (unw_step(&cursor) <= 0) {
+            return;
+        }
     }
 
     auto& ipCache = threadData.ipCache;
