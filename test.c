@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 int main()
 {
@@ -11,6 +12,7 @@ int main()
         malloc(rand() % 1000);
         usleep(100);
     }
+    printf("malloc: %p\n", p);
     free(p);
     return 0;
 }

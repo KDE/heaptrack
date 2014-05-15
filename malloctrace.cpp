@@ -24,8 +24,10 @@
 
 #include <unordered_map>
 #include <atomic>
+#include <string>
 
 #include <dlfcn.h>
+#include <unistd.h>
 
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
@@ -55,31 +57,50 @@ struct IPCacheEntry
     bool stop;
 };
 
+std::atomic<size_t> next_cache_id;
+std::atomic<size_t> next_thread_id;
+
 // must be kept separately from ThreadData to ensure it stays valid
 // even until after ThreadData is destroyed
 thread_local bool in_handler = false;
 
+std::string env(const char* variable)
+{
+    const char* value = getenv(variable);
+    return value ? std::string(value) : std::string();
+}
+
+//TODO: per-thread output
 struct ThreadData
 {
     ThreadData()
+        : thread_id(next_thread_id++)
+        , out(nullptr)
     {
         bool wasInHandler = in_handler;
         in_handler = true;
         ipCache.reserve(1024);
+        std::string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT") + std::to_string(getpid()) + '.' + std::to_string(thread_id);
+        out = fopen(outputFileName.c_str(), "wa");
+        if (!out) {
+            fprintf(stderr, "Failed to open output file: %s\n", outputFileName.c_str());
+            exit(1);
+        }
         in_handler = wasInHandler;
     }
 
     ~ThreadData()
     {
         in_handler = true;
+        fclose(out);
     }
 
     std::unordered_map<unw_word_t, IPCacheEntry> ipCache;
+    size_t thread_id;
+    FILE* out;
 };
 
 thread_local ThreadData threadData;
-
-std::atomic<size_t> next_id;
 
 void print_caller()
 {
@@ -117,13 +138,13 @@ void print_caller()
                         && name[4] == 'm' && name[5] == '\0'
                         && (name[3] == 'w' || name[3] == 'a');
             const bool stop = !skip && (!strcmp(name, "main") || !strcmp(name, "_GLOBAL__sub_I_main"));
-            const size_t id = next_id++;
+            const size_t id = next_cache_id++;
 
             // and store it in the cache
-            ipCache.insert(it, std::make_pair(ip, IPCacheEntry{next_id, skip, stop}));
+            ipCache.insert(it, std::make_pair(ip, IPCacheEntry{id, skip, stop}));
 
             if (!skip) {
-                printf("%lu=%lx@%s+0x%lx;", id, ip, name, offset);
+                fprintf(threadData.out, "%lu=%lx@%s+0x%lx;", id, ip, name, offset);
             }
             if (stop) {
                 break;
@@ -133,7 +154,7 @@ void print_caller()
 
         const auto& frame = it->second;
         if (!frame.skip) {
-            printf("%lu;", frame.id);
+            fprintf(threadData.out, "%lu;", frame.id);
         }
         if (frame.stop) {
             break;
@@ -197,14 +218,14 @@ void init()
 
 void handleMalloc(void* ptr, size_t size)
 {
-    printf("+%ld:%p ", size, ptr);
+    fprintf(threadData.out, "+%ld:%p ", size, ptr);
     print_caller();
-    printf("\n");
+    fprintf(threadData.out,"\n");
 }
 
 void handleFree(void* ptr)
 {
-    printf("-%p\n", ptr);
+    fprintf(threadData.out, "-%p\n", ptr);
 }
 
 }
