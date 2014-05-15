@@ -192,6 +192,10 @@ unsigned int print_caller()
         }
     }
 
+    if (tree.depth == 1) {
+        return tree.data[0];
+    }
+
     auto& treeCache = threadData.treeCache;
     auto it = treeCache.find(tree);
     if (it == treeCache.end()) {
