@@ -36,11 +36,17 @@ using malloc_t = void* (*) (size_t);
 using free_t = void (*) (void*);
 using realloc_t = void* (*) (void*, size_t);
 using calloc_t = void* (*) (size_t, size_t);
+using posix_memalign_t = int (*) (void **, size_t, size_t);
+using valloc_t = void* (*) (size_t);
+using aligned_alloc_t = void* (*) (size_t, size_t);
 
 malloc_t real_malloc = nullptr;
 free_t real_free = nullptr;
 realloc_t real_realloc = nullptr;
 calloc_t real_calloc = nullptr;
+posix_memalign_t real_posix_memalign = nullptr;
+valloc_t real_valloc = nullptr;
+aligned_alloc_t real_aligned_alloc = nullptr;
 
 struct IPCacheEntry
 {
@@ -180,6 +186,9 @@ void init()
     real_malloc = findReal<malloc_t>("malloc");
     real_free = findReal<free_t>("free");
     real_realloc = findReal<realloc_t>("realloc");
+    real_posix_memalign = findReal<posix_memalign_t>("posix_memalign");
+    real_valloc = findReal<valloc_t>("valloc");
+    real_aligned_alloc = findReal<aligned_alloc_t>("aligned_alloc");
 
     in_handler = false;
 }
@@ -200,7 +209,7 @@ void handleFree(void* ptr)
 
 extern "C" {
 
-/// TODO: memalign, ...
+/// TODO: memalign, pvalloc, ...?
 
 void* malloc(size_t size)
 {
@@ -263,6 +272,57 @@ void* calloc(size_t num, size_t size)
     if (!in_handler) {
         in_handler = true;
         handleMalloc(ret, num*size);
+        in_handler = false;
+    }
+
+    return ret;
+}
+
+int posix_memalign(void **memptr, size_t alignment, size_t size)
+{
+    if (!real_posix_memalign) {
+        init();
+    }
+
+    int ret = real_posix_memalign(memptr, alignment, size);
+
+    if (!in_handler) {
+        in_handler = true;
+        handleMalloc(*memptr, size);
+        in_handler = false;
+    }
+
+    return ret;
+}
+
+void* aligned_alloc(size_t alignment, size_t size)
+{
+    if (!real_aligned_alloc) {
+        init();
+    }
+
+    void* ret = real_aligned_alloc(alignment, size);
+
+    if (!in_handler) {
+        in_handler = true;
+        handleMalloc(ret, size);
+        in_handler = false;
+    }
+
+    return ret;
+}
+
+void* valloc(size_t size)
+{
+    if (!real_valloc) {
+        init();
+    }
+
+    void* ret = real_valloc(size);
+
+    if (!in_handler) {
+        in_handler = true;
+        handleMalloc(ret, size);
         in_handler = false;
     }
 

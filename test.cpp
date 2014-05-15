@@ -35,5 +35,17 @@ int main()
     printf("calloc: %p\n", buf);
     free(buf);
 
+    buf = aligned_alloc(16, 160);
+    printf("aligned_alloc: %p\n", buf);
+    free(buf);
+
+    buf = valloc(32);
+    printf("valloc: %p\n", buf);
+    free(buf);
+
+    posix_memalign(&buf, 16, 64);
+    printf("posix_memalign: %p\n", buf);
+    free(buf);
+
     return 0;
 }
