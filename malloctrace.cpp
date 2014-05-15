@@ -23,6 +23,7 @@
 #include <cstdlib>
 
 #include <dlfcn.h>
+
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
 
@@ -34,29 +35,35 @@ using free_t = void (*) (void*);
 malloc_t real_malloc = nullptr;
 free_t real_free = nullptr;
 
-void show_backtrace()
+void print_caller(size_t size)
 {
-    const size_t BUFSIZE = 256;
-    char name[BUFSIZE];
-    unw_cursor_t cursor; unw_context_t uc;
-    unw_word_t ip, sp, offp;
-
+    unw_context_t uc;
     unw_getcontext (&uc);
+
+    unw_cursor_t cursor;
     unw_init_local (&cursor, &uc);
 
+    // skip malloc
+    if (unw_step(&cursor) <= 0) {
+        return;
+    }
+
+    size_t BUF_SIZE = 256;
+    char name[BUF_SIZE];
+    unw_word_t offset;
+    unw_word_t ip;
+
+    printf("-----\n");
     while (unw_step(&cursor) > 0)
     {
         name[0] = '\0';
-        unw_get_proc_name(&cursor, name, BUFSIZE, &offp);
-        unw_get_reg(&cursor, UNW_REG_IP, &ip);
-        unw_get_reg(&cursor, UNW_REG_SP, &sp);
-
-        if (name[0] == '\0') {
-            strcpy(name, "??");
-        }
-
-        printf("%s ip = %lx, sp = %lx\n", name, (long) ip, (long) sp);
-        if (!strcmp(name, "main")) {
+        unw_get_proc_name(&cursor, name, BUF_SIZE, &offset);
+        if (name[0] != '_' || name[1] != 'Z' ||
+            (strcmp(name, "_Znwm") && // operator new
+            strcmp(name, "_Znam")))   // operator new[]
+        {
+            unw_get_reg(&cursor, UNW_REG_IP, &ip);
+            printf("%s+0x%lx@0x%lx %ld\n", name, offset, ip, size);
             break;
         }
     }
@@ -77,7 +84,7 @@ void* malloc(size_t size)
     }
     assert(real_malloc);
     void* ret = real_malloc(size);
-    show_backtrace();
+    print_caller(size);
     return ret;
 }
 
