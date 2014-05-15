@@ -38,14 +38,37 @@ using free_t = void (*) (void*);
 malloc_t real_malloc = nullptr;
 free_t real_free = nullptr;
 
-struct IPCacheEntry {
+struct IPCacheEntry
+{
     size_t id;
     bool skip;
     bool stop;
 };
 
-thread_local std::unordered_map<unw_word_t, IPCacheEntry> ipCache;
+// must be kept separately from ThreadData to ensure it stays valid
+// even until after ThreadData is destroyed
 thread_local bool in_handler = false;
+
+struct ThreadData
+{
+    ThreadData()
+    {
+        bool wasInHandler = in_handler;
+        in_handler = true;
+        ipCache.reserve(1024);
+        in_handler = wasInHandler;
+    }
+
+    ~ThreadData()
+    {
+        in_handler = true;
+    }
+
+    std::unordered_map<unw_word_t, IPCacheEntry> ipCache;
+};
+
+thread_local ThreadData threadData;
+
 std::atomic<size_t> next_id;
 
 void print_caller()
@@ -60,6 +83,8 @@ void print_caller()
     if (unw_step(&cursor) <= 0) {
         return;
     }
+
+    auto& ipCache = threadData.ipCache;
 
     while (unw_step(&cursor) > 0)
     {
@@ -127,8 +152,6 @@ void init()
     real_malloc = findReal<malloc_t>("malloc");
     real_free = findReal<free_t>("free");
 
-    ipCache.reserve(1024);
-
     in_handler = false;
 }
 
@@ -148,7 +171,7 @@ void* malloc(size_t size)
 
     if (!in_handler) {
         in_handler = true;
-        printf("+%ld ", size);
+        printf("+%ld:%p ", size, ret);
         print_caller();
         printf("\n");
         in_handler = false;
@@ -165,6 +188,11 @@ void free(void* ptr)
 
     real_free(ptr);
 
+    if (!in_handler) {
+        in_handler = true;
+        printf("-%p\n", ptr);
+        in_handler = false;
+    }
     // TODO: actually handle this
 }
 
