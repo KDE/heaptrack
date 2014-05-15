@@ -23,6 +23,7 @@
 #include <cstdlib>
 
 #include <unordered_map>
+#include <atomic>
 
 #include <dlfcn.h>
 
@@ -38,13 +39,16 @@ malloc_t real_malloc = nullptr;
 free_t real_free = nullptr;
 
 struct IPCacheEntry {
+    size_t id;
     bool skip;
+    bool stop;
 };
 
 thread_local std::unordered_map<unw_word_t, IPCacheEntry> ipCache;
-thread_local bool in_handler;
+thread_local bool in_handler = false;
+std::atomic<size_t> next_id;
 
-void print_caller(size_t size)
+void print_caller()
 {
     unw_context_t uc;
     unw_getcontext (&uc);
@@ -75,18 +79,26 @@ void print_caller(size_t size)
             const bool skip = name[0] == '_' && name[1] == 'Z' && name[2] == 'n'
                         && name[4] == 'm' && name[5] == '\0'
                         && (name[3] == 'w' || name[3] == 'a');
+            const bool stop = !skip && (!strcmp(name, "main") || !strcmp(name, "_GLOBAL__sub_I_main"));
+            const size_t id = next_id++;
 
             // and store it in the cache
-            it = ipCache.insert(it, std::make_pair(ip, IPCacheEntry{skip}));
+            ipCache.insert(it, std::make_pair(ip, IPCacheEntry{next_id, skip, stop}));
 
             if (!skip) {
-                printf("=%lx %s+0x%lx\n", ip, name, offset);
+                printf("%lu=%lx@%s+0x%lx;", id, ip, name, offset);
             }
+            if (stop) {
+                break;
+            }
+            continue;
         }
 
         const auto& frame = it->second;
         if (!frame.skip) {
-            printf("+%lx %ld\n", ip, size);
+            printf("%lu;", frame.id);
+        }
+        if (frame.stop) {
             break;
         }
     }
@@ -136,7 +148,9 @@ void* malloc(size_t size)
 
     if (!in_handler) {
         in_handler = true;
-        print_caller(size);
+        printf("+%ld ", size);
+        print_caller();
+        printf("\n");
         in_handler = false;
     }
 
