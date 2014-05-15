@@ -34,23 +34,6 @@ using free_t = void (*) (void*);
 malloc_t real_malloc = nullptr;
 free_t real_free = nullptr;
 
-struct InitializeMallocTrace
-{
-    InitializeMallocTrace()
-    {
-        real_malloc = reinterpret_cast<malloc_t>(dlsym(RTLD_NEXT, "malloc"));
-        real_free = reinterpret_cast<free_t>(dlsym(RTLD_NEXT, "free"));
-    }
-
-    ~InitializeMallocTrace()
-    {
-        real_malloc = 0;
-        real_free = nullptr;
-    }
-};
-
-static InitializeMallocTrace initializeMallocTrace;
-
 void show_backtrace()
 {
     const size_t BUFSIZE = 256;
@@ -85,6 +68,13 @@ extern "C" {
 
 void* malloc(size_t size)
 {
+    if (!real_malloc) {
+        real_malloc = reinterpret_cast<malloc_t>(dlsym(RTLD_NEXT, "malloc"));
+        if (!real_malloc) {
+            fprintf(stderr, "could not find original malloc\n");
+            exit(1);
+        }
+    }
     assert(real_malloc);
     void* ret = real_malloc(size);
     show_backtrace();
@@ -93,6 +83,13 @@ void* malloc(size_t size)
 
 void free(void* ptr)
 {
+    if (!real_free) {
+        real_free = reinterpret_cast<free_t>(dlsym(RTLD_NEXT, "free"));
+        if (!real_free) {
+            fprintf(stderr, "could not find original free\n");
+            exit(1);
+        }
+    }
     assert(real_free);
     real_free(ptr);
 }
