@@ -37,15 +37,11 @@ using free_t = void (*) (void*);
 malloc_t real_malloc = nullptr;
 free_t real_free = nullptr;
 
-
-const size_t BUF_SIZE = 256;
-struct Frame {
-    char name[BUF_SIZE];
-    unw_word_t offset;
+struct IPCacheEntry {
     bool skip;
 };
 
-thread_local std::unordered_map<unw_word_t, Frame> frames;
+thread_local std::unordered_map<unw_word_t, IPCacheEntry> ipCache;
 thread_local bool in_handler;
 
 void print_caller(size_t size)
@@ -66,60 +62,93 @@ void print_caller(size_t size)
         unw_word_t ip;
         unw_get_reg(&cursor, UNW_REG_IP, &ip);
 
-        auto it = frames.find(ip);
-        if (it == frames.end()) {
-
-            Frame frame;
-            frame.name[0] = '\0';
-            unw_get_proc_name(&cursor, frame.name, BUF_SIZE, &frame.offset);
+        // check cache for known ip's
+        auto it = ipCache.find(ip);
+        if (it == ipCache.end()) {
+            // not cached yet, get data
+            const size_t BUF_SIZE = 256;
+            char name[BUF_SIZE];
+            name[0] = '\0';
+            unw_word_t offset;
+            unw_get_proc_name(&cursor, name, BUF_SIZE, &offset);
             // skip operator new (_Znwm) and operator new[] (_Znam)
-            frame.skip = frame.name[0] == '_' && frame.name[1] == 'Z' && frame.name[2] == 'n'
-                        && frame.name[4] == 'm' && frame.name[5] == '\0'
-                        && (frame.name[3] == 'w' || frame.name[3] == 'a');
+            const bool skip = name[0] == '_' && name[1] == 'Z' && name[2] == 'n'
+                        && name[4] == 'm' && name[5] == '\0'
+                        && (name[3] == 'w' || name[3] == 'a');
 
-            it = frames.insert(it, std::make_pair(ip, frame));
+            // and store it in the cache
+            it = ipCache.insert(it, std::make_pair(ip, IPCacheEntry{skip}));
+
+            if (!skip) {
+                printf("=%lx %s+0x%lx\n", ip, name, offset);
+            }
         }
 
-        const Frame& frame = it->second;
+        const auto& frame = it->second;
         if (!frame.skip) {
-            printf("%s+0x%lx@0x%lx %ld\n", frame.name, frame.offset, ip, size);
+            printf("+%lx %ld\n", ip, size);
             break;
         }
     }
+}
+
+template<typename T>
+T findReal(const char* name)
+{
+    auto ret = dlsym(RTLD_NEXT, name);
+    if (!ret) {
+        fprintf(stderr, "could not find original function %s\n", name);
+        exit(1);
+    }
+    return reinterpret_cast<T>(ret);
+}
+
+void init()
+{
+    if (in_handler) {
+        fprintf(stderr, "initialization recursion detected\n");
+        exit(1);
+    }
+
+    in_handler = true;
+
+    real_malloc = findReal<malloc_t>("malloc");
+    real_free = findReal<free_t>("free");
+
+    ipCache.reserve(1024);
+
+    in_handler = false;
 }
 
 }
 
 extern "C" {
 
+/// TODO: realloc, calloc, memalign, ...
+
 void* malloc(size_t size)
 {
     if (!real_malloc) {
-        real_malloc = reinterpret_cast<malloc_t>(dlsym(RTLD_NEXT, "malloc"));
-        if (!real_malloc) {
-            fprintf(stderr, "could not find original malloc\n");
-            exit(1);
-        }
+        init();
     }
-    assert(real_malloc);
+
     void* ret = real_malloc(size);
+
     if (!in_handler) {
         in_handler = true;
         print_caller(size);
         in_handler = false;
     }
+
     return ret;
 }
 
 void free(void* ptr)
 {
     if (!real_free) {
-        real_free = reinterpret_cast<free_t>(dlsym(RTLD_NEXT, "free"));
-        if (!real_free) {
-            fprintf(stderr, "could not find original free\n");
-            exit(1);
-        }
+        init();
     }
+
     real_free(ptr);
 
     // TODO: actually handle this
