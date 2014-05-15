@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [[ -z "$2" ]]; then
+    echo "$0 INTERVAL DEBUGEE ARGS"
+    exit 1
+fi
+
 interval=$1
 shift 1
 
