@@ -32,6 +32,8 @@
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
 
+using namespace std;
+
 namespace {
 
 using malloc_t = void* (*) (size_t);
@@ -57,17 +59,17 @@ struct IPCacheEntry
     bool stop;
 };
 
-std::atomic<size_t> next_cache_id;
-std::atomic<size_t> next_thread_id;
+atomic<size_t> next_cache_id;
+atomic<size_t> next_thread_id;
 
 // must be kept separately from ThreadData to ensure it stays valid
 // even until after ThreadData is destroyed
 thread_local bool in_handler = false;
 
-std::string env(const char* variable)
+string env(const char* variable)
 {
     const char* value = getenv(variable);
-    return value ? std::string(value) : std::string();
+    return value ? string(value) : string();
 }
 
 //TODO: per-thread output
@@ -80,7 +82,7 @@ struct ThreadData
         bool wasInHandler = in_handler;
         in_handler = true;
         ipCache.reserve(1024);
-        std::string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT") + std::to_string(getpid()) + '.' + std::to_string(thread_id);
+        string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT") + to_string(getpid()) + '.' + to_string(thread_id);
         out = fopen(outputFileName.c_str(), "wa");
         if (!out) {
             fprintf(stderr, "Failed to open output file: %s\n", outputFileName.c_str());
@@ -95,7 +97,7 @@ struct ThreadData
         fclose(out);
     }
 
-    std::unordered_map<unw_word_t, IPCacheEntry> ipCache;
+    unordered_map<unw_word_t, IPCacheEntry> ipCache;
     size_t thread_id;
     FILE* out;
 };
@@ -141,7 +143,7 @@ void print_caller()
             const size_t id = next_cache_id++;
 
             // and store it in the cache
-            ipCache.insert(it, std::make_pair(ip, IPCacheEntry{id, skip, stop}));
+            ipCache.insert(it, make_pair(ip, IPCacheEntry{id, skip, stop}));
 
             if (!skip) {
                 fprintf(threadData.out, "%lu=%lx@%s+0x%lx;", id, ip, name, offset);
