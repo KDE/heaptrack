@@ -13,5 +13,6 @@ add_library(malloctrace SHARED malloctrace.cpp)
 target_link_libraries(malloctrace -ldl -lunwind -lunwind-x86_64)
 
 add_executable(test_c test.c)
+add_executable(test_cpp test.cpp)
 
 install(TARGETS mallocinfo RUNTIME DESTINATION bin)
