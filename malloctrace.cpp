@@ -25,6 +25,9 @@
 #include <unordered_map>
 #include <atomic>
 #include <string>
+#include <vector>
+
+#include <boost/functional/hash.hpp>
 
 #include <dlfcn.h>
 #include <unistd.h>
@@ -72,7 +75,32 @@ string env(const char* variable)
     return value ? string(value) : string();
 }
 
-//TODO: per-thread output
+struct Tree
+{
+    static const size_t MAX_DEPTH = 64;
+    size_t data[MAX_DEPTH];
+    size_t depth;
+
+    bool operator==(const Tree& o) const
+    {
+        return depth == o.depth && !memcmp(data, o.data, sizeof(size_t) * depth);
+    }
+};
+
+struct TreeHasher
+{
+    size_t operator()(const Tree& tree) const
+    {
+        size_t seed = 0;
+        hash<size_t> nodeHash;
+        for (size_t i = 0; i < tree.depth; ++i) {
+            boost::hash_combine(seed, nodeHash(tree.data[i]));
+        }
+        return seed;
+    }
+};
+
+//TODO: merge per-thread output into single file
 struct ThreadData
 {
     ThreadData()
@@ -98,13 +126,14 @@ struct ThreadData
     }
 
     unordered_map<unw_word_t, IPCacheEntry> ipCache;
+    unordered_map<Tree, size_t, TreeHasher> treeCache;
     size_t thread_id;
     FILE* out;
 };
 
 thread_local ThreadData threadData;
 
-void print_caller()
+size_t print_caller()
 {
     unw_context_t uc;
     unw_getcontext (&uc);
@@ -115,14 +144,15 @@ void print_caller()
     // skip handleMalloc & malloc
     for (int i = 0; i < 2; ++i) {
         if (unw_step(&cursor) <= 0) {
-            return;
+            return 0;
         }
     }
 
     auto& ipCache = threadData.ipCache;
 
-    while (unw_step(&cursor) > 0)
-    {
+    Tree tree;
+    tree.depth = 0;
+    while (unw_step(&cursor) > 0 && tree.depth < Tree::MAX_DEPTH) {
         unw_word_t ip;
         unw_get_reg(&cursor, UNW_REG_IP, &ip);
 
@@ -145,25 +175,35 @@ void print_caller()
             const size_t id = next_cache_id++;
 
             // and store it in the cache
-            ipCache.insert(it, make_pair(ip, IPCacheEntry{id, skip, stop}));
+            it = ipCache.insert(it, make_pair(ip, IPCacheEntry{id, skip, stop}));
 
             if (!skip) {
-                fprintf(threadData.out, "%lu=%lx@%s+0x%lx;", id, ip, name, offset);
+                fprintf(threadData.out, "%lu=%lx@%s+0x%lx\n", id, ip, name, offset);
             }
-            if (stop) {
-                break;
-            }
-            continue;
         }
 
         const auto& frame = it->second;
         if (!frame.skip) {
-            fprintf(threadData.out, "%lu;", frame.id);
+            tree.data[tree.depth++] = frame.id;
         }
         if (frame.stop) {
             break;
         }
     }
+
+    auto& treeCache = threadData.treeCache;
+    auto it = treeCache.find(tree);
+    if (it == treeCache.end()) {
+        it = treeCache.insert(it, make_pair(tree, next_cache_id++));
+
+        fprintf(threadData.out, "%lu=", it->second);
+        for (size_t i = 0; i < tree.depth; ++i) {
+            fprintf(threadData.out, "%lu;", tree.data[i]);
+        }
+        fputs("\n", threadData.out);
+    }
+
+    return it->second;
 }
 
 template<typename T>
@@ -222,9 +262,8 @@ void init()
 
 void handleMalloc(void* ptr, size_t size)
 {
-    fprintf(threadData.out, "+%ld:%p ", size, ptr);
-    print_caller();
-    fprintf(threadData.out,"\n");
+    const size_t treeId = print_caller();
+    fprintf(threadData.out, "+%lu:%p %lu\n", size, ptr, treeId);
 }
 
 void handleFree(void* ptr)
