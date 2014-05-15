@@ -35,10 +35,12 @@ namespace {
 using malloc_t = void* (*) (size_t);
 using free_t = void (*) (void*);
 using realloc_t = void* (*) (void*, size_t);
+using calloc_t = void* (*) (size_t, size_t);
 
 malloc_t real_malloc = nullptr;
 free_t real_free = nullptr;
 realloc_t real_realloc = nullptr;
+calloc_t real_calloc = nullptr;
 
 struct IPCacheEntry
 {
@@ -142,6 +144,28 @@ T findReal(const char* name)
     return reinterpret_cast<T>(ret);
 }
 
+/**
+ * Dummy implementation, since the call to dlsym from findReal triggers a call to calloc.
+ *
+ * This is only called at startup and will eventually be replaced by the "proper" calloc implementation.
+ */
+void* dummy_calloc(size_t num, size_t size)
+{
+    const size_t MAX_SIZE = 1024;
+    static char* buf[MAX_SIZE];
+    static size_t offset = 0;
+    if (!offset) {
+        memset(buf, 0, MAX_SIZE);
+    }
+    size_t oldOffset = offset;
+    offset += num * size;
+    if (offset >= MAX_SIZE) {
+        fprintf(stderr, "failed to initialize, dummy calloc buf size exhausted: %lu requested, %lu available\n", offset, MAX_SIZE);
+        exit(1);
+    }
+    return buf + oldOffset;
+}
+
 void init()
 {
     if (in_handler) {
@@ -151,6 +175,8 @@ void init()
 
     in_handler = true;
 
+    real_calloc = &dummy_calloc;
+    real_calloc = findReal<calloc_t>("calloc");
     real_malloc = findReal<malloc_t>("malloc");
     real_free = findReal<free_t>("free");
     real_realloc = findReal<realloc_t>("realloc");
@@ -174,7 +200,7 @@ void handleFree(void* ptr)
 
 extern "C" {
 
-/// TODO: calloc, memalign, ...
+/// TODO: memalign, ...
 
 void* malloc(size_t size)
 {
@@ -220,6 +246,23 @@ void* realloc(void* ptr, size_t size)
         in_handler = true;
         handleFree(ptr);
         handleMalloc(ret, size);
+        in_handler = false;
+    }
+
+    return ret;
+}
+
+void* calloc(size_t num, size_t size)
+{
+    if (!real_calloc) {
+        init();
+    }
+
+    void* ret = real_calloc(num, size);
+
+    if (!in_handler) {
+        in_handler = true;
+        handleMalloc(ret, num*size);
         in_handler = false;
     }
 
