@@ -57,13 +57,13 @@ aligned_alloc_t real_aligned_alloc = nullptr;
 
 struct IPCacheEntry
 {
-    size_t id;
+    unsigned int id;
     bool skip;
     bool stop;
 };
 
-atomic<size_t> next_cache_id;
-atomic<size_t> next_thread_id;
+atomic<unsigned int> next_cache_id;
+atomic<unsigned int> next_thread_id;
 
 // must be kept separately from ThreadData to ensure it stays valid
 // even until after ThreadData is destroyed
@@ -77,13 +77,13 @@ string env(const char* variable)
 
 struct Tree
 {
-    static const size_t MAX_DEPTH = 64;
-    size_t data[MAX_DEPTH];
-    size_t depth;
+    static const unsigned int MAX_DEPTH = 64;
+    unsigned int data[MAX_DEPTH];
+    unsigned int depth;
 
     bool operator==(const Tree& o) const
     {
-        return depth == o.depth && !memcmp(data, o.data, sizeof(size_t) * depth);
+        return depth == o.depth && !memcmp(data, o.data, sizeof(unsigned int) * depth);
     }
 };
 
@@ -92,8 +92,8 @@ struct TreeHasher
     size_t operator()(const Tree& tree) const
     {
         size_t seed = 0;
-        hash<size_t> nodeHash;
-        for (size_t i = 0; i < tree.depth; ++i) {
+        hash<unsigned int> nodeHash;
+        for (unsigned int i = 0; i < tree.depth; ++i) {
             boost::hash_combine(seed, nodeHash(tree.data[i]));
         }
         return seed;
@@ -109,7 +109,8 @@ struct ThreadData
     {
         bool wasInHandler = in_handler;
         in_handler = true;
-        ipCache.reserve(1024);
+        ipCache.reserve(16384);
+        treeCache.reserve(16384);
         string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT") + to_string(getpid()) + '.' + to_string(thread_id);
         out = fopen(outputFileName.c_str(), "wa");
         if (!out) {
@@ -126,14 +127,14 @@ struct ThreadData
     }
 
     unordered_map<unw_word_t, IPCacheEntry> ipCache;
-    unordered_map<Tree, size_t, TreeHasher> treeCache;
-    size_t thread_id;
+    unordered_map<Tree, unsigned int, TreeHasher> treeCache;
+    unsigned int thread_id;
     FILE* out;
 };
 
 thread_local ThreadData threadData;
 
-size_t print_caller()
+unsigned int print_caller()
 {
     unw_context_t uc;
     unw_getcontext (&uc);
@@ -172,13 +173,13 @@ size_t print_caller()
             const bool stop = !skip && (!strcmp(name, "main")
                                     || !strcmp(name, "_GLOBAL__sub_I_main")
                                     || !strcmp(name, "_Z41__static_initialization_and_destruction_0ii"));
-            const size_t id = next_cache_id++;
+            const unsigned int id = next_cache_id++;
 
             // and store it in the cache
             it = ipCache.insert(it, make_pair(ip, IPCacheEntry{id, skip, stop}));
 
             if (!skip) {
-                fprintf(threadData.out, "%lu=%lx@%s+0x%lx\n", id, ip, name, offset);
+                fprintf(threadData.out, "%u=%lx@%s+0x%lx\n", id, ip, name, offset);
             }
         }
 
@@ -196,9 +197,9 @@ size_t print_caller()
     if (it == treeCache.end()) {
         it = treeCache.insert(it, make_pair(tree, next_cache_id++));
 
-        fprintf(threadData.out, "%lu=", it->second);
-        for (size_t i = 0; i < tree.depth; ++i) {
-            fprintf(threadData.out, "%lu;", tree.data[i]);
+        fprintf(threadData.out, "%u=", it->second);
+        for (unsigned int i = 0; i < tree.depth; ++i) {
+            fprintf(threadData.out, "%u;", tree.data[i]);
         }
         fputs("\n", threadData.out);
     }
@@ -262,8 +263,8 @@ void init()
 
 void handleMalloc(void* ptr, size_t size)
 {
-    const size_t treeId = print_caller();
-    fprintf(threadData.out, "+%lu:%p %lu\n", size, ptr, treeId);
+    const unsigned int treeId = print_caller();
+    fprintf(threadData.out, "+%lu:%p %u\n", size, ptr, treeId);
 }
 
 void handleFree(void* ptr)
