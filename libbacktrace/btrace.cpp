@@ -68,8 +68,6 @@ struct btrace_module_info
     uint32_t address_size;
     struct backtrace_state *backtrace_state;
     const char *filename;
-    int uuid_len;
-    uint8_t uuid[20];
     int is_exe;
 };
 
@@ -162,10 +160,6 @@ bool module_info_init_state(btrace_module_info *module_info)
     if (!module_info->backtrace_state) {
         module_info->backtrace_state = backtrace_create_state(module_info->filename, 0,
                                                               backtrace_initialize_error_callback, nullptr);
-        if (module_info->backtrace_state) {
-            elf_get_uuid(module_info->backtrace_state, module_info->filename,
-                         module_info->uuid, &module_info->uuid_len);
-        }
     }
 
     return module_info->backtrace_state;
@@ -217,8 +211,6 @@ int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void */*d
     module_info.filename = filename;
     module_info.is_exe = is_exe;
     module_info.backtrace_state = nullptr;
-    module_info.uuid_len = 0;
-    memset(module_info.uuid, 0, sizeof(module_info.uuid));
 
     auto it = std::lower_bound(module_infos.begin(), module_infos.end(), module_info);
     if (it == module_infos.end() || *it != module_info) {
