@@ -15,4 +15,7 @@ target_link_libraries(mallocinfo dumpmallocinfo)
 add_library(malloctrace SHARED malloctrace.cpp)
 target_link_libraries(malloctrace -ldl backtrace)
 
+add_executable(malloctrace_eval malloctrace_main.cpp)
+target_link_libraries(malloctrace_eval backtrace)
+
 install(TARGETS mallocinfo RUNTIME DESTINATION bin)
