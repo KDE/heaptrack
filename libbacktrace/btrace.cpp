@@ -171,19 +171,18 @@ bool module_info_init_state(btrace_module_info *module_info)
     return module_info->backtrace_state;
 }
 
-int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void *data)
+int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void */*data*/)
 {
-    const int PATH_MAX = 1024;
-    char buf[PATH_MAX];
     bool is_exe = false;
     const char *filename = info->dlpi_name;
-    std::vector<btrace_module_info> *new_module_infos = (std::vector<btrace_module_info> *)data;
     std::vector<btrace_module_info>& module_infos = get_module_infos();
 
     // If we don't have a filename and we haven't added our main exe yet, do it.
     if (!filename || !filename[0]) {
-        if (!module_infos.size() && !new_module_infos->size()) {
+        if (!module_infos.size()) {
             is_exe = true;
+            const int PATH_MAX = 1024;
+            char buf[PATH_MAX];
             ssize_t ret =  readlink("/proc/self/exe", buf, sizeof(buf));
             if ((ret > 0) && (ret < (ssize_t)sizeof(buf))) {
                 buf[ret] = 0;
@@ -225,25 +224,17 @@ int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void *dat
     if (it == module_infos.end() || *it != module_info) {
         module_info.filename = strdup(filename);
         if (module_info.filename) {
-            new_module_infos->push_back(module_info);
+            module_infos.insert(it, module_info);
         }
     }
     return 0;
 }
 
-// like btrace_dlopen_notify but must be called while already holding the mutex lock
+// like btrace_dlopen_notify, but must be called while already holding the mutex lock
 void btrace_dlopen_notify_impl()
 {
-    std::vector<btrace_module_info> new_module_infos;
-
-    // Iterator through all the currently loaded modules.
-    dl_iterate_phdr(dlopen_notify_callback, &new_module_infos);
-
-    if (new_module_infos.size()) {
-        std::vector<btrace_module_info>& module_infos = get_module_infos();
-        module_infos.insert(module_infos.end(), new_module_infos.begin(), new_module_infos.end());
-        std::sort(module_infos.begin(), module_infos.end());
-    }
+    // iterate through all currently loaded modules.
+    dl_iterate_phdr(dlopen_notify_callback, nullptr);
 }
 
 }
