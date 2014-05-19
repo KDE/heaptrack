@@ -28,8 +28,10 @@ fi
 pid=$!
 wait $pid
 
-echo "finished application, merging and zipping data files"
-cd $(dirname $output)
-output=$(basename $output)$pid
-tar -cjf "$output.tar.bz2" "$output."[0-9]* && rm "$output."[0-9]*
-du -h "$output.tar.bz2"
+if [[ "$(ls $output$pid* 2> /dev/null)" != "" ]]; then
+    echo "finished application, merging and zipping data files"
+    cd $(dirname $output)
+    output=$(basename $output)$pid
+    tar -cjf "$output.tar.bz2" "$output."[0-9]* && rm "$output."[0-9]*
+    du -h "$output.tar.bz2"
+fi

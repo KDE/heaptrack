@@ -35,6 +35,8 @@
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
 
+#include "libbacktrace/btrace.h"
+
 using namespace std;
 
 namespace {
@@ -46,6 +48,7 @@ using calloc_t = void* (*) (size_t, size_t);
 using posix_memalign_t = int (*) (void **, size_t, size_t);
 using valloc_t = void* (*) (size_t);
 using aligned_alloc_t = void* (*) (size_t, size_t);
+using dlopen_t = void* (*) (const char*, int);
 
 malloc_t real_malloc = nullptr;
 free_t real_free = nullptr;
@@ -54,16 +57,18 @@ calloc_t real_calloc = nullptr;
 posix_memalign_t real_posix_memalign = nullptr;
 valloc_t real_valloc = nullptr;
 aligned_alloc_t real_aligned_alloc = nullptr;
+dlopen_t real_dlopen = nullptr;
 
 struct IPCacheEntry
 {
     unsigned int id;
-    bool skip;
     bool stop;
 };
 
-atomic<unsigned int> next_cache_id;
+atomic<unsigned int> next_ipCache_id;
+atomic<unsigned int> next_traceCache_id;
 atomic<unsigned int> next_thread_id;
+atomic<unsigned int> next_string_id(1);
 
 // must be kept separately from ThreadData to ensure it stays valid
 // even until after ThreadData is destroyed
@@ -75,26 +80,26 @@ string env(const char* variable)
     return value ? string(value) : string();
 }
 
-struct Tree
+struct Trace
 {
     static const unsigned int MAX_DEPTH = 64;
     unsigned int data[MAX_DEPTH];
     unsigned int depth;
 
-    bool operator==(const Tree& o) const
+    bool operator==(const Trace& o) const
     {
         return depth == o.depth && !memcmp(data, o.data, sizeof(unsigned int) * depth);
     }
 };
 
-struct TreeHasher
+struct TraceHasher
 {
-    size_t operator()(const Tree& tree) const
+    size_t operator()(const Trace& trace) const
     {
         size_t seed = 0;
         hash<unsigned int> nodeHash;
-        for (unsigned int i = 0; i < tree.depth; ++i) {
-            boost::hash_combine(seed, nodeHash(tree.data[i]));
+        for (unsigned int i = 0; i < trace.depth; ++i) {
+            boost::hash_combine(seed, nodeHash(trace.data[i]));
         }
         return seed;
     }
@@ -110,7 +115,7 @@ struct ThreadData
         bool wasInHandler = in_handler;
         in_handler = true;
         ipCache.reserve(16384);
-        treeCache.reserve(16384);
+        traceCache.reserve(16384);
         string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT") + to_string(getpid()) + '.' + to_string(thread_id);
         out = fopen(outputFileName.c_str(), "wa");
         if (!out) {
@@ -126,15 +131,35 @@ struct ThreadData
         fclose(out);
     }
 
+    // assumes unique string ptrs as input, i.e. does not compare string data but only string ptrs
+    unsigned int stringId(const char* string)
+    {
+        if (!strcmp(string, "")) {
+            return 0;
+        }
+
+        auto it = stringCache.find(string);
+        if (it != stringCache.end()) {
+            return it->second;
+        }
+
+        auto id = next_string_id++;
+        stringCache.insert(it, make_pair(string, id));
+        fprintf(out, "s%u=%s\n", id, string);
+        return id;
+    }
+
     unordered_map<unw_word_t, IPCacheEntry> ipCache;
-    unordered_map<Tree, unsigned int, TreeHasher> treeCache;
+    unordered_map<Trace, unsigned int, TraceHasher> traceCache;
+    // maps known file names and module names to string ID
+    unordered_map<const char*, unsigned int> stringCache;
     unsigned int thread_id;
     FILE* out;
 };
 
 thread_local ThreadData threadData;
 
-unsigned int print_caller()
+unsigned int print_caller(const int skip = 2)
 {
     unw_context_t uc;
     unw_getcontext (&uc);
@@ -142,8 +167,8 @@ unsigned int print_caller()
     unw_cursor_t cursor;
     unw_init_local (&cursor, &uc);
 
-    // skip handleMalloc & malloc
-    for (int i = 0; i < 2; ++i) {
+    // skip functions we are not interested in
+    for (int i = 0; i < skip; ++i) {
         if (unw_step(&cursor) <= 0) {
             return 0;
         }
@@ -151,9 +176,9 @@ unsigned int print_caller()
 
     auto& ipCache = threadData.ipCache;
 
-    Tree tree;
-    tree.depth = 0;
-    while (unw_step(&cursor) > 0 && tree.depth < Tree::MAX_DEPTH) {
+    Trace trace;
+    trace.depth = 0;
+    while (unw_step(&cursor) > 0 && trace.depth < Trace::MAX_DEPTH) {
         unw_word_t ip;
         unw_get_reg(&cursor, UNW_REG_IP, &ip);
 
@@ -161,50 +186,52 @@ unsigned int print_caller()
         auto it = ipCache.find(ip);
         if (it == ipCache.end()) {
             // not cached yet, get data
-            const size_t BUF_SIZE = 256;
-            char name[BUF_SIZE];
-            name[0] = '\0';
-            unw_word_t offset;
-            unw_get_proc_name(&cursor, name, BUF_SIZE, &offset);
-            // skip operator new (_Znwm) and operator new[] (_Znam)
-            const bool skip = name[0] == '_' && name[1] == 'Z' && name[2] == 'n'
-                        && name[4] == 'm' && name[5] == '\0'
-                        && (name[3] == 'w' || name[3] == 'a');
-            const bool stop = !skip && (!strcmp(name, "main")
-                                    || !strcmp(name, "_GLOBAL__sub_I_main")
-                                    || !strcmp(name, "_Z41__static_initialization_and_destruction_0ii"));
-            const unsigned int id = next_cache_id++;
+            btrace_info info;
+            btrace_resolve_addr(&info, static_cast<uintptr_t>(ip),
+                                BTRACE_RESOLVE_ADDR_DEMANGLE_FUNC | BTRACE_RESOLVE_ADDR_GET_FILENAME);
+
+            const bool stop = !strcmp(info.function, "__libc_start_main")
+                           || !strcmp(info.function, "__static_initialization_and_destruction_0");
+            const unsigned int id = next_ipCache_id++;
 
             // and store it in the cache
-            it = ipCache.insert(it, make_pair(ip, IPCacheEntry{id, skip, stop}));
+            it = ipCache.insert(it, make_pair(ip, IPCacheEntry{id, stop}));
 
-            if (!skip) {
-                fprintf(threadData.out, "%u=%lx@%s+0x%lx\n", id, ip, name, offset);
+            const auto funcId = threadData.stringId(info.demangled_func_buf);
+            const auto moduleId = threadData.stringId(info.module);
+            const auto fileId = threadData.stringId(info.filename);
+
+            fprintf(threadData.out, "%u=%u;%u;", id, funcId, moduleId);
+            if (fileId) {
+                if (info.linenumber > 0) {
+                    fprintf(threadData.out, "%u:%d", fileId, info.linenumber);
+                } else {
+                    fprintf(threadData.out, "%u", fileId);
+                }
             }
+            fputs("\n", threadData.out);
         }
 
         const auto& frame = it->second;
-        if (!frame.skip) {
-            tree.data[tree.depth++] = frame.id;
-        }
+        trace.data[trace.depth++] = frame.id;
         if (frame.stop) {
             break;
         }
     }
 
-    if (tree.depth == 1) {
-        return tree.data[0];
+    if (trace.depth == 1) {
+        return trace.data[0];
     }
 
     // TODO: sub-tree matching
-    auto& treeCache = threadData.treeCache;
-    auto it = treeCache.find(tree);
-    if (it == treeCache.end()) {
-        it = treeCache.insert(it, make_pair(tree, next_cache_id++));
+    auto& traceCache = threadData.traceCache;
+    auto it = traceCache.find(trace);
+    if (it == traceCache.end()) {
+        it = traceCache.insert(it, make_pair(trace, next_traceCache_id++));
 
-        fprintf(threadData.out, "%u=", it->second);
-        for (unsigned int i = 0; i < tree.depth; ++i) {
-            fprintf(threadData.out, "%u;", tree.data[i]);
+        fprintf(threadData.out, "t%u=", it->second);
+        for (unsigned int i = 0; i < trace.depth; ++i) {
+            fprintf(threadData.out, "%u;", trace.data[i]);
         }
         fputs("\n", threadData.out);
     }
@@ -256,6 +283,7 @@ void init()
 
     real_calloc = &dummy_calloc;
     real_calloc = findReal<calloc_t>("calloc");
+    real_dlopen = findReal<dlopen_t>("dlopen");
     real_malloc = findReal<malloc_t>("malloc");
     real_free = findReal<free_t>("free");
     real_realloc = findReal<realloc_t>("realloc");
@@ -263,6 +291,7 @@ void init()
     real_valloc = findReal<valloc_t>("valloc");
     real_aligned_alloc = findReal<aligned_alloc_t>("aligned_alloc");
 
+    btrace_dlopen_notify(nullptr);
     in_handler = false;
 }
 
@@ -395,6 +424,23 @@ void* valloc(size_t size)
     if (!in_handler) {
         in_handler = true;
         handleMalloc(ret, size);
+        in_handler = false;
+    }
+
+    return ret;
+}
+
+void *dlopen(const char *filename, int flag)
+{
+    if (!real_dlopen) {
+        init();
+    }
+
+    void* ret = real_dlopen(filename, flag);
+
+    if (!in_handler) {
+        in_handler = true;
+        btrace_dlopen_notify(filename);
         in_handler = false;
     }
 
