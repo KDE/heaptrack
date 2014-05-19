@@ -117,21 +117,6 @@ std::vector<btrace_module_info> &get_module_infos()
     return s_module_infos;
 }
 
-int btrace_module_search (const void *vkey, const void *ventry)
-{
-    const uintptr_t *key = (const uintptr_t *)vkey;
-    const struct btrace_module_info *entry = (const struct btrace_module_info *) ventry;
-    uintptr_t addr;
-
-    addr = *key;
-    if (addr < entry->base_address) {
-        return -1;
-    } else if (addr >= entry->base_address + entry->address_size) {
-        return 1;
-    }
-    return 0;
-}
-
 void btrace_err_callback(void */*data*/, const char *msg, int errnum)
 {
     if (errnum == -1) {
@@ -280,12 +265,15 @@ bool btrace_resolve_addr(btrace_info *info, uintptr_t addr, ResolveFlags flags)
     info->linenumber = 0;
     info->demangled_func_buf[0] = 0;
 
-    btrace_module_info *module_info = (btrace_module_info *)bsearch(&addr,
-        &module_infos[0], module_infos.size(), sizeof(btrace_module_info), btrace_module_search);
-    if (module_info) {
+    auto module_info = std::lower_bound(module_infos.begin(), module_infos.end(), addr,
+                                        [] (const btrace_module_info& info, const uintptr_t addr) -> bool {
+                                            return info.base_address + info.address_size < addr;
+                                        });
+
+    if (module_info != module_infos.end()) {
         info->module = module_info->filename;
 
-        if (module_info_init_state(module_info)) {
+        if (module_info_init_state(&*module_info)) {
             backtrace_fileline_initialize(module_info->backtrace_state, module_info->base_address,
                                           module_info->is_exe, backtrace_initialize_error_callback, nullptr);
 
