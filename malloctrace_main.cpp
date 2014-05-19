@@ -34,10 +34,9 @@ void printUsage(ostream& out)
 
 struct Module
 {
-    Module(string _fileName, uintptr_t baseAddress, bool isExe)
+    Module(string _fileName, bool isExe)
         : backtraceState(nullptr)
         , fileName(move(_fileName))
-        , baseAddress(baseAddress)
         , isExe(isExe)
     {
         backtraceState = backtrace_create_state(fileName.c_str(), /* we are single threaded, so: not thread safe */ false,
@@ -48,11 +47,11 @@ struct Module
                                                 }, this);
 
         if (backtraceState) {
-            backtrace_fileline_initialize(backtraceState, baseAddress, isExe,
+            backtrace_fileline_initialize(backtraceState, 1, isExe,
                                           [] (void *data, const char *msg, int errnum) {
                                             const Module* module = reinterpret_cast<Module*>(data);
-                                            cerr << "Failed to initialize backtrace fileline for file " << module->fileName
-                                                 << ", base address: " << hex << module->baseAddress << dec << ", exe: " << module->isExe
+                                            cerr << "Failed to initialize backtrace fileline for "
+                                                 << (module->isExe ? "executable" : "library") << module->fileName
                                                  << ": " << msg << " (error code " << errnum << ")" << endl;
                                         }, this);
         }
@@ -75,7 +74,6 @@ struct Module
 
     backtrace_state* backtraceState;
     string fileName;
-    uintptr_t baseAddress;
     bool isExe;
 };
 
