@@ -124,22 +124,20 @@ int btrace_module_search (const void *vkey, const void *ventry)
     uintptr_t addr;
 
     addr = *key;
-    if (addr < entry->base_address)
+    if (addr < entry->base_address) {
         return -1;
-    else if (addr >= entry->base_address + entry->address_size)
+    } else if (addr >= entry->base_address + entry->address_size) {
         return 1;
+    }
     return 0;
 }
 
 void btrace_err_callback(void */*data*/, const char *msg, int errnum)
 {
-    if (errnum == -1)
-    {
+    if (errnum == -1) {
         // Missing dwarf information. This happens when folks haven't compiled with -g or they
         //  stripped the symbols and we couldn't find em.
-    }
-    else
-    {
+    } else {
         const char *errstr = errnum ? strerror(errnum) : "";
         printf("libbacktrace error: %s %s\n", msg, errstr);
         assert(false);
@@ -148,8 +146,7 @@ void btrace_err_callback(void */*data*/, const char *msg, int errnum)
 
 void btrace_syminfo_callback(void *data, uintptr_t addr, const char *symname, uintptr_t symval, uintptr_t /*symsize*/)
 {
-    if (symname)
-    {
+    if (symname) {
         btrace_info *info = (btrace_info *)data;
         info->function = symname;
         info->offset = addr - symval;
@@ -164,8 +161,9 @@ int btrace_pcinfo_callback(void *data, uintptr_t /*addr*/, const char *file, int
     frame->linenumber = line;
 
     // Don't overwrite function string if we got a blank one for some reason.
-    if (func && func[0])
+    if (func && func[0]) {
         frame->function = func;
+    }
     return 0;
 }
 
@@ -176,18 +174,16 @@ void backtrace_initialize_error_callback(void */*data*/, const char */*msg*/, in
 
 bool module_info_init_state(btrace_module_info *module_info)
 {
-    if (!module_info->backtrace_state)
-    {
-        module_info->backtrace_state = backtrace_create_state(
-                    module_info->filename, 0, backtrace_initialize_error_callback, NULL);
-        if (module_info->backtrace_state)
-        {
+    if (!module_info->backtrace_state) {
+        module_info->backtrace_state = backtrace_create_state(module_info->filename, 0,
+                                                              backtrace_initialize_error_callback, nullptr);
+        if (module_info->backtrace_state) {
             elf_get_uuid(module_info->backtrace_state, module_info->filename,
                          module_info->uuid, &module_info->uuid_len);
         }
     }
 
-    return !!module_info->backtrace_state;
+    return module_info->backtrace_state;
 }
 
 int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void *data)
@@ -200,39 +196,33 @@ int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void *dat
     std::vector<btrace_module_info>& module_infos = get_module_infos();
 
     // If we don't have a filename and we haven't added our main exe yet, do it.
-    if (!filename || !filename[0])
-    {
-        if (!module_infos.size() && !new_module_infos->size())
-        {
+    if (!filename || !filename[0]) {
+        if (!module_infos.size() && !new_module_infos->size()) {
             is_exe = true;
             ssize_t ret =  readlink("/proc/self/exe", buf, sizeof(buf));
-            if ((ret > 0) && (ret < (ssize_t)sizeof(buf)))
-            {
+            if ((ret > 0) && (ret < (ssize_t)sizeof(buf))) {
                 buf[ret] = 0;
                 filename = buf;
             }
         }
-        if (!filename || !filename[0])
+        if (!filename || !filename[0]) {
             return 0;
+        }
     }
 
     uintptr_t addr_start = 0;
     uintptr_t addr_end = 0;
 
-    for (int i = 0; i < info->dlpi_phnum; i++)
-    {
-        if (info->dlpi_phdr[i].p_type == PT_LOAD)
-        {
-            if (addr_end == 0)
-            {
+    for (int i = 0; i < info->dlpi_phnum; i++) {
+        if (info->dlpi_phdr[i].p_type == PT_LOAD) {
+            if (addr_end == 0) {
                 addr_start = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr;
                 addr_end = addr_start + info->dlpi_phdr[i].p_memsz;
-            }
-            else
-            {
+            } else {
                 uintptr_t addr = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr + info->dlpi_phdr[i].p_memsz;
-                if (addr > addr_end)
+                if (addr > addr_end) {
                     addr_end = addr;
+                }
             }
         }
     }
@@ -242,16 +232,14 @@ int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void *dat
     module_info.address_size = (uint32_t)(addr_end - addr_start);
     module_info.filename = filename;
     module_info.is_exe = is_exe;
-    module_info.backtrace_state = NULL;
+    module_info.backtrace_state = nullptr;
     module_info.uuid_len = 0;
     memset(module_info.uuid, 0, sizeof(module_info.uuid));
 
     auto it = std::lower_bound(module_infos.begin(), module_infos.end(), module_info);
-    if (it == module_infos.end() || *it != module_info)
-    {
+    if (it == module_infos.end() || *it != module_info) {
         module_info.filename = strdup(filename);
-        if (module_info.filename)
-        {
+        if (module_info.filename) {
             new_module_infos->push_back(module_info);
         }
     }
@@ -266,8 +254,7 @@ void btrace_dlopen_notify_impl()
     // Iterator through all the currently loaded modules.
     dl_iterate_phdr(dlopen_notify_callback, &new_module_infos);
 
-    if (new_module_infos.size())
-    {
+    if (new_module_infos.size()) {
         std::vector<btrace_module_info>& module_infos = get_module_infos();
         module_infos.insert(module_infos.end(), new_module_infos.begin(), new_module_infos.end());
         std::sort(module_infos.begin(), module_infos.end());
@@ -281,72 +268,74 @@ bool btrace_resolve_addr(btrace_info *info, uintptr_t addr, ResolveFlags flags)
     std::lock_guard<std::mutex> lock(get_dlopen_mutex());
     std::vector<btrace_module_info>& module_infos = get_module_infos();
 
-    if (!module_infos.size())
+    if (!module_infos.size()) {
         btrace_dlopen_notify_impl();
+    }
 
     info->addr = addr;
     info->offset = 0;
-    info->module = NULL;
-    info->function = NULL;
-    info->filename = NULL;
+    info->module = nullptr;
+    info->function = nullptr;
+    info->filename = nullptr;
     info->linenumber = 0;
     info->demangled_func_buf[0] = 0;
 
     btrace_module_info *module_info = (btrace_module_info *)bsearch(&addr,
         &module_infos[0], module_infos.size(), sizeof(btrace_module_info), btrace_module_search);
-    if (module_info)
-    {
+    if (module_info) {
         info->module = module_info->filename;
 
-        if (module_info_init_state(module_info))
-        {
+        if (module_info_init_state(module_info)) {
             backtrace_fileline_initialize(module_info->backtrace_state, module_info->base_address,
-                                          module_info->is_exe, backtrace_initialize_error_callback, NULL);
+                                          module_info->is_exe, backtrace_initialize_error_callback, nullptr);
 
             // Get function name and offset.
             backtrace_syminfo(module_info->backtrace_state, addr, btrace_syminfo_callback,
                               btrace_err_callback, info);
 
-            if (flags & GET_FILENAME)
-            {
+            if (flags & GET_FILENAME) {
                 // Get filename and line number (and maybe function).
                 backtrace_pcinfo(module_info->backtrace_state, addr, btrace_pcinfo_callback,
                                  btrace_err_callback, info);
             }
 
-            if ((flags & DEMANGLE_FUNC) && info->function && info->function[0])
-            {
+            if ((flags & DEMANGLE_FUNC) && info->function && info->function[0]) {
                 info->function = btrace_demangle_function(info->function, info->demangled_func_buf, sizeof(info->demangled_func_buf));
             }
         }
 
-        if (!info->offset)
+        if (!info->offset) {
             info->offset = addr - module_info->base_address;
+        }
     }
 
     // Get module name.
-    if (!info->module || !info->module[0])
-    {
+    if (!info->module || !info->module[0]) {
         Dl_info dl_info;
-        if (dladdr((void *)addr, &dl_info))
+        if (dladdr((void *)addr, &dl_info)) {
             info->module = dl_info.dli_fname;
-        if (!info->offset)
+        }
+        if (!info->offset) {
             info->offset = addr - (uintptr_t)dl_info.dli_fbase;
+        }
     }
 
-    if (info->module)
-    {
+    if (info->module) {
         const char *module_name = strrchr(info->module, '/');
-        if (module_name)
+        if (module_name) {
             info->module = module_name + 1;
+        }
     }
 
-    if (!info->module)
+    if (!info->module) {
         info->module = "";
-    if (!info->function)
+    }
+    if (!info->function) {
         info->function = "";
-    if (!info->filename)
+    }
+    if (!info->filename) {
         info->filename = "";
+    }
     return 1;
 }
 
@@ -365,7 +354,7 @@ btrace_dlopen_notify(const char */*filename*/)
 
 const char * btrace_demangle_function(const char *name, char *buffer, size_t buflen)
 {
-    char *function = NULL;
+    char *function = nullptr;
 
     // Mangled-name is function or variable name...
     if (name[0] == '_' && name[1] == 'Z') {
@@ -373,10 +362,11 @@ const char * btrace_demangle_function(const char *name, char *buffer, size_t buf
         function = abi::__cxa_demangle(name, nullptr, nullptr, &status);
     }
 
-    if (function && function[0])
+    if (function && function[0]) {
         snprintf(buffer, buflen, "%s", function);
-    else
+    } else {
         snprintf(buffer, buflen, "%s", name);
+    }
 
     buffer[buflen - 1] = 0;
     free(function);

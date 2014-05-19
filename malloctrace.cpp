@@ -117,7 +117,8 @@ struct ThreadData
         ipCache.reserve(16384);
         traceCache.reserve(16384);
         string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT") + to_string(getpid()) + '.' + to_string(thread_id);
-        out = fopen(outputFileName.c_str(), "wa");
+//         out = fopen(outputFileName.c_str(), "wa");
+        out = stderr;
         if (!out) {
             fprintf(stderr, "Failed to open output file: %s\n", outputFileName.c_str());
             exit(1);
