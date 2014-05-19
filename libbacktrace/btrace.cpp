@@ -34,6 +34,7 @@
 #include <link.h>
 #include <sys/utsname.h>
 #include <unistd.h>
+#include <cxxabi.h>
 
 #include <cassert>
 
@@ -56,111 +57,67 @@ extern "C" char * __cxa_demangle_gnu3(const char *org);
 extern "C" int unw_backtrace_skip (void **buffer, int size, int skip);
 #endif
 
+namespace {
+
+struct btrace_module_info
+{
+    //$ TODO mikesart: need an ID number in here. This will get incremented
+    // everytime we have an address conflict. All stack traces should get this
+    // ID so they know which module they should get symbols from.
+    uintptr_t base_address;
+    uint32_t address_size;
+    struct backtrace_state *backtrace_state;
+    const char *filename;
+    int uuid_len;
+    uint8_t uuid[20];
+    int is_exe;
+};
+
+inline bool operator<(const btrace_module_info &info1, const btrace_module_info &info2)
+{
+    if (info1.base_address < info2.base_address) {
+        return true;
+    }
+    if (info1.base_address == info2.base_address) {
+        if (info1.address_size < info2.address_size) {
+            return true;
+        }
+        if (info1.address_size == info2.address_size) {
+            if (strcmp(info1.filename, info2.filename) < 0) {
+                return false;
+            }
+        }
+    }
+    return false;
+}
+
+inline bool operator==(const btrace_module_info &info1, const btrace_module_info &info2)
+{
+    return info1.base_address == info2.base_address &&
+           info1.address_size == info2.address_size &&
+           !strcmp(info1.filename, info2.filename);
+}
+
+inline bool operator!=(const btrace_module_info &info1, const btrace_module_info &info2)
+{
+    return !(info1 == info2);
+}
+
 // Our dlopen mutex to protect g_module_infos operations
-static std::mutex &get_dlopen_mutex()
+std::mutex &get_dlopen_mutex()
 {
     static std::mutex g_dlopen_mutex;
     return g_dlopen_mutex;
 }
 
 // An array of all the modules that have been loaded in this process.
-static std::vector<btrace_module_info> &get_module_infos()
+std::vector<btrace_module_info> &get_module_infos()
 {
     static std::vector<btrace_module_info> s_module_infos;
     return s_module_infos;
 }
 
-static void btrace_dlopen_notify_impl();
-
-int
-btrace_get(uintptr_t *addrs, size_t count_addrs, uint32_t addrs_to_skip)
-{
-#ifdef HAVE_UNW_BACKTRACE_SKIP
-    return unw_backtrace_skip((void **)addrs, (int)count_addrs, addrs_to_skip);
-#else
-    size_t count = 0;
-    unw_cursor_t cursor;
-    unw_context_t context;
-
-    unw_getcontext(&context);
-    unw_init_local(&cursor, &context);
-
-    while (count < count_addrs)
-    {
-        unw_word_t addr;
-
-        if (unw_step(&cursor) <= 0)
-            break;
-
-        unw_get_reg(&cursor, UNW_REG_IP, &addr);
-        // Could retrieve registers via something like this:
-        //   unw_get_reg(&cursor, UNW_X86_EAX, &eax), ...
-
-        if (addrs_to_skip)
-        {
-            addrs_to_skip--;
-            continue;
-        }
-
-        addrs[count++] = (uintptr_t)addr;
-
-#if 0
-        // Get function name and offset from libunwind. Should match
-        //  the libbacktrace code down below.
-        unw_word_t offset;
-        char function[512];
-        function[0] = 0;
-        unw_get_proc_name(&cursor, function, sizeof(function), &offset);
-        printf ("0x%" PRIxPTR ": %s [+0x%" PRIxPTR "]\n", addr, function, offset);
-#endif
-    }
-
-    return (int)count;
-#endif
-}
-
-const char *
-btrace_get_calling_module()
-{
-    unw_cursor_t cursor;
-    unw_context_t context;
-    const char *calling_fname = NULL;
-
-    unw_getcontext(&context);
-    unw_init_local(&cursor, &context);
-
-    for(;;)
-    {
-        unw_word_t addr;
-        Dl_info dl_info;
-
-        if (unw_step(&cursor) <= 0)
-            break;
-
-        unw_get_reg(&cursor, UNW_REG_IP, &addr);
-
-        // Get module name.
-        if (dladdr((void *)addr, &dl_info) == 0)
-            return NULL;
-
-        if (dl_info.dli_fname)
-        {
-            if (!calling_fname)
-            {
-                calling_fname = dl_info.dli_fname;
-            }
-            else if(strcmp(calling_fname, dl_info.dli_fname))
-            {
-                return dl_info.dli_fname;
-            }
-        }
-    }
-
-    return NULL;
-}
-
-static int
-btrace_module_search (const void *vkey, const void *ventry)
+int btrace_module_search (const void *vkey, const void *ventry)
 {
     const uintptr_t *key = (const uintptr_t *)vkey;
     const struct btrace_module_info *entry = (const struct btrace_module_info *) ventry;
@@ -174,35 +131,7 @@ btrace_module_search (const void *vkey, const void *ventry)
     return 0;
 }
 
-const char *
-btrace_get_current_module()
-{
-    void *paddr = __builtin_return_address(0);
-    uintptr_t addr = (uintptr_t)paddr;
-    std::lock_guard<std::mutex> lock(get_dlopen_mutex());
-
-    // Try to search for the module name in our list. Should be faster than dladdr which
-    //  goes through a bunch of symbol information.
-    std::vector<btrace_module_info>& module_infos = get_module_infos();
-    if (module_infos.size())
-    {
-        btrace_module_info *module_info = (btrace_module_info *)bsearch(&addr,
-            &module_infos[0], module_infos.size(), sizeof(btrace_module_info), btrace_module_search);
-        if (module_info && module_info->filename)
-            return module_info->filename;
-    }
-
-    // Well, that failed for some reason. Try dladdr.
-    Dl_info dl_info;
-    if (dladdr(paddr, &dl_info) && dl_info.dli_fname)
-        return dl_info.dli_fname;
-
-    assert(false);
-    return nullptr;
-}
-
-static void
-btrace_err_callback(void */*data*/, const char *msg, int errnum)
+void btrace_err_callback(void */*data*/, const char *msg, int errnum)
 {
     if (errnum == -1)
     {
@@ -217,8 +146,7 @@ btrace_err_callback(void */*data*/, const char *msg, int errnum)
     }
 }
 
-static void
-btrace_syminfo_callback(void *data, uintptr_t addr, const char *symname, uintptr_t symval, uintptr_t /*symsize*/)
+void btrace_syminfo_callback(void *data, uintptr_t addr, const char *symname, uintptr_t symval, uintptr_t /*symsize*/)
 {
     if (symname)
     {
@@ -228,8 +156,7 @@ btrace_syminfo_callback(void *data, uintptr_t addr, const char *symname, uintptr
     }
 }
 
-static int
-btrace_pcinfo_callback(void *data, uintptr_t /*addr*/, const char *file, int line, const char *func)
+int btrace_pcinfo_callback(void *data, uintptr_t /*addr*/, const char *file, int line, const char *func)
 {
     btrace_info *frame = (btrace_info *)data;
 
@@ -242,14 +169,12 @@ btrace_pcinfo_callback(void *data, uintptr_t /*addr*/, const char *file, int lin
     return 0;
 }
 
-static void
-backtrace_initialize_error_callback(void */*data*/, const char */*msg*/, int /*errnum*/)
+void backtrace_initialize_error_callback(void */*data*/, const char */*msg*/, int /*errnum*/)
 {
     // Backtrace_initialize only fails with alloc error and will be handled below.
 }
 
-static bool
-module_info_init_state(btrace_module_info *module_info)
+bool module_info_init_state(btrace_module_info *module_info)
 {
     if (!module_info->backtrace_state)
     {
@@ -265,183 +190,7 @@ module_info_init_state(btrace_module_info *module_info)
     return !!module_info->backtrace_state;
 }
 
-bool
-btrace_resolve_addr(btrace_info *info, uintptr_t addr, uint32_t flags)
-{
-    std::lock_guard<std::mutex> lock(get_dlopen_mutex());
-    std::vector<btrace_module_info>& module_infos = get_module_infos();
-
-    if (!module_infos.size())
-        btrace_dlopen_notify_impl();
-
-    info->addr = addr;
-    info->offset = 0;
-    info->module = NULL;
-    info->function = NULL;
-    info->filename = NULL;
-    info->linenumber = 0;
-    info->demangled_func_buf[0] = 0;
-
-    btrace_module_info *module_info = (btrace_module_info *)bsearch(&addr,
-        &module_infos[0], module_infos.size(), sizeof(btrace_module_info), btrace_module_search);
-    if (module_info)
-    {
-        info->module = module_info->filename;
-
-        if (module_info_init_state(module_info))
-        {
-            backtrace_fileline_initialize(module_info->backtrace_state, module_info->base_address,
-                                          module_info->is_exe, backtrace_initialize_error_callback, NULL);
-
-            // Get function name and offset.
-            backtrace_syminfo(module_info->backtrace_state, addr, btrace_syminfo_callback,
-                              btrace_err_callback, info);
-
-            if (flags & BTRACE_RESOLVE_ADDR_GET_FILENAME)
-            {
-                // Get filename and line number (and maybe function).
-                backtrace_pcinfo(module_info->backtrace_state, addr, btrace_pcinfo_callback,
-                                 btrace_err_callback, info);
-            }
-
-            if ((flags & BTRACE_RESOLVE_ADDR_DEMANGLE_FUNC) && info->function && info->function[0])
-            {
-                info->function = btrace_demangle_function(info->function, info->demangled_func_buf, sizeof(info->demangled_func_buf));
-            }
-        }
-
-        if (!info->offset)
-            info->offset = addr - module_info->base_address;
-    }
-
-    // Get module name.
-    if (!info->module || !info->module[0])
-    {
-        Dl_info dl_info;
-        if (dladdr((void *)addr, &dl_info))
-            info->module = dl_info.dli_fname;
-        if (!info->offset)
-            info->offset = addr - (uintptr_t)dl_info.dli_fbase;
-    }
-
-    if (info->module)
-    {
-        const char *module_name = strrchr(info->module, '/');
-        if (module_name)
-            info->module = module_name + 1;
-    }
-
-    if (!info->module)
-        info->module = "";
-    if (!info->function)
-        info->function = "";
-    if (!info->filename)
-        info->filename = "";
-    return 1;
-}
-
-static int
-get_hex_value(char ch)
-{
-    if (ch >= 'A' && ch <= 'F')
-        return 10 + ch - 'A';
-    else if (ch >= 'a' && ch <= 'f')
-        return 10 + ch - 'a';
-    else if (ch >= '0' && ch <= '9')
-        return ch - '0';
-
-    return -1;
-}
-
-int
-btrace_uuid_str_to_uuid(uint8_t uuid[20], const char *uuid_str)
-{
-    int len;
-
-    for (len = 0; (len < 20) && *uuid_str; len++)
-    {
-        int val0 = get_hex_value(*uuid_str++);
-        int val1 = get_hex_value(*uuid_str++);
-        if (val0 < 0 || val1 < 0)
-            break;
-        uuid[len] = (val0 << 4) | val1;
-    }
-
-    return len;
-}
-
-void
-btrace_uuid_to_str(char uuid_str[41], const uint8_t *uuid, int len)
-{
-    int i;
-    static const char hex[] = "0123456789abcdef";
-
-    if (len > 40)
-        len = 40;
-    for (i = 0; i < len; i++)
-    {
-        uint8_t c = *uuid++;
-
-        *uuid_str++ = hex[c >> 4];
-        *uuid_str++ = hex[c & 0xf];
-    }
-    *uuid_str = 0;
-}
-
-int
-btrace_dump()
-{
-    int i;
-    const int addrs_size = 128;
-    uintptr_t addrs[addrs_size];
-    int count = btrace_get(addrs, addrs_size, 0);
-
-    for (i = 0; i < count; i++)
-    {
-        int ret;
-        btrace_info info;
-
-        ret = btrace_resolve_addr(&info, addrs[i],
-                                BTRACE_RESOLVE_ADDR_GET_FILENAME | BTRACE_RESOLVE_ADDR_DEMANGLE_FUNC);
-
-        printf(" 0x%" PRIxPTR " ", addrs[i]);
-        if (ret)
-        {
-            printf("%s", info.module);
-
-            if (info.function[0])
-            {
-                printf(": %s", info.function);
-            }
-
-            printf("+0x%" PRIxPTR, info.offset);
-
-            if (info.filename && info.filename[0])
-            {
-                // Print last directory plus filename if possible.
-                const char *slash_cur = info.filename;
-                const char *slash_last = NULL;
-                for (const char *ch = info.filename; *ch; ch++)
-                {
-                    if (*ch == '/')
-                    {
-                        slash_last = slash_cur;
-                        slash_cur = ch + 1;
-                    }
-                }
-                const char *filename = slash_last ? slash_last : slash_cur;
-                printf(": %s:%d", filename, info.linenumber);
-            }
-        }
-
-        printf("\n");
-    }
-
-    return count;
-}
-
-static int
-dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void *data)
+int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void *data)
 {
     const int PATH_MAX = 1024;
     char buf[PATH_MAX];
@@ -509,59 +258,8 @@ dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void *data)
     return 0;
 }
 
-bool
-btrace_dlopen_add_module(const btrace_module_info &module_info_in)
-{
-    std::lock_guard<std::mutex> lock(get_dlopen_mutex());
-    std::vector<btrace_module_info>& module_infos = get_module_infos();
-
-    auto it = std::lower_bound(module_infos.begin(), module_infos.end(), module_info_in);
-    if (it == module_infos.end() || *it != module_info_in)
-    {
-        btrace_module_info module_info = module_info_in;
-
-        if (module_info_init_state(&module_info))
-        {
-            // Make sure the UUID of the file on disk matches with what we were asked for.
-            if ((module_info_in.uuid_len == module_info.uuid_len) &&
-                    !memcmp(module_info_in.uuid, module_info.uuid, module_info.uuid_len))
-            {
-                module_infos.push_back(module_info);
-                std::sort(module_infos.begin(), module_infos.end());
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-const char *
-btrace_get_debug_filename(const char *filename)
-{
-    std::lock_guard<std::mutex> lock(get_dlopen_mutex());
-    std::vector<btrace_module_info>& module_infos = get_module_infos();
-
-    std::string fname = filename;
-    for (uint i = 0; i < module_infos.size(); i++)
-    {
-        btrace_module_info &module_info = module_infos[i];
-
-        if (fname == module_info.filename)
-        {
-            if (module_info_init_state(&module_info))
-            {
-                backtrace_fileline_initialize(module_info.backtrace_state, module_info.base_address,
-                                              module_info.is_exe, backtrace_initialize_error_callback, NULL);
-
-                return backtrace_get_debug_filename(module_info.backtrace_state);
-            }
-        }
-    }
-    return NULL;
-}
-
-static void btrace_dlopen_notify_impl()
+// like btrace_dlopen_notify but must be called while already holding the mutex lock
+void btrace_dlopen_notify_impl()
 {
     std::vector<btrace_module_info> new_module_infos;
 
@@ -574,6 +272,82 @@ static void btrace_dlopen_notify_impl()
         module_infos.insert(module_infos.end(), new_module_infos.begin(), new_module_infos.end());
         std::sort(module_infos.begin(), module_infos.end());
     }
+}
+
+}
+
+bool btrace_resolve_addr(btrace_info *info, uintptr_t addr, ResolveFlags flags)
+{
+    std::lock_guard<std::mutex> lock(get_dlopen_mutex());
+    std::vector<btrace_module_info>& module_infos = get_module_infos();
+
+    if (!module_infos.size())
+        btrace_dlopen_notify_impl();
+
+    info->addr = addr;
+    info->offset = 0;
+    info->module = NULL;
+    info->function = NULL;
+    info->filename = NULL;
+    info->linenumber = 0;
+    info->demangled_func_buf[0] = 0;
+
+    btrace_module_info *module_info = (btrace_module_info *)bsearch(&addr,
+        &module_infos[0], module_infos.size(), sizeof(btrace_module_info), btrace_module_search);
+    if (module_info)
+    {
+        info->module = module_info->filename;
+
+        if (module_info_init_state(module_info))
+        {
+            backtrace_fileline_initialize(module_info->backtrace_state, module_info->base_address,
+                                          module_info->is_exe, backtrace_initialize_error_callback, NULL);
+
+            // Get function name and offset.
+            backtrace_syminfo(module_info->backtrace_state, addr, btrace_syminfo_callback,
+                              btrace_err_callback, info);
+
+            if (flags & GET_FILENAME)
+            {
+                // Get filename and line number (and maybe function).
+                backtrace_pcinfo(module_info->backtrace_state, addr, btrace_pcinfo_callback,
+                                 btrace_err_callback, info);
+            }
+
+            if ((flags & DEMANGLE_FUNC) && info->function && info->function[0])
+            {
+                info->function = btrace_demangle_function(info->function, info->demangled_func_buf, sizeof(info->demangled_func_buf));
+            }
+        }
+
+        if (!info->offset)
+            info->offset = addr - module_info->base_address;
+    }
+
+    // Get module name.
+    if (!info->module || !info->module[0])
+    {
+        Dl_info dl_info;
+        if (dladdr((void *)addr, &dl_info))
+            info->module = dl_info.dli_fname;
+        if (!info->offset)
+            info->offset = addr - (uintptr_t)dl_info.dli_fbase;
+    }
+
+    if (info->module)
+    {
+        const char *module_name = strrchr(info->module, '/');
+        if (module_name)
+            info->module = module_name + 1;
+    }
+
+    if (!info->module)
+        info->module = "";
+    if (!info->function)
+        info->function = "";
+    if (!info->filename)
+        info->filename = "";
+    return 1;
 }
 
 // This function is called from a dlopen hook, which means it could be
@@ -589,20 +363,7 @@ btrace_dlopen_notify(const char */*filename*/)
     btrace_dlopen_notify_impl();
 }
 
-//
-// Other possibilities:
-//   abi::__cxa_demangle() (cxxabi.h)
-//   bfd_demangle (bfd.h)
-//   cplus_demangle (demangle.h) libiberty code from gcc
-//
-#include <cxxabi.h>
-// char * abi::__cxa_demangle(const char* __mangled_name, char* __output_buffer,
-//    size_t* __length, int* __status);
-// int status = 0;
-// char *function = abi::__cxa_demangle(name, NULL, NULL, &status);
-//
-const char *
-btrace_demangle_function(const char *name, char *buffer, size_t buflen)
+const char * btrace_demangle_function(const char *name, char *buffer, size_t buflen)
 {
     char *function = NULL;
 

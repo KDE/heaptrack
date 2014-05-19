@@ -188,7 +188,7 @@ unsigned int print_caller(const int skip = 2)
             // not cached yet, get data
             btrace_info info;
             btrace_resolve_addr(&info, static_cast<uintptr_t>(ip),
-                                BTRACE_RESOLVE_ADDR_DEMANGLE_FUNC | BTRACE_RESOLVE_ADDR_GET_FILENAME);
+                                ResolveFlags(DEMANGLE_FUNC | GET_FILENAME));
 
             const bool stop = !strcmp(info.function, "__libc_start_main")
                            || !strcmp(info.function, "__static_initialization_and_destruction_0");
