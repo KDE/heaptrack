@@ -348,7 +348,7 @@ void* malloc(size_t size)
 
     void* ret = real_malloc(size);
 
-    if (!in_handler) {
+    if (ret && !in_handler) {
         in_handler = true;
         threadData.handleMalloc(ret, size);
         in_handler = false;
@@ -365,7 +365,7 @@ void free(void* ptr)
 
     real_free(ptr);
 
-    if (!in_handler) {
+    if (ptr && !in_handler) {
         in_handler = true;
         threadData.handleFree(ptr);
         in_handler = false;
@@ -380,7 +380,7 @@ void* realloc(void* ptr, size_t size)
 
     void* ret = real_realloc(ptr, size);
 
-    if (!in_handler) {
+    if (ret && !in_handler) {
         in_handler = true;
         threadData.handleFree(ptr);
         threadData.handleMalloc(ret, size);
@@ -398,7 +398,7 @@ void* calloc(size_t num, size_t size)
 
     void* ret = real_calloc(num, size);
 
-    if (!in_handler) {
+    if (ret && !in_handler) {
         in_handler = true;
         threadData.handleMalloc(ret, num*size);
         in_handler = false;
@@ -415,7 +415,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
 
     int ret = real_posix_memalign(memptr, alignment, size);
 
-    if (!in_handler) {
+    if (ret && !in_handler) {
         in_handler = true;
         threadData.handleMalloc(*memptr, size);
         in_handler = false;
@@ -432,7 +432,7 @@ void* aligned_alloc(size_t alignment, size_t size)
 
     void* ret = real_aligned_alloc(alignment, size);
 
-    if (!in_handler) {
+    if (ret && !in_handler) {
         in_handler = true;
         threadData.handleMalloc(ret, size);
         in_handler = false;
@@ -449,7 +449,7 @@ void* valloc(size_t size)
 
     void* ret = real_valloc(size);
 
-    if (!in_handler) {
+    if (ret && !in_handler) {
         in_handler = true;
         threadData.handleMalloc(ret, size);
         in_handler = false;
@@ -466,7 +466,7 @@ void *dlopen(const char *filename, int flag)
 
     void* ret = real_dlopen(filename, flag);
 
-    if (!in_handler) {
+    if (ret && !in_handler) {
         threadRegistry.setModuleCacheDirty();
     }
 
