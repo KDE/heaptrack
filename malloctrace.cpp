@@ -41,6 +41,23 @@
 
 using namespace std;
 
+using Trace = vector<unw_word_t>;
+
+namespace std {
+    template<>
+    struct hash<Trace>
+    {
+        size_t operator() (const Trace& trace) const
+        {
+            std::size_t seed = 0;
+            for (auto ip : trace) {
+                boost::hash_combine(seed, ip);
+            }
+            return seed;
+        }
+    };
+}
+
 namespace {
 
 using malloc_t = void* (*) (size_t);
@@ -61,8 +78,10 @@ valloc_t real_valloc = nullptr;
 aligned_alloc_t real_aligned_alloc = nullptr;
 dlopen_t real_dlopen = nullptr;
 
-atomic<unsigned int> next_thread_id;
+atomic<unsigned int> next_thread_id(0);
 atomic<unsigned int> next_module_id(1);
+atomic<unsigned int> next_ipCache_id(0);
+atomic<unsigned int> next_trace_id(0);
 
 struct ThreadData;
 
@@ -135,6 +154,9 @@ struct ThreadData
         in_handler = true;
         threadRegistry.addThread(this);
         modules.reserve(32);
+        ipCache.reserve(65536);
+        traceCache.reserve(16384);
+        allocationInfo.reserve(16384);
 
         string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT") + to_string(getpid()) + '.' + to_string(thread_id);
         out = fopen(outputFileName.c_str(), "wa");
@@ -215,7 +237,7 @@ struct ThreadData
         return 0;
     }
 
-    void trace(const int skip = 2)
+    unsigned int trace(const int skip = 2)
     {
         unw_context_t uc;
         unw_getcontext (&uc);
@@ -226,25 +248,45 @@ struct ThreadData
         // skip functions we are not interested in
         for (int i = 0; i < skip; ++i) {
             if (unw_step(&cursor) <= 0) {
-                return;
+                return 0;
             }
         }
 
-        while (unw_step(&cursor) > 0) {
+        traceBuffer.clear();
+        const size_t MAX_TRACE_SIZE = 64;
+        while (unw_step(&cursor) > 0 && traceBuffer.size() < MAX_TRACE_SIZE) {
             unw_word_t ip;
             unw_get_reg(&cursor, UNW_REG_IP, &ip);
 
-            // find module and offset from cache
-
-            auto module = lower_bound(modules.begin(), modules.end(), ip,
-                                      [] (const Module& module, const unw_word_t addr) -> bool {
-                                          return module.baseAddress + module.size < addr;
-                                      });
-            if (module != modules.end()) {
-                fprintf(out, "%lu %lx ", module->id, ip - module->baseAddress);
+            auto it = ipCache.find(ip);
+            if (it == ipCache.end()) {
+                auto ipId = next_ipCache_id++;
+                // find module and offset from cache
+                auto module = lower_bound(modules.begin(), modules.end(), ip,
+                                          [] (const Module& module, const unw_word_t addr) -> bool {
+                                              return module.baseAddress + module.size < addr;
+                                          });
+                if (module != modules.end()) {
+                    fprintf(out, "i %lu %lu %lx\n", ipId, module->id, ip - module->baseAddress);
+                } else {
+                    fprintf(out, "i %lu 0 %lx\n", ipId, ip);
+                }
+                it = ipCache.insert(it, {ip, ipId});
             }
-            // TODO: handle failure
+            traceBuffer.push_back(it->second);
         }
+
+        auto it = traceCache.find(traceBuffer);
+        if (it == traceCache.end()) {
+            auto traceId = next_trace_id++;
+            it = traceCache.insert(it, {traceBuffer, traceId});
+            fprintf(out, "t %lu ", traceId);
+            for (auto ipId : traceBuffer) {
+                fprintf(out, "%lu ", ipId);
+            }
+            fputc('\n', out);
+        }
+        return it->second;
     }
 
     void handleMalloc(void* ptr, size_t size)
@@ -253,20 +295,38 @@ struct ThreadData
             updateModuleCache();
         }
 
-        fprintf(out, "+ %lu %p ", size, ptr);
-        trace();
-        fputc('\n', out);
+        auto traceId = trace();
+        if (!traceId) {
+            return;
+        }
+
+        allocationInfo[ptr] = {size, traceId};
+        fprintf(out, "+ %lu %lu\n", size, traceId);
     }
 
     void handleFree(void* ptr)
     {
-        fprintf(out, "- %p\n", ptr);
+        auto it = allocationInfo.find(ptr);
+        if (it == allocationInfo.end()) {
+            return;
+        }
+        fprintf(out, "- %lu %lu\n", it->second.size, it->second.traceId);
+        allocationInfo.erase(it);
     }
 
     vector<Module> modules;
+    unordered_map<unw_word_t, unw_word_t> ipCache;
+    unordered_map<vector<unw_word_t>, unsigned int> traceCache;
+    struct AllocationInfo
+    {
+        size_t size;
+        unsigned int traceId;
+    };
+    unordered_map<void*, AllocationInfo> allocationInfo;
     unsigned int thread_id;
     FILE* out;
     atomic<bool> moduleCacheDirty;
+    vector<unw_word_t> traceBuffer;
 };
 
 void ThreadRegistry::setModuleCacheDirty()
