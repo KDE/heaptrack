@@ -22,20 +22,22 @@
 #include <cstring>
 #include <cstdlib>
 
-#include <unordered_map>
 #include <atomic>
+#include <mutex>
+#include <unordered_map>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <tuple>
 
 #include <boost/functional/hash.hpp>
 
 #include <dlfcn.h>
 #include <unistd.h>
+#include <link.h>
 
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
-
-#include "libbacktrace/btrace.h"
 
 using namespace std;
 
@@ -59,16 +61,39 @@ valloc_t real_valloc = nullptr;
 aligned_alloc_t real_aligned_alloc = nullptr;
 dlopen_t real_dlopen = nullptr;
 
-struct IPCacheEntry
-{
-    unsigned int id;
-    bool stop;
-};
-
-atomic<unsigned int> next_ipCache_id;
-atomic<unsigned int> next_traceCache_id;
 atomic<unsigned int> next_thread_id;
-atomic<unsigned int> next_string_id(1);
+atomic<unsigned int> next_module_id(1);
+
+struct ThreadData;
+
+/**
+ * Central thread registry.
+ *
+ * All functions are threadsafe.
+ */
+class ThreadRegistry
+{
+public:
+    void addThread(ThreadData* thread)
+    {
+        lock_guard<mutex> lock(m_mutex);
+        m_threads.push_back(thread);
+    }
+    void removeThread(ThreadData* thread)
+    {
+        lock_guard<mutex> lock(m_mutex);
+        m_threads.erase(remove(m_threads.begin(), m_threads.end(), thread), m_threads.end());
+    }
+
+    /**
+     * Mark the module cache of all threads dirty.
+     */
+    void setModuleCacheDirty();
+private:
+    mutex m_mutex;
+    vector<ThreadData*> m_threads;
+};
+ThreadRegistry threadRegistry;
 
 // must be kept separately from ThreadData to ensure it stays valid
 // even until after ThreadData is destroyed
@@ -80,28 +105,21 @@ string env(const char* variable)
     return value ? string(value) : string();
 }
 
-struct Trace
+struct Module
 {
-    static const unsigned int MAX_DEPTH = 64;
-    unsigned int data[MAX_DEPTH];
-    unsigned int depth;
+    string fileName;
+    uintptr_t baseAddress;
+    uint32_t size;
+    unsigned int id;
+    bool isExe;
 
-    bool operator==(const Trace& o) const
+    bool operator<(const Module& module) const
     {
-        return depth == o.depth && !memcmp(data, o.data, sizeof(unsigned int) * depth);
+        return make_tuple(baseAddress, size, fileName) < make_tuple(module.baseAddress, module.size, module.fileName);
     }
-};
-
-struct TraceHasher
-{
-    size_t operator()(const Trace& trace) const
+    bool operator!=(const Module& module) const
     {
-        size_t seed = 0;
-        hash<unsigned int> nodeHash;
-        for (unsigned int i = 0; i < trace.depth; ++i) {
-            boost::hash_combine(seed, nodeHash(trace.data[i]));
-        }
-        return seed;
+        return make_tuple(baseAddress, size, fileName) != make_tuple(module.baseAddress, module.size, module.fileName);
     }
 };
 
@@ -111,14 +129,14 @@ struct ThreadData
     ThreadData()
         : thread_id(next_thread_id++)
         , out(nullptr)
+        , moduleCacheDirty(true)
     {
         bool wasInHandler = in_handler;
         in_handler = true;
-        ipCache.reserve(16384);
-        traceCache.reserve(16384);
+        threadRegistry.addThread(this);
+
         string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT") + to_string(getpid()) + '.' + to_string(thread_id);
-//         out = fopen(outputFileName.c_str(), "wa");
-        out = stderr;
+        out = fopen(outputFileName.c_str(), "wa");
         if (!out) {
             fprintf(stderr, "Failed to open output file: %s\n", outputFileName.c_str());
             exit(1);
@@ -129,116 +147,136 @@ struct ThreadData
     ~ThreadData()
     {
         in_handler = true;
+        threadRegistry.removeThread(this);
         fclose(out);
     }
 
-    // assumes unique string ptrs as input, i.e. does not compare string data but only string ptrs
-    unsigned int stringId(const char* string)
+    void updateModuleCache()
     {
-        if (!strcmp(string, "")) {
-            return 0;
-        }
-
-        auto it = stringCache.find(string);
-        if (it != stringCache.end()) {
-            return it->second;
-        }
-
-        auto id = next_string_id++;
-        stringCache.insert(it, make_pair(string, id));
-        fprintf(out, "s%u=%s\n", id, string);
-        return id;
+        // check list of loaded modules for unknown ones
+        dl_iterate_phdr(dlopen_notify_callback, this);
+        moduleCacheDirty = false;
     }
 
-    unordered_map<unw_word_t, IPCacheEntry> ipCache;
-    unordered_map<Trace, unsigned int, TraceHasher> traceCache;
-    // maps known file names and module names to string ID
-    unordered_map<const char*, unsigned int> stringCache;
-    unsigned int thread_id;
-    FILE* out;
-};
+    /**
+     * Mostly copied from vogl's src/libbacktrace/btrace.cpp
+     */
+    static int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void *data)
+    {
+        auto threadData = reinterpret_cast<ThreadData*>(data);
+        auto& modules = threadData->modules;
 
-thread_local ThreadData threadData;
+        bool isExe = false;
+        const char *fileName = info->dlpi_name;
 
-unsigned int print_caller(const int skip = 2)
-{
-    unw_context_t uc;
-    unw_getcontext (&uc);
-
-    unw_cursor_t cursor;
-    unw_init_local (&cursor, &uc);
-
-    // skip functions we are not interested in
-    for (int i = 0; i < skip; ++i) {
-        if (unw_step(&cursor) <= 0) {
-            return 0;
-        }
-    }
-
-    auto& ipCache = threadData.ipCache;
-
-    Trace trace;
-    trace.depth = 0;
-    while (unw_step(&cursor) > 0 && trace.depth < Trace::MAX_DEPTH) {
-        unw_word_t ip;
-        unw_get_reg(&cursor, UNW_REG_IP, &ip);
-
-        // check cache for known ip's
-        auto it = ipCache.find(ip);
-        if (it == ipCache.end()) {
-            // not cached yet, get data
-            btrace_info info;
-            btrace_resolve_addr(&info, static_cast<uintptr_t>(ip),
-                                ResolveFlags(DEMANGLE_FUNC | GET_FILENAME));
-
-            const bool stop = !strcmp(info.function, "__libc_start_main")
-                           || !strcmp(info.function, "__static_initialization_and_destruction_0");
-            const unsigned int id = next_ipCache_id++;
-
-            // and store it in the cache
-            it = ipCache.insert(it, make_pair(ip, IPCacheEntry{id, stop}));
-
-            const auto funcId = threadData.stringId(info.demangled_func_buf);
-            const auto moduleId = threadData.stringId(info.module);
-            const auto fileId = threadData.stringId(info.filename);
-
-            fprintf(threadData.out, "%u=%u;%u;", id, funcId, moduleId);
-            if (fileId) {
-                if (info.linenumber > 0) {
-                    fprintf(threadData.out, "%u:%d", fileId, info.linenumber);
-                } else {
-                    fprintf(threadData.out, "%u", fileId);
+        const int BUF_SIZE = 1024;
+        char buf[BUF_SIZE];
+        // If we don't have a filename and we haven't added our main exe yet, do it now.
+        if (!fileName || !fileName[0]) {
+            if (modules.empty()) {
+                isExe = true;
+                ssize_t ret =  readlink("/proc/self/exe", buf, sizeof(buf));
+                if ((ret > 0) && (ret < (ssize_t)sizeof(buf))) {
+                    buf[ret] = 0;
+                    fileName = buf;
                 }
             }
-            fputs("\n", threadData.out);
+            if (!fileName || !fileName[0]) {
+                return 0;
+            }
         }
 
-        const auto& frame = it->second;
-        trace.data[trace.depth++] = frame.id;
-        if (frame.stop) {
-            break;
+        uintptr_t addressStart = 0;
+        uintptr_t addressEnd = 0;
+
+        for (int i = 0; i < info->dlpi_phnum; i++) {
+            if (info->dlpi_phdr[i].p_type == PT_LOAD) {
+                if (addressEnd == 0) {
+                    addressStart = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr;
+                    addressEnd = addressStart + info->dlpi_phdr[i].p_memsz;
+                } else {
+                    uintptr_t addr = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr + info->dlpi_phdr[i].p_memsz;
+                    if (addr > addressEnd) {
+                        addressEnd = addr;
+                    }
+                }
+            }
+        }
+
+        Module module{fileName, addressStart, static_cast<uint32_t>(addressEnd - addressStart), 0, isExe};
+
+        auto it = lower_bound(modules.begin(), modules.end(), module);
+        if (it == modules.end() || *it != module) {
+            module.id = next_module_id++;
+            fprintf(threadData->out, "m %u %s %lx %d\n", module.id, module.fileName.c_str(), module.baseAddress, module.isExe);
+            modules.insert(it, module);
+        }
+        return 0;
+    }
+
+    void trace(const int skip = 2)
+    {
+        unw_context_t uc;
+        unw_getcontext (&uc);
+
+        unw_cursor_t cursor;
+        unw_init_local (&cursor, &uc);
+
+        // skip functions we are not interested in
+        for (int i = 0; i < skip; ++i) {
+            if (unw_step(&cursor) <= 0) {
+                return;
+            }
+        }
+
+        while (unw_step(&cursor) > 0) {
+            unw_word_t ip;
+            unw_get_reg(&cursor, UNW_REG_IP, &ip);
+
+            // find module and offset from cache
+
+            auto module = lower_bound(modules.begin(), modules.end(), ip,
+                                      [] (const Module& module, const unw_word_t addr) -> bool {
+                                          return module.baseAddress + module.size < addr;
+                                      });
+            if (module != modules.end()) {
+                fprintf(out, "%lu %lx ", module->id, ip - module->baseAddress);
+            }
+            // TODO: handle failure
         }
     }
 
-    if (trace.depth == 1) {
-        return trace.data[0];
-    }
-
-    // TODO: sub-tree matching
-    auto& traceCache = threadData.traceCache;
-    auto it = traceCache.find(trace);
-    if (it == traceCache.end()) {
-        it = traceCache.insert(it, make_pair(trace, next_traceCache_id++));
-
-        fprintf(threadData.out, "t%u=", it->second);
-        for (unsigned int i = 0; i < trace.depth; ++i) {
-            fprintf(threadData.out, "%u;", trace.data[i]);
+    void handleMalloc(void* ptr, size_t size)
+    {
+        if (moduleCacheDirty) {
+            updateModuleCache();
         }
-        fputs("\n", threadData.out);
+
+        fprintf(out, "+ %lu %p ", size, ptr);
+        trace();
+        fputc('\n', out);
     }
 
-    return it->second;
+    void handleFree(void* ptr)
+    {
+        fprintf(out, "- %p\n", ptr);
+    }
+
+    vector<Module> modules;
+    unsigned int thread_id;
+    FILE* out;
+    atomic<bool> moduleCacheDirty;
+};
+
+void ThreadRegistry::setModuleCacheDirty()
+{
+    lock_guard<mutex> lock(m_mutex);
+    for (auto t : m_threads) {
+        t->moduleCacheDirty = true;
+    }
 }
+
+thread_local ThreadData threadData;
 
 template<typename T>
 T findReal(const char* name)
@@ -292,19 +330,7 @@ void init()
     real_valloc = findReal<valloc_t>("valloc");
     real_aligned_alloc = findReal<aligned_alloc_t>("aligned_alloc");
 
-    btrace_dlopen_notify(nullptr);
     in_handler = false;
-}
-
-void handleMalloc(void* ptr, size_t size)
-{
-    const unsigned int treeId = print_caller();
-    fprintf(threadData.out, "+%lu:%p %u\n", size, ptr, treeId);
-}
-
-void handleFree(void* ptr)
-{
-    fprintf(threadData.out, "-%p\n", ptr);
 }
 
 }
@@ -323,7 +349,7 @@ void* malloc(size_t size)
 
     if (!in_handler) {
         in_handler = true;
-        handleMalloc(ret, size);
+        threadData.handleMalloc(ret, size);
         in_handler = false;
     }
 
@@ -340,7 +366,7 @@ void free(void* ptr)
 
     if (!in_handler) {
         in_handler = true;
-        handleFree(ptr);
+        threadData.handleFree(ptr);
         in_handler = false;
     }
 }
@@ -355,8 +381,8 @@ void* realloc(void* ptr, size_t size)
 
     if (!in_handler) {
         in_handler = true;
-        handleFree(ptr);
-        handleMalloc(ret, size);
+        threadData.handleFree(ptr);
+        threadData.handleMalloc(ret, size);
         in_handler = false;
     }
 
@@ -373,7 +399,7 @@ void* calloc(size_t num, size_t size)
 
     if (!in_handler) {
         in_handler = true;
-        handleMalloc(ret, num*size);
+        threadData.handleMalloc(ret, num*size);
         in_handler = false;
     }
 
@@ -390,7 +416,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
 
     if (!in_handler) {
         in_handler = true;
-        handleMalloc(*memptr, size);
+        threadData.handleMalloc(*memptr, size);
         in_handler = false;
     }
 
@@ -407,7 +433,7 @@ void* aligned_alloc(size_t alignment, size_t size)
 
     if (!in_handler) {
         in_handler = true;
-        handleMalloc(ret, size);
+        threadData.handleMalloc(ret, size);
         in_handler = false;
     }
 
@@ -424,7 +450,7 @@ void* valloc(size_t size)
 
     if (!in_handler) {
         in_handler = true;
-        handleMalloc(ret, size);
+        threadData.handleMalloc(ret, size);
         in_handler = false;
     }
 
@@ -440,9 +466,7 @@ void *dlopen(const char *filename, int flag)
     void* ret = real_dlopen(filename, flag);
 
     if (!in_handler) {
-        in_handler = true;
-        btrace_dlopen_notify(filename);
-        in_handler = false;
+        threadRegistry.setModuleCacheDirty();
     }
 
     return ret;

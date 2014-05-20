@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <unordered_map>
 
 #include "libbacktrace/backtrace.h"
@@ -34,10 +35,7 @@ void printUsage(ostream& out)
 
 struct Module
 {
-    Module(string _fileName, bool isExe)
-        : backtraceState(nullptr)
-        , fileName(move(_fileName))
-        , isExe(isExe)
+    void init()
     {
         backtraceState = backtrace_create_state(fileName.c_str(), /* we are single threaded, so: not thread safe */ false,
                                                 [] (void *data, const char *msg, int errnum) {
@@ -47,7 +45,7 @@ struct Module
                                                 }, this);
 
         if (backtraceState) {
-            backtrace_fileline_initialize(backtraceState, 1, isExe,
+            backtrace_fileline_initialize(backtraceState, baseAddress, isExe,
                                           [] (void *data, const char *msg, int errnum) {
                                             const Module* module = reinterpret_cast<Module*>(data);
                                             cerr << "Failed to initialize backtrace fileline for "
@@ -57,12 +55,17 @@ struct Module
         }
     }
 
-    string resolveAddress(uintptr_t address)
+    string resolveAddress(uintptr_t offset) const
     {
         string ret;
-        backtrace_syminfo(backtraceState, address,
+        if (!backtraceState) {
+            return ret;
+        }
+        backtrace_syminfo(backtraceState, baseAddress + offset,
                           [] (void *data, uintptr_t /*pc*/, const char *symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
-                            *reinterpret_cast<string*>(data) = symname;
+                            if (symname) {
+                                *reinterpret_cast<string*>(data) = symname;
+                            }
                           }, &errorCallback, &ret);
         return ret;
     }
@@ -74,11 +77,13 @@ struct Module
 
     backtrace_state* backtraceState;
     string fileName;
+    uintptr_t baseAddress;
     bool isExe;
 };
 
 struct AccumulatedTraceData
 {
+    /// TODO: vector?
     unordered_map<unsigned int, Module> modules;
 };
 
@@ -91,16 +96,58 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    AccumulatedTraceData data;
 
     for (int i = 1; i < argc; ++i) {
-        fstream in(argv[i], std::fstream::in);
+        fstream in(argv[i], ios_base::in);
         if (!in.is_open()) {
             cerr << "Failed to open malloctrace log file: " << argv[1] << endl;
             cerr << endl;
             printUsage(cerr);
             return 1;
         }
-        // TODO: parse file
+
+        string line;
+        line.reserve(1024);
+        while (in.good()) {
+            getline(in, line);
+            stringstream lineIn(line, ios_base::in);
+            char mode;
+            lineIn >> mode;
+            if (mode == 'm') {
+                Module module;
+                module.backtraceState = nullptr;
+                unsigned int id;
+                lineIn >> id;
+                lineIn >> module.fileName;
+                lineIn << hex;
+                lineIn >> module.baseAddress;
+                lineIn << dec;
+                lineIn >> module.isExe;
+                module.init();
+                data.modules[id] = module;
+            } else if (mode == '+') {
+                size_t size = 0;
+                lineIn >> size;
+                lineIn << hex;
+                void* ptr = nullptr;
+                lineIn >> ptr;
+                cout << "GOGOGO " << size << ' ' << ptr << '\n';
+                while (lineIn.good()) {
+                    unsigned int moduleId = 0;
+                    lineIn >> moduleId;
+                    if (!moduleId) {
+                        break;
+                    }
+                    uintptr_t offset = 0;
+                    lineIn << hex;
+                    lineIn >> offset;
+                    lineIn << dec;
+                    auto module = data.modules[moduleId];
+                    cout << moduleId << '\t' << offset << '\t' << module.resolveAddress(offset) << ' ' << module.fileName << '\n';
+                }
+            }
+        }
     }
 
     return 0;
