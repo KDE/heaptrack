@@ -134,6 +134,7 @@ struct ThreadData
         bool wasInHandler = in_handler;
         in_handler = true;
         threadRegistry.addThread(this);
+        modules.reserve(32);
 
         string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT") + to_string(getpid()) + '.' + to_string(thread_id);
         out = fopen(outputFileName.c_str(), "wa");
