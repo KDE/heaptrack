@@ -171,12 +171,12 @@ int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void */*d
     const char *filename = info->dlpi_name;
     std::vector<btrace_module_info>& module_infos = get_module_infos();
 
+    const int BUF_SIZE = 1024;
+    char buf[BUF_SIZE];
     // If we don't have a filename and we haven't added our main exe yet, do it.
     if (!filename || !filename[0]) {
         if (!module_infos.size()) {
             is_exe = true;
-            const int PATH_MAX = 1024;
-            char buf[PATH_MAX];
             ssize_t ret =  readlink("/proc/self/exe", buf, sizeof(buf));
             if ((ret > 0) && (ret < (ssize_t)sizeof(buf))) {
                 buf[ret] = 0;
