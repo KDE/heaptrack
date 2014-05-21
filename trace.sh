@@ -21,7 +21,7 @@ if [ -z "$debug" ]; then
   LD_PRELOAD=./libmalloctrace.so DUMP_MALLOC_TRACE_OUTPUT="$output" $@ &
 else
   gdb --eval-command="set environment LD_PRELOAD=./libmalloctrace.so" \
-      --eval-command="set environment DUMP_MALLOC_TRACE_OUTPUT=\"$output\"" \
+      --eval-command="set environment DUMP_MALLOC_TRACE_OUTPUT=$output" \
       --eval-command="run" --args $@
 fi
 
