@@ -167,6 +167,9 @@ struct Data
             fprintf(stderr, "Failed to open output file: %s\n", outputFileName.c_str());
             exit(1);
         }
+
+        unsetenv("DUMP_MALLOC_TRACE_OUTPUT");
+        unsetenv("LD_PRELOAD");
     }
 
     ~Data()
