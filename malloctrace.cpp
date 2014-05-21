@@ -41,7 +41,51 @@
 
 using namespace std;
 
-using Trace = vector<unw_word_t>;
+const size_t MAX_TRACE_SIZE = 64;
+
+struct Trace
+{
+    void clear()
+    {
+        m_size = 0;
+    }
+
+    void push_back(unw_word_t ip)
+    {
+        m_data[m_size++] = ip;
+    }
+
+    const unw_word_t* begin() const
+    {
+        return m_data;
+    }
+    unw_word_t* begin()
+    {
+        return m_data;
+    }
+
+    const unw_word_t* end() const
+    {
+        return m_data + m_size;
+    }
+    unw_word_t* end()
+    {
+        return m_data + m_size;
+    }
+
+    size_t size() const
+    {
+        return m_size;
+    }
+
+    bool operator==(const Trace& o) const
+    {
+        return m_size == o.m_size && !memcmp(m_data, o.m_data, m_size * sizeof(unw_word_t));
+    }
+private:
+    size_t m_size = 0;
+    unw_word_t m_data[MAX_TRACE_SIZE];
+};
 
 namespace std {
     template<>
@@ -82,14 +126,9 @@ dlopen_t real_dlopen = nullptr;
 // threadsafe stuff
 atomic<bool> moduleCacheDirty(true);
 
-thread_local Trace traceBuffer;
-
-void trace(const int skip = 2)
+void trace(Trace& trace, const int skip = 2)
 {
-    traceBuffer.clear();
-
-    const size_t MAX_TRACE_SIZE = 64;
-    traceBuffer.reserve(MAX_TRACE_SIZE);
+    trace.clear();
 
     unw_context_t uc;
     unw_getcontext (&uc);
@@ -104,8 +143,7 @@ void trace(const int skip = 2)
         }
     }
 
-
-    while (unw_step(&cursor) > 0 && traceBuffer.size() < MAX_TRACE_SIZE) {
+    while (unw_step(&cursor) > 0 && trace.size() < MAX_TRACE_SIZE) {
         unw_word_t ip;
         unw_get_reg(&cursor, UNW_REG_IP, &ip);
         if (!ip) {
@@ -114,7 +152,7 @@ void trace(const int skip = 2)
             // I'll report this upstream.
             break;
         }
-        traceBuffer.push_back(ip);
+        trace.push_back(ip);
     }
 }
 
@@ -251,7 +289,8 @@ struct Data
 
     void handleMalloc(void* ptr, size_t size)
     {
-        trace();
+        Trace traceBuffer;
+        trace(traceBuffer);
 
         lock_guard<mutex> lock(m_mutex);
         if (moduleCacheDirty) {
@@ -314,7 +353,7 @@ struct Data
 
     vector<Module> modules;
     unordered_map<unw_word_t, unw_word_t> ipCache;
-    unordered_map<vector<unw_word_t>, unsigned int> traceCache;
+    unordered_map<Trace, unsigned int> traceCache;
     struct AllocationInfo
     {
         size_t size;
