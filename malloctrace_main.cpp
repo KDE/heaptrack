@@ -232,9 +232,6 @@ int main(int argc, char** argv)
                     cerr << "failed to find instruction " << ipId << endl;
                 }
             }
-            if (data.traces.size() <= id) {
-                data.traces.reserve(id + 1000);
-            }
             data.traces.push_back(trace);
             ++nextTraceId;
         } else if (mode == '+') {
