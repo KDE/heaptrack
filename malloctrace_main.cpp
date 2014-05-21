@@ -23,6 +23,7 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
+#include <cxxabi.h>
 
 #include "libbacktrace/backtrace.h"
 
@@ -33,6 +34,22 @@ namespace {
 void printUsage(ostream& out)
 {
     out << "malloctrace_main MALLOCTRACE_LOG_FILE..." << endl;
+}
+
+string demangle(const char* function)
+{
+    if (!function || function[0] != '_' || function[1] != 'Z') {
+        return {function};
+    }
+
+    string ret;
+    int status = 0;
+    char* demangled = abi::__cxa_demangle(function, 0, 0, &status);
+    if (demangled) {
+        ret = demangled;
+        free(demangled);
+    }
+    return ret;
 }
 
 struct Module
@@ -69,9 +86,12 @@ struct Module
         backtrace_syminfo(backtraceState, baseAddress + offset,
                           [] (void *data, uintptr_t /*pc*/, const char *symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
                             if (symname) {
-                                *reinterpret_cast<string*>(data) = symname;
+                                *reinterpret_cast<string*>(data) = demangle(symname);
                             }
                           }, &errorCallback, &ret);
+        if (ret.empty()) {
+            ret = "??";
+        }
         return ret;
     }
 
