@@ -17,7 +17,6 @@ void asdf()
 {
     int* i = new int;
     printf("i in asdf: %p\n", i);
-    delete i;
 }
 
 void bar()
