@@ -87,6 +87,9 @@ void trace(const int skip = 2)
 {
     traceBuffer.clear();
 
+    const size_t MAX_TRACE_SIZE = 64;
+    traceBuffer.reserve(MAX_TRACE_SIZE);
+
     unw_context_t uc;
     unw_getcontext (&uc);
 
@@ -100,7 +103,6 @@ void trace(const int skip = 2)
         }
     }
 
-    const size_t MAX_TRACE_SIZE = 64;
 
     while (unw_step(&cursor) > 0 && traceBuffer.size() < MAX_TRACE_SIZE) {
         unw_word_t ip;
