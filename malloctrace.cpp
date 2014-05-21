@@ -322,7 +322,7 @@ T findReal(const char* name)
     auto ret = dlsym(RTLD_NEXT, name);
     if (!ret) {
         fprintf(stderr, "Could not find original function %s\n", name);
-        exit(1);
+        abort();
     }
     return reinterpret_cast<T>(ret);
 }
@@ -344,7 +344,7 @@ void* dummy_calloc(size_t num, size_t size)
     offset += num * size;
     if (offset >= MAX_SIZE) {
         fprintf(stderr, "failed to initialize, dummy calloc buf size exhausted: %lu requested, %lu available\n", offset, MAX_SIZE);
-        exit(1);
+        abort();
     }
     return buf + oldOffset;
 }
@@ -353,7 +353,7 @@ void init()
 {
     if (data || HandleGuard::inHandler) {
         fprintf(stderr, "initialization recursion detected\n");
-        exit(1);
+        abort();
     }
 
     HandleGuard guard;
