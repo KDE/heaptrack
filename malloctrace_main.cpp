@@ -110,7 +110,7 @@ struct Module
                             info->file = file ? file : "";
                             info->line = line;
                             return 0;
-                         }, &errorCallback, &info);
+                         }, &emptyErrorCallback, &info);
         if (info.function.empty()) {
             backtrace_syminfo(backtraceState, baseAddress + offset,
                               [] (void *data, uintptr_t /*pc*/, const char *symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
@@ -130,6 +130,10 @@ struct Module
     static void errorCallback(void */*data*/, const char *msg, int errnum)
     {
         cerr << "Module backtrace error (code " << errnum << "): " << msg << endl;
+    }
+
+    static void emptyErrorCallback(void */*data*/, const char */*msg*/, int /*errnum*/)
+    {
     }
 
     backtrace_state* backtraceState = nullptr;
