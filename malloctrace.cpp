@@ -259,17 +259,17 @@ struct Data
             for (auto& ip : traceBuffer) {
                 auto ipIt = ipCache.find(ip);
                 if (ipIt == ipCache.end()) {
-                    auto ipId = next_ipCache_id++;
                     // find module and offset from cache
                     auto module = lower_bound(modules.begin(), modules.end(), ip,
                                                 [] (const Module& module, const unw_word_t addr) -> bool {
                                                     return module.baseAddress + module.size < addr;
                                                 });
-                    if (module != modules.end()) {
-                        fprintf(out, "i %u %u %lx\n", ipId, module->id, ip - module->baseAddress);
-                    } else {
-                        fprintf(out, "i %u 0 %lx\n", ipId, ip);
+                    if (module == modules.end()) {
+                        ip = numeric_limits<unsigned int>::max();
+                        continue;
                     }
+                    auto ipId = next_ipCache_id++;
+                    fprintf(out, "i %u %u %lx\n", ipId, module->id, ip - module->baseAddress);
                     ipIt = ipCache.insert(ipIt, {ip, ipId});
                 }
                 ip = ipIt->second;
@@ -277,6 +277,9 @@ struct Data
             // print trace
             fprintf(out, "t %u ", traceId);
             for (auto ipId : traceBuffer) {
+                if (ipId == numeric_limits<unsigned int>::max()) {
+                    continue;
+                }
                 fprintf(out, "%lu ", ipId);
             }
             fputc('\n', out);
