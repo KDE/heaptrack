@@ -131,142 +131,153 @@ struct AccumulatedTraceData
     /// TODO: vectors?
     unordered_map<unsigned int, shared_ptr<Module>> modules;
     unordered_map<unsigned int, InstructionPointer> instructions;
-    unordered_map<unsigned int, Trace> traces;
+    vector<Trace> traces;
 };
 
 }
 
 int main(int argc, char** argv)
 {
-    if (argc < 2) {
+    if (argc != 2) {
         printUsage(cerr);
         return 1;
     }
 
     AccumulatedTraceData data;
 
-    for (int i = 1; i < argc; ++i) {
-        fstream in(argv[i], ios_base::in);
-        if (!in.is_open()) {
-            cerr << "Failed to open malloctrace log file: " << argv[1] << endl;
-            cerr << endl;
-            printUsage(cerr);
-            return 1;
-        }
+    fstream in(argv[1], ios_base::in);
+    if (!in.is_open()) {
+        cerr << "Failed to open malloctrace log file: " << argv[1] << endl;
+        cerr << endl;
+        printUsage(cerr);
+        return 1;
+    }
 
-        string line;
-        line.reserve(1024);
-        stringstream lineIn(ios_base::in);
-        while (in.good()) {
-            getline(in, line);
-            if (line.empty()) {
+    string line;
+    line.reserve(1024);
+    stringstream lineIn(ios_base::in);
+    unsigned int nextTraceId = 0;
+    while (in.good()) {
+        getline(in, line);
+        if (line.empty()) {
+            continue;
+        }
+        lineIn.str(line);
+        lineIn.clear();
+        char mode = 0;
+        lineIn >> mode;
+        if (mode == 'm') {
+            unsigned int id = 0;
+            lineIn >> id;
+            string fileName;
+            lineIn >> fileName;
+            lineIn << hex;
+            uintptr_t baseAddress = 0;
+            lineIn >> baseAddress;
+            bool isExe = false;
+            lineIn << dec;
+            lineIn >> isExe;
+            if (lineIn.bad()) {
+                cerr << "failed to parse line: " << line << endl;
                 continue;
             }
-            lineIn.str(line);
-            lineIn.clear();
-            char mode = 0;
-            lineIn >> mode;
-            if (mode == 'm') {
-                unsigned int id = 0;
-                lineIn >> id;
-                string fileName;
-                lineIn >> fileName;
-                lineIn << hex;
-                uintptr_t baseAddress = 0;
-                lineIn >> baseAddress;
-                bool isExe = false;
-                lineIn << dec;
-                lineIn >> isExe;
-                if (lineIn.bad()) {
-                    cerr << "failed to parse line: " << line << endl;
-                    continue;
-                }
-                data.modules[id] = make_shared<Module>(fileName, baseAddress, isExe);
-            } else if (mode == 'i') {
-                InstructionPointer ip;
-                unsigned int id = 0;
-                lineIn >> id;
-                unsigned int moduleId = 0;
-                lineIn >> moduleId;
-                lineIn << hex;
-                lineIn >> ip.offset;
-                lineIn << dec;
-                if (lineIn.bad()) {
-                    cerr << "failed to parse line: " << line << endl;
-                    continue;
-                }
-                auto module = data.modules.find(moduleId);
-                if (module != data.modules.end()) {
-                    ip.module = module->second;
-                }
-                data.instructions[id] = ip;
-            } else if (mode == 't') {
-                Trace trace;
-                unsigned int id = 0;
-                lineIn >> id;
-                if (lineIn.bad()) {
-                    cerr << "failed to parse line: " << line << endl;
-                    continue;
-                }
-                while (lineIn.good()) {
-                    unsigned int ipId = 0;
-                    lineIn >> ipId;
-                    auto ip = data.instructions.find(ipId);
-                    if (ip != data.instructions.end()) {
-                        trace.backtrace.push_back(ip->second);
-                    } else {
-                        cerr << "failed to find instruction " << ipId << endl;
-                    }
-                }
-                data.traces[id] = trace;
-            } else if (mode == '+') {
-                size_t size = 0;
-                lineIn >> size;
-                unsigned int traceId = 0;
-                lineIn >> traceId;
-                if (lineIn.bad()) {
-                    cerr << "failed to parse line: " << line << endl;
-                    continue;
-                }
-                auto trace = data.traces.find(traceId);
-                if (trace != data.traces.end()) {
-                    trace->second.leaked += size;
-                    trace->second.allocations++;
+            data.modules[id] = make_shared<Module>(fileName, baseAddress, isExe);
+        } else if (mode == 'i') {
+            InstructionPointer ip;
+            unsigned int id = 0;
+            lineIn >> id;
+            unsigned int moduleId = 0;
+            lineIn >> moduleId;
+            lineIn << hex;
+            lineIn >> ip.offset;
+            lineIn << dec;
+            if (lineIn.bad()) {
+                cerr << "failed to parse line: " << line << endl;
+                continue;
+            }
+            auto module = data.modules.find(moduleId);
+            if (module != data.modules.end()) {
+                ip.module = module->second;
+            }
+            data.instructions[id] = ip;
+        } else if (mode == 't') {
+            Trace trace;
+            unsigned int id = 0;
+            lineIn >> id;
+            if (lineIn.bad()) {
+                cerr << "failed to parse line: " << line << endl;
+                continue;
+            }
+            if (id != nextTraceId) {
+                cerr << "inconsistent trace data: " << line << endl << "expected trace with id: " << nextTraceId << endl;
+                return 1;
+            }
+            while (lineIn.good()) {
+                unsigned int ipId = 0;
+                lineIn >> ipId;
+                auto ip = data.instructions.find(ipId);
+                if (ip != data.instructions.end()) {
+                    trace.backtrace.push_back(ip->second);
                 } else {
-                    cerr << "failed to find trace " << traceId << endl;
+                    cerr << "failed to find instruction " << ipId << endl;
                 }
-            } else if (mode == '-') {
-                /// TODO
-                size_t size = 0;
-                lineIn >> size;
-                unsigned int traceId = 0;
-                lineIn >> traceId;
-                if (lineIn.bad()) {
-                    cerr << "failed to parse line: " << line << endl;
-                    continue;
-                }
-                auto trace = data.traces.find(traceId);
-                if (trace != data.traces.end()) {
-                    if (trace->second.leaked >= size) {
-                        trace->second.leaked -= size;
-                    } else {
-                        cerr << "inconsistent allocation info, underflowed allocations of " << traceId << endl;
-                        trace->second.leaked = 0;
-                    }
+            }
+            if (data.traces.size() <= id) {
+                data.traces.reserve(id + 1000);
+            }
+            data.traces.push_back(trace);
+            ++nextTraceId;
+        } else if (mode == '+') {
+            size_t size = 0;
+            lineIn >> size;
+            unsigned int traceId = 0;
+            lineIn >> traceId;
+            if (lineIn.bad()) {
+                cerr << "failed to parse line: " << line << endl;
+                continue;
+            }
+            if (traceId < data.traces.size()) {
+                auto& trace = data.traces[traceId];
+                trace.leaked += size;
+                trace.allocations++;
+            } else {
+                cerr << "failed to find trace of malloc at " << traceId << endl;
+            }
+        } else if (mode == '-') {
+            /// TODO
+            size_t size = 0;
+            lineIn >> size;
+            unsigned int traceId = 0;
+            lineIn >> traceId;
+            if (lineIn.bad()) {
+                cerr << "failed to parse line: " << line << endl;
+                continue;
+            }
+            if (traceId < data.traces.size()) {
+                auto& trace = data.traces[traceId];
+                if (trace.leaked >= size) {
+                    trace.leaked -= size;
                 } else {
-                    cerr << "failed to find trace " << traceId << endl;
+                    cerr << "inconsistent allocation info, underflowed allocations of " << traceId << endl;
+                    trace.leaked = 0;
                 }
             } else {
-                cerr << "failed to parse line: " << line << endl;
+                cerr << "failed to find trace for free at " << traceId << endl;
             }
+        } else {
+            cerr << "failed to parse line: " << line << endl;
         }
     }
 
     for (const auto& trace : data.traces) {
-        if (!trace.second.leaked) {
+        if (!trace.leaked) {
             continue;
         }
-        cout << trace.second.leaked << " leaked in: " << trace.first << " allocations: " << trace.second.allocations << endl;
+        cout << trace.leaked << " bytes leaked in " << trace.allocations << " allocations" << endl;
+        for (const auto& ip : trace.backtrace) {
+            cout << "0x" << hex << ip.offset << dec << ' ' << ip.module->resolveAddress(ip.offset) << ' ' << ip.module->fileName << endl;
+        }
+        cout << endl;
     }
 
     return 0;
