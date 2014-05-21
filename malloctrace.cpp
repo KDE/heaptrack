@@ -292,7 +292,7 @@ struct Data
     }
 
     mutex m_mutex;
-    unsigned int next_module_id = 1;
+    unsigned int next_module_id = 0;
     unsigned int next_thread_id = 0;
     unsigned int next_ipCache_id = 0;
     unsigned int next_trace_id = 0;

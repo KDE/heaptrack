@@ -138,9 +138,8 @@ struct AccumulatedTraceData
         traces.reserve(16384);
     }
 
-    /// TODO: vectors?
-    unordered_map<unsigned int, shared_ptr<Module>> modules;
-    unordered_map<unsigned int, InstructionPointer> instructions;
+    vector<shared_ptr<Module>> modules;
+    vector<InstructionPointer> instructions;
     vector<Trace> traces;
 };
 
@@ -166,7 +165,9 @@ int main(int argc, char** argv)
     string line;
     line.reserve(1024);
     stringstream lineIn(ios_base::in);
-    unsigned int nextTraceId = 0;
+    size_t nextTraceId = 0;
+    size_t nextModuleId = 0;
+    size_t nextIpId = 0;
     while (in.good()) {
         getline(in, line);
         if (line.empty()) {
@@ -177,8 +178,13 @@ int main(int argc, char** argv)
         char mode = 0;
         lineIn >> mode;
         if (mode == 'm') {
-            unsigned int id = 0;
+            size_t id = 0;
             lineIn >> id;
+            if (id != nextModuleId) {
+                cerr << "inconsistent trace data: " << line << endl
+                     << "expected module with id: " << nextModuleId << endl;
+                return 1;
+            }
             string fileName;
             lineIn >> fileName;
             lineIn << hex;
@@ -189,48 +195,60 @@ int main(int argc, char** argv)
             lineIn >> isExe;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
-                continue;
+                return 1;
             }
-            data.modules[id] = make_shared<Module>(fileName, baseAddress, isExe);
+            data.modules.push_back(make_shared<Module>(fileName, baseAddress, isExe));
+            ++nextModuleId;
         } else if (mode == 'i') {
             InstructionPointer ip;
-            unsigned int id = 0;
+            size_t id = 0;
             lineIn >> id;
-            unsigned int moduleId = 0;
+            if (id != nextIpId) {
+                cerr << "inconsistent trace data: " << line << endl
+                     << "expected instruction with id: " << nextIpId << endl;
+                return 1;
+            }
+
+            size_t moduleId = 0;
             lineIn >> moduleId;
+            if (moduleId >= data.modules.size()) {
+                cerr << "inconsistent trace data: " << line << endl
+                     << "failed to find module " << moduleId << ", only got so far: " << data.modules.size() << endl;
+                return 1;
+            }
+
             lineIn << hex;
             lineIn >> ip.offset;
             lineIn << dec;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
-                continue;
+                return 1;
             }
-            auto module = data.modules.find(moduleId);
-            if (module != data.modules.end()) {
-                ip.module = module->second;
-            }
-            data.instructions[id] = ip;
+            ip.module = data.modules[moduleId];
+            data.instructions.push_back(ip);
+            ++nextIpId;
         } else if (mode == 't') {
             Trace trace;
             unsigned int id = 0;
             lineIn >> id;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
-                continue;
+                return 1;
             }
             if (id != nextTraceId) {
-                cerr << "inconsistent trace data: " << line << endl << "expected trace with id: " << nextTraceId << endl;
+                cerr << "inconsistent trace data: " << line << endl
+                     << "expected trace with id: " << nextTraceId << endl;
                 return 1;
             }
             while (lineIn.good()) {
                 unsigned int ipId = 0;
                 lineIn >> ipId;
-                auto ip = data.instructions.find(ipId);
-                if (ip != data.instructions.end()) {
-                    trace.backtrace.push_back(ip->second);
-                } else {
-                    cerr << "failed to find instruction " << ipId << endl;
+                if (ipId >= data.instructions.size()) {
+                    cerr << "inconsistent trace data: " << line << endl
+                         << "failed to find instruction " << ipId << endl;
+                    return 1;
                 }
+                trace.backtrace.push_back(data.instructions[ipId]);
             }
             data.traces.push_back(trace);
             ++nextTraceId;
@@ -241,14 +259,15 @@ int main(int argc, char** argv)
             lineIn >> traceId;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
-                continue;
+                return 1;
             }
             if (traceId < data.traces.size()) {
                 auto& trace = data.traces[traceId];
                 trace.leaked += size;
-                trace.allocations++;
+                ++trace.allocations;
             } else {
                 cerr << "failed to find trace of malloc at " << traceId << endl;
+                return 1;
             }
         } else if (mode == '-') {
             /// TODO
@@ -258,7 +277,7 @@ int main(int argc, char** argv)
             lineIn >> traceId;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
-                continue;
+                return 1;
             }
             if (traceId < data.traces.size()) {
                 auto& trace = data.traces[traceId];
