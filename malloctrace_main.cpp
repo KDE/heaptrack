@@ -24,6 +24,7 @@
 #include <vector>
 #include <memory>
 #include <cxxabi.h>
+#include <algorithm>
 
 #include "libbacktrace/backtrace.h"
 
@@ -117,6 +118,15 @@ struct Trace
     vector<InstructionPointer> backtrace;
     size_t allocations = 0;
     size_t leaked = 0;
+
+    void printBacktrace(ostream& out) const
+    {
+        for (const auto& ip : backtrace) {
+            out << "0x" << hex << ip.offset << dec
+                << ' ' << ip.module->resolveAddress(ip.offset)
+                << ' ' << ip.module->fileName << endl;
+        }
+    }
 };
 
 struct AccumulatedTraceData
@@ -269,14 +279,31 @@ int main(int argc, char** argv)
         }
     }
 
+    // sort by amount of allocations
+    sort(data.traces.begin(), data.traces.end(), [] (const Trace& l, const Trace &r) {
+        return l.allocations > r.allocations;
+    });
+    cout << "TOP ALLOCATORS" << endl;
+    for (size_t i = 0; i < min(10lu, data.traces.size()); ++i) {
+        const auto& trace = data.traces[i];
+        cout << trace.allocations << " allocations at:" << endl;
+        trace.printBacktrace(cout);
+        cout << endl;
+    }
+    cout << endl;
+
+
+    // sort by amount of leaks
+    sort(data.traces.begin(), data.traces.end(), [] (const Trace& l, const Trace &r) {
+        return l.leaked < r.leaked;
+    });
+
     for (const auto& trace : data.traces) {
         if (!trace.leaked) {
             continue;
         }
-        cout << trace.leaked << " bytes leaked in " << trace.allocations << " allocations" << endl;
-        for (const auto& ip : trace.backtrace) {
-            cout << "0x" << hex << ip.offset << dec << ' ' << ip.module->resolveAddress(ip.offset) << ' ' << ip.module->fileName << endl;
-        }
+        cout << trace.leaked << " bytes leaked in " << trace.allocations << " allocations at:" << endl;
+        trace.printBacktrace(cout);
         cout << endl;
     }
 
