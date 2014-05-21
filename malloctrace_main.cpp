@@ -295,14 +295,22 @@ int main(int argc, char** argv)
         return l.leaked < r.leaked;
     });
 
+    size_t totalLeaked = 0;
+    size_t totalLeakAllocations = 0;
+    size_t totalAllocations = 0;
     for (const auto& trace : data.traces) {
+        totalAllocations += trace.allocations;
         if (!trace.leaked) {
             continue;
         }
+        totalLeakAllocations += trace.allocations;
+        totalLeaked += trace.leaked;
+
         cout << trace.leaked << " bytes leaked in " << trace.allocations << " allocations at:" << endl;
         trace.printBacktrace(cout);
         cout << endl;
     }
+    cout << totalLeaked << " bytes leaked in total from " << totalLeakAllocations << " of " << totalAllocations << " allocations" << endl;
 
     return 0;
 }
