@@ -39,7 +39,9 @@ void printUsage(ostream& out)
 
 string demangle(const char* function)
 {
-    if (!function || function[0] != '_' || function[1] != 'Z') {
+    if (!function) {
+        return {};
+    } else if (function[0] != '_' || function[1] != 'Z') {
         return {function};
     }
 
@@ -51,6 +53,22 @@ string demangle(const char* function)
         free(demangled);
     }
     return ret;
+}
+
+struct AddressInformation
+{
+    string function;
+    string file;
+    int line = 0;
+};
+
+ostream& operator<<(ostream& out, const AddressInformation& info)
+{
+    out << info.function;
+    if (!info.file.empty()) {
+        out << " in " << info.file << ':' << info.line;
+    }
+    return out;
 }
 
 struct Module
@@ -78,22 +96,35 @@ struct Module
         }
     }
 
-    string resolveAddress(uintptr_t offset) const
+    AddressInformation resolveAddress(uintptr_t offset) const
     {
-        string ret;
+        AddressInformation info;
         if (!backtraceState) {
-            return ret;
+            return info;
         }
-        backtrace_syminfo(backtraceState, baseAddress + offset,
-                          [] (void *data, uintptr_t /*pc*/, const char *symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
-                            if (symname) {
-                                *reinterpret_cast<string*>(data) = demangle(symname);
-                            }
-                          }, &errorCallback, &ret);
-        if (ret.empty()) {
-            ret = "??";
+
+        backtrace_pcinfo(backtraceState, baseAddress + offset,
+                         [] (void *data, uintptr_t /*addr*/, const char *file, int line, const char *function) -> int {
+                            auto info = reinterpret_cast<AddressInformation*>(data);
+                            info->function = demangle(function);
+                            info->file = file ? file : "";
+                            info->line = line;
+                            return 0;
+                         }, &errorCallback, &info);
+        if (info.function.empty()) {
+            backtrace_syminfo(backtraceState, baseAddress + offset,
+                              [] (void *data, uintptr_t /*pc*/, const char *symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
+                                if (symname) {
+                                    reinterpret_cast<AddressInformation*>(data)->function = demangle(symname);
+                                }
+                              }, &errorCallback, &info);
         }
-        return ret;
+
+        if (info.function.empty()) {
+            info.function = "?";
+        }
+
+        return info;
     }
 
     static void errorCallback(void */*data*/, const char *msg, int errnum)
