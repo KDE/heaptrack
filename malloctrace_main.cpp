@@ -20,7 +20,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <unordered_map>
+#include <map>
 #include <vector>
 #include <memory>
 #include <cxxabi.h>
@@ -176,6 +176,12 @@ struct AccumulatedTraceData
     vector<shared_ptr<Module>> modules;
     vector<InstructionPointer> instructions;
     vector<Trace> traces;
+
+    map<size_t, size_t> sizeHistogram;
+    size_t totalAllocated = 0;
+    size_t totalAllocations = 0;
+    size_t peak = 0;
+    size_t leaked = 0;
 };
 
 }
@@ -304,6 +310,13 @@ int main(int argc, char** argv)
                 cerr << "failed to find trace of malloc at " << traceId << endl;
                 return 1;
             }
+            data.totalAllocated += size;
+            data.totalAllocations++;
+            data.leaked += size;
+            if (data.leaked > data.peak) {
+                data.peak = data.leaked;
+            }
+            data.sizeHistogram[size]++;
         } else if (mode == '-') {
             /// TODO
             size_t size = 0;
@@ -325,6 +338,7 @@ int main(int argc, char** argv)
             } else {
                 cerr << "failed to find trace for free at " << traceId << endl;
             }
+            data.leaked -= size;
         } else {
             cerr << "failed to parse line: " << line << endl;
         }
@@ -349,22 +363,28 @@ int main(int argc, char** argv)
         return l.leaked < r.leaked;
     });
 
-    size_t totalLeaked = 0;
     size_t totalLeakAllocations = 0;
-    size_t totalAllocations = 0;
     for (const auto& trace : data.traces) {
-        totalAllocations += trace.allocations;
         if (!trace.leaked) {
             continue;
         }
         totalLeakAllocations += trace.allocations;
-        totalLeaked += trace.leaked;
 
         cout << trace.leaked << " bytes leaked in " << trace.allocations << " allocations at:" << endl;
         trace.printBacktrace(cout);
         cout << endl;
     }
-    cout << totalLeaked << " bytes leaked in total from " << totalLeakAllocations << " of " << totalAllocations << " allocations" << endl;
+    cout << data.leaked << " bytes leaked in total from " << totalLeakAllocations << " allocations" << endl;
+
+    cout << data.totalAllocated << " bytes allocated in total over " << data.totalAllocations
+         << " allocations, peak consumption: " << data.peak << " bytes" << endl;
+
+    cout << endl;
+
+    cout << "size histogram: " << endl;
+    for (auto entry : data.sizeHistogram) {
+        cout << entry.first << "\t" << entry.second << endl;
+    }
 
     return 0;
 }
