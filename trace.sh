@@ -28,6 +28,8 @@ fi
 pid=$!
 wait $pid
 
+exit 0
+
 if [[ "$(ls $output$pid 2> /dev/null)" != "" ]]; then
     echo "finished application, zipping data file"
     cd $(dirname $output)
