@@ -108,6 +108,12 @@ void trace(const int skip = 2)
     while (unw_step(&cursor) > 0 && traceBuffer.size() < MAX_TRACE_SIZE) {
         unw_word_t ip;
         unw_get_reg(&cursor, UNW_REG_IP, &ip);
+        if (!ip) {
+            // this seems to happen regularly at the end of every trace and is useless to us
+            // not also useless, its also quite slow to continue here into libunwind
+            // I'll report this upstream.
+            break;
+        }
         traceBuffer.push_back(ip);
     }
 }
