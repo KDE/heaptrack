@@ -53,6 +53,7 @@ namespace std {
             for (auto ip : trace) {
                 boost::hash_combine(seed, ip);
             }
+            boost::hash_combine(seed, trace.size());
             return seed;
         }
     };
