@@ -73,9 +73,10 @@ ostream& operator<<(ostream& out, const AddressInformation& info)
 
 struct Module
 {
-    Module(string _fileName, uintptr_t baseAddress, bool isExe)
+    Module(string _fileName, uintptr_t addressStart, uintptr_t addressEnd, bool isExe)
         : fileName(move(_fileName))
-        , baseAddress(baseAddress)
+        , addressStart(addressStart)
+        , addressEnd(addressEnd)
         , isExe(isExe)
     {
         backtraceState = backtrace_create_state(fileName.c_str(), /* we are single threaded, so: not thread safe */ false,
@@ -86,13 +87,13 @@ struct Module
                                                 }, this);
 
         if (backtraceState) {
-            backtrace_fileline_initialize(backtraceState, baseAddress, isExe,
+            backtrace_fileline_initialize(backtraceState, addressStart, isExe,
                                           [] (void *data, const char *msg, int errnum) {
                                             const Module* module = reinterpret_cast<Module*>(data);
                                             cerr << "Failed to initialize backtrace fileline for "
                                                  << (module->isExe ? "executable" : "library") << module->fileName
                                                  << ": " << msg << " (error code " << errnum << ")" << endl;
-                                        }, this);
+                                          }, this);
         }
     }
 
@@ -103,7 +104,7 @@ struct Module
             return info;
         }
 
-        backtrace_pcinfo(backtraceState, baseAddress + offset,
+        backtrace_pcinfo(backtraceState, addressStart + offset,
                          [] (void *data, uintptr_t /*addr*/, const char *file, int line, const char *function) -> int {
                             auto info = reinterpret_cast<AddressInformation*>(data);
                             info->function = demangle(function);
@@ -111,8 +112,9 @@ struct Module
                             info->line = line;
                             return 0;
                          }, &emptyErrorCallback, &info);
+
         if (info.function.empty()) {
-            backtrace_syminfo(backtraceState, baseAddress + offset,
+            backtrace_syminfo(backtraceState, addressStart + offset,
                               [] (void *data, uintptr_t /*pc*/, const char *symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
                                 if (symname) {
                                     reinterpret_cast<AddressInformation*>(data)->function = demangle(symname);
@@ -138,7 +140,8 @@ struct Module
 
     backtrace_state* backtraceState = nullptr;
     string fileName;
-    uintptr_t baseAddress;
+    uintptr_t addressStart;
+    uintptr_t addressEnd;
     bool isExe;
 };
 
@@ -229,8 +232,10 @@ int main(int argc, char** argv)
             string fileName;
             lineIn >> fileName;
             lineIn << hex;
-            uintptr_t baseAddress = 0;
-            lineIn >> baseAddress;
+            uintptr_t addressStart = 0;
+            lineIn >> addressStart;
+            uintptr_t addressEnd = 0;
+            lineIn >> addressEnd;
             bool isExe = false;
             lineIn << dec;
             lineIn >> isExe;
@@ -238,7 +243,7 @@ int main(int argc, char** argv)
                 cerr << "failed to parse line: " << line << endl;
                 return 1;
             }
-            data.modules.push_back(make_shared<Module>(fileName, baseAddress, isExe));
+            data.modules.push_back(make_shared<Module>(fileName, addressStart, addressEnd, isExe));
             ++nextModuleId;
         } else if (mode == 'i') {
             InstructionPointer ip;

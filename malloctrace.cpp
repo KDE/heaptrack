@@ -184,18 +184,19 @@ string env(const char* variable)
 struct Module
 {
     string fileName;
-    uintptr_t baseAddress;
-    uint32_t size;
+    uintptr_t addressStart;
+    uintptr_t addressEnd;
     unsigned int id;
     bool isExe;
 
     bool operator<(const Module& module) const
     {
-        return make_tuple(baseAddress, size, fileName) < make_tuple(module.baseAddress, module.size, module.fileName);
+        return make_tuple(addressStart, addressEnd, fileName) < make_tuple(module.addressStart, module.addressEnd, module.fileName);
     }
+
     bool operator!=(const Module& module) const
     {
-        return make_tuple(baseAddress, size, fileName) != make_tuple(module.baseAddress, module.size, module.fileName);
+        return make_tuple(addressStart, addressEnd, fileName) != make_tuple(module.addressStart, module.addressEnd, module.fileName);
     }
 };
 
@@ -275,12 +276,13 @@ struct Data
             }
         }
 
-        Module module{fileName, addressStart, static_cast<uint32_t>(addressEnd - addressStart), 0, isExe};
+        Module module{fileName, addressStart, addressEnd, 0, isExe};
 
         auto it = lower_bound(modules.begin(), modules.end(), module);
         if (it == modules.end() || *it != module) {
             module.id = data->next_module_id++;
-            fprintf(data->out, "m %u %s %lx %d\n", module.id, module.fileName.c_str(), module.baseAddress, module.isExe);
+            fprintf(data->out, "m %u %s %lx %lx %d\n", module.id, module.fileName.c_str(),
+                                                       module.addressStart, module.addressEnd, module.isExe);
             modules.insert(it, module);
         }
 
@@ -308,14 +310,14 @@ struct Data
                     // find module and offset from cache
                     auto module = lower_bound(modules.begin(), modules.end(), ip,
                                                 [] (const Module& module, const unw_word_t addr) -> bool {
-                                                    return module.baseAddress + module.size < addr;
+                                                    return module.addressEnd < addr;
                                                 });
                     if (module == modules.end()) {
                         ip = numeric_limits<unsigned int>::max();
                         continue;
                     }
                     auto ipId = next_ipCache_id++;
-                    fprintf(out, "i %u %u %lx\n", ipId, module->id, ip - module->baseAddress);
+                    fprintf(out, "i %u %u %lx\n", ipId, module->id, ip - module->addressStart);
                     ipIt = ipCache.insert(ipIt, {ip, ipId});
                 }
                 ip = ipIt->second;
