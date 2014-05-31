@@ -265,9 +265,8 @@ int main(int argc, char** argv)
                 return 1;
             }
             lineIn << hex;
-            while (lineIn.good()) {
-                uintptr_t ip = 0;
-                lineIn >> ip;
+            uintptr_t ip = 0;
+            while (lineIn >> ip) {
                 trace.backtrace.push_back(ip);
             }
             lineIn << dec;
