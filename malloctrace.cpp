@@ -186,8 +186,6 @@ struct Module
     string fileName;
     uintptr_t addressStart;
     uintptr_t addressEnd;
-    unsigned int id;
-    bool isExe;
 
     bool operator<(const Module& module) const
     {
@@ -205,7 +203,6 @@ struct Data
     Data()
     {
         modules.reserve(32);
-        ipCache.reserve(65536);
         traceCache.reserve(16384);
         allocationInfo.reserve(16384);
 
@@ -276,13 +273,12 @@ struct Data
             }
         }
 
-        Module module{fileName, addressStart, addressEnd, 0, isExe};
+        Module module{fileName, addressStart, addressEnd};
 
         auto it = lower_bound(modules.begin(), modules.end(), module);
         if (it == modules.end() || *it != module) {
-            module.id = data->next_module_id++;
-            fprintf(data->out, "m %u %s %lx %lx %d\n", module.id, module.fileName.c_str(),
-                                                       module.addressStart, module.addressEnd, module.isExe);
+            fprintf(data->out, "m %s %d %lx %lx\n", module.fileName.c_str(), isExe,
+                                                    module.addressStart, module.addressEnd);
             modules.insert(it, module);
         }
 
@@ -300,35 +296,13 @@ struct Data
         }
         auto it = traceCache.find(traceBuffer);
         if (it == traceCache.end()) {
-            // cache before converting
+            // cache trace
             auto traceId = next_trace_id++;
             it = traceCache.insert(it, {traceBuffer, traceId});
-            // ensure ip cache is up2date
-            for (auto& ip : traceBuffer) {
-                auto ipIt = ipCache.find(ip);
-                if (ipIt == ipCache.end()) {
-                    // find module and offset from cache
-                    auto module = lower_bound(modules.begin(), modules.end(), ip,
-                                                [] (const Module& module, const unw_word_t addr) -> bool {
-                                                    return module.addressEnd < addr;
-                                                });
-                    if (module == modules.end()) {
-                        ip = numeric_limits<unsigned int>::max();
-                        continue;
-                    }
-                    auto ipId = next_ipCache_id++;
-                    fprintf(out, "i %u %u %lx\n", ipId, module->id, ip - module->addressStart);
-                    ipIt = ipCache.insert(ipIt, {ip, ipId});
-                }
-                ip = ipIt->second;
-            }
             // print trace
             fprintf(out, "t %u ", traceId);
-            for (auto ipId : traceBuffer) {
-                if (ipId == numeric_limits<unsigned int>::max()) {
-                    continue;
-                }
-                fprintf(out, "%lu ", ipId);
+            for (auto ip : traceBuffer) {
+                fprintf(out, "%lx ", ip);
             }
             fputc('\n', out);
         }
@@ -348,13 +322,10 @@ struct Data
     }
 
     mutex m_mutex;
-    unsigned int next_module_id = 0;
     unsigned int next_thread_id = 0;
-    unsigned int next_ipCache_id = 0;
     unsigned int next_trace_id = 0;
 
     vector<Module> modules;
-    unordered_map<unw_word_t, unw_word_t> ipCache;
     unordered_map<Trace, unsigned int> traceCache;
     struct AllocationInfo
     {

@@ -23,8 +23,10 @@
 #include <map>
 #include <vector>
 #include <memory>
-#include <cxxabi.h>
+#include <tuple>
 #include <algorithm>
+
+#include <cxxabi.h>
 
 #include "libbacktrace/backtrace.h"
 
@@ -73,7 +75,7 @@ ostream& operator<<(ostream& out, const AddressInformation& info)
 
 struct Module
 {
-    Module(string _fileName, uintptr_t addressStart, uintptr_t addressEnd, bool isExe)
+    Module(string _fileName, bool isExe, uintptr_t addressStart, uintptr_t addressEnd)
         : fileName(move(_fileName))
         , addressStart(addressStart)
         , addressEnd(addressEnd)
@@ -97,14 +99,14 @@ struct Module
         }
     }
 
-    AddressInformation resolveAddress(uintptr_t offset) const
+    AddressInformation resolveAddress(uintptr_t address) const
     {
         AddressInformation info;
         if (!backtraceState) {
             return info;
         }
 
-        backtrace_pcinfo(backtraceState, addressStart + offset,
+        backtrace_pcinfo(backtraceState, address,
                          [] (void *data, uintptr_t /*addr*/, const char *file, int line, const char *function) -> int {
                             auto info = reinterpret_cast<AddressInformation*>(data);
                             info->function = demangle(function);
@@ -114,7 +116,7 @@ struct Module
                          }, &emptyErrorCallback, &info);
 
         if (info.function.empty()) {
-            backtrace_syminfo(backtraceState, addressStart + offset,
+            backtrace_syminfo(backtraceState, address,
                               [] (void *data, uintptr_t /*pc*/, const char *symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
                                 if (symname) {
                                     reinterpret_cast<AddressInformation*>(data)->function = demangle(symname);
@@ -138,6 +140,18 @@ struct Module
     {
     }
 
+    bool operator<(const Module& module) const
+    {
+        return make_tuple(addressStart, addressEnd, fileName)
+             < make_tuple(module.addressStart, module.addressEnd, module.fileName);
+    }
+
+    bool operator!=(const Module& module) const
+    {
+        return make_tuple(addressStart, addressEnd, fileName)
+            != make_tuple(module.addressStart, module.addressEnd, module.fileName);
+    }
+
     backtrace_state* backtraceState = nullptr;
     string fileName;
     uintptr_t addressStart;
@@ -145,26 +159,11 @@ struct Module
     bool isExe;
 };
 
-struct InstructionPointer
-{
-    shared_ptr<Module> module;
-    uintptr_t offset;
-};
-
 struct Trace
 {
-    vector<InstructionPointer> backtrace;
+    vector<uintptr_t> backtrace;
     size_t allocations = 0;
     size_t leaked = 0;
-
-    void printBacktrace(ostream& out) const
-    {
-        for (const auto& ip : backtrace) {
-            out << "0x" << hex << ip.offset << dec
-                << ' ' << ip.module->resolveAddress(ip.offset)
-                << ' ' << ip.module->fileName << endl;
-        }
-    }
 };
 
 struct AccumulatedTraceData
@@ -172,12 +171,29 @@ struct AccumulatedTraceData
     AccumulatedTraceData()
     {
         modules.reserve(64);
-        instructions.reserve(65536);
         traces.reserve(16384);
     }
 
-    vector<shared_ptr<Module>> modules;
-    vector<InstructionPointer> instructions;
+    void printBacktrace(const Trace& trace, ostream& out) const
+    {
+        for (auto ip : trace.backtrace) {
+            out << "0x" << hex << ip << dec;
+            // find module for this instruction pointer
+            auto module = lower_bound(modules.begin(), modules.end(), ip,
+                                      [] (const Module& module, const uintptr_t ip) -> bool {
+                                        return module.addressEnd < ip;
+                                      });
+            if (module != modules.end() && module->addressStart <= ip && module->addressEnd >= ip) {
+                out << ' ' << module->resolveAddress(ip)
+                    << ' ' << module->fileName;
+            } else {
+                out << " <unknown module>";
+            }
+            out << endl;
+        }
+    }
+
+    vector<Module> modules;
     vector<Trace> traces;
 
     map<size_t, size_t> sizeHistogram;
@@ -210,8 +226,6 @@ int main(int argc, char** argv)
     line.reserve(1024);
     stringstream lineIn(ios_base::in);
     size_t nextTraceId = 0;
-    size_t nextModuleId = 0;
-    size_t nextIpId = 0;
     while (in.good()) {
         getline(in, line);
         if (line.empty()) {
@@ -222,57 +236,21 @@ int main(int argc, char** argv)
         char mode = 0;
         lineIn >> mode;
         if (mode == 'm') {
-            size_t id = 0;
-            lineIn >> id;
-            if (id != nextModuleId) {
-                cerr << "inconsistent trace data: " << line << endl
-                     << "expected module with id: " << nextModuleId << endl;
-                return 1;
-            }
             string fileName;
             lineIn >> fileName;
+            bool isExe = false;
+            lineIn >> isExe;
             lineIn << hex;
             uintptr_t addressStart = 0;
             lineIn >> addressStart;
             uintptr_t addressEnd = 0;
             lineIn >> addressEnd;
-            bool isExe = false;
-            lineIn << dec;
-            lineIn >> isExe;
-            if (lineIn.bad()) {
-                cerr << "failed to parse line: " << line << endl;
-                return 1;
-            }
-            data.modules.push_back(make_shared<Module>(fileName, addressStart, addressEnd, isExe));
-            ++nextModuleId;
-        } else if (mode == 'i') {
-            InstructionPointer ip;
-            size_t id = 0;
-            lineIn >> id;
-            if (id != nextIpId) {
-                cerr << "inconsistent trace data: " << line << endl
-                     << "expected instruction with id: " << nextIpId << endl;
-                return 1;
-            }
-
-            size_t moduleId = 0;
-            lineIn >> moduleId;
-            if (moduleId >= data.modules.size()) {
-                cerr << "inconsistent trace data: " << line << endl
-                     << "failed to find module " << moduleId << ", only got so far: " << data.modules.size() << endl;
-                return 1;
-            }
-
-            lineIn << hex;
-            lineIn >> ip.offset;
             lineIn << dec;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
                 return 1;
             }
-            ip.module = data.modules[moduleId];
-            data.instructions.push_back(ip);
-            ++nextIpId;
+            data.modules.push_back({fileName, isExe, addressStart, addressEnd});
         } else if (mode == 't') {
             Trace trace;
             unsigned int id = 0;
@@ -286,16 +264,13 @@ int main(int argc, char** argv)
                      << "expected trace with id: " << nextTraceId << endl;
                 return 1;
             }
+            lineIn << hex;
             while (lineIn.good()) {
-                unsigned int ipId = 0;
-                lineIn >> ipId;
-                if (ipId >= data.instructions.size()) {
-                    cerr << "inconsistent trace data: " << line << endl
-                         << "failed to find instruction " << ipId << endl;
-                    return 1;
-                }
-                trace.backtrace.push_back(data.instructions[ipId]);
+                uintptr_t ip = 0;
+                lineIn >> ip;
+                trace.backtrace.push_back(ip);
             }
+            lineIn << dec;
             data.traces.push_back(trace);
             ++nextTraceId;
         } else if (mode == '+') {
@@ -349,6 +324,9 @@ int main(int argc, char** argv)
         }
     }
 
+    // sort by addresses
+    sort(data.modules.begin(), data.modules.end());
+
     // sort by amount of allocations
     sort(data.traces.begin(), data.traces.end(), [] (const Trace& l, const Trace &r) {
         return l.allocations > r.allocations;
@@ -357,11 +335,10 @@ int main(int argc, char** argv)
     for (size_t i = 0; i < min(10lu, data.traces.size()); ++i) {
         const auto& trace = data.traces[i];
         cout << trace.allocations << " allocations at:" << endl;
-        trace.printBacktrace(cout);
+        data.printBacktrace(trace, cout);
         cout << endl;
     }
     cout << endl;
-
 
     // sort by amount of leaks
     sort(data.traces.begin(), data.traces.end(), [] (const Trace& l, const Trace &r) {
@@ -376,7 +353,7 @@ int main(int argc, char** argv)
         totalLeakAllocations += trace.allocations;
 
         cout << trace.leaked << " bytes leaked in " << trace.allocations << " allocations at:" << endl;
-        trace.printBacktrace(cout);
+        data.printBacktrace(trace, cout);
         cout << endl;
     }
     cout << data.leaked << " bytes leaked in total from " << totalLeakAllocations << " allocations" << endl;
