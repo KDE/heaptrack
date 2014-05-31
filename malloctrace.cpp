@@ -206,13 +206,22 @@ struct Data
         traceCache.reserve(16384);
         allocationInfo.reserve(16384);
 
-        string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT") + to_string(getpid());
+        string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT");
+        if (outputFileName.empty()) {
+            // env var might not be set when linked directly into an executable
+            outputFileName = "malloctrace.";
+        }
+        outputFileName += to_string(getpid());
+
         out = fopen(outputFileName.c_str(), "wa");
         if (!out) {
             fprintf(stderr, "Failed to open output file: %s\n", outputFileName.c_str());
             exit(1);
         }
 
+        // TODO: remember meta data about host application, such as cmdline, date of run, ...
+
+        // cleanup environment to prevent tracing of child apps
         unsetenv("DUMP_MALLOC_TRACE_OUTPUT");
         unsetenv("LD_PRELOAD");
     }
@@ -245,7 +254,7 @@ struct Data
         if (!fileName || !fileName[0]) {
             if (modules.empty()) {
                 isExe = true;
-                ssize_t ret =  readlink("/proc/self/exe", buf, sizeof(buf));
+                ssize_t ret = readlink("/proc/self/exe", buf, sizeof(buf));
                 if ((ret > 0) && (ret < (ssize_t)sizeof(buf))) {
                     buf[ret] = 0;
                     fileName = buf;
