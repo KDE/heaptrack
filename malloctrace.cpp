@@ -407,6 +407,10 @@ void init()
     real_valloc = findReal<valloc_t>("valloc");
     real_aligned_alloc = findReal<aligned_alloc_t>("aligned_alloc");
 
+    if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
+        fprintf(stderr, "Failed to enable per-thread libunwind caching.\n");
+    }
+
     data.reset(new Data);
 }
 
