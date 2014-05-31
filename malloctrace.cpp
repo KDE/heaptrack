@@ -31,6 +31,7 @@
 #include <tuple>
 
 #include <boost/functional/hash.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 #include <dlfcn.h>
 #include <unistd.h>
@@ -209,11 +210,18 @@ struct Data
         string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT");
         if (outputFileName.empty()) {
             // env var might not be set when linked directly into an executable
-            outputFileName = "malloctrace.";
+            outputFileName = "malloctrace.$$";
+        } else if (outputFileName == "-" || outputFileName == "stdout") {
+            out = stdout;
+        } else if (outputFileName == "stderr") {
+            out = stderr;
         }
-        outputFileName += to_string(getpid());
 
-        out = fopen(outputFileName.c_str(), "wa");
+        if (!out) {
+            boost::replace_all(outputFileName, "$$", to_string(getpid()));
+            out = fopen(outputFileName.c_str(), "w");
+        }
+
         if (!out) {
             fprintf(stderr, "Failed to open output file: %s\n", outputFileName.c_str());
             exit(1);
