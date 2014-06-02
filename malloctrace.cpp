@@ -74,9 +74,14 @@ struct Trace
         return m_data + m_size;
     }
 
-    size_t size() const
+    int size() const
     {
         return m_size;
+    }
+
+    void setSize(int size)
+    {
+        m_size = size;
     }
 
     bool operator==(const Trace& o) const
@@ -84,7 +89,7 @@ struct Trace
         return m_size == o.m_size && !memcmp(m_data, o.m_data, m_size * sizeof(unw_word_t));
     }
 private:
-    size_t m_size = 0;
+    int m_size = 0;
     unw_word_t m_data[MAX_TRACE_SIZE];
 };
 
@@ -129,32 +134,8 @@ atomic<bool> moduleCacheDirty(true);
 
 void trace(Trace& trace, const int skip = 2)
 {
-    trace.clear();
-
-    unw_context_t uc;
-    unw_getcontext (&uc);
-
-    unw_cursor_t cursor;
-    unw_init_local (&cursor, &uc);
-
-    // skip functions we are not interested in
-    for (int i = 0; i < skip; ++i) {
-        if (unw_step(&cursor) <= 0) {
-            return;
-        }
-    }
-
-    while (unw_step(&cursor) > 0 && trace.size() < MAX_TRACE_SIZE) {
-        unw_word_t ip;
-        unw_get_reg(&cursor, UNW_REG_IP, &ip);
-        if (!ip) {
-            // this seems to happen regularly at the end of every trace and is useless to us
-            // not also useless, its also quite slow to continue here into libunwind
-            // I'll report this upstream.
-            break;
-        }
-        trace.push_back(ip);
-    }
+    int size = unw_backtrace(reinterpret_cast<void**>(trace.begin()), MAX_TRACE_SIZE);
+    trace.setSize(max(0, size));
 }
 
 struct HandleGuard
@@ -306,6 +287,9 @@ struct Data
     {
         Trace traceBuffer;
         trace(traceBuffer);
+        if (!traceBuffer.size()) {
+            return;
+        }
 
         lock_guard<mutex> lock(m_mutex);
         if (moduleCacheDirty) {
