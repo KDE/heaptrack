@@ -42,34 +42,26 @@
 
 using namespace std;
 
-const size_t MAX_TRACE_SIZE = 64;
-
 struct Trace
 {
-    void clear()
-    {
-        m_size = 0;
-    }
+    using ip_t = void*;
 
-    void push_back(unw_word_t ip)
-    {
-        m_data[m_size++] = ip;
-    }
+    static const int MAX_SIZE = 64;
 
-    const unw_word_t* begin() const
+    const ip_t* begin() const
     {
         return m_data;
     }
-    unw_word_t* begin()
+    ip_t* begin()
     {
         return m_data;
     }
 
-    const unw_word_t* end() const
+    const ip_t* end() const
     {
         return m_data + m_size;
     }
-    unw_word_t* end()
+    ip_t* end()
     {
         return m_data + m_size;
     }
@@ -78,7 +70,6 @@ struct Trace
     {
         return m_size;
     }
-
     void setSize(int size)
     {
         m_size = size;
@@ -86,11 +77,11 @@ struct Trace
 
     bool operator==(const Trace& o) const
     {
-        return m_size == o.m_size && !memcmp(m_data, o.m_data, m_size * sizeof(unw_word_t));
+        return m_size == o.m_size && !memcmp(m_data, o.m_data, m_size * sizeof(ip_t));
     }
 private:
     int m_size = 0;
-    unw_word_t m_data[MAX_TRACE_SIZE];
+    ip_t m_data[MAX_SIZE];
 };
 
 namespace std {
@@ -132,10 +123,12 @@ dlopen_t real_dlopen = nullptr;
 // threadsafe stuff
 atomic<bool> moduleCacheDirty(true);
 
-void trace(Trace& trace, const int skip = 2)
+bool trace(Trace& trace)
 {
-    int size = unw_backtrace(reinterpret_cast<void**>(trace.begin()), MAX_TRACE_SIZE);
+    ///FIXME: handle skip value
+    int size = unw_backtrace(trace.begin(), Trace::MAX_SIZE);
     trace.setSize(max(0, size));
+    return size > 0;
 }
 
 struct HandleGuard
@@ -286,8 +279,7 @@ struct Data
     void handleMalloc(void* ptr, size_t size)
     {
         Trace traceBuffer;
-        trace(traceBuffer);
-        if (!traceBuffer.size()) {
+        if (!trace(traceBuffer)) {
             return;
         }
 
@@ -303,7 +295,7 @@ struct Data
             // print trace
             fprintf(out, "t %u ", traceId);
             for (auto ip : traceBuffer) {
-                fprintf(out, "%lx ", ip);
+                fprintf(out, "%p ", ip);
             }
             fputc('\n', out);
         }
