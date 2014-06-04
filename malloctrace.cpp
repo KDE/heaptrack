@@ -350,7 +350,9 @@ void* realloc(void* ptr, size_t size)
 
     if (ret && !HandleGuard::inHandler) {
         HandleGuard guard;
-        data->handleFree(ptr);
+        if (ptr) {
+            data->handleFree(ptr);
+        }
         data->handleMalloc(ret, size);
     }
 
