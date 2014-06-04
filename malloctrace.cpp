@@ -18,87 +18,23 @@
  */
 
 #include <cstdio>
-#include <cassert>
-#include <cstring>
 #include <cstdlib>
 
 #include <atomic>
 #include <mutex>
 #include <unordered_map>
 #include <string>
-#include <vector>
-#include <algorithm>
 #include <tuple>
+#include <memory>
 
-#include <boost/functional/hash.hpp>
 #include <boost/algorithm/string/replace.hpp>
 
 #include <dlfcn.h>
-#include <unistd.h>
 #include <link.h>
 
-#define UNW_LOCAL_ONLY
-#include <libunwind.h>
+#include "tracetree.h"
 
 using namespace std;
-
-struct Trace
-{
-    using ip_t = void*;
-
-    static const int MAX_SIZE = 64;
-
-    const ip_t* begin() const
-    {
-        return m_data;
-    }
-    ip_t* begin()
-    {
-        return m_data;
-    }
-
-    const ip_t* end() const
-    {
-        return m_data + m_size;
-    }
-    ip_t* end()
-    {
-        return m_data + m_size;
-    }
-
-    int size() const
-    {
-        return m_size;
-    }
-    void setSize(int size)
-    {
-        m_size = size;
-    }
-
-    bool operator==(const Trace& o) const
-    {
-        return m_size == o.m_size && !memcmp(m_data, o.m_data, m_size * sizeof(ip_t));
-    }
-private:
-    int m_size = 0;
-    ip_t m_data[MAX_SIZE];
-};
-
-namespace std {
-    template<>
-    struct hash<Trace>
-    {
-        size_t operator() (const Trace& trace) const
-        {
-            size_t seed = 0;
-            for (auto ip : trace) {
-                boost::hash_combine(seed, ip);
-            }
-            boost::hash_combine(seed, trace.size());
-            return seed;
-        }
-    };
-}
 
 namespace {
 
@@ -122,14 +58,6 @@ dlopen_t real_dlopen = nullptr;
 
 // threadsafe stuff
 atomic<bool> moduleCacheDirty(true);
-
-bool trace(Trace& trace)
-{
-    ///FIXME: handle skip value
-    int size = unw_backtrace(trace.begin(), Trace::MAX_SIZE);
-    trace.setSize(max(0, size));
-    return size > 0;
-}
 
 struct HandleGuard
 {
@@ -178,7 +106,6 @@ struct Data
     Data()
     {
         modules.reserve(32);
-        traceCache.reserve(16384);
         allocationInfo.reserve(16384);
 
         string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT");
@@ -278,8 +205,8 @@ struct Data
 
     void handleMalloc(void* ptr, size_t size)
     {
-        Trace traceBuffer;
-        if (!trace(traceBuffer)) {
+        Trace trace;
+        if (!trace.fill()) {
             return;
         }
 
@@ -287,20 +214,9 @@ struct Data
         if (moduleCacheDirty) {
             updateModuleCache();
         }
-        auto it = traceCache.find(traceBuffer);
-        if (it == traceCache.end()) {
-            // cache trace
-            auto traceId = next_trace_id++;
-            it = traceCache.insert(it, {traceBuffer, traceId});
-            // print trace
-            fprintf(out, "t %u ", traceId);
-            for (auto ip : traceBuffer) {
-                fprintf(out, "%p ", ip);
-            }
-            fputc('\n', out);
-        }
-        allocationInfo[ptr] = {size, it->second};
-        fprintf(out, "+ %lu %u\n", size, it->second);
+        auto index = traceTree.index(trace, out);
+        allocationInfo[ptr] = {size, index};
+        fprintf(out, "+ %lu %lu\n", size, index);
     }
 
     void handleFree(void* ptr)
@@ -310,20 +226,18 @@ struct Data
         if (it == allocationInfo.end()) {
             return;
         }
-        fprintf(out, "- %lu %u\n", it->second.size, it->second.traceId);
+        fprintf(out, "- %lu %lu\n", it->second.size, it->second.traceIndex);
         allocationInfo.erase(it);
     }
 
     mutex m_mutex;
-    unsigned int next_thread_id = 0;
-    unsigned int next_trace_id = 0;
 
     vector<Module> modules;
-    unordered_map<Trace, unsigned int> traceCache;
+    TraceTree traceTree;
     struct AllocationInfo
     {
         size_t size;
-        unsigned int traceId;
+        size_t traceIndex;
     };
     unordered_map<void*, AllocationInfo> allocationInfo;
     FILE* out = nullptr;

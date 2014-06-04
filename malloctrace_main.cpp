@@ -159,11 +159,20 @@ struct Module
     bool isExe;
 };
 
-struct Trace
+struct InstructionPointer
 {
-    vector<uintptr_t> backtrace;
-    size_t allocations = 0;
-    size_t leaked = 0;
+    uintptr_t instructionPointer;
+    size_t parentIndex;
+};
+
+struct Allocation
+{
+    // backtrace entry point
+    size_t ipIndex;
+    // number of allocations
+    size_t allocations;
+    // amount of bytes leaked
+    size_t leaked;
 };
 
 struct AccumulatedTraceData
@@ -171,30 +180,60 @@ struct AccumulatedTraceData
     AccumulatedTraceData()
     {
         modules.reserve(64);
-        traces.reserve(16384);
+        instructionPointers.reserve(65536);
+        // root node with invalid instruction pointer
+        instructionPointers.push_back({0, 0});
+        allocations.reserve(16384);
     }
 
-    void printBacktrace(const Trace& trace, ostream& out) const
+    void printBacktrace(InstructionPointer ip, ostream& out) const
     {
-        for (auto ip : trace.backtrace) {
-            out << "0x" << hex << ip << dec;
+        while (ip.instructionPointer) {
+            out << "0x" << hex << ip.instructionPointer << dec;
             // find module for this instruction pointer
-            auto module = lower_bound(modules.begin(), modules.end(), ip,
+            auto module = lower_bound(modules.begin(), modules.end(), ip.instructionPointer,
                                       [] (const Module& module, const uintptr_t ip) -> bool {
                                         return module.addressEnd < ip;
                                       });
-            if (module != modules.end() && module->addressStart <= ip && module->addressEnd >= ip) {
-                out << ' ' << module->resolveAddress(ip)
+            if (module != modules.end()
+                && module->addressStart <= ip.instructionPointer
+                && module->addressEnd >= ip.instructionPointer)
+            {
+                out << ' ' << module->resolveAddress(ip.instructionPointer)
                     << ' ' << module->fileName;
             } else {
                 out << " <unknown module>";
             }
             out << endl;
+
+            ip = instructionPointers[ip.parentIndex];
+        };
+    }
+
+    Allocation& findAllocation(const size_t ipIndex)
+    {
+        auto it = lower_bound(allocations.begin(), allocations.end(), ipIndex,
+                                [] (const Allocation& allocation, const size_t ipIndex) -> bool {
+                                    return allocation.ipIndex < ipIndex;
+                                });
+        if (it == allocations.end() || it->ipIndex != ipIndex) {
+            it = allocations.insert(it, {ipIndex, 0, 0});
+        }
+        return *it;
+    }
+
+    InstructionPointer findIp(const size_t ipIndex) const
+    {
+        if (ipIndex > instructionPointers.size()) {
+            return {};
+        } else {
+            return instructionPointers[ipIndex];
         }
     }
 
     vector<Module> modules;
-    vector<Trace> traces;
+    vector<InstructionPointer> instructionPointers;
+    vector<Allocation> allocations;
 
     map<size_t, size_t> sizeHistogram;
     size_t totalAllocated = 0;
@@ -225,7 +264,7 @@ int main(int argc, char** argv)
     string line;
     line.reserve(1024);
     stringstream lineIn(ios_base::in);
-    size_t nextTraceId = 0;
+    size_t nextIpId = 1;
     while (in.good()) {
         getline(in, line);
         if (line.empty()) {
@@ -251,71 +290,60 @@ int main(int argc, char** argv)
                 return 1;
             }
             data.modules.push_back({fileName, isExe, addressStart, addressEnd});
-        } else if (mode == 't') {
-            Trace trace;
-            unsigned int id = 0;
+        } else if (mode == 'i') {
+            InstructionPointer ip{0, 0};
+            size_t id = 0;
             lineIn >> id;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
                 return 1;
             }
-            if (id != nextTraceId) {
+            if (id != nextIpId) {
                 cerr << "inconsistent trace data: " << line << endl
-                     << "expected trace with id: " << nextTraceId << endl;
+                     << "expected id: " << nextIpId << endl;
                 return 1;
             }
             lineIn << hex;
-            uintptr_t ip = 0;
-            while (lineIn >> ip) {
-                trace.backtrace.push_back(ip);
-            }
+            lineIn >> ip.instructionPointer;
             lineIn << dec;
-            data.traces.push_back(trace);
-            ++nextTraceId;
+            lineIn >> ip.parentIndex;
+            data.instructionPointers.push_back(ip);
+            ++nextIpId;
         } else if (mode == '+') {
             size_t size = 0;
             lineIn >> size;
-            unsigned int traceId = 0;
-            lineIn >> traceId;
+            size_t ipId = 0;
+            lineIn >> ipId;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
                 return 1;
             }
-            if (traceId < data.traces.size()) {
-                auto& trace = data.traces[traceId];
-                trace.leaked += size;
-                ++trace.allocations;
-            } else {
-                cerr << "failed to find trace of malloc at " << traceId << endl;
-                return 1;
-            }
+            auto& allocation = data.findAllocation(ipId);
+            allocation.leaked += size;
+            ++allocation.allocations;
             data.totalAllocated += size;
-            data.totalAllocations++;
+            ++data.totalAllocations;
             data.leaked += size;
             if (data.leaked > data.peak) {
                 data.peak = data.leaked;
             }
-            data.sizeHistogram[size]++;
+            ++data.sizeHistogram[size];
         } else if (mode == '-') {
-            /// TODO
             size_t size = 0;
             lineIn >> size;
-            unsigned int traceId = 0;
-            lineIn >> traceId;
+            size_t ipId = 0;
+            lineIn >> ipId;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
                 return 1;
             }
-            if (traceId < data.traces.size()) {
-                auto& trace = data.traces[traceId];
-                if (trace.leaked >= size) {
-                    trace.leaked -= size;
-                } else {
-                    cerr << "inconsistent allocation info, underflowed allocations of " << traceId << endl;
-                    trace.leaked = 0;
-                }
+            auto& allocation = data.findAllocation(ipId);
+            if (!allocation.allocations || allocation.leaked < size) {
+                cerr << "inconsistent allocation info, underflowed allocations of " << ipId << endl;
+                allocation.leaked = 0;
+                allocation.allocations = 0;
             } else {
-                cerr << "failed to find trace for free at " << traceId << endl;
+                allocation.leaked -= size;
             }
             data.leaked -= size;
         } else {
@@ -327,32 +355,32 @@ int main(int argc, char** argv)
     sort(data.modules.begin(), data.modules.end());
 
     // sort by amount of allocations
-    sort(data.traces.begin(), data.traces.end(), [] (const Trace& l, const Trace &r) {
+    sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
         return l.allocations > r.allocations;
     });
     cout << "TOP ALLOCATORS" << endl;
-    for (size_t i = 0; i < min(10lu, data.traces.size()); ++i) {
-        const auto& trace = data.traces[i];
-        cout << trace.allocations << " allocations at:" << endl;
-        data.printBacktrace(trace, cout);
+    for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
+        const auto& allocation = data.allocations[i];
+        cout << allocation.allocations << " allocations at:" << endl;
+        data.printBacktrace(data.findIp(allocation.ipIndex), cout);
         cout << endl;
     }
     cout << endl;
 
     // sort by amount of leaks
-    sort(data.traces.begin(), data.traces.end(), [] (const Trace& l, const Trace &r) {
+    sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
         return l.leaked < r.leaked;
     });
 
     size_t totalLeakAllocations = 0;
-    for (const auto& trace : data.traces) {
-        if (!trace.leaked) {
+    for (const auto& allocation : data.allocations) {
+        if (!allocation.leaked) {
             continue;
         }
-        totalLeakAllocations += trace.allocations;
+        totalLeakAllocations += allocation.allocations;
 
-        cout << trace.leaked << " bytes leaked in " << trace.allocations << " allocations at:" << endl;
-        data.printBacktrace(trace, cout);
+        cout << allocation.leaked << " bytes leaked in " << allocation.allocations << " allocations at:" << endl;
+        data.printBacktrace(data.findIp(allocation.ipIndex), cout);
         cout << endl;
     }
     cout << data.leaked << " bytes leaked in total from " << totalLeakAllocations << " allocations" << endl;
