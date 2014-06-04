@@ -276,6 +276,7 @@ int main(int argc, char** argv)
     string line;
     line.reserve(1024);
     stringstream lineIn(ios_base::in);
+    lineIn << hex;
     size_t nextIpId = 1;
     while (in.good()) {
         getline(in, line);
@@ -291,12 +292,10 @@ int main(int argc, char** argv)
             lineIn >> fileName;
             bool isExe = false;
             lineIn >> isExe;
-            lineIn << hex;
             uintptr_t addressStart = 0;
             lineIn >> addressStart;
             uintptr_t addressEnd = 0;
             lineIn >> addressEnd;
-            lineIn << dec;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
                 return 1;
@@ -315,9 +314,7 @@ int main(int argc, char** argv)
                      << "expected id: " << nextIpId << endl;
                 return 1;
             }
-            lineIn << hex;
             lineIn >> ip.instructionPointer;
-            lineIn << dec;
             lineIn >> ip.parentIndex;
             data.instructionPointers.push_back(ip);
             ++nextIpId;
@@ -326,10 +323,8 @@ int main(int argc, char** argv)
             lineIn >> size;
             size_t ipId = 0;
             lineIn >> ipId;
-            lineIn << hex;
             uintptr_t ptr = 0;
             lineIn >> ptr;
-            lineIn << dec;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
                 return 1;
@@ -349,9 +344,7 @@ int main(int argc, char** argv)
             ++data.sizeHistogram[size];
         } else if (mode == '-') {
             uintptr_t ptr = 0;
-            lineIn << hex;
             lineIn >> ptr;
-            lineIn << dec;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
                 return 1;

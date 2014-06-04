@@ -217,7 +217,7 @@ struct Data
             }
             index = traceTree.index(trace, out);
         }
-        fprintf(out, "+ %lu %lu %lx\n", size, index, ptr);
+        fprintf(out, "+ %lx %lx %lx\n", size, index, ptr);
     }
 
     void handleFree(void* ptr)
