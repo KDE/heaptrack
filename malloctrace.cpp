@@ -106,7 +106,6 @@ struct Data
     Data()
     {
         modules.reserve(32);
-        allocationInfo.reserve(16384);
 
         string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT");
         if (outputFileName.empty()) {
@@ -210,36 +209,26 @@ struct Data
             return;
         }
 
-        lock_guard<mutex> lock(m_mutex);
-        if (moduleCacheDirty) {
-            updateModuleCache();
+        size_t index = 0;
+        {
+            lock_guard<mutex> lock(m_mutex);
+            if (moduleCacheDirty) {
+                updateModuleCache();
+            }
+            index = traceTree.index(trace, out);
         }
-        auto index = traceTree.index(trace, out);
-        allocationInfo[ptr] = {size, index};
-        fprintf(out, "+ %lu %lu\n", size, index);
+        fprintf(out, "+ %lu %lu %p\n", size, index, ptr);
     }
 
     void handleFree(void* ptr)
     {
-        lock_guard<mutex> lock(m_mutex);
-        auto it = allocationInfo.find(ptr);
-        if (it == allocationInfo.end()) {
-            return;
-        }
-        fprintf(out, "- %lu %lu\n", it->second.size, it->second.traceIndex);
-        allocationInfo.erase(it);
+        fprintf(out, "- %p\n", ptr);
     }
 
     mutex m_mutex;
 
     vector<Module> modules;
     TraceTree traceTree;
-    struct AllocationInfo
-    {
-        size_t size;
-        size_t traceIndex;
-    };
-    unordered_map<void*, AllocationInfo> allocationInfo;
     FILE* out = nullptr;
 };
 
@@ -332,12 +321,15 @@ void free(void* ptr)
         init();
     }
 
-    real_free(ptr);
-
+    // call handler before handing over the real free implementation
+    // to ensure the ptr is not reused in-between and thus the output
+    // stays consistent
     if (ptr && !HandleGuard::inHandler) {
         HandleGuard guard;
         data->handleFree(ptr);
     }
+
+    real_free(ptr);
 }
 
 void* realloc(void* ptr, size_t size)

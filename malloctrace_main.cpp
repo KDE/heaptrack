@@ -20,6 +20,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <unordered_map>
 #include <map>
 #include <vector>
 #include <memory>
@@ -175,6 +176,15 @@ struct Allocation
     size_t leaked;
 };
 
+/**
+ * Information for a single call to an allocation function
+ */
+struct AllocationInfo
+{
+    size_t ipIndex;
+    size_t size;
+};
+
 struct AccumulatedTraceData
 {
     AccumulatedTraceData()
@@ -184,6 +194,7 @@ struct AccumulatedTraceData
         // root node with invalid instruction pointer
         instructionPointers.push_back({0, 0});
         allocations.reserve(16384);
+        activeAllocations.reserve(65536);
     }
 
     void printBacktrace(InstructionPointer ip, ostream& out) const
@@ -234,6 +245,7 @@ struct AccumulatedTraceData
     vector<Module> modules;
     vector<InstructionPointer> instructionPointers;
     vector<Allocation> allocations;
+    unordered_map<uintptr_t, AllocationInfo> activeAllocations;
 
     map<size_t, size_t> sizeHistogram;
     size_t totalAllocated = 0;
@@ -314,10 +326,17 @@ int main(int argc, char** argv)
             lineIn >> size;
             size_t ipId = 0;
             lineIn >> ipId;
+            lineIn << hex;
+            uintptr_t ptr = 0;
+            lineIn >> ptr;
+            lineIn << dec;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
                 return 1;
             }
+
+            data.activeAllocations[ptr] = {ipId, size};
+
             auto& allocation = data.findAllocation(ipId);
             allocation.leaked += size;
             ++allocation.allocations;
@@ -329,23 +348,31 @@ int main(int argc, char** argv)
             }
             ++data.sizeHistogram[size];
         } else if (mode == '-') {
-            size_t size = 0;
-            lineIn >> size;
-            size_t ipId = 0;
-            lineIn >> ipId;
+            uintptr_t ptr = 0;
+            lineIn << hex;
+            lineIn >> ptr;
+            lineIn << dec;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
                 return 1;
             }
-            auto& allocation = data.findAllocation(ipId);
-            if (!allocation.allocations || allocation.leaked < size) {
-                cerr << "inconsistent allocation info, underflowed allocations of " << ipId << endl;
+            auto ip = data.activeAllocations.find(ptr);
+            if (ip == data.activeAllocations.end()) {
+                cerr << "unknown pointer in line: " << line << endl;
+                continue;
+            }
+            const auto info = ip->second;
+            data.activeAllocations.erase(ip);
+
+            auto& allocation = data.findAllocation(info.ipIndex);
+            if (!allocation.allocations || allocation.leaked < info.size) {
+                cerr << "inconsistent allocation info, underflowed allocations of " << info.ipIndex << endl;
                 allocation.leaked = 0;
                 allocation.allocations = 0;
             } else {
-                allocation.leaked -= size;
+                allocation.leaked -= info.size;
             }
-            data.leaked -= size;
+            data.leaked -= info.size;
         } else {
             cerr << "failed to parse line: " << line << endl;
         }
