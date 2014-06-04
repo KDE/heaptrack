@@ -277,7 +277,6 @@ int main(int argc, char** argv)
     line.reserve(1024);
     stringstream lineIn(ios_base::in);
     lineIn << hex;
-    size_t nextIpId = 1;
     while (in.good()) {
         getline(in, line);
         if (line.empty()) {
@@ -303,21 +302,13 @@ int main(int argc, char** argv)
             data.modules.push_back({fileName, isExe, addressStart, addressEnd});
         } else if (mode == 'i') {
             InstructionPointer ip{0, 0};
-            size_t id = 0;
-            lineIn >> id;
+            lineIn >> ip.instructionPointer;
+            lineIn >> ip.parentIndex;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
                 return 1;
             }
-            if (id != nextIpId) {
-                cerr << "inconsistent trace data: " << line << endl
-                     << "expected id: " << nextIpId << endl;
-                return 1;
-            }
-            lineIn >> ip.instructionPointer;
-            lineIn >> ip.parentIndex;
             data.instructionPointers.push_back(ip);
-            ++nextIpId;
         } else if (mode == '+') {
             size_t size = 0;
             lineIn >> size;
