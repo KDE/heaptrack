@@ -20,7 +20,7 @@ bool dealloc(future<int**>&& f)
     for (int i = 0; i < ALLOCS_PER_THREAD; ++i) {
         delete block[i];
     }
-    delete block;
+    delete[] block;
     return true;
 }
 
