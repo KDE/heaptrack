@@ -29,6 +29,10 @@
 
 #include <cxxabi.h>
 
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/algorithm/string/predicate.hpp>
+
 #include "libbacktrace/backtrace.h"
 
 using namespace std;
@@ -265,13 +269,22 @@ int main(int argc, char** argv)
 
     AccumulatedTraceData data;
 
-    fstream in(argv[1], ios_base::in);
-    if (!in.is_open()) {
+    string fileName(argv[1]);
+    const bool isCompressed = boost::algorithm::ends_with(fileName, ".gz");
+    ifstream file(fileName, isCompressed ? ios_base::in | ios_base::binary : ios_base::in);
+
+    if (!file.is_open()) {
         cerr << "Failed to open malloctrace log file: " << argv[1] << endl;
         cerr << endl;
         printUsage(cerr);
         return 1;
     }
+
+    boost::iostreams::filtering_istream in;
+    if (isCompressed) {
+        in.push(boost::iostreams::gzip_decompressor());
+    }
+    in.push(file);
 
     string line;
     line.reserve(1024);
