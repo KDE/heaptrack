@@ -214,8 +214,13 @@ struct AccumulatedTraceData
                 && module->addressStart <= ip.instructionPointer
                 && module->addressEnd >= ip.instructionPointer)
             {
-                out << ' ' << module->resolveAddress(ip.instructionPointer)
+                const auto info = module->resolveAddress(ip.instructionPointer);
+                out << ' ' << info
                     << ' ' << module->fileName;
+                if (info.function == "__libc_start_main") {
+                    // hide anything above as its mostly garbage anyways
+                    ip.parentIndex = 0;
+                }
             } else {
                 out << " <unknown module>";
             }
