@@ -27,13 +27,9 @@
 #include <tuple>
 #include <algorithm>
 
-#include <cxxabi.h>
-
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-
-#include "libbacktrace/backtrace.h"
 
 using namespace std;
 
@@ -42,24 +38,6 @@ namespace {
 void printUsage(ostream& out)
 {
     out << "malloctrace_main MALLOCTRACE_LOG_FILE..." << endl;
-}
-
-string demangle(const char* function)
-{
-    if (!function) {
-        return {};
-    } else if (function[0] != '_' || function[1] != 'Z') {
-        return {function};
-    }
-
-    string ret;
-    int status = 0;
-    char* demangled = abi::__cxa_demangle(function, 0, 0, &status);
-    if (demangled) {
-        ret = demangled;
-        free(demangled);
-    }
-    return ret;
 }
 
 struct AddressInformation
@@ -78,96 +56,14 @@ ostream& operator<<(ostream& out, const AddressInformation& info)
     return out;
 }
 
-struct Module
-{
-    Module(string _fileName, bool isExe, uintptr_t addressStart, uintptr_t addressEnd)
-        : fileName(move(_fileName))
-        , addressStart(addressStart)
-        , addressEnd(addressEnd)
-        , isExe(isExe)
-    {
-        backtraceState = backtrace_create_state(fileName.c_str(), /* we are single threaded, so: not thread safe */ false,
-                                                [] (void *data, const char *msg, int errnum) {
-                                                    const Module* module = reinterpret_cast<Module*>(data);
-                                                    cerr << "Failed to create backtrace state for file " << module->fileName
-                                                         << ": " << msg << " (error code " << errnum << ")" << endl;
-                                                }, this);
-
-        if (backtraceState) {
-            backtrace_fileline_initialize(backtraceState, addressStart, isExe,
-                                          [] (void *data, const char *msg, int errnum) {
-                                            const Module* module = reinterpret_cast<Module*>(data);
-                                            cerr << "Failed to initialize backtrace fileline for "
-                                                 << (module->isExe ? "executable" : "library") << module->fileName
-                                                 << ": " << msg << " (error code " << errnum << ")" << endl;
-                                          }, this);
-        }
-    }
-
-    AddressInformation resolveAddress(uintptr_t address) const
-    {
-        AddressInformation info;
-        if (!backtraceState) {
-            return info;
-        }
-
-        backtrace_pcinfo(backtraceState, address,
-                         [] (void *data, uintptr_t /*addr*/, const char *file, int line, const char *function) -> int {
-                            auto info = reinterpret_cast<AddressInformation*>(data);
-                            info->function = demangle(function);
-                            info->file = file ? file : "";
-                            info->line = line;
-                            return 0;
-                         }, &emptyErrorCallback, &info);
-
-        if (info.function.empty()) {
-            backtrace_syminfo(backtraceState, address,
-                              [] (void *data, uintptr_t /*pc*/, const char *symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
-                                if (symname) {
-                                    reinterpret_cast<AddressInformation*>(data)->function = demangle(symname);
-                                }
-                              }, &errorCallback, &info);
-        }
-
-        if (info.function.empty()) {
-            info.function = "?";
-        }
-
-        return info;
-    }
-
-    static void errorCallback(void */*data*/, const char *msg, int errnum)
-    {
-        cerr << "Module backtrace error (code " << errnum << "): " << msg << endl;
-    }
-
-    static void emptyErrorCallback(void */*data*/, const char */*msg*/, int /*errnum*/)
-    {
-    }
-
-    bool operator<(const Module& module) const
-    {
-        return make_tuple(addressStart, addressEnd, fileName)
-             < make_tuple(module.addressStart, module.addressEnd, module.fileName);
-    }
-
-    bool operator!=(const Module& module) const
-    {
-        return make_tuple(addressStart, addressEnd, fileName)
-            != make_tuple(module.addressStart, module.addressEnd, module.fileName);
-    }
-
-    backtrace_state* backtraceState = nullptr;
-    string fileName;
-    uintptr_t addressStart;
-    uintptr_t addressEnd;
-    bool isExe;
-};
-
 struct InstructionPointer
 {
-    uintptr_t instructionPointer;
-    size_t parentIndex;
+    uintptr_t instructionPointer = 0;
+    size_t parentIndex = 0;
+    size_t moduleIndex = 0;
+    size_t functionIndex = 0;
+    size_t fileIndex = 0;
+    int line = 0;
 };
 
 struct Allocation
@@ -193,10 +89,12 @@ struct AccumulatedTraceData
 {
     AccumulatedTraceData()
     {
-        modules.reserve(64);
         instructionPointers.reserve(65536);
+        strings.reserve(16384);
+        // invalid string
+        strings.push_back(string());
         // root node with invalid instruction pointer
-        instructionPointers.push_back({0, 0});
+        instructionPointers.push_back(InstructionPointer());
         allocations.reserve(16384);
         activeAllocations.reserve(65536);
     }
@@ -205,26 +103,24 @@ struct AccumulatedTraceData
     {
         while (ip.instructionPointer) {
             out << "0x" << hex << ip.instructionPointer << dec;
-            // find module for this instruction pointer
-            auto module = lower_bound(modules.begin(), modules.end(), ip.instructionPointer,
-                                      [] (const Module& module, const uintptr_t ip) -> bool {
-                                        return module.addressEnd < ip;
-                                      });
-            if (module != modules.end()
-                && module->addressStart <= ip.instructionPointer
-                && module->addressEnd >= ip.instructionPointer)
-            {
-                const auto info = module->resolveAddress(ip.instructionPointer);
-                out << ' ' << info
-                    << ' ' << module->fileName;
-                if (info.function == "__libc_start_main") {
-                    // hide anything above as its mostly garbage anyways
-                    ip.parentIndex = 0;
-                }
+            if (ip.moduleIndex) {
+                out << ' ' << stringify(ip.moduleIndex);
             } else {
                 out << " <unknown module>";
             }
-            out << endl;
+            if (ip.functionIndex) {
+                out << ' ' << stringify(ip.functionIndex);
+            } else {
+                out << " ??";
+            }
+            if (ip.fileIndex) {
+                out << ' ' << stringify(ip.fileIndex) << ':' << ip.line;
+            }
+            out << '\n';
+
+            if (mainIndex && ip.functionIndex == mainIndex) {
+                break;
+            }
 
             ip = instructionPointers[ip.parentIndex];
         };
@@ -251,10 +147,29 @@ struct AccumulatedTraceData
         }
     }
 
-    vector<Module> modules;
+    const string& stringify(const size_t stringId) const
+    {
+        if (stringId < strings.size()) {
+            return strings.at(stringId);
+        } else {
+            return strings.at(0);
+        }
+    }
+
+    void finalize()
+    {
+        auto it = find(strings.begin(), strings.end(), "main");
+        if (it != strings.end()) {
+            mainIndex = distance(strings.begin(), it);
+        }
+    }
+
     vector<InstructionPointer> instructionPointers;
+    vector<string> strings;
     vector<Allocation> allocations;
     unordered_map<uintptr_t, AllocationInfo> activeAllocations;
+
+    size_t mainIndex = 0;
 
     map<size_t, size_t> sizeHistogram;
     size_t totalAllocated = 0;
@@ -291,10 +206,15 @@ int main(int argc, char** argv)
     }
     in.push(file);
 
+    string str;
+    str.reserve(1024);
+
     string line;
     line.reserve(1024);
+
     stringstream lineIn(ios_base::in);
     lineIn << hex;
+
     while (in.good()) {
         getline(in, line);
         if (line.empty()) {
@@ -304,24 +224,19 @@ int main(int argc, char** argv)
         lineIn.clear();
         char mode = 0;
         lineIn >> mode;
-        if (mode == 'm') {
-            string fileName;
-            lineIn >> fileName;
-            bool isExe = false;
-            lineIn >> isExe;
-            uintptr_t addressStart = 0;
-            lineIn >> addressStart;
-            uintptr_t addressEnd = 0;
-            lineIn >> addressEnd;
-            if (lineIn.bad()) {
-                cerr << "failed to parse line: " << line << endl;
-                return 1;
-            }
-            data.modules.push_back({fileName, isExe, addressStart, addressEnd});
+        if (mode == 's') {
+            // skip whitespace
+            lineIn.seekg(1, ios_base::cur);
+            getline(lineIn, str);
+            data.strings.push_back(str);
         } else if (mode == 'i') {
-            InstructionPointer ip{0, 0};
+            InstructionPointer ip;
             lineIn >> ip.instructionPointer;
             lineIn >> ip.parentIndex;
+            lineIn >> ip.moduleIndex;
+            lineIn >> ip.functionIndex;
+            lineIn >> ip.fileIndex;
+            lineIn >> ip.line;
             if (lineIn.bad()) {
                 cerr << "failed to parse line: " << line << endl;
                 return 1;
@@ -380,8 +295,7 @@ int main(int argc, char** argv)
         }
     }
 
-    // sort by addresses
-    sort(data.modules.begin(), data.modules.end());
+    data.finalize();
 
     // sort by amount of allocations
     sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {

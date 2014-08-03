@@ -21,7 +21,7 @@ pipe=/tmp/malloctrace_fifo$$
 mkfifo $pipe
 trap "rm -f $pipe" EXIT
 
-gzip -c > "$output.gz" < $pipe &
+./malloctrace_interpret < $pipe | gzip -c > "$output.gz" &
 compressor=$!
 
 if [ -z "$debug" ]; then
