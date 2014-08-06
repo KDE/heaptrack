@@ -25,6 +25,9 @@
 #define UNW_LOCAL_ONLY
 #include <libunwind.h>
 
+/**
+ * @brief A libunwind based backtrace.
+ */
 struct Trace
 {
     using ip_t = void*;

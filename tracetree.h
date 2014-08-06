@@ -20,6 +20,11 @@
 #ifndef TRACETREE_H
 #define TRACETREE_H
 
+/**
+ * @file tracetree.h
+ * @brief Efficiently combine and store the data of multiple Traces.
+ */
+
 #include <vector>
 #include <algorithm>
 
@@ -46,7 +51,9 @@ class TraceTree
 {
 public:
     /**
-     * Index the backtrace and return the index of the last instruction pointer.
+     * Index the data in @p trace and return the index of the last instruction pointer.
+     *
+     * Unknown instruction pointers will be printed to @p out.
      */
     std::size_t index(const Trace& trace, FILE* out)
     {

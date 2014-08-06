@@ -17,6 +17,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+/**
+ * @file heaptrack_interpret.cpp
+ *
+ * @brief Interpret raw heaptrack data and add Dwarf based debug information.
+ */
+
 #include <iostream>
 #include <sstream>
 #include <unordered_map>

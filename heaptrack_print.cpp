@@ -17,6 +17,12 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
+/**
+ * @file heaptrack_print.cpp
+ *
+ * @brief Evaluate and print the collected heaptrack data.
+ */
+
 #include <iostream>
 #include <fstream>
 #include <sstream>

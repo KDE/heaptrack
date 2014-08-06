@@ -14,19 +14,19 @@ include_directories(
 add_subdirectory(3rdparty)
 add_subdirectory(tests)
 
-add_library(libheaptrack SHARED heaptrack.cpp)
+add_library(libheaptrack SHARED libheaptrack.cpp)
 set_target_properties(libheaptrack
   PROPERTIES OUTPUT_NAME heaptrack)
 target_link_libraries(libheaptrack ${CMAKE_DL_LIBS} backtrace)
 
-add_executable(heaptrack_eval heaptrack_main.cpp)
-target_link_libraries(heaptrack_eval ${Boost_LIBRARIES})
-
 add_executable(heaptrack_interpret heaptrack_interpret.cpp)
 target_link_libraries(heaptrack_interpret backtrace)
 
+add_executable(heaptrack_print heaptrack_print.cpp)
+target_link_libraries(heaptrack_print ${Boost_LIBRARIES})
+
 # TODO: support running from an installed location
-# install(TARGETS libheaptrack heaptrack_eval heaptrack_interpret
+# install(TARGETS libheaptrack heaptrack_interpret heaptrack_print
 #   RUNTIME DESTINATION bin
 #   LIBRARY DESTINATION lib
 #   ARCHIVE DESTINATION lib
