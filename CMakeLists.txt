@@ -8,19 +8,26 @@ find_package(Threads)
 
 include_directories(
     ${Boost_INCLUDE_DIRS}
+    3rdparty/
 )
 
+add_subdirectory(3rdparty)
 add_subdirectory(tests)
-add_subdirectory(libbacktrace)
 
-add_library(malloctrace SHARED malloctrace.cpp)
-target_link_libraries(malloctrace -ldl backtrace)
+add_library(libheaptrack SHARED heaptrack.cpp)
+set_target_properties(libheaptrack
+  PROPERTIES OUTPUT_NAME heaptrack)
+target_link_libraries(libheaptrack ${CMAKE_DL_LIBS} backtrace)
 
-add_executable(malloctrace_eval malloctrace_main.cpp)
-target_link_libraries(malloctrace_eval ${Boost_LIBRARIES})
+add_executable(heaptrack_eval heaptrack_main.cpp)
+target_link_libraries(heaptrack_eval ${Boost_LIBRARIES})
 
-add_executable(malloctrace_interpret malloctrace_interpret.cpp)
-target_link_libraries(malloctrace_interpret backtrace)
+add_executable(heaptrack_interpret heaptrack_interpret.cpp)
+target_link_libraries(heaptrack_interpret backtrace)
 
-# FIXME: install
-# install(TARGETS heaptrack RUNTIME DESTINATION bin)
+# TODO: support running from an installed location
+# install(TARGETS libheaptrack heaptrack_eval heaptrack_interpret
+#   RUNTIME DESTINATION bin
+#   LIBRARY DESTINATION lib
+#   ARCHIVE DESTINATION lib
+# )

@@ -107,10 +107,10 @@ struct Data
     {
         modules.reserve(32);
 
-        string outputFileName = env("DUMP_MALLOC_TRACE_OUTPUT");
+        string outputFileName = env("DUMP_HEAPTRACK_OUTPUT");
         if (outputFileName.empty()) {
             // env var might not be set when linked directly into an executable
-            outputFileName = "malloctrace.$$";
+            outputFileName = "heaptrack.$$";
         } else if (outputFileName == "-" || outputFileName == "stdout") {
             out = stdout;
         } else if (outputFileName == "stderr") {
@@ -130,7 +130,7 @@ struct Data
         // TODO: remember meta data about host application, such as cmdline, date of run, ...
 
         // cleanup environment to prevent tracing of child apps
-        unsetenv("DUMP_MALLOC_TRACE_OUTPUT");
+        unsetenv("DUMP_HEAPTRACK_OUTPUT");
         unsetenv("LD_PRELOAD");
     }
 

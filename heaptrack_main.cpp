@@ -37,7 +37,7 @@ namespace {
 
 void printUsage(ostream& out)
 {
-    out << "malloctrace_main MALLOCTRACE_LOG_FILE..." << endl;
+    out << "heaptrack_main HEAPTRACK_LOG_FILE..." << endl;
 }
 
 struct AddressInformation
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
     ifstream file(fileName, isCompressed ? ios_base::in | ios_base::binary : ios_base::in);
 
     if (!file.is_open()) {
-        cerr << "Failed to open malloctrace log file: " << argv[1] << endl;
+        cerr << "Failed to open heaptrack log file: " << argv[1] << endl;
         cerr << endl;
         printUsage(cerr);
         return 1;

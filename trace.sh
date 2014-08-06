@@ -11,24 +11,24 @@ if [[ -z "$1" ]]; then
     exit 1
 fi
 
-output=$(pwd)/malloctrace.$(basename $1).$$
+output=$(pwd)/heaptrack.$(basename $1).$$
 
 cb
 
 echo "starting application, this might take some time..."
 
-pipe=/tmp/malloctrace_fifo$$
+pipe=/tmp/heaptrack_fifo$$
 mkfifo $pipe
 trap "rm -f $pipe" EXIT
 
-./malloctrace_interpret < $pipe | gzip -c > "$output.gz" &
+./heaptrack_interpret < $pipe | gzip -c > "$output.gz" &
 compressor=$!
 
 if [ -z "$debug" ]; then
-  LD_PRELOAD=./libmalloctrace.so DUMP_MALLOC_TRACE_OUTPUT="$pipe" $@
+  LD_PRELOAD=./libheaptrack.so DUMP_HEAPTRACK_OUTPUT="$pipe" $@
 else
-  gdb --eval-command="set environment LD_PRELOAD=./libmalloctrace.so" \
-      --eval-command="set environment DUMP_MALLOC_TRACE_OUTPUT=$pipe" \
+  gdb --eval-command="set environment LD_PRELOAD=./libheaptrack.so" \
+      --eval-command="set environment DUMP_HEAPTRACK_OUTPUT=$pipe" \
       --eval-command="run" --args $@
 fi
 
