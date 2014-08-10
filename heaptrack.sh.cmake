@@ -19,14 +19,42 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-debug=
-if [ "$1" = "--debug" ]; then
-  debug=1
-  shift 1;
+if [ "$1" = "--help" -o "$1" = "-h" ]; then
+    echo "Usage: $0 [--debug|-d] DEBUGGEE [ARGUMENT]..."
+    echo
+    echo "A heap memory usage profiler. It uses LD_PRELOAD to track all"
+    echo "calls to the core memory allocation functions and logs these"
+    echo "occurrances. Additionally, backtraces are obtained and logged."
+    echo "Combined this can give interesting answers to questions such as:"
+    echo
+    echo "  * How much heap memory is my application using?"
+    echo "  * Where is heap memory being allocated, and how often?"
+    echo "  * How much space are heap individual allocations requesting?"
+    echo
+    echo "To evaluate the generated heaptrack data, use heaptrack_print."
+    echo
+    echo "Mandatory arguments to heaptrack:"
+    echo "  DEBUGGEE        The name or path to the application that should"
+    echo "                 be run with heaptrack analyzation enabled."
+    echo
+    echo "Optional arguments to heaptrack:"
+    echo "  -d, --debug    Run the debuggee in GDB and heaptrack."
+    echo "  ARGUMENT       Any number of arguments that will be passed verbatim"
+    echo "                 to the debuggee."
+    echo
+    exit 0
 fi
 
-if [ -z "$1" ]; then
-    echo "$0 DEBUGEE [ARGS...]"
+debug=
+if [ "$1" = "--debug" -o "$1" = "-d" ]; then
+    debug=1
+    shift 1;
+fi
+
+if [ ! -x "$1" ]; then
+    echo "Error: Debuggee \"$1\" is not an executable."
+    echo
+    echo "Usage: $0 [--debug|-d] DEBUGGEE [ARGS...]"
     exit 1
 fi
 
