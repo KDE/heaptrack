@@ -52,14 +52,18 @@ if [ ! -f "$LIBHEAPTRACK" ]; then
 fi
 LIBHEAPTRACK=$(readlink -f "$LIBHEAPTRACK")
 
-echo "starting application, this might take some time..."
-
+# setup named pipe to read data from
 pipe=/tmp/heaptrack_fifo$$
 mkfifo $pipe
 trap "rm -f $pipe" EXIT
 
-"$INTERPRETER" < $pipe | gzip -c > "$output.gz" &
+# interpret the data and compress the output on the fly
+output="$output.gz"
+"$INTERPRETER" < $pipe | gzip -c > "$output" &
 debuggee=$!
+
+echo "starting application, this might take some time..."
+echo "output will be written to $output"
 
 if [ -z "$debug" ]; then
   LD_PRELOAD=$LIBHEAPTRACK DUMP_HEAPTRACK_OUTPUT="$pipe" $@
@@ -70,5 +74,9 @@ else
 fi
 
 wait $debuggee
+
+echo "Heaptrack finished! Now run the following to investigate the data:"
+echo
+echo "  heaptrack_print $output | less"
 
 # kate: hl Bash
