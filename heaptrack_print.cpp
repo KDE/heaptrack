@@ -209,6 +209,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    cout << "reading file \"" << fileName << "\" - please wait, this might take some time..." << endl;
+
     boost::iostreams::filtering_istream in;
     if (isCompressed) {
         in.push(boost::iostreams::gzip_decompressor());
@@ -298,6 +300,8 @@ int main(int argc, char** argv)
             cerr << "failed to parse line: " << line << endl;
         }
     }
+
+    cout << "finished reading file, now analyzing data" << endl;
 
     data.finalize();
 
