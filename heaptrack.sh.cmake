@@ -51,7 +51,7 @@ if [ "$1" = "--debug" -o "$1" = "-d" ]; then
     shift 1;
 fi
 
-if [ ! -x "$1" ]; then
+if [ ! -x "$(which $1)" ]; then
     echo "Error: Debuggee \"$1\" is not an executable."
     echo
     echo "Usage: $0 [--debug|-d] DEBUGGEE [ARGS...]"
