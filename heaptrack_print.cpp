@@ -212,9 +212,6 @@ int main(int argc, char** argv)
     }
     in.push(file);
 
-    string str;
-    str.reserve(1024);
-
     string line;
     line.reserve(1024);
 
@@ -226,15 +223,13 @@ int main(int argc, char** argv)
         if (line.empty()) {
             continue;
         }
+        const char mode = line[0];
         lineIn.str(line);
         lineIn.clear();
-        char mode = 0;
-        lineIn >> mode;
+        // skip mode and leading whitespace
+        lineIn.seekg(2);
         if (mode == 's') {
-            // skip whitespace
-            lineIn.seekg(1, ios_base::cur);
-            getline(lineIn, str);
-            data.strings.push_back(str);
+            data.strings.push_back(line.substr(2));
         } else if (mode == 'i') {
             InstructionPointer ip;
             lineIn >> ip.instructionPointer;
