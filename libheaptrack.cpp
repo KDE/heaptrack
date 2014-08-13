@@ -235,6 +235,11 @@ struct Data
 
     vector<Module> modules;
     TraceTree traceTree;
+    /**
+     * Note: We use the C stdio API here for performance reasons.
+     *       Esp. in multi-threaded environments this is much faster
+     *       to produce non-per-line-interleaved output.
+     */
     FILE* out = nullptr;
 };
 
