@@ -223,12 +223,12 @@ struct Data
             }
             index = traceTree.index(trace, out);
         }
-        fprintf(out, "+ %lx %lx %lx\n", size, index, ptr);
+        fprintf(out, "+ %lx %lx %p\n", size, index, ptr);
     }
 
     void handleFree(void* ptr)
     {
-        fprintf(out, "- %lx\n", ptr);
+        fprintf(out, "- %p\n", ptr);
     }
 
     mutex m_mutex;
