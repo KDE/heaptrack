@@ -78,6 +78,8 @@ struct Allocation
     size_t ipIndex;
     // number of allocations
     size_t allocations;
+    // bytes allocated in total
+    size_t allocated;
     // amount of bytes leaked
     size_t leaked;
 };
@@ -139,7 +141,7 @@ struct AccumulatedTraceData
                                     return allocation.ipIndex < ipIndex;
                                 });
         if (it == allocations.end() || it->ipIndex != ipIndex) {
-            it = allocations.insert(it, {ipIndex, 0, 0});
+            it = allocations.insert(it, {ipIndex, 0, 0, 0});
         }
         return *it;
     }
@@ -264,6 +266,7 @@ int main(int argc, char** argv)
 
             auto& allocation = data.findAllocation(ipId);
             allocation.leaked += size;
+            allocation.allocated += size;
             ++allocation.allocations;
             data.totalAllocated += size;
             ++data.totalAllocations;
@@ -309,10 +312,23 @@ int main(int argc, char** argv)
     sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
         return l.allocations > r.allocations;
     });
-    cout << "TOP ALLOCATORS" << endl;
+    cout << "MOST ALLOCATIONS" << endl;
     for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
         const auto& allocation = data.allocations[i];
         cout << allocation.allocations << " allocations at:" << endl;
+        data.printBacktrace(data.findIp(allocation.ipIndex), cout);
+        cout << endl;
+    }
+    cout << endl;
+
+    // sort by amount of bytes allocated
+    sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
+        return l.allocated > r.allocated;
+    });
+    cout << "MOST ALLOCATED OVER TIME (ignoring deallocations)" << endl;
+    for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
+        const auto& allocation = data.allocations[i];
+        cout << allocation.allocated << " bytes allocated at:" << endl;
         data.printBacktrace(data.findIp(allocation.ipIndex), cout);
         cout << endl;
     }
