@@ -82,6 +82,8 @@ struct Allocation
     size_t allocated;
     // amount of bytes leaked
     size_t leaked;
+    // largest amount of bytes allocated
+    size_t peak;
 };
 
 /**
@@ -141,7 +143,7 @@ struct AccumulatedTraceData
                                     return allocation.ipIndex < ipIndex;
                                 });
         if (it == allocations.end() || it->ipIndex != ipIndex) {
-            it = allocations.insert(it, {ipIndex, 0, 0, 0});
+            it = allocations.insert(it, {ipIndex, 0, 0, 0, 0});
         }
         return *it;
     }
@@ -268,6 +270,9 @@ int main(int argc, char** argv)
             allocation.leaked += size;
             allocation.allocated += size;
             ++allocation.allocations;
+            if (allocation.leaked > allocation.peak) {
+                allocation.peak = allocation.leaked;
+            }
             data.totalAllocated += size;
             ++data.totalAllocations;
             data.leaked += size;
@@ -329,6 +334,19 @@ int main(int argc, char** argv)
     for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
         const auto& allocation = data.allocations[i];
         cout << allocation.allocated << " bytes allocated at:" << endl;
+        data.printBacktrace(data.findIp(allocation.ipIndex), cout);
+        cout << endl;
+    }
+    cout << endl;
+
+    // sort by peak memory consumption
+    sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
+        return l.peak > r.peak;
+    });
+    cout << "PEAK ALLOCATIONS" << endl;
+    for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
+        const auto& allocation = data.allocations[i];
+        cout << allocation.peak << " bytes allocated at peak:" << endl;
         data.printBacktrace(data.findIp(allocation.ipIndex), cout);
         cout << endl;
     }
