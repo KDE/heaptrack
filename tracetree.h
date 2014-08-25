@@ -70,7 +70,7 @@ public:
             if (it == parent->children.end()) {
                 index = m_index++;
                 it = parent->children.insert(it, {ip, index, {}});
-                fprintf(out, "i %p %lx\n", ip, parent->index);
+                fprintf(out, "i %lx %lx\n", reinterpret_cast<uintptr_t>(ip), parent->index);
             }
             index = it->index;
             parent = &(*it);
