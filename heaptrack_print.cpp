@@ -396,12 +396,12 @@ int main(int argc, char** argv)
         sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
             return l.allocations > r.allocations;
         });
-        cout << "MOST CALLS TO ALLOCATION FUNCTIONS" << endl;
+        cout << "MOST CALLS TO ALLOCATION FUNCTIONS\n";
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
-            cout << allocation.allocations << " allocations at:" << endl;
+            cout << allocation.allocations << " allocations at:\n";
             data.printBacktrace(allocation.ipIndex, cout);
-            cout << endl;
+            cout << '\n';
         }
         cout << endl;
     }
@@ -411,12 +411,12 @@ int main(int argc, char** argv)
         sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
             return l.allocated > r.allocated;
         });
-        cout << "MOST BYTES ALLOCATED OVER TIME (ignoring deallocations)" << endl;
+        cout << "MOST BYTES ALLOCATED OVER TIME (ignoring deallocations)\n";
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
-            cout << allocation.allocated << " bytes allocated at:" << endl;
+            cout << allocation.allocated << " bytes allocated at:\n";
             data.printBacktrace(allocation.ipIndex, cout);
-            cout << endl;
+            cout << '\n';
         }
         cout << endl;
     }
@@ -426,12 +426,12 @@ int main(int argc, char** argv)
         sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
             return l.peak > r.peak;
         });
-        cout << "PEAK MEMORY CONSUMERS" << endl;
+        cout << "PEAK MEMORY CONSUMERS\n";
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
-            cout << allocation.peak << " bytes allocated at peak:" << endl;
+            cout << allocation.peak << " bytes allocated at peak:\n";
             data.printBacktrace(allocation.ipIndex, cout);
-            cout << endl;
+            cout << '\n';
         }
         cout << endl;
     }
@@ -443,23 +443,22 @@ int main(int argc, char** argv)
         });
 
         size_t totalLeakAllocations = 0;
-        cout << "MEMORY LEAKS" << endl;
+        cout << "MEMORY LEAKS\n";
         for (const auto& allocation : data.allocations) {
             if (!allocation.leaked) {
                 continue;
             }
             totalLeakAllocations += allocation.allocations;
 
-            cout << allocation.leaked << " bytes leaked in " << allocation.allocations << " allocations at:" << endl;
+            cout << allocation.leaked << " bytes leaked in " << allocation.allocations << " allocations at:\n";
             data.printBacktrace(allocation.ipIndex, cout);
-            cout << endl;
+            cout << '\n';
         }
         cout << data.leaked << " bytes leaked in total from " << totalLeakAllocations << " allocations" << endl;
     }
 
     cout << data.totalAllocated << " bytes allocated in total over " << data.totalAllocations
-         << " allocations, peak consumption: " << data.peak << " bytes" << endl;
-    cout << endl;
+         << " allocations, peak consumption: " << data.peak << " bytes\n\n";
 
     if (printHistogram) {
         cout << "size histogram: " << endl;
