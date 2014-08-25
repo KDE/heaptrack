@@ -122,18 +122,33 @@ struct TraceNode
     TraceIndex parentIndex;
 };
 
-struct Allocation
+struct AllocationData
+{
+    // number of allocations
+    size_t allocations = 0;
+    // bytes allocated in total
+    size_t allocated = 0;
+    // amount of bytes leaked
+    size_t leaked = 0;
+    // largest amount of bytes allocated
+    size_t peak = 0;
+};
+
+struct Allocation : public AllocationData
 {
     // backtrace entry point
     TraceIndex traceIndex;
-    // number of allocations
-    size_t allocations;
-    // bytes allocated in total
-    size_t allocated;
-    // amount of bytes leaked
-    size_t leaked;
-    // largest amount of bytes allocated
-    size_t peak;
+};
+
+/**
+ * Merged allocation information by instruction pointer outside of alloc funcs
+ */
+struct MergedAllocation : public AllocationData
+{
+    // individual backtraces
+    vector<Allocation> traces;
+    // location
+    IpIndex ipIndex;
 };
 
 /**
@@ -162,34 +177,53 @@ struct AccumulatedTraceData
         instructionPointers.clear();
         traces.clear();
         strings.clear();
+        mergedAllocations.clear();
         allocations.clear();
         activeAllocations.clear();
     }
 
-    void printBacktrace(const TraceIndex traceIndex, ostream& out) const
+    void printIp(const IpIndex ip, ostream &out, const size_t indent = 0) const
     {
-        printBacktrace(findTrace(traceIndex), out);
+        printIp(findIp(ip), out, indent);
     }
 
-    void printBacktrace(TraceNode node, ostream& out) const
+    void printIp(const InstructionPointer& ip, ostream& out, size_t indent = 0) const
+    {
+        while (indent--) {
+            out << "  ";
+        }
+        out << "0x" << hex << ip.instructionPointer << dec;
+        if (ip.moduleIndex) {
+            out << ' ' << stringify(ip.moduleIndex);
+        } else {
+            out << " <unknown module>";
+        }
+        if (ip.functionIndex) {
+            out << ' ' << prettyFunction(stringify(ip.functionIndex));
+        } else {
+            out << " ??";
+        }
+        if (ip.fileIndex) {
+            out << ' ' << stringify(ip.fileIndex) << ':' << ip.line;
+        }
+        out << '\n';
+    }
+
+    void printBacktrace(const TraceIndex traceIndex, ostream& out,
+                        const size_t indent = 0, bool skipFirst = false) const
+    {
+        printBacktrace(findTrace(traceIndex), out, indent, skipFirst);
+    }
+
+    void printBacktrace(TraceNode node, ostream& out, const size_t indent = 0,
+                        bool skipFirst = false) const
     {
         while (node.ipIndex) {
             const auto& ip = findIp(node.ipIndex);
-            out << "0x" << hex << ip.instructionPointer << dec;
-            if (ip.moduleIndex) {
-                out << ' ' << stringify(ip.moduleIndex);
-            } else {
-                out << " <unknown module>";
+            if (!skipFirst) {
+                printIp(ip, out, indent);
             }
-            if (ip.functionIndex) {
-                out << ' ' << prettyFunction(stringify(ip.functionIndex));
-            } else {
-                out << " ??";
-            }
-            if (ip.fileIndex) {
-                out << ' ' << stringify(ip.fileIndex) << ':' << ip.line;
-            }
-            out << '\n';
+            skipFirst = false;
 
             if (mainIndex && ip.functionIndex.index == mainIndex.index + 1) {
                 break;
@@ -197,18 +231,6 @@ struct AccumulatedTraceData
 
             node = findTrace(node.parentIndex);
         };
-    }
-
-    Allocation& findAllocation(const TraceIndex traceIndex)
-    {
-        auto it = lower_bound(allocations.begin(), allocations.end(), traceIndex,
-                                [] (const Allocation& allocation, const TraceIndex traceIndex) -> bool {
-                                    return allocation.traceIndex < traceIndex;
-                                });
-        if (it == allocations.end() || it->traceIndex != traceIndex) {
-            it = allocations.insert(it, {traceIndex, 0, 0, 0, 0});
-        }
-        return *it;
     }
 
     const string& stringify(const StringIndex stringId) const
@@ -380,13 +402,29 @@ struct AccumulatedTraceData
             }
         }
 
+        // merge allocations so that different traces that point to the same
+        // instruction pointer at the end where the allocation function is
+        // called are combined
+        mergedAllocations.reserve(allocations.size());
+        for (const Allocation& allocation : allocations) {
+            mergeAllocation(allocation);
+        }
+        for (MergedAllocation& merged : mergedAllocations) {
+            for (const Allocation& allocation: merged.traces) {
+                merged.allocated += allocation.allocated;
+                merged.allocations += allocation.allocations;
+                merged.leaked += allocation.leaked;
+                merged.peak += allocation.peak;
+            }
+        }
+
         return true;
     }
 
     bool shortenTemplates = false;
 
     vector<Allocation> allocations;
-    vector<MergedAllocations> mergedAllocations;
+    vector<MergedAllocation> mergedAllocations;
     map<size_t, size_t> sizeHistogram;
     size_t totalAllocated = 0;
     size_t totalAllocations = 0;
@@ -394,6 +432,35 @@ struct AccumulatedTraceData
     size_t leaked = 0;
 
 private:
+    Allocation& findAllocation(const TraceIndex traceIndex)
+    {
+        auto it = lower_bound(allocations.begin(), allocations.end(), traceIndex,
+                                [] (const Allocation& allocation, const TraceIndex traceIndex) -> bool {
+                                    return allocation.traceIndex < traceIndex;
+                                });
+        if (it == allocations.end() || it->traceIndex != traceIndex) {
+            Allocation allocation;
+            allocation.traceIndex = traceIndex;
+            it = allocations.insert(it, allocation);
+        }
+        return *it;
+    }
+
+    void mergeAllocation(const Allocation& allocation)
+    {
+        const auto trace = findTrace(allocation.traceIndex);
+        auto it = lower_bound(mergedAllocations.begin(), mergedAllocations.end(), trace,
+                                [] (const MergedAllocation& allocation, const TraceNode trace) -> bool {
+                                    return allocation.ipIndex < trace.ipIndex;
+                                });
+        if (it == mergedAllocations.end() || it->ipIndex != trace.ipIndex) {
+            MergedAllocation merged;
+            merged.ipIndex = trace.ipIndex;
+            it = mergedAllocations.insert(it, merged);
+        }
+        it->traces.push_back(allocation);
+    }
+
     size_t findStringIndex(const char* const str) const
     {
         auto it = find(strings.begin(), strings.end(), str);
@@ -505,14 +572,19 @@ int main(int argc, char** argv)
 
     if (printAllocs) {
         // sort by amount of allocations
-        sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
-            return l.allocations > r.allocations;
-        });
+        sort(data.mergedAllocations.begin(), data.mergedAllocations.end(),
+            [] (const MergedAllocation& l, const MergedAllocation &r) {
+                return l.allocations > r.allocations;
+            });
         cout << "MOST CALLS TO ALLOCATION FUNCTIONS\n";
-        for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
-            const auto& allocation = data.allocations[i];
+        for (size_t i = 0; i < min(10lu, data.mergedAllocations.size()); ++i) {
+            const auto& allocation = data.mergedAllocations[i];
             cout << allocation.allocations << " allocations at:\n";
-            data.printBacktrace(allocation.traceIndex, cout);
+            data.printIp(allocation.ipIndex, cout);
+            for (const auto& trace : allocation.traces) {
+                cout << "  " << trace.allocations << " from:\n";
+                data.printBacktrace(trace.traceIndex, cout, 2, true);
+            }
             cout << '\n';
         }
         cout << endl;
@@ -520,24 +592,36 @@ int main(int argc, char** argv)
 
     if (printOverallAlloc) {
         // sort by amount of bytes allocated
-        sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
-            return l.allocated > r.allocated;
-        });
+        sort(data.mergedAllocations.begin(), data.mergedAllocations.end(),
+            [] (const MergedAllocation& l, const MergedAllocation &r) {
+                return l.allocated > r.allocated;
+            });
         cout << "MOST BYTES ALLOCATED OVER TIME (ignoring deallocations)\n";
-        for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
-            const auto& allocation = data.allocations[i];
+        for (size_t i = 0; i < min(10lu, data.mergedAllocations.size()); ++i) {
+            const auto& allocation = data.mergedAllocations[i];
             cout << allocation.allocated << " bytes allocated at:\n";
-            data.printBacktrace(allocation.traceIndex, cout);
+            data.printIp(allocation.ipIndex, cout);
+            for (const auto& trace : allocation.traces) {
+                cout << "  " << trace.allocated << " bytes from:\n";
+                data.printBacktrace(trace.traceIndex, cout, 2, true);
+            }
             cout << '\n';
         }
         cout << endl;
     }
 
     if (printPeaks) {
+        ///FIXME: find a way to merge this without breaking temporal dependency.
+        /// I.e. a given function could be called N times from different places
+        /// and allocate M bytes each, but free it thereafter.
+        /// Then the below would give a wrong total peak size of N * M instead
+        /// of just N!
+
         // sort by peak memory consumption
-        sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
-            return l.peak > r.peak;
-        });
+        sort(data.allocations.begin(), data.allocations.end(),
+            [] (const Allocation& l, const Allocation &r) {
+                return l.peak > r.peak;
+            });
         cout << "PEAK MEMORY CONSUMERS\n";
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
@@ -550,20 +634,28 @@ int main(int argc, char** argv)
 
     if (printLeaks) {
         // sort by amount of leaks
-        sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
-            return l.leaked < r.leaked;
-        });
+        sort(data.mergedAllocations.begin(), data.mergedAllocations.end(),
+            [] (const MergedAllocation& l, const MergedAllocation &r) {
+                return l.leaked > r.leaked;
+            });
 
         size_t totalLeakAllocations = 0;
         cout << "MEMORY LEAKS\n";
-        for (const auto& allocation : data.allocations) {
+        for (const auto& allocation : data.mergedAllocations) {
             if (!allocation.leaked) {
-                continue;
+                break;
             }
             totalLeakAllocations += allocation.allocations;
 
             cout << allocation.leaked << " bytes leaked in " << allocation.allocations << " allocations at:\n";
-            data.printBacktrace(allocation.traceIndex, cout);
+            data.printIp(allocation.ipIndex, cout);
+            for (const auto& trace : allocation.traces) {
+                if (!trace.leaked) {
+                    continue;
+                }
+                cout << "  " << trace.leaked << " bytes from:\n";
+                data.printBacktrace(trace.traceIndex, cout, 2, true);
+            }
             cout << '\n';
         }
         cout << data.leaked << " bytes leaked in total from " << totalLeakAllocations << " allocations" << endl;
