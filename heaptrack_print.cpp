@@ -79,6 +79,11 @@ struct Index
     {
         return index != o.index;
     }
+
+    bool operator==(Index o) const
+    {
+        return index == o.index;
+    }
 };
 
 template<typename Base>
@@ -252,6 +257,13 @@ struct AccumulatedTraceData
         stringstream lineIn(ios_base::in);
         lineIn << hex;
 
+        const string opNewStr("operator new(unsigned long)");
+        StringIndex opNewStrIndex;
+        IpIndex opNewIpIndex;
+        const string opArrNewStr("operator new[](unsigned long)");
+        StringIndex opArrNewStrIndex;
+        IpIndex opArrNewIpIndex;
+
         while (in.good()) {
             getline(in, line);
             if (line.empty()) {
@@ -267,6 +279,11 @@ struct AccumulatedTraceData
             lineIn.seekg(2);
             if (mode == 's') {
                 strings.push_back(line.substr(2));
+                if (!opNewStrIndex && strings.back() == opNewStr) {
+                    opNewStrIndex.index = strings.size();
+                } else if (!opArrNewStrIndex && strings.back() == opArrNewStr) {
+                    opArrNewStrIndex.index = strings.size();
+                }
             } else if (mode == 't') {
                 TraceNode node;
                 lineIn >> node.ipIndex;
@@ -280,6 +297,11 @@ struct AccumulatedTraceData
                 lineIn >> ip.fileIndex;
                 lineIn >> ip.line;
                 instructionPointers.push_back(ip);
+                if (opNewStrIndex && !opNewIpIndex && opNewStrIndex == ip.functionIndex) {
+                    opNewIpIndex.index = instructionPointers.size();
+                } else if (opArrNewStrIndex && !opArrNewIpIndex && opArrNewStrIndex == ip.functionIndex) {
+                    opArrNewIpIndex.index = instructionPointers.size();
+                }
             } else if (mode == '+') {
                 size_t size = 0;
                 lineIn >> size;
@@ -337,21 +359,34 @@ struct AccumulatedTraceData
             }
         }
 
+        /// these are leaks, but we now have the same data in \c allocations as well
+        activeAllocations.clear();
+
         // find index of "main" index which can be used to terminate backtraces
         // and prevent printing stuff above main, which is usually uninteresting
-        auto it = find(strings.begin(), strings.end(), "main");
-        if (it != strings.end()) {
-            mainIndex.index = distance(strings.begin(), it);
+        mainIndex.index = findStringIndex("main");
+
+        if (opNewIpIndex || opArrNewIpIndex) {
+            cout << opNewIpIndex.index << ' ' << opArrNewIpIndex << endl;
+            for (Allocation& allocation : allocations) {
+                while (true) {
+                    auto trace = findTrace(allocation.traceIndex);
+                    if (trace.ipIndex == opNewIpIndex || trace.ipIndex == opArrNewIpIndex) {
+                        allocation.traceIndex = trace.parentIndex;
+                    } else {
+                        break;
+                    }
+                }
+            }
         }
 
-        /// these are leaks, but we have the same data in \c allocations as well
-        activeAllocations.clear();
         return true;
     }
 
     bool shortenTemplates = false;
 
     vector<Allocation> allocations;
+    vector<MergedAllocations> mergedAllocations;
     map<size_t, size_t> sizeHistogram;
     size_t totalAllocated = 0;
     size_t totalAllocations = 0;
@@ -359,6 +394,16 @@ struct AccumulatedTraceData
     size_t leaked = 0;
 
 private:
+    size_t findStringIndex(const char* const str) const
+    {
+        auto it = find(strings.begin(), strings.end(), str);
+        if (it != strings.end()) {
+            return distance(strings.begin(), it);
+        } else {
+            return 0;
+        }
+    }
+
     InstructionPointer findIp(const IpIndex ipIndex) const
     {
         if (!ipIndex || ipIndex.index > instructionPointers.size()) {
