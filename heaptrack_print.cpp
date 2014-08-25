@@ -224,7 +224,7 @@ int main(int argc, char** argv)
         ("print-peaks,p", po::value<bool>()->default_value(true), "Print backtraces to top allocators, sorted by peak consumption.")
         ("print-allocators,a", po::value<bool>()->default_value(true), "Print backtraces to top allocators, sorted by number of calls to allocation functions.")
         ("print-leaks,l", po::value<bool>()->default_value(false), "Print backtraces to leaked memory allocations.")
-        ("print-histogram,h", po::value<bool>()->default_value(false), "Print allocation size histogram.")
+        ("print-histogram,H", po::value<bool>()->default_value(false), "Print allocation size histogram.")
         ("print-overall-allocated,o", po::value<bool>()->default_value(false), "Print top overall allocators, ignoring memory frees.")
         ("help,h", "Show this help message.");
     po::positional_options_description p;
