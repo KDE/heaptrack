@@ -16,10 +16,20 @@ void bar()
     new char[123];
 }
 
+void recurse(int i)
+{
+    new char[2];
+    bar();
+    if (i) {
+        recurse(--i);
+    }
+}
+
 int main()
 {
     asdf();
     foo();
     bar();
+    recurse(5);
     return 0;
 }
