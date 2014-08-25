@@ -281,9 +281,14 @@ int main(int /*argc*/, char** /*argv*/)
                 return 1;
             }
             const auto ip = data.resolve(instructionPointer);
-            cout << line << ' '
-                 << ip.moduleIndex << ' ' << ip.functionIndex << ' '
-                 << ip.fileIndex << ' ' << ip.line << '\n';
+            cout << line << ' ' << ip.moduleIndex;
+            if (ip.functionIndex || ip.fileIndex) {
+                cout << ' ' << ip.functionIndex;
+                if (ip.fileIndex) {
+                    cout << ' ' << ip.fileIndex << ' ' << ip.line;
+                }
+            }
+            cout << '\n';
         } else {
             cout << line << '\n';
         }

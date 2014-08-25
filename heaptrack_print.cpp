@@ -247,10 +247,6 @@ int main(int argc, char** argv)
             lineIn >> ip.functionIndex;
             lineIn >> ip.fileIndex;
             lineIn >> ip.line;
-            if (lineIn.bad()) {
-                cerr << "failed to parse line: " << line << endl;
-                return 1;
-            }
             data.instructionPointers.push_back(ip);
         } else if (mode == '+') {
             size_t size = 0;
