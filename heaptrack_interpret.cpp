@@ -253,10 +253,11 @@ int main(int /*argc*/, char** /*argv*/)
         if (line.empty()) {
             continue;
         }
+        const char mode = line[0];
         lineIn.str(line);
         lineIn.clear();
-        char mode = 0;
-        lineIn >> mode;
+        // skip mode and leading whitespace
+        lineIn.seekg(2);
         if (mode == 'm') {
             string fileName;
             lineIn >> fileName;
