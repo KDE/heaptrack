@@ -143,7 +143,7 @@ struct AccumulatedTraceData
             }
             out << '\n';
 
-            if (mainIndex && ip.functionIndex == mainIndex) {
+            if (mainIndex && ip.functionIndex == mainIndex + 1) {
                 break;
             }
 
