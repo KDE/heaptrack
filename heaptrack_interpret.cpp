@@ -222,7 +222,7 @@ struct AccumulatedTraceData
         if (it != m_internedData.end()) {
             return it->second;
         }
-        const size_t id = m_nextInternId++;
+        const size_t id = m_internedData.size() + 1;
         m_internedData.insert(it, make_pair(str, id));
         cout << "s " << str << '\n';
         return id;
@@ -245,7 +245,7 @@ struct AccumulatedTraceData
             return it->second;
         }
 
-        const size_t ipId = m_nextIpId++;
+        const size_t ipId = m_encounteredIps.size() + 1;
         m_encounteredIps.insert(it, make_pair(instructionPointer, ipId));
 
         const auto ip = resolve(instructionPointer);
@@ -264,9 +264,7 @@ private:
     vector<Module> m_modules;
     bool m_modulesDirty = false;
 
-    size_t m_nextInternId = 1;
     unordered_map<string, size_t> m_internedData;
-    size_t m_nextIpId = 1;
     unordered_map<uintptr_t, size_t> m_encounteredIps;
 };
 
