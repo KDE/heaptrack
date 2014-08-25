@@ -3,7 +3,7 @@ project(heaptrack)
 
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-std=c++11")
 
-find_package(Boost 1.45.0 COMPONENTS iostreams)
+find_package(Boost 1.45.0 COMPONENTS iostreams program_options)
 find_package(Threads)
 
 include_directories(

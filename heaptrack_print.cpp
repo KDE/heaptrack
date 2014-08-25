@@ -36,15 +36,12 @@
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/program_options.hpp>
 
 using namespace std;
+namespace po = boost::program_options;
 
 namespace {
-
-void printUsage(ostream& out)
-{
-    out << "heaptrack_main HEAPTRACK_LOG_FILE..." << endl;
-}
 
 struct AddressInformation
 {
@@ -192,8 +189,31 @@ struct AccumulatedTraceData
 
 int main(int argc, char** argv)
 {
-    if (argc != 2) {
-        printUsage(cerr);
+    po::options_description desc("Options");
+    desc.add_options()
+        ("file,f", po::value<string>()->required(), "The heaptrack data file to print.")
+        ("print-peaks,p", po::value<bool>()->default_value(true), "Print backtraces to top allocators, sorted by peak consumption.")
+        ("print-allocators,a", po::value<bool>()->default_value(true), "Print backtraces to top allocators, sorted by number of calls to allocation functions.")
+        ("print-leaks,l", po::value<bool>()->default_value(false), "Print backtraces to leaked memory allocations.")
+        ("print-histogram,h", po::value<bool>()->default_value(false), "Print allocation size histogram.")
+        ("print-overall-allocated,o", po::value<bool>()->default_value(false), "Print top overall allocators, ignoring memory frees.")
+        ("help,h", "Show this help message.");
+    po::positional_options_description p;
+    p.add("file", -1);
+
+    po::variables_map vm;
+    try {
+        po::store(po::command_line_parser(argc, argv)
+                    .options(desc).positional(p).run(), vm);
+        po::notify(vm);
+    } catch (const po::error& error) {
+        cerr << "ERROR: " << error.what() << endl
+             << endl << desc << endl;
+        return 1;
+    }
+
+    if (vm.count("help")) {
+        cout << desc << endl;
         return 1;
     }
 
@@ -202,14 +222,20 @@ int main(int argc, char** argv)
     // optimize: we only have a single thread
     ios_base::sync_with_stdio(false);
 
-    string fileName(argv[1]);
+    const auto inputFile = vm["file"].as<string>();
+    const bool printHistogram = vm["print-histogram"].as<bool>();
+    const bool printLeaks = vm["print-leaks"].as<bool>();
+    const bool printOverallAlloc = vm["print-overall-allocated"].as<bool>();
+    const bool printPeaks = vm["print-peaks"].as<bool>();
+    const bool printAllocs = vm["print-allocators"].as<bool>();
+
+    string fileName(inputFile);
     const bool isCompressed = boost::algorithm::ends_with(fileName, ".gz");
     ifstream file(fileName, isCompressed ? ios_base::in | ios_base::binary : ios_base::in);
 
     if (!file.is_open()) {
-        cerr << "Failed to open heaptrack log file: " << argv[1] << endl;
-        cerr << endl;
-        printUsage(cerr);
+        cerr << "Failed to open heaptrack log file: " << inputFile << endl
+             << endl << desc << endl;
         return 1;
     }
 
@@ -309,71 +335,80 @@ int main(int argc, char** argv)
 
     data.finalize();
 
-    // sort by amount of allocations
-    sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
-        return l.allocations > r.allocations;
-    });
-    cout << "MOST ALLOCATIONS" << endl;
-    for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
-        const auto& allocation = data.allocations[i];
-        cout << allocation.allocations << " allocations at:" << endl;
-        data.printBacktrace(data.findIp(allocation.ipIndex), cout);
-        cout << endl;
-    }
-    cout << endl;
-
-    // sort by amount of bytes allocated
-    sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
-        return l.allocated > r.allocated;
-    });
-    cout << "MOST ALLOCATED OVER TIME (ignoring deallocations)" << endl;
-    for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
-        const auto& allocation = data.allocations[i];
-        cout << allocation.allocated << " bytes allocated at:" << endl;
-        data.printBacktrace(data.findIp(allocation.ipIndex), cout);
-        cout << endl;
-    }
-    cout << endl;
-
-    // sort by peak memory consumption
-    sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
-        return l.peak > r.peak;
-    });
-    cout << "PEAK ALLOCATIONS" << endl;
-    for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
-        const auto& allocation = data.allocations[i];
-        cout << allocation.peak << " bytes allocated at peak:" << endl;
-        data.printBacktrace(data.findIp(allocation.ipIndex), cout);
-        cout << endl;
-    }
-    cout << endl;
-
-    // sort by amount of leaks
-    sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
-        return l.leaked < r.leaked;
-    });
-
-    size_t totalLeakAllocations = 0;
-    for (const auto& allocation : data.allocations) {
-        if (!allocation.leaked) {
-            continue;
+    if (printAllocs) {
+        // sort by amount of allocations
+        sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
+            return l.allocations > r.allocations;
+        });
+        cout << "MOST ALLOCATIONS" << endl;
+        for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
+            const auto& allocation = data.allocations[i];
+            cout << allocation.allocations << " allocations at:" << endl;
+            data.printBacktrace(data.findIp(allocation.ipIndex), cout);
+            cout << endl;
         }
-        totalLeakAllocations += allocation.allocations;
-
-        cout << allocation.leaked << " bytes leaked in " << allocation.allocations << " allocations at:" << endl;
-        data.printBacktrace(data.findIp(allocation.ipIndex), cout);
         cout << endl;
     }
-    cout << data.leaked << " bytes leaked in total from " << totalLeakAllocations << " allocations" << endl;
+
+    if (printOverallAlloc) {
+        // sort by amount of bytes allocated
+        sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
+            return l.allocated > r.allocated;
+        });
+        cout << "MOST ALLOCATED OVER TIME (ignoring deallocations)" << endl;
+        for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
+            const auto& allocation = data.allocations[i];
+            cout << allocation.allocated << " bytes allocated at:" << endl;
+            data.printBacktrace(data.findIp(allocation.ipIndex), cout);
+            cout << endl;
+        }
+        cout << endl;
+    }
+
+    if (printPeaks) {
+        // sort by peak memory consumption
+        sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
+            return l.peak > r.peak;
+        });
+        cout << "PEAK ALLOCATIONS" << endl;
+        for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
+            const auto& allocation = data.allocations[i];
+            cout << allocation.peak << " bytes allocated at peak:" << endl;
+            data.printBacktrace(data.findIp(allocation.ipIndex), cout);
+            cout << endl;
+        }
+        cout << endl;
+    }
+
+    if (printLeaks) {
+        // sort by amount of leaks
+        sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
+            return l.leaked < r.leaked;
+        });
+
+        size_t totalLeakAllocations = 0;
+        for (const auto& allocation : data.allocations) {
+            if (!allocation.leaked) {
+                continue;
+            }
+            totalLeakAllocations += allocation.allocations;
+
+            cout << allocation.leaked << " bytes leaked in " << allocation.allocations << " allocations at:" << endl;
+            data.printBacktrace(data.findIp(allocation.ipIndex), cout);
+            cout << endl;
+        }
+        cout << data.leaked << " bytes leaked in total from " << totalLeakAllocations << " allocations" << endl;
+    }
 
     cout << data.totalAllocated << " bytes allocated in total over " << data.totalAllocations
          << " allocations, peak consumption: " << data.peak << " bytes" << endl;
-
     cout << endl;
 
-    cout << "size histogram: " << endl;
-    for (auto entry : data.sizeHistogram) {
-        cout << entry.first << "\t" << entry.second << endl;
+    if (printHistogram) {
+        cout << "size histogram: " << endl;
+        for (auto entry : data.sizeHistogram) {
+            cout << entry.first << "\t" << entry.second << endl;
+        }
     }
 
     return 0;
