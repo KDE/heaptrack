@@ -62,11 +62,16 @@ ostream& operator<<(ostream& out, const AddressInformation& info)
 struct InstructionPointer
 {
     uintptr_t instructionPointer = 0;
-    size_t parentIndex = 0;
     size_t moduleIndex = 0;
     size_t functionIndex = 0;
     size_t fileIndex = 0;
     int line = 0;
+};
+
+struct TraceNode
+{
+    size_t ipIndex = 0;
+    size_t parentIndex = 0;
 };
 
 struct Allocation
@@ -96,8 +101,9 @@ struct AccumulatedTraceData
 {
     AccumulatedTraceData()
     {
-        instructionPointers.reserve(65536);
-        strings.reserve(16384);
+        instructionPointers.reserve(16384);
+        traces.reserve(65536);
+        strings.reserve(4096);
         allocations.reserve(16384);
         activeAllocations.reserve(65536);
     }
@@ -106,19 +112,21 @@ struct AccumulatedTraceData
     {
         mainIndex = 0;
         instructionPointers.clear();
+        traces.clear();
         strings.clear();
         allocations.clear();
         activeAllocations.clear();
     }
 
-    void printBacktrace(const size_t ipIndex, ostream& out) const
+    void printBacktrace(const size_t traceIndex, ostream& out) const
     {
-        printBacktrace(findIp(ipIndex), out);
+        printBacktrace(findTrace(traceIndex), out);
     }
 
-    void printBacktrace(InstructionPointer ip, ostream& out) const
+    void printBacktrace(TraceNode node, ostream& out) const
     {
-        while (ip.instructionPointer) {
+        while (node.ipIndex) {
+            const auto& ip = findIp(node.ipIndex);
             out << "0x" << hex << ip.instructionPointer << dec;
             if (ip.moduleIndex) {
                 out << ' ' << stringify(ip.moduleIndex);
@@ -139,7 +147,7 @@ struct AccumulatedTraceData
                 break;
             }
 
-            ip = findIp(ip.parentIndex);
+            node = findTrace(node.parentIndex);
         };
     }
 
@@ -207,16 +215,23 @@ struct AccumulatedTraceData
                 continue;
             }
             const char mode = line[0];
+            if (mode == '#') {
+                continue;
+            }
             lineIn.str(line);
             lineIn.clear();
             // skip mode and leading whitespace
             lineIn.seekg(2);
             if (mode == 's') {
                 strings.push_back(line.substr(2));
+            } else if (mode == 't') {
+                TraceNode node;
+                lineIn >> node.ipIndex;
+                lineIn >> node.parentIndex;
+                traces.push_back(node);
             } else if (mode == 'i') {
                 InstructionPointer ip;
                 lineIn >> ip.instructionPointer;
-                lineIn >> ip.parentIndex;
                 lineIn >> ip.moduleIndex;
                 lineIn >> ip.functionIndex;
                 lineIn >> ip.fileIndex;
@@ -310,9 +325,19 @@ private:
         }
     }
 
+    TraceNode findTrace(const size_t traceIndex) const
+    {
+        if (!traceIndex || traceIndex > traces.size()) {
+            return {};
+        } else {
+            return traces[traceIndex - 1];
+        }
+    }
+
     size_t mainIndex = 0;
     unordered_map<uintptr_t, AllocationInfo> activeAllocations;
     vector<InstructionPointer> instructionPointers;
+    vector<TraceNode> traces;
     vector<string> strings;
 };
 
@@ -382,8 +407,7 @@ int main(int argc, char** argv)
     }
     in.push(file);
 
-    cout << "reading file \"" << fileName << "\" - please wait, this might take some time...";
-    cout.flush();
+    cout << "reading file \"" << fileName << "\" - please wait, this might take some time..." << endl;
 
     if (!data.read(in)) {
         return 1;

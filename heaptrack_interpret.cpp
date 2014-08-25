@@ -177,6 +177,15 @@ struct AccumulatedTraceData
     AccumulatedTraceData()
     {
         m_modules.reserve(64);
+        m_internedData.reserve(4096);
+        m_encounteredIps.reserve(32768);
+    }
+
+    ~AccumulatedTraceData()
+    {
+        cout << dec;
+        cout << "# strings: " << m_internedData.size() << '\n';
+        cout << "# ips: " << m_encounteredIps.size() << '\n';
     }
 
     ResolvedIP resolve(const uintptr_t ip)
@@ -225,12 +234,40 @@ struct AccumulatedTraceData
         m_modulesDirty = true;
     }
 
+    size_t addIp(const uintptr_t instructionPointer)
+    {
+        if (!instructionPointer) {
+            return 0;
+        }
+
+        auto it = m_encounteredIps.find(instructionPointer);
+        if (it != m_encounteredIps.end()) {
+            return it->second;
+        }
+
+        const size_t ipId = m_nextIpId++;
+        m_encounteredIps.insert(it, make_pair(instructionPointer, ipId));
+
+        const auto ip = resolve(instructionPointer);
+        cout << "i " << instructionPointer << ' ' << ip.moduleIndex;
+        if (ip.functionIndex || ip.fileIndex) {
+            cout << ' ' << ip.functionIndex;
+            if (ip.fileIndex) {
+                cout << ' ' << ip.fileIndex << ' ' << ip.line;
+            }
+        }
+        cout << '\n';
+        return ipId;
+    }
+
 private:
     vector<Module> m_modules;
     bool m_modulesDirty = false;
 
     size_t m_nextInternId = 1;
     unordered_map<string, size_t> m_internedData;
+    size_t m_nextIpId = 1;
+    unordered_map<uintptr_t, size_t> m_encounteredIps;
 };
 
 }
@@ -272,7 +309,7 @@ int main(int /*argc*/, char** /*argv*/)
                 return 1;
             }
             data.addModule({fileName, isExe, addressStart, addressEnd});
-        } else if (mode == 'i') {
+        } else if (mode == 't') {
             uintptr_t instructionPointer = 0;
             size_t parentIndex = 0;
             lineIn >> instructionPointer;
@@ -281,15 +318,10 @@ int main(int /*argc*/, char** /*argv*/)
                 cerr << "failed to parse line: " << line << endl;
                 return 1;
             }
-            const auto ip = data.resolve(instructionPointer);
-            cout << line << ' ' << ip.moduleIndex;
-            if (ip.functionIndex || ip.fileIndex) {
-                cout << ' ' << ip.functionIndex;
-                if (ip.fileIndex) {
-                    cout << ' ' << ip.fileIndex << ' ' << ip.line;
-                }
-            }
-            cout << '\n';
+            // ensure ip is encountered
+            const auto ipId = data.addIp(instructionPointer);
+            // trace point, map current output index to parent index
+            cout << "t " << ipId << ' ' << parentIndex << '\n';
         } else {
             cout << line << '\n';
         }
