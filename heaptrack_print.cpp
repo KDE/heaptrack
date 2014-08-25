@@ -234,15 +234,19 @@ int main(int argc, char** argv)
     try {
         po::store(po::command_line_parser(argc, argv)
                     .options(desc).positional(p).run(), vm);
+        if (vm.count("help")) {
+            cout << "heaptrack_print - analyze heaptrack data files.\n"
+                << "\n"
+                << "heaptrack is a heap memory profiler which records information\n"
+                << "about calls to heap allocation functions such as malloc, operator new etc. pp.\n"
+                << "This print utility can then be used to analyze the generated data files.\n\n"
+                << desc << endl;
+            return 1;
+        }
         po::notify(vm);
     } catch (const po::error& error) {
         cerr << "ERROR: " << error.what() << endl
              << endl << desc << endl;
-        return 1;
-    }
-
-    if (vm.count("help")) {
-        cout << desc << endl;
         return 1;
     }
 
