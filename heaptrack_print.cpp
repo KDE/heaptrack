@@ -77,7 +77,7 @@ struct TraceNode
 struct Allocation
 {
     // backtrace entry point
-    size_t ipIndex;
+    size_t traceIndex;
     // number of allocations
     size_t allocations;
     // bytes allocated in total
@@ -93,7 +93,7 @@ struct Allocation
  */
 struct AllocationInfo
 {
-    size_t ipIndex;
+    size_t traceIndex;
     size_t size;
 };
 
@@ -151,14 +151,14 @@ struct AccumulatedTraceData
         };
     }
 
-    Allocation& findAllocation(const size_t ipIndex)
+    Allocation& findAllocation(const size_t traceIndex)
     {
-        auto it = lower_bound(allocations.begin(), allocations.end(), ipIndex,
-                                [] (const Allocation& allocation, const size_t ipIndex) -> bool {
-                                    return allocation.ipIndex < ipIndex;
+        auto it = lower_bound(allocations.begin(), allocations.end(), traceIndex,
+                                [] (const Allocation& allocation, const size_t traceIndex) -> bool {
+                                    return allocation.traceIndex < traceIndex;
                                 });
-        if (it == allocations.end() || it->ipIndex != ipIndex) {
-            it = allocations.insert(it, {ipIndex, 0, 0, 0, 0});
+        if (it == allocations.end() || it->traceIndex != traceIndex) {
+            it = allocations.insert(it, {traceIndex, 0, 0, 0, 0});
         }
         return *it;
     }
@@ -280,9 +280,9 @@ struct AccumulatedTraceData
                 const auto info = ip->second;
                 activeAllocations.erase(ip);
 
-                auto& allocation = findAllocation(info.ipIndex);
+                auto& allocation = findAllocation(info.traceIndex);
                 if (!allocation.allocations || allocation.leaked < info.size) {
-                    cerr << "inconsistent allocation info, underflowed allocations of " << info.ipIndex << endl;
+                    cerr << "inconsistent allocation info, underflowed allocations of " << info.traceIndex << endl;
                     allocation.leaked = 0;
                     allocation.allocations = 0;
                 } else {
@@ -424,7 +424,7 @@ int main(int argc, char** argv)
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
             cout << allocation.allocations << " allocations at:\n";
-            data.printBacktrace(allocation.ipIndex, cout);
+            data.printBacktrace(allocation.traceIndex, cout);
             cout << '\n';
         }
         cout << endl;
@@ -439,7 +439,7 @@ int main(int argc, char** argv)
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
             cout << allocation.allocated << " bytes allocated at:\n";
-            data.printBacktrace(allocation.ipIndex, cout);
+            data.printBacktrace(allocation.traceIndex, cout);
             cout << '\n';
         }
         cout << endl;
@@ -454,7 +454,7 @@ int main(int argc, char** argv)
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
             cout << allocation.peak << " bytes allocated at peak:\n";
-            data.printBacktrace(allocation.ipIndex, cout);
+            data.printBacktrace(allocation.traceIndex, cout);
             cout << '\n';
         }
         cout << endl;
@@ -475,7 +475,7 @@ int main(int argc, char** argv)
             totalLeakAllocations += allocation.allocations;
 
             cout << allocation.leaked << " bytes leaked in " << allocation.allocations << " allocations at:\n";
-            data.printBacktrace(allocation.ipIndex, cout);
+            data.printBacktrace(allocation.traceIndex, cout);
             cout << '\n';
         }
         cout << data.leaked << " bytes leaked in total from " << totalLeakAllocations << " allocations" << endl;
