@@ -60,6 +60,7 @@ using posix_memalign_t = int (*) (void **, size_t, size_t);
 using valloc_t = void* (*) (size_t);
 using aligned_alloc_t = void* (*) (size_t, size_t);
 using dlopen_t = void* (*) (const char*, int);
+using dlclose_t = int (*) (void*);
 
 malloc_t real_malloc = nullptr;
 free_t real_free = nullptr;
@@ -69,6 +70,7 @@ posix_memalign_t real_posix_memalign = nullptr;
 valloc_t real_valloc = nullptr;
 aligned_alloc_t real_aligned_alloc = nullptr;
 dlopen_t real_dlopen = nullptr;
+dlclose_t real_dlclose = nullptr;
 
 // threadsafe stuff
 atomic<bool> moduleCacheDirty(true);
@@ -103,6 +105,8 @@ struct Module
     string fileName;
     uintptr_t addressStart;
     uintptr_t addressEnd;
+    // to update the module cache and remove unloaded modules
+    bool isLoaded;
 
     bool operator<(const Module& module) const
     {
@@ -156,8 +160,15 @@ struct Data
 
     void updateModuleCache()
     {
-        // check list of loaded modules for unknown ones
+        // check list of loaded modules for unknown ones and remove unloaded modules
+        for (auto& module : modules) {
+            module.isLoaded = false;
+        }
         dl_iterate_phdr(dlopen_notify_callback, this);
+        auto it = remove_if(modules.begin(), modules.end(), [] (const Module& module) {
+            return !module.isLoaded;
+        });
+        modules.erase(it, modules.end());
         moduleCacheDirty = false;
     }
 
@@ -204,13 +215,15 @@ struct Data
             }
         }
 
-        Module module{fileName, addressStart, addressEnd};
+        Module module{fileName, addressStart, addressEnd, true};
 
         auto it = lower_bound(modules.begin(), modules.end(), module);
         if (it == modules.end() || *it != module) {
             fprintf(data->out, "m %s %d %lx %lx\n", module.fileName.c_str(), isExe,
                                                     module.addressStart, module.addressEnd);
             modules.insert(it, module);
+        } else {
+            it->isLoaded = true;
         }
 
         return 0;
@@ -315,6 +328,7 @@ void init()
     real_calloc = &dummy_calloc;
     real_calloc = findReal<calloc_t>("calloc");
     real_dlopen = findReal<dlopen_t>("dlopen");
+    real_dlclose = findReal<dlclose_t>("dlclose");
     real_malloc = findReal<malloc_t>("malloc");
     real_free = findReal<free_t>("free");
     real_realloc = findReal<realloc_t>("realloc");
@@ -460,6 +474,21 @@ void *dlopen(const char *filename, int flag)
     void* ret = real_dlopen(filename, flag);
 
     if (ret) {
+        moduleCacheDirty = true;
+    }
+
+    return ret;
+}
+
+int dlclose(void *handle)
+{
+    if (!real_dlclose) {
+        init();
+    }
+
+    int ret = real_dlclose(handle);
+
+    if (!ret) {
         moduleCacheDirty = true;
     }
 
