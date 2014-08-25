@@ -238,7 +238,7 @@ private:
 int main(int /*argc*/, char** /*argv*/)
 {
     // optimize: we only have a single thread
-    std::ios_base::sync_with_stdio(false);
+    ios_base::sync_with_stdio(false);
 
     AccumulatedTraceData data;
 

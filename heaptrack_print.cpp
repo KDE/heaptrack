@@ -200,7 +200,7 @@ int main(int argc, char** argv)
     AccumulatedTraceData data;
 
     // optimize: we only have a single thread
-    std::ios_base::sync_with_stdio(false);
+    ios_base::sync_with_stdio(false);
 
     string fileName(argv[1]);
     const bool isCompressed = boost::algorithm::ends_with(fileName, ".gz");
