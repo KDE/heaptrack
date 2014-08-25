@@ -374,7 +374,7 @@ int main(int argc, char** argv)
         sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
             return l.allocations > r.allocations;
         });
-        cout << "MOST ALLOCATIONS" << endl;
+        cout << "MOST CALLS TO ALLOCATION FUNCTIONS" << endl;
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
             cout << allocation.allocations << " allocations at:" << endl;
@@ -389,7 +389,7 @@ int main(int argc, char** argv)
         sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
             return l.allocated > r.allocated;
         });
-        cout << "MOST ALLOCATED OVER TIME (ignoring deallocations)" << endl;
+        cout << "MOST BYTES ALLOCATED OVER TIME (ignoring deallocations)" << endl;
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
             cout << allocation.allocated << " bytes allocated at:" << endl;
@@ -404,7 +404,7 @@ int main(int argc, char** argv)
         sort(data.allocations.begin(), data.allocations.end(), [] (const Allocation& l, const Allocation &r) {
             return l.peak > r.peak;
         });
-        cout << "PEAK ALLOCATIONS" << endl;
+        cout << "PEAK MEMORY CONSUMERS" << endl;
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
             cout << allocation.peak << " bytes allocated at peak:" << endl;
@@ -421,6 +421,7 @@ int main(int argc, char** argv)
         });
 
         size_t totalLeakAllocations = 0;
+        cout << "MEMORY LEAKS" << endl;
         for (const auto& allocation : data.allocations) {
             if (!allocation.leaked) {
                 continue;
