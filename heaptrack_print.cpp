@@ -98,12 +98,22 @@ struct AccumulatedTraceData
     {
         instructionPointers.reserve(65536);
         strings.reserve(16384);
-        // invalid string
-        strings.push_back(string());
-        // root node with invalid instruction pointer
-        instructionPointers.push_back(InstructionPointer());
         allocations.reserve(16384);
         activeAllocations.reserve(65536);
+    }
+
+    void clear()
+    {
+        mainIndex = 0;
+        instructionPointers.clear();
+        strings.clear();
+        allocations.clear();
+        activeAllocations.clear();
+    }
+
+    void printBacktrace(const size_t ipIndex, ostream& out) const
+    {
+        printBacktrace(findIp(ipIndex), out);
     }
 
     void printBacktrace(InstructionPointer ip, ostream& out) const
@@ -129,7 +139,7 @@ struct AccumulatedTraceData
                 break;
             }
 
-            ip = instructionPointers[ip.parentIndex];
+            ip = findIp(ip.parentIndex);
         };
     }
 
@@ -145,29 +155,13 @@ struct AccumulatedTraceData
         return *it;
     }
 
-    InstructionPointer findIp(const size_t ipIndex) const
-    {
-        if (ipIndex > instructionPointers.size()) {
-            return {};
-        } else {
-            return instructionPointers[ipIndex];
-        }
-    }
-
     const string& stringify(const size_t stringId) const
     {
-        if (stringId < strings.size()) {
-            return strings.at(stringId);
+        if (!stringId || stringId > strings.size()) {
+            static const string empty;
+            return empty;
         } else {
-            return strings.at(0);
-        }
-    }
-
-    void finalize()
-    {
-        auto it = find(strings.begin(), strings.end(), "main");
-        if (it != strings.end()) {
-            mainIndex = distance(strings.begin(), it);
+            return strings.at(stringId - 1);
         }
     }
 
@@ -197,20 +191,129 @@ struct AccumulatedTraceData
         return ret;
     }
 
+    bool read(istream& in)
+    {
+        clear();
+
+        string line;
+        line.reserve(1024);
+
+        stringstream lineIn(ios_base::in);
+        lineIn << hex;
+
+        while (in.good()) {
+            getline(in, line);
+            if (line.empty()) {
+                continue;
+            }
+            const char mode = line[0];
+            lineIn.str(line);
+            lineIn.clear();
+            // skip mode and leading whitespace
+            lineIn.seekg(2);
+            if (mode == 's') {
+                strings.push_back(line.substr(2));
+            } else if (mode == 'i') {
+                InstructionPointer ip;
+                lineIn >> ip.instructionPointer;
+                lineIn >> ip.parentIndex;
+                lineIn >> ip.moduleIndex;
+                lineIn >> ip.functionIndex;
+                lineIn >> ip.fileIndex;
+                lineIn >> ip.line;
+                instructionPointers.push_back(ip);
+            } else if (mode == '+') {
+                size_t size = 0;
+                lineIn >> size;
+                size_t ipId = 0;
+                lineIn >> ipId;
+                uintptr_t ptr = 0;
+                lineIn >> ptr;
+                if (lineIn.bad()) {
+                    cerr << "failed to parse line: " << line << endl;
+                    return false;
+                }
+
+                activeAllocations[ptr] = {ipId, size};
+
+                auto& allocation = findAllocation(ipId);
+                allocation.leaked += size;
+                allocation.allocated += size;
+                ++allocation.allocations;
+                if (allocation.leaked > allocation.peak) {
+                    allocation.peak = allocation.leaked;
+                }
+                totalAllocated += size;
+                ++totalAllocations;
+                leaked += size;
+                if (leaked > peak) {
+                    peak = leaked;
+                }
+                ++sizeHistogram[size];
+            } else if (mode == '-') {
+                uintptr_t ptr = 0;
+                lineIn >> ptr;
+                if (lineIn.bad()) {
+                    cerr << "failed to parse line: " << line << endl;
+                    return false;
+                }
+                auto ip = activeAllocations.find(ptr);
+                if (ip == activeAllocations.end()) {
+                    cerr << "unknown pointer in line: " << line << endl;
+                    continue;
+                }
+                const auto info = ip->second;
+                activeAllocations.erase(ip);
+
+                auto& allocation = findAllocation(info.ipIndex);
+                if (!allocation.allocations || allocation.leaked < info.size) {
+                    cerr << "inconsistent allocation info, underflowed allocations of " << info.ipIndex << endl;
+                    allocation.leaked = 0;
+                    allocation.allocations = 0;
+                } else {
+                    allocation.leaked -= info.size;
+                }
+                leaked -= info.size;
+            } else {
+                cerr << "failed to parse line: " << line << endl;
+            }
+        }
+
+        // find index of "main" index which can be used to terminate backtraces
+        // and prevent printing stuff above main, which is usually uninteresting
+        auto it = find(strings.begin(), strings.end(), "main");
+        if (it != strings.end()) {
+            mainIndex = distance(strings.begin(), it);
+        }
+
+        /// these are leaks, but we have the same data in \c allocations as well
+        activeAllocations.clear();
+        return true;
+    }
+
     bool shortenTemplates = false;
 
-    vector<InstructionPointer> instructionPointers;
-    vector<string> strings;
     vector<Allocation> allocations;
-    unordered_map<uintptr_t, AllocationInfo> activeAllocations;
-
-    size_t mainIndex = 0;
-
     map<size_t, size_t> sizeHistogram;
     size_t totalAllocated = 0;
     size_t totalAllocations = 0;
     size_t peak = 0;
     size_t leaked = 0;
+
+private:
+    InstructionPointer findIp(const size_t ipIndex) const
+    {
+        if (!ipIndex || ipIndex > instructionPointers.size()) {
+            return {};
+        } else {
+            return instructionPointers[ipIndex - 1];
+        }
+    }
+
+    size_t mainIndex = 0;
+    unordered_map<uintptr_t, AllocationInfo> activeAllocations;
+    vector<InstructionPointer> instructionPointers;
+    vector<string> strings;
 };
 
 }
@@ -273,101 +376,20 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    cout << "reading file \"" << fileName << "\" - please wait, this might take some time..." << endl;
-
     boost::iostreams::filtering_istream in;
     if (isCompressed) {
         in.push(boost::iostreams::gzip_decompressor());
     }
     in.push(file);
 
-    string line;
-    line.reserve(1024);
+    cout << "reading file \"" << fileName << "\" - please wait, this might take some time...";
+    cout.flush();
 
-    stringstream lineIn(ios_base::in);
-    lineIn << hex;
-
-    while (in.good()) {
-        getline(in, line);
-        if (line.empty()) {
-            continue;
-        }
-        const char mode = line[0];
-        lineIn.str(line);
-        lineIn.clear();
-        // skip mode and leading whitespace
-        lineIn.seekg(2);
-        if (mode == 's') {
-            data.strings.push_back(line.substr(2));
-        } else if (mode == 'i') {
-            InstructionPointer ip;
-            lineIn >> ip.instructionPointer;
-            lineIn >> ip.parentIndex;
-            lineIn >> ip.moduleIndex;
-            lineIn >> ip.functionIndex;
-            lineIn >> ip.fileIndex;
-            lineIn >> ip.line;
-            data.instructionPointers.push_back(ip);
-        } else if (mode == '+') {
-            size_t size = 0;
-            lineIn >> size;
-            size_t ipId = 0;
-            lineIn >> ipId;
-            uintptr_t ptr = 0;
-            lineIn >> ptr;
-            if (lineIn.bad()) {
-                cerr << "failed to parse line: " << line << endl;
-                return 1;
-            }
-
-            data.activeAllocations[ptr] = {ipId, size};
-
-            auto& allocation = data.findAllocation(ipId);
-            allocation.leaked += size;
-            allocation.allocated += size;
-            ++allocation.allocations;
-            if (allocation.leaked > allocation.peak) {
-                allocation.peak = allocation.leaked;
-            }
-            data.totalAllocated += size;
-            ++data.totalAllocations;
-            data.leaked += size;
-            if (data.leaked > data.peak) {
-                data.peak = data.leaked;
-            }
-            ++data.sizeHistogram[size];
-        } else if (mode == '-') {
-            uintptr_t ptr = 0;
-            lineIn >> ptr;
-            if (lineIn.bad()) {
-                cerr << "failed to parse line: " << line << endl;
-                return 1;
-            }
-            auto ip = data.activeAllocations.find(ptr);
-            if (ip == data.activeAllocations.end()) {
-                cerr << "unknown pointer in line: " << line << endl;
-                continue;
-            }
-            const auto info = ip->second;
-            data.activeAllocations.erase(ip);
-
-            auto& allocation = data.findAllocation(info.ipIndex);
-            if (!allocation.allocations || allocation.leaked < info.size) {
-                cerr << "inconsistent allocation info, underflowed allocations of " << info.ipIndex << endl;
-                allocation.leaked = 0;
-                allocation.allocations = 0;
-            } else {
-                allocation.leaked -= info.size;
-            }
-            data.leaked -= info.size;
-        } else {
-            cerr << "failed to parse line: " << line << endl;
-        }
+    if (!data.read(in)) {
+        return 1;
     }
 
-    cout << "finished reading file, now analyzing data" << endl;
-
-    data.finalize();
+    cout << "finished reading file, now analyzing data:\n" << endl;
 
     if (printAllocs) {
         // sort by amount of allocations
@@ -378,7 +400,7 @@ int main(int argc, char** argv)
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
             cout << allocation.allocations << " allocations at:" << endl;
-            data.printBacktrace(data.findIp(allocation.ipIndex), cout);
+            data.printBacktrace(allocation.ipIndex, cout);
             cout << endl;
         }
         cout << endl;
@@ -393,7 +415,7 @@ int main(int argc, char** argv)
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
             cout << allocation.allocated << " bytes allocated at:" << endl;
-            data.printBacktrace(data.findIp(allocation.ipIndex), cout);
+            data.printBacktrace(allocation.ipIndex, cout);
             cout << endl;
         }
         cout << endl;
@@ -408,7 +430,7 @@ int main(int argc, char** argv)
         for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
             const auto& allocation = data.allocations[i];
             cout << allocation.peak << " bytes allocated at peak:" << endl;
-            data.printBacktrace(data.findIp(allocation.ipIndex), cout);
+            data.printBacktrace(allocation.ipIndex, cout);
             cout << endl;
         }
         cout << endl;
@@ -429,7 +451,7 @@ int main(int argc, char** argv)
             totalLeakAllocations += allocation.allocations;
 
             cout << allocation.leaked << " bytes leaked in " << allocation.allocations << " allocations at:" << endl;
-            data.printBacktrace(data.findIp(allocation.ipIndex), cout);
+            data.printBacktrace(allocation.ipIndex, cout);
             cout << endl;
         }
         cout << data.leaked << " bytes leaked in total from " << totalLeakAllocations << " allocations" << endl;
