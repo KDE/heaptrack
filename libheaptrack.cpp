@@ -32,6 +32,7 @@
 #include <string>
 #include <tuple>
 #include <memory>
+#include <unordered_set>
 
 #include <boost/algorithm/string/replace.hpp>
 
@@ -39,6 +40,13 @@
 #include <link.h>
 
 #include "tracetree.h"
+
+/**
+ * uncomment this to get extended debug code for known pointers
+ * there are still some malloc functions I'm missing apparently,
+ * related to TLS and such I guess
+ */
+// #define DEBUG_MALLOC_PTRS
 
 using namespace std;
 
@@ -222,12 +230,25 @@ struct Data
                 updateModuleCache();
             }
             index = traceTree.index(trace, out);
+
+#ifdef DEBUG_MALLOC_PTRS
+            auto it = known.find(ptr);
+            assert(it == known.end());
+            known.insert(ptr);
+#endif
         }
         fprintf(out, "+ %lx %lx %lx\n", size, index, reinterpret_cast<uintptr_t>(ptr));
     }
 
     void handleFree(void* ptr)
     {
+#ifdef DEBUG_MALLOC_PTRS
+        lock_guard<mutex> lock(m_mutex);
+        auto it = known.find(ptr);
+        assert(it != known.end());
+        known.erase(it);
+#endif
+
         fprintf(out, "- %lx\n", reinterpret_cast<uintptr_t>(ptr));
     }
 
@@ -241,6 +262,10 @@ struct Data
      *       to produce non-per-line-interleaved output.
      */
     FILE* out = nullptr;
+
+#ifdef DEBUG_MALLOC_PTRS
+    unordered_set<void*> known;
+#endif
 };
 
 unique_ptr<Data> data;
