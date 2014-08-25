@@ -59,25 +59,68 @@ ostream& operator<<(ostream& out, const AddressInformation& info)
     return out;
 }
 
+// sadly, C++ doesn't yet have opaque typedefs
+template<typename Base>
+struct Index
+{
+    size_t index = 0;
+
+    explicit operator bool() const
+    {
+        return index;
+    }
+
+    bool operator<(Index o) const
+    {
+        return index < o.index;
+    }
+
+    bool operator!=(Index o) const
+    {
+        return index != o.index;
+    }
+};
+
+template<typename Base>
+istream& operator>>(istream &in, Index<Base> &index)
+{
+    in >> index.index;
+    return in;
+}
+
+template<typename Base>
+ostream& operator<<(ostream &out, const Index<Base> index)
+{
+    out << index.index;
+    return out;
+}
+
+struct StringIndex : public Index<StringIndex> {};
+struct ModuleIndex : public StringIndex {};
+struct FunctionIndex : public StringIndex {};
+struct FileIndex : public StringIndex {};
+struct IpIndex : public Index<IpIndex> {};
+struct TraceIndex : public Index<TraceIndex> {};
+
 struct InstructionPointer
 {
     uintptr_t instructionPointer = 0;
-    size_t moduleIndex = 0;
-    size_t functionIndex = 0;
-    size_t fileIndex = 0;
+    ModuleIndex moduleIndex;
+    FunctionIndex functionIndex;
+    FileIndex fileIndex;
     int line = 0;
 };
 
 struct TraceNode
 {
-    size_t ipIndex = 0;
-    size_t parentIndex = 0;
+    IpIndex ipIndex;
+    TraceIndex parentIndex;
 };
 
 struct Allocation
 {
     // backtrace entry point
-    size_t traceIndex;
+    TraceIndex traceIndex;
     // number of allocations
     size_t allocations;
     // bytes allocated in total
@@ -93,7 +136,7 @@ struct Allocation
  */
 struct AllocationInfo
 {
-    size_t traceIndex;
+    TraceIndex traceIndex;
     size_t size;
 };
 
@@ -110,7 +153,7 @@ struct AccumulatedTraceData
 
     void clear()
     {
-        mainIndex = 0;
+        mainIndex.index = 0;
         instructionPointers.clear();
         traces.clear();
         strings.clear();
@@ -118,7 +161,7 @@ struct AccumulatedTraceData
         activeAllocations.clear();
     }
 
-    void printBacktrace(const size_t traceIndex, ostream& out) const
+    void printBacktrace(const TraceIndex traceIndex, ostream& out) const
     {
         printBacktrace(findTrace(traceIndex), out);
     }
@@ -143,7 +186,7 @@ struct AccumulatedTraceData
             }
             out << '\n';
 
-            if (mainIndex && ip.functionIndex == mainIndex + 1) {
+            if (mainIndex && ip.functionIndex.index == mainIndex.index + 1) {
                 break;
             }
 
@@ -151,10 +194,10 @@ struct AccumulatedTraceData
         };
     }
 
-    Allocation& findAllocation(const size_t traceIndex)
+    Allocation& findAllocation(const TraceIndex traceIndex)
     {
         auto it = lower_bound(allocations.begin(), allocations.end(), traceIndex,
-                                [] (const Allocation& allocation, const size_t traceIndex) -> bool {
+                                [] (const Allocation& allocation, const TraceIndex traceIndex) -> bool {
                                     return allocation.traceIndex < traceIndex;
                                 });
         if (it == allocations.end() || it->traceIndex != traceIndex) {
@@ -163,13 +206,13 @@ struct AccumulatedTraceData
         return *it;
     }
 
-    const string& stringify(const size_t stringId) const
+    const string& stringify(const StringIndex stringId) const
     {
-        if (!stringId || stringId > strings.size()) {
+        if (!stringId || stringId.index > strings.size()) {
             static const string empty;
             return empty;
         } else {
-            return strings.at(stringId - 1);
+            return strings.at(stringId.index - 1);
         }
     }
 
@@ -240,8 +283,8 @@ struct AccumulatedTraceData
             } else if (mode == '+') {
                 size_t size = 0;
                 lineIn >> size;
-                size_t ipId = 0;
-                lineIn >> ipId;
+                TraceIndex traceId;
+                lineIn >> traceId;
                 uintptr_t ptr = 0;
                 lineIn >> ptr;
                 if (lineIn.bad()) {
@@ -249,9 +292,9 @@ struct AccumulatedTraceData
                     return false;
                 }
 
-                activeAllocations[ptr] = {ipId, size};
+                activeAllocations[ptr] = {traceId, size};
 
-                auto& allocation = findAllocation(ipId);
+                auto& allocation = findAllocation(traceId);
                 allocation.leaked += size;
                 allocation.allocated += size;
                 ++allocation.allocations;
@@ -298,7 +341,7 @@ struct AccumulatedTraceData
         // and prevent printing stuff above main, which is usually uninteresting
         auto it = find(strings.begin(), strings.end(), "main");
         if (it != strings.end()) {
-            mainIndex = distance(strings.begin(), it);
+            mainIndex.index = distance(strings.begin(), it);
         }
 
         /// these are leaks, but we have the same data in \c allocations as well
@@ -316,25 +359,25 @@ struct AccumulatedTraceData
     size_t leaked = 0;
 
 private:
-    InstructionPointer findIp(const size_t ipIndex) const
+    InstructionPointer findIp(const IpIndex ipIndex) const
     {
-        if (!ipIndex || ipIndex > instructionPointers.size()) {
+        if (!ipIndex || ipIndex.index > instructionPointers.size()) {
             return {};
         } else {
-            return instructionPointers[ipIndex - 1];
+            return instructionPointers[ipIndex.index - 1];
         }
     }
 
-    TraceNode findTrace(const size_t traceIndex) const
+    TraceNode findTrace(const TraceIndex traceIndex) const
     {
-        if (!traceIndex || traceIndex > traces.size()) {
+        if (!traceIndex || traceIndex.index > traces.size()) {
             return {};
         } else {
-            return traces[traceIndex - 1];
+            return traces[traceIndex.index - 1];
         }
     }
 
-    size_t mainIndex = 0;
+    StringIndex mainIndex;
     unordered_map<uintptr_t, AllocationInfo> activeAllocations;
     vector<InstructionPointer> instructionPointers;
     vector<TraceNode> traces;
