@@ -116,7 +116,7 @@ struct AccumulatedTraceData
                 out << " <unknown module>";
             }
             if (ip.functionIndex) {
-                out << ' ' << stringify(ip.functionIndex);
+                out << ' ' << prettyFunction(stringify(ip.functionIndex));
             } else {
                 out << " ??";
             }
@@ -171,6 +171,34 @@ struct AccumulatedTraceData
         }
     }
 
+    string prettyFunction(const string& function) const
+    {
+        if (!shortenTemplates) {
+            return function;
+        }
+        string ret;
+        ret.reserve(function.size());
+        int depth = 0;
+        for (size_t i = 0; i < function.size(); ++i) {
+            const auto c = function[i];
+            if (c == '<') {
+                ++depth;
+                if (depth == 1) {
+                    ret.push_back(c);
+                }
+            } else if (c == '>') {
+                --depth;
+            }
+            if (depth) {
+                continue;
+            }
+            ret.push_back(c);
+        }
+        return ret;
+    }
+
+    bool shortenTemplates = false;
+
     vector<InstructionPointer> instructionPointers;
     vector<string> strings;
     vector<Allocation> allocations;
@@ -192,6 +220,7 @@ int main(int argc, char** argv)
     po::options_description desc("Options");
     desc.add_options()
         ("file,f", po::value<string>()->required(), "The heaptrack data file to print.")
+        ("shorten-templates,t", po::value<bool>()->default_value(true), "Shorten template identifiers.")
         ("print-peaks,p", po::value<bool>()->default_value(true), "Print backtraces to top allocators, sorted by peak consumption.")
         ("print-allocators,a", po::value<bool>()->default_value(true), "Print backtraces to top allocators, sorted by number of calls to allocation functions.")
         ("print-leaks,l", po::value<bool>()->default_value(false), "Print backtraces to leaked memory allocations.")
@@ -223,6 +252,7 @@ int main(int argc, char** argv)
     ios_base::sync_with_stdio(false);
 
     const auto inputFile = vm["file"].as<string>();
+    data.shortenTemplates = vm["shorten-templates"].as<bool>();
     const bool printHistogram = vm["print-histogram"].as<bool>();
     const bool printLeaks = vm["print-leaks"].as<bool>();
     const bool printOverallAlloc = vm["print-overall-allocated"].as<bool>();
