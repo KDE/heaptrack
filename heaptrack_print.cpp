@@ -246,19 +246,16 @@ struct AccumulatedTraceData
     template<typename T>
     void printMerged(T AllocationData::* member, const char* label)
     {
-        sort(mergedAllocations.begin(), mergedAllocations.end(),
-            [member] (const MergedAllocation& l, const MergedAllocation &r) {
-                return l.*member > r.*member;
-            });
+        auto sortOrder = [member] (const AllocationData& l, const AllocationData& r) {
+            return l.*member > r.*member;
+        };
+        sort(mergedAllocations.begin(), mergedAllocations.end(), sortOrder);
         for (size_t i = 0; i < min(10lu, mergedAllocations.size()); ++i) {
             auto& allocation = mergedAllocations[i];
             cout << allocation.*member << ' ' << label << " from:\n";
             printIp(allocation.ipIndex, cout);
 
-            sort(allocation.traces.begin(), allocation.traces.end(),
-                [member] (const Allocation& l, const Allocation &r) {
-                    return l.*member > r.*member;
-                });
+            sort(allocation.traces.begin(), allocation.traces.end(), sortOrder);
             size_t handled = 0;
             const size_t subTracesToPrint = 5;
             for (size_t j = 0; j < min(subTracesToPrint, allocation.traces.size()); ++j) {
