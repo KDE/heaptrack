@@ -572,18 +572,31 @@ int main(int argc, char** argv)
 
     if (printAllocs) {
         // sort by amount of allocations
+        cout << "MOST CALLS TO ALLOCATION FUNCTIONS\n";
         sort(data.mergedAllocations.begin(), data.mergedAllocations.end(),
             [] (const MergedAllocation& l, const MergedAllocation &r) {
                 return l.allocations > r.allocations;
             });
-        cout << "MOST CALLS TO ALLOCATION FUNCTIONS\n";
         for (size_t i = 0; i < min(10lu, data.mergedAllocations.size()); ++i) {
-            const auto& allocation = data.mergedAllocations[i];
-            cout << allocation.allocations << " allocations at:\n";
+            auto& allocation = data.mergedAllocations[i];
+            cout << allocation.allocations << " calls to allocation functions from:\n";
             data.printIp(allocation.ipIndex, cout);
-            for (const auto& trace : allocation.traces) {
-                cout << "  " << trace.allocations << " from:\n";
+
+            sort(allocation.traces.begin(), allocation.traces.end(),
+                [] (const Allocation& l, const Allocation &r) {
+                    return l.allocations > r.allocations;
+                });
+            size_t handled = 0;
+            const size_t subTracesToPrint = 5;
+            for (size_t j = 0; j < min(subTracesToPrint, allocation.traces.size()); ++j) {
+                const auto& trace = allocation.traces[j];
+                cout << "  " << trace.allocations << " calls from:\n";
+                handled += trace.allocations;
                 data.printBacktrace(trace.traceIndex, cout, 2, true);
+            }
+            if (allocation.traces.size() > subTracesToPrint) {
+                cout << "  and " << (allocation.allocations - handled) << " calls from "
+                    << (allocation.traces.size() - subTracesToPrint) << " other places\n";
             }
             cout << '\n';
         }
