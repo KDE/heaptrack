@@ -234,6 +234,16 @@ struct AccumulatedTraceData
     }
 
     template<typename T>
+    void printAllocations(T AllocationData::* member, const char* label)
+    {
+        if (mergeBacktraces) {
+            printMerged(member, label);
+        } else {
+            printUnmerged(member, label);
+        }
+    }
+
+    template<typename T>
     void printMerged(T AllocationData::* member, const char* label)
     {
         sort(mergedAllocations.begin(), mergedAllocations.end(),
@@ -263,6 +273,22 @@ struct AccumulatedTraceData
             }
             cout << '\n';
         }
+    }
+
+    template<typename T>
+    void printUnmerged(T AllocationData::* member, const char* label)
+    {
+        sort(allocations.begin(), allocations.end(),
+            [member] (const Allocation& l, const Allocation &r) {
+                return l.*member > r.*member;
+            });
+        for (size_t i = 0; i < min(10lu, allocations.size()); ++i) {
+            const auto& allocation = allocations[i];
+            cout << allocation.*member << ' ' << label << " from:\n";
+            printBacktrace(allocation.traceIndex, cout);
+            cout << '\n';
+        }
+        cout << endl;
     }
 
     const string& stringify(const StringIndex stringId) const
@@ -457,6 +483,7 @@ struct AccumulatedTraceData
     }
 
     bool shortenTemplates = false;
+    bool mergeBacktraces = true;
 
     vector<Allocation> allocations;
     vector<MergedAllocation> mergedAllocations;
@@ -541,6 +568,8 @@ int main(int argc, char** argv)
             "The heaptrack data file to print.")
         ("shorten-templates,t", po::value<bool>()->default_value(true)->implicit_value(true),
             "Shorten template identifiers.")
+        ("merge-backtraces,m", po::value<bool>()->default_value(true)->implicit_value(true),
+            "Merge backtraces.\nNOTE: the merged peak consumption is not correct.")
         ("print-peaks,p", po::value<bool>()->default_value(true)->implicit_value(true),
             "Print backtraces to top allocators, sorted by peak consumption.")
         ("print-allocators,a", po::value<bool>()->default_value(true)->implicit_value(true),
@@ -583,6 +612,7 @@ int main(int argc, char** argv)
 
     const auto inputFile = vm["file"].as<string>();
     data.shortenTemplates = vm["shorten-templates"].as<bool>();
+    data.mergeBacktraces = vm["merge-backtraces"].as<bool>();
     const bool printHistogram = vm["print-histogram"].as<bool>();
     const bool printLeaks = vm["print-leaks"].as<bool>();
     const bool printOverallAlloc = vm["print-overall-allocated"].as<bool>();
@@ -616,13 +646,13 @@ int main(int argc, char** argv)
     if (printAllocs) {
         // sort by amount of allocations
         cout << "MOST CALLS TO ALLOCATION FUNCTIONS\n";
-        data.printMerged(&AllocationData::allocations, "calls to allocation functions");
+        data.printAllocations(&AllocationData::allocations, "calls to allocation functions");
         cout << endl;
     }
 
     if (printOverallAlloc) {
         cout << "MOST BYTES ALLOCATED OVER TIME (ignoring deallocations)\n";
-        data.printMerged(&AllocationData::allocated, "bytes allocated");
+        data.printAllocations(&AllocationData::allocated, "bytes allocated");
         cout << endl;
     }
 
@@ -632,26 +662,20 @@ int main(int argc, char** argv)
         /// and allocate M bytes each, but free it thereafter.
         /// Then the below would give a wrong total peak size of N * M instead
         /// of just N!
-
-        // sort by peak memory consumption
-        sort(data.allocations.begin(), data.allocations.end(),
-            [] (const Allocation& l, const Allocation &r) {
-                return l.peak > r.peak;
-            });
         cout << "PEAK MEMORY CONSUMERS\n";
-        for (size_t i = 0; i < min(10lu, data.allocations.size()); ++i) {
-            const auto& allocation = data.allocations[i];
-            cout << allocation.peak << " bytes allocated at peak:\n";
-            data.printBacktrace(allocation.traceIndex, cout);
-            cout << '\n';
+        if (data.mergeBacktraces) {
+            cout << "\nWARNING - the data below is not an accurate calcuation of"
+                    " the total peak consumption and can easily be wrong.\n"
+                    " For an accurate overview, disable backtrace merging.\n";
         }
-        cout << endl;
+
+        data.printAllocations(&AllocationData::peak, "bytes peak memory consumption");
     }
 
     if (printLeaks) {
         // sort by amount of leaks
         cout << "MEMORY LEAKS\n";
-        data.printMerged(&AllocationData::leaked, "bytes leaked");
+        data.printAllocations(&AllocationData::leaked, "bytes leaked");
         cout << endl;
     }
 
