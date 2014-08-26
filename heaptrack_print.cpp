@@ -534,14 +534,22 @@ int main(int argc, char** argv)
 {
     po::options_description desc("Options");
     desc.add_options()
-        ("file,f", po::value<string>()->required(), "The heaptrack data file to print.")
-        ("shorten-templates,t", po::value<bool>()->default_value(true), "Shorten template identifiers.")
-        ("print-peaks,p", po::value<bool>()->default_value(true), "Print backtraces to top allocators, sorted by peak consumption.")
-        ("print-allocators,a", po::value<bool>()->default_value(true), "Print backtraces to top allocators, sorted by number of calls to allocation functions.")
-        ("print-leaks,l", po::value<bool>()->default_value(false), "Print backtraces to leaked memory allocations.")
-        ("print-histogram,H", po::value<bool>()->default_value(false), "Print allocation size histogram.")
-        ("print-overall-allocated,o", po::value<bool>()->default_value(false), "Print top overall allocators, ignoring memory frees.")
-        ("help,h", "Show this help message.");
+        ("file,f", po::value<string>()->required(),
+            "The heaptrack data file to print.")
+        ("shorten-templates,t", po::value<bool>()->default_value(true)->implicit_value(true),
+            "Shorten template identifiers.")
+        ("print-peaks,p", po::value<bool>()->default_value(true)->implicit_value(true),
+            "Print backtraces to top allocators, sorted by peak consumption.")
+        ("print-allocators,a", po::value<bool>()->default_value(true)->implicit_value(true),
+            "Print backtraces to top allocators, sorted by number of calls to allocation functions.")
+        ("print-leaks,l", po::value<bool>()->default_value(false)->implicit_value(true),
+            "Print backtraces to leaked memory allocations.")
+        ("print-histogram,H", po::value<bool>()->default_value(false)->implicit_value(true),
+            "Print allocation size histogram.")
+        ("print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
+            "Print top overall allocators, ignoring memory frees.")
+        ("help,h",
+            "Show this help message.");
     po::positional_options_description p;
     p.add("file", -1);
 
