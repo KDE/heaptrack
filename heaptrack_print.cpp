@@ -420,6 +420,7 @@ struct AccumulatedTraceData
         // and prevent printing stuff above main, which is usually uninteresting
         mainIndex.index = findStringIndex("main");
 
+        // skip operator new and operator new[] at the beginning of traces
         if (opNewIpIndex || opArrNewIpIndex) {
             for (Allocation& allocation : allocations) {
                 while (true) {
@@ -436,6 +437,9 @@ struct AccumulatedTraceData
         // merge allocations so that different traces that point to the same
         // instruction pointer at the end where the allocation function is
         // called are combined
+        // TODO: merge deeper traces, i.e. A,B,C,D and A,B,C,F
+        //       should be merged to A,B,C: D & F
+        //       currently the below will only merge it to: A: B,C,D & B,C,F
         mergedAllocations.reserve(allocations.size());
         for (const Allocation& allocation : allocations) {
             mergeAllocation(allocation);
