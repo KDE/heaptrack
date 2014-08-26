@@ -421,7 +421,6 @@ struct AccumulatedTraceData
         mainIndex.index = findStringIndex("main");
 
         if (opNewIpIndex || opArrNewIpIndex) {
-            cout << opNewIpIndex.index << ' ' << opArrNewIpIndex << endl;
             for (Allocation& allocation : allocations) {
                 while (true) {
                     auto trace = findTrace(allocation.traceIndex);
