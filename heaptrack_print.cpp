@@ -233,6 +233,38 @@ struct AccumulatedTraceData
         };
     }
 
+    template<typename T>
+    void printMerged(T AllocationData::* member, const char* label)
+    {
+        sort(mergedAllocations.begin(), mergedAllocations.end(),
+            [member] (const MergedAllocation& l, const MergedAllocation &r) {
+                return l.*member > r.*member;
+            });
+        for (size_t i = 0; i < min(10lu, mergedAllocations.size()); ++i) {
+            auto& allocation = mergedAllocations[i];
+            cout << allocation.*member << ' ' << label << " from:\n";
+            printIp(allocation.ipIndex, cout);
+
+            sort(allocation.traces.begin(), allocation.traces.end(),
+                [member] (const Allocation& l, const Allocation &r) {
+                    return l.*member > r.*member;
+                });
+            size_t handled = 0;
+            const size_t subTracesToPrint = 5;
+            for (size_t j = 0; j < min(subTracesToPrint, allocation.traces.size()); ++j) {
+                const auto& trace = allocation.traces[j];
+                cout << "  " << trace.*member << " from:\n";
+                handled += trace.*member;
+                printBacktrace(trace.traceIndex, cout, 2, true);
+            }
+            if (allocation.traces.size() > subTracesToPrint) {
+                cout << "  and " << (allocation.*member - handled) << " from "
+                     << (allocation.traces.size() - subTracesToPrint) << " other places\n";
+            }
+            cout << '\n';
+        }
+    }
+
     const string& stringify(const StringIndex stringId) const
     {
         if (!stringId || stringId.index > strings.size()) {
@@ -573,53 +605,13 @@ int main(int argc, char** argv)
     if (printAllocs) {
         // sort by amount of allocations
         cout << "MOST CALLS TO ALLOCATION FUNCTIONS\n";
-        sort(data.mergedAllocations.begin(), data.mergedAllocations.end(),
-            [] (const MergedAllocation& l, const MergedAllocation &r) {
-                return l.allocations > r.allocations;
-            });
-        for (size_t i = 0; i < min(10lu, data.mergedAllocations.size()); ++i) {
-            auto& allocation = data.mergedAllocations[i];
-            cout << allocation.allocations << " calls to allocation functions from:\n";
-            data.printIp(allocation.ipIndex, cout);
-
-            sort(allocation.traces.begin(), allocation.traces.end(),
-                [] (const Allocation& l, const Allocation &r) {
-                    return l.allocations > r.allocations;
-                });
-            size_t handled = 0;
-            const size_t subTracesToPrint = 5;
-            for (size_t j = 0; j < min(subTracesToPrint, allocation.traces.size()); ++j) {
-                const auto& trace = allocation.traces[j];
-                cout << "  " << trace.allocations << " calls from:\n";
-                handled += trace.allocations;
-                data.printBacktrace(trace.traceIndex, cout, 2, true);
-            }
-            if (allocation.traces.size() > subTracesToPrint) {
-                cout << "  and " << (allocation.allocations - handled) << " calls from "
-                    << (allocation.traces.size() - subTracesToPrint) << " other places\n";
-            }
-            cout << '\n';
-        }
+        data.printMerged(&AllocationData::allocations, "calls to allocation functions");
         cout << endl;
     }
 
     if (printOverallAlloc) {
-        // sort by amount of bytes allocated
-        sort(data.mergedAllocations.begin(), data.mergedAllocations.end(),
-            [] (const MergedAllocation& l, const MergedAllocation &r) {
-                return l.allocated > r.allocated;
-            });
         cout << "MOST BYTES ALLOCATED OVER TIME (ignoring deallocations)\n";
-        for (size_t i = 0; i < min(10lu, data.mergedAllocations.size()); ++i) {
-            const auto& allocation = data.mergedAllocations[i];
-            cout << allocation.allocated << " bytes allocated at:\n";
-            data.printIp(allocation.ipIndex, cout);
-            for (const auto& trace : allocation.traces) {
-                cout << "  " << trace.allocated << " bytes from:\n";
-                data.printBacktrace(trace.traceIndex, cout, 2, true);
-            }
-            cout << '\n';
-        }
+        data.printMerged(&AllocationData::allocated, "bytes allocated");
         cout << endl;
     }
 
@@ -647,35 +639,15 @@ int main(int argc, char** argv)
 
     if (printLeaks) {
         // sort by amount of leaks
-        sort(data.mergedAllocations.begin(), data.mergedAllocations.end(),
-            [] (const MergedAllocation& l, const MergedAllocation &r) {
-                return l.leaked > r.leaked;
-            });
-
-        size_t totalLeakAllocations = 0;
         cout << "MEMORY LEAKS\n";
-        for (const auto& allocation : data.mergedAllocations) {
-            if (!allocation.leaked) {
-                break;
-            }
-            totalLeakAllocations += allocation.allocations;
-
-            cout << allocation.leaked << " bytes leaked in " << allocation.allocations << " allocations at:\n";
-            data.printIp(allocation.ipIndex, cout);
-            for (const auto& trace : allocation.traces) {
-                if (!trace.leaked) {
-                    continue;
-                }
-                cout << "  " << trace.leaked << " bytes from:\n";
-                data.printBacktrace(trace.traceIndex, cout, 2, true);
-            }
-            cout << '\n';
-        }
-        cout << data.leaked << " bytes leaked in total from " << totalLeakAllocations << " allocations" << endl;
+        data.printMerged(&AllocationData::leaked, "bytes leaked");
+        cout << endl;
     }
 
-    cout << data.totalAllocated << " bytes allocated in total over " << data.totalAllocations
-         << " allocations, peak consumption: " << data.peak << " bytes\n\n";
+    cout << data.totalAllocated << " bytes allocated in total (ignoring deallocations) over "
+         << data.totalAllocations << " calls to allocation functions.\n"
+         << "peak heap memory consumption: " << data.peak << " bytes\n"
+         << "total memory leaked: " << data.leaked << " bytes\n";
 
     if (printHistogram) {
         cout << "size histogram: " << endl;
