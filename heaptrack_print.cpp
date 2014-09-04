@@ -308,6 +308,23 @@ struct AccumulatedTraceData
         int depth = 0;
         for (size_t i = 0; i < function.size(); ++i) {
             const auto c = function[i];
+            if ((c == '<' || c == '>') && ret.size() >= 8) {
+                // don't get confused by C++ operators
+                auto end = ret.end();
+                const char* cmp = "operator";
+                if (ret.back() == c) {
+                    // skip second angle bracket for operator<< or operator>>
+                    if (c == '<') {
+                        cmp = "operator<";
+                    } else {
+                        cmp = "operator>";
+                    }
+                }
+                if (boost::algorithm::ends_with(ret, cmp)) {
+                    ret.push_back(c);
+                    continue;
+                }
+            }
             if (c == '<') {
                 ++depth;
                 if (depth == 1) {
