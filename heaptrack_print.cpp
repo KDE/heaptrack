@@ -27,6 +27,7 @@
 #include <fstream>
 #include <sstream>
 #include <unordered_map>
+#include <unordered_set>
 #include <map>
 #include <vector>
 #include <memory>
@@ -352,11 +353,10 @@ struct AccumulatedTraceData
         lineIn << hex;
 
         const string opNewStr("operator new(unsigned long)");
-        StringIndex opNewStrIndex;
-        IpIndex opNewIpIndex;
         const string opArrNewStr("operator new[](unsigned long)");
+        StringIndex opNewStrIndex;
         StringIndex opArrNewStrIndex;
-        IpIndex opArrNewIpIndex;
+        unordered_set<size_t> opNewIpIndices;
 
         while (in.good()) {
             getline(in, line);
@@ -391,10 +391,10 @@ struct AccumulatedTraceData
                 lineIn >> ip.fileIndex;
                 lineIn >> ip.line;
                 instructionPointers.push_back(ip);
-                if (opNewStrIndex && !opNewIpIndex && opNewStrIndex == ip.functionIndex) {
-                    opNewIpIndex.index = instructionPointers.size();
-                } else if (opArrNewStrIndex && !opArrNewIpIndex && opArrNewStrIndex == ip.functionIndex) {
-                    opArrNewIpIndex.index = instructionPointers.size();
+                if ((opNewStrIndex && opNewStrIndex == ip.functionIndex)
+                    || (opArrNewStrIndex && opArrNewStrIndex == ip.functionIndex))
+                {
+                    opNewIpIndices.insert(instructionPointers.size());
                 }
             } else if (mode == '+') {
                 size_t size = 0;
@@ -461,11 +461,11 @@ struct AccumulatedTraceData
         mainIndex.index = findStringIndex("main");
 
         // skip operator new and operator new[] at the beginning of traces
-        if (opNewIpIndex || opArrNewIpIndex) {
+        if (!opNewIpIndices.empty()) {
             for (Allocation& allocation : allocations) {
                 while (true) {
                     auto trace = findTrace(allocation.traceIndex);
-                    if (trace.ipIndex == opNewIpIndex || trace.ipIndex == opArrNewIpIndex) {
+                    if (opNewIpIndices.find(trace.ipIndex.index) != opNewIpIndices.end()) {
                         allocation.traceIndex = trace.parentIndex;
                     } else {
                         break;
