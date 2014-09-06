@@ -593,8 +593,8 @@ int main(int argc, char** argv)
             "Print backtraces to top allocators, sorted by number of calls to allocation functions.")
         ("print-leaks,l", po::value<bool>()->default_value(false)->implicit_value(true),
             "Print backtraces to leaked memory allocations.")
-        ("print-histogram,H", po::value<bool>()->default_value(false)->implicit_value(true),
-            "Print allocation size histogram.")
+        ("print-histogram,H", po::value<string>()->default_value(string()),
+            "Path to output file where an allocation size histogram will be written to.")
         ("print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
             "Print top overall allocators, ignoring memory frees.")
         ("help,h",
@@ -627,7 +627,7 @@ int main(int argc, char** argv)
     const auto inputFile = vm["file"].as<string>();
     data.shortenTemplates = vm["shorten-templates"].as<bool>();
     data.mergeBacktraces = vm["merge-backtraces"].as<bool>();
-    const bool printHistogram = vm["print-histogram"].as<bool>();
+    const string printHistogram = vm["print-histogram"].as<string>();
     const bool printLeaks = vm["print-leaks"].as<bool>();
     const bool printOverallAlloc = vm["print-overall-allocated"].as<bool>();
     const bool printPeaks = vm["print-peaks"].as<bool>();
@@ -706,10 +706,14 @@ int main(int argc, char** argv)
          << "peak heap memory consumption: " << data.peak << " bytes\n"
          << "total memory leaked: " << data.leaked << " bytes\n";
 
-    if (printHistogram) {
-        cout << "size histogram: " << endl;
-        for (auto entry : data.sizeHistogram) {
-            cout << entry.first << "\t" << entry.second << endl;
+    if (!printHistogram.empty()) {
+        ofstream histogram(printHistogram, ios_base::out);
+        if (!histogram.is_open()) {
+            cerr << "Failed to open histogram output file \"" << histogram << "\"." << endl;
+        } else {
+            for (auto entry : data.sizeHistogram) {
+                histogram << entry.first << '\t' << entry.second << '\n';
+            }
         }
     }
 
