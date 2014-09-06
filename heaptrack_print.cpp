@@ -235,17 +235,17 @@ struct AccumulatedTraceData
     }
 
     template<typename T>
-    void printAllocations(T AllocationData::* member, const char* label)
+    void printAllocations(T AllocationData::* member, const char* label, const char* sublabel)
     {
         if (mergeBacktraces) {
-            printMerged(member, label);
+            printMerged(member, label, sublabel);
         } else {
             printUnmerged(member, label);
         }
     }
 
     template<typename T>
-    void printMerged(T AllocationData::* member, const char* label)
+    void printMerged(T AllocationData::* member, const char* label, const char* sublabel)
     {
         auto sortOrder = [member] (const AllocationData& l, const AllocationData& r) {
             return l.*member > r.*member;
@@ -253,7 +253,8 @@ struct AccumulatedTraceData
         sort(mergedAllocations.begin(), mergedAllocations.end(), sortOrder);
         for (size_t i = 0; i < min(10lu, mergedAllocations.size()); ++i) {
             auto& allocation = mergedAllocations[i];
-            cout << allocation.*member << ' ' << label << " from:\n";
+            printf(label, allocation.allocations, allocation.allocated,
+                   allocation.leaked, allocation.peak);
             printIp(allocation.ipIndex, cout);
 
             sort(allocation.traces.begin(), allocation.traces.end(), sortOrder);
@@ -261,7 +262,8 @@ struct AccumulatedTraceData
             const size_t subTracesToPrint = 5;
             for (size_t j = 0; j < min(subTracesToPrint, allocation.traces.size()); ++j) {
                 const auto& trace = allocation.traces[j];
-                cout << "  " << trace.*member << " from:\n";
+                printf(sublabel, trace.allocations, trace.allocated,
+                       trace.leaked, trace.peak);
                 handled += trace.*member;
                 printBacktrace(trace.traceIndex, cout, 2, true);
             }
@@ -282,7 +284,8 @@ struct AccumulatedTraceData
             });
         for (size_t i = 0; i < min(10lu, allocations.size()); ++i) {
             const auto& allocation = allocations[i];
-            cout << allocation.*member << ' ' << label << " from:\n";
+            printf(label, allocation.allocations, allocation.allocated,
+                   allocation.leaked, allocation.peak);
             printBacktrace(allocation.traceIndex, cout);
             cout << '\n';
         }
@@ -621,9 +624,6 @@ int main(int argc, char** argv)
 
     AccumulatedTraceData data;
 
-    // optimize: we only have a single thread
-    ios_base::sync_with_stdio(false);
-
     const auto inputFile = vm["file"].as<string>();
     data.shortenTemplates = vm["shorten-templates"].as<bool>();
     data.mergeBacktraces = vm["merge-backtraces"].as<bool>();
@@ -660,13 +660,17 @@ int main(int argc, char** argv)
     if (printAllocs) {
         // sort by amount of allocations
         cout << "MOST CALLS TO ALLOCATION FUNCTIONS\n";
-        data.printAllocations(&AllocationData::allocations, "calls to allocation functions");
+        data.printAllocations(&AllocationData::allocations,
+                              "%1$lu calls to allocation functions with %4$lu bytes peak consumption from\n",
+                              "  %1$lu calls with %4$lu bytes peak consumption from: \n");
         cout << endl;
     }
 
     if (printOverallAlloc) {
         cout << "MOST BYTES ALLOCATED OVER TIME (ignoring deallocations)\n";
-        data.printAllocations(&AllocationData::allocated, "bytes allocated");
+        data.printAllocations(&AllocationData::allocated,
+                              "%2$lu bytes over %1$lu calls allocated\n",
+                              "  %2$lu bytes over %1$lu calls from:\n");
         cout << endl;
     }
 
@@ -683,13 +687,17 @@ int main(int argc, char** argv)
                     " For an accurate overview, disable backtrace merging.\n";
         }
 
-        data.printAllocations(&AllocationData::peak, "bytes peak memory consumption");
+        data.printAllocations(&AllocationData::peak,
+                              "%4$lu bytes peak memory consumed over %1$lu calls from\n",
+                              "  %4$lu bytes over %1$lu calls from:\n");
     }
 
     if (printLeaks) {
         // sort by amount of leaks
         cout << "MEMORY LEAKS\n";
-        data.printAllocations(&AllocationData::leaked, "bytes leaked");
+        data.printAllocations(&AllocationData::leaked,
+                              "%3$lu bytes leaked over %1$lu calls from\n",
+                              "  %3$lu bytes over %1$lu calls from:\n");
         cout << endl;
     }
 
