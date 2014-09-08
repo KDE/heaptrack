@@ -170,6 +170,7 @@ struct AccumulatedTraceData
         strings.reserve(4096);
         allocations.reserve(16384);
         activeAllocations.reserve(65536);
+        opNewIpIndices.reserve(16);
     }
 
     void clear()
@@ -181,6 +182,7 @@ struct AccumulatedTraceData
         mergedAllocations.clear();
         allocations.clear();
         activeAllocations.clear();
+        opNewIpIndices.clear();
     }
 
     void printIp(const IpIndex ip, ostream &out, const size_t indent = 0) const
@@ -359,7 +361,6 @@ struct AccumulatedTraceData
         const string opArrNewStr("operator new[](unsigned long)");
         StringIndex opNewStrIndex;
         StringIndex opArrNewStrIndex;
-        unordered_set<size_t> opNewIpIndices;
 
         while (in.good()) {
             getline(in, line);
@@ -385,6 +386,16 @@ struct AccumulatedTraceData
                 TraceNode node;
                 lineIn >> node.ipIndex;
                 lineIn >> node.parentIndex;
+                // skip operator new and operator new[] at the beginning of traces
+                if (!opNewIpIndices.empty()) {
+                    while (true) {
+                        if (opNewIpIndices.find(node.ipIndex.index) != opNewIpIndices.end()) {
+                            node = findTrace(node.parentIndex);
+                        } else {
+                            break;
+                        }
+                    }
+                }
                 traces.push_back(node);
             } else if (mode == 'i') {
                 InstructionPointer ip;
@@ -462,20 +473,6 @@ struct AccumulatedTraceData
         // find index of "main" index which can be used to terminate backtraces
         // and prevent printing stuff above main, which is usually uninteresting
         mainIndex.index = findStringIndex("main");
-
-        // skip operator new and operator new[] at the beginning of traces
-        if (!opNewIpIndices.empty()) {
-            for (Allocation& allocation : allocations) {
-                while (true) {
-                    auto trace = findTrace(allocation.traceIndex);
-                    if (opNewIpIndices.find(trace.ipIndex.index) != opNewIpIndices.end()) {
-                        allocation.traceIndex = trace.parentIndex;
-                    } else {
-                        break;
-                    }
-                }
-            }
-        }
 
         // merge allocations so that different traces that point to the same
         // instruction pointer at the end where the allocation function is
@@ -573,6 +570,7 @@ private:
     vector<InstructionPointer> instructionPointers;
     vector<TraceNode> traces;
     vector<string> strings;
+    unordered_set<size_t> opNewIpIndices;
 };
 
 }
