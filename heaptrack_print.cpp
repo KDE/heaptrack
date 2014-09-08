@@ -228,7 +228,7 @@ struct AccumulatedTraceData
             }
             skipFirst = false;
 
-            if (mainIndex && ip.functionIndex.index == mainIndex.index + 1) {
+            if (mainIndex && ip.functionIndex.index == mainIndex.index) {
                 break;
             }
 
@@ -359,6 +359,7 @@ struct AccumulatedTraceData
 
         const string opNewStr("operator new(unsigned long)");
         const string opArrNewStr("operator new[](unsigned long)");
+        const string mainStr("main");
         StringIndex opNewStrIndex;
         StringIndex opArrNewStrIndex;
 
@@ -381,6 +382,8 @@ struct AccumulatedTraceData
                     opNewStrIndex.index = strings.size();
                 } else if (!opArrNewStrIndex && strings.back() == opArrNewStr) {
                     opArrNewStrIndex.index = strings.size();
+                } else if (!mainIndex && strings.back() == mainStr) {
+                    mainIndex.index = strings.size();
                 }
             } else if (mode == 't') {
                 TraceNode node;
@@ -470,10 +473,6 @@ struct AccumulatedTraceData
         /// these are leaks, but we now have the same data in \c allocations as well
         activeAllocations.clear();
 
-        // find index of "main" index which can be used to terminate backtraces
-        // and prevent printing stuff above main, which is usually uninteresting
-        mainIndex.index = findStringIndex("main");
-
         // merge allocations so that different traces that point to the same
         // instruction pointer at the end where the allocation function is
         // called are combined
@@ -535,16 +534,6 @@ private:
             it = mergedAllocations.insert(it, merged);
         }
         it->traces.push_back(allocation);
-    }
-
-    size_t findStringIndex(const char* const str) const
-    {
-        auto it = find(strings.begin(), strings.end(), str);
-        if (it != strings.end()) {
-            return distance(strings.begin(), it);
-        } else {
-            return 0;
-        }
     }
 
     InstructionPointer findIp(const IpIndex ipIndex) const
