@@ -6,14 +6,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 find_package(Boost 1.45.0 COMPONENTS iostreams program_options)
 find_package(Threads)
 
+add_subdirectory(3rdparty)
+add_subdirectory(tests)
+
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${Boost_INCLUDE_DIRS}
     3rdparty/
+    ${LIBUNWIND_INCLUDE_DIR}
 )
-
-add_subdirectory(3rdparty)
-add_subdirectory(tests)
 
 add_library(libheaptrack SHARED libheaptrack.cpp)
 # the final .so should be named libheaptrack, not liblibheaptrack
