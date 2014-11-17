@@ -77,12 +77,19 @@ struct Module
             return;
         }
 
-        backtraceState = backtrace_create_state(fileName.c_str(), /* we are single threaded, so: not thread safe */ false,
-                                                [] (void *data, const char *msg, int errnum) {
-                                                    const Module* module = reinterpret_cast<Module*>(data);
-                                                    cerr << "Failed to create backtrace state for file " << module->fileName
-                                                         << ": " << msg << " (error code " << errnum << ")" << endl;
-                                                }, this);
+        // NOTE: To prevent the same file to be initialized multiple times, we use this map.
+        //       There is also no backtrace_free_state so we don't really loose anything...
+        static unordered_map<string, backtrace_state*> knownStates;
+        auto& state = knownStates[fileName];
+        if (!state) {
+            state = backtrace_create_state(fileName.c_str(), /* we are single threaded, so: not thread safe */ false,
+                                            [] (void *data, const char *msg, int errnum) {
+                                                const Module* module = reinterpret_cast<Module*>(data);
+                                                cerr << "Failed to create backtrace state for file " << module->fileName
+                                                        << ": " << msg << " (error code " << errnum << ")" << endl;
+                                            }, this);
+        }
+        backtraceState = state;
 
         if (backtraceState) {
             backtrace_fileline_initialize(backtraceState, addressStart, isExe,
@@ -93,11 +100,6 @@ struct Module
                                                  << ": " << msg << " (error code " << errnum << ")" << endl;
                                           }, this);
         }
-    }
-
-    ~Module()
-    {
-        // TODO: there is no backtrace_free_state, what should I do here?
     }
 
     AddressInformation resolveAddress(uintptr_t address) const
@@ -204,7 +206,6 @@ struct AccumulatedTraceData
         if (m_modulesDirty) {
             // sort by addresses, required for binary search below
             sort(m_modules.begin(), m_modules.end());
-            m_modulesDirty = false;
 
             for (size_t i = 0; i < m_modules.size(); ++i) {
                 const auto& m1 = m_modules[i];
@@ -213,13 +214,20 @@ struct AccumulatedTraceData
                         continue;
                     }
                     const auto& m2 = m_modules[j];
-                    if ((m1.addressStart <= m2.addressStart && m1.addressEnd >= m2.addressStart) ||
-                        (m1.addressStart <= m2.addressEnd && m1.addressEnd >= m2.addressEnd))
+                    if ((m1.addressStart <= m2.addressStart && m1.addressEnd > m2.addressStart) ||
+                        (m1.addressStart < m2.addressEnd && m1.addressEnd >= m2.addressEnd))
                     {
-                        cerr << "OVERLAPPING MODULES: " << m1.fileName << " and " << m2.fileName << endl;
+                        cerr << "OVERLAPPING MODULES: " << hex
+                             << m1.fileName << " (" << m1.addressStart << " to " << m1.addressEnd << ") and "
+                             << m2.fileName << " (" << m2.addressStart << " to " << m2.addressEnd << ")\n"
+                             << dec;
+                    } else if (m2.addressStart >= m1.addressEnd) {
+                        break;
                     }
                 }
             }
+
+            m_modulesDirty = false;
         }
 
         ResolvedIP data;
