@@ -89,7 +89,7 @@ struct Module
                                           [] (void *data, const char *msg, int errnum) {
                                             const Module* module = reinterpret_cast<Module*>(data);
                                             cerr << "Failed to initialize backtrace fileline for "
-                                                 << (module->isExe ? "executable" : "library") << module->fileName
+                                                 << (module->isExe ? "executable " : "library ") << module->fileName
                                                  << ": " << msg << " (error code " << errnum << ")" << endl;
                                           }, this);
         }
