@@ -198,32 +198,22 @@ struct Data
             }
         }
 
-        uintptr_t addressStart = 0;
-        uintptr_t addressEnd = 0;
-
         for (int i = 0; i < info->dlpi_phnum; i++) {
             if (info->dlpi_phdr[i].p_type == PT_LOAD) {
-                if (addressEnd == 0) {
-                    addressStart = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr;
-                    addressEnd = addressStart + info->dlpi_phdr[i].p_memsz;
+                uintptr_t addressStart = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr;
+                uintptr_t addressEnd = addressStart + info->dlpi_phdr[i].p_memsz;
+
+                Module module{fileName, addressStart, addressEnd, true};
+
+                auto it = lower_bound(modules.begin(), modules.end(), module);
+                if (it == modules.end() || *it != module) {
+                    fprintf(data->out, "m %s %d %lx %lx\n", module.fileName.c_str(), isExe,
+                                                            module.addressStart, module.addressEnd);
+                    modules.insert(it, module);
                 } else {
-                    uintptr_t addr = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr + info->dlpi_phdr[i].p_memsz;
-                    if (addr > addressEnd) {
-                        addressEnd = addr;
-                    }
+                    it->isLoaded = true;
                 }
             }
-        }
-
-        Module module{fileName, addressStart, addressEnd, true};
-
-        auto it = lower_bound(modules.begin(), modules.end(), module);
-        if (it == modules.end() || *it != module) {
-            fprintf(data->out, "m %s %d %lx %lx\n", module.fileName.c_str(), isExe,
-                                                    module.addressStart, module.addressEnd);
-            modules.insert(it, module);
-        } else {
-            it->isLoaded = true;
         }
 
         return 0;

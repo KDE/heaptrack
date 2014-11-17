@@ -200,6 +200,21 @@ struct AccumulatedTraceData
             // sort by addresses, required for binary search below
             sort(m_modules.begin(), m_modules.end());
             m_modulesDirty = false;
+
+            for (size_t i = 0; i < m_modules.size(); ++i) {
+                const auto& m1 = m_modules[i];
+                for (size_t j = 0; j < m_modules.size(); ++j) {
+                    if (i == j) {
+                        continue;
+                    }
+                    const auto& m2 = m_modules[j];
+                    if ((m1.addressStart <= m2.addressStart && m1.addressEnd >= m2.addressStart) ||
+                        (m1.addressStart <= m2.addressEnd && m1.addressEnd >= m2.addressEnd))
+                    {
+                        cerr << "OVERLAPPING MODULES: " << m1.fileName << " and " << m2.fileName << endl;
+                    }
+                }
+            }
         }
 
         ResolvedIP data;
