@@ -209,7 +209,7 @@ struct AccumulatedTraceData
 
             for (size_t i = 0; i < m_modules.size(); ++i) {
                 const auto& m1 = m_modules[i];
-                for (size_t j = 0; j < m_modules.size(); ++j) {
+                for (size_t j = i + 1; j < m_modules.size(); ++j) {
                     if (i == j) {
                         continue;
                     }
