@@ -31,6 +31,7 @@
 #include <algorithm>
 
 #include <cxxabi.h>
+#include <boost/algorithm/string/predicate.hpp>
 
 #include "libbacktrace/backtrace.h"
 
@@ -70,7 +71,12 @@ struct Module
         , addressStart(addressStart)
         , addressEnd(addressEnd)
         , isExe(isExe)
+        , backtraceState(nullptr)
     {
+        if (boost::algorithm::starts_with(fileName, "linux-vdso.so")) {
+            return;
+        }
+
         backtraceState = backtrace_create_state(fileName.c_str(), /* we are single threaded, so: not thread safe */ false,
                                                 [] (void *data, const char *msg, int errnum) {
                                                     const Module* module = reinterpret_cast<Module*>(data);
