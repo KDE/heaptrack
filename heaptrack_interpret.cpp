@@ -95,6 +95,11 @@ struct Module
         }
     }
 
+    ~Module()
+    {
+        // TODO: there is no backtrace_free_state, what should I do here?
+    }
+
     AddressInformation resolveAddress(uintptr_t address) const
     {
         AddressInformation info;
@@ -255,6 +260,13 @@ struct AccumulatedTraceData
         m_modulesDirty = true;
     }
 
+    void clearModules()
+    {
+        // TODO: optimize this, reuse modules that are still valid
+        m_modules.clear();
+        m_modulesDirty = true;
+    }
+
     size_t addIp(const uintptr_t instructionPointer)
     {
         if (!instructionPointer) {
@@ -317,17 +329,21 @@ int main(int /*argc*/, char** /*argv*/)
         if (mode == 'm') {
             string fileName;
             lineIn >> fileName;
-            bool isExe = false;
-            lineIn >> isExe;
-            uintptr_t addressStart = 0;
-            lineIn >> addressStart;
-            uintptr_t addressEnd = 0;
-            lineIn >> addressEnd;
-            if (lineIn.bad()) {
-                cerr << "failed to parse line: " << line << endl;
-                return 1;
+            if (fileName == "-") {
+                data.clearModules();
+            } else {
+                bool isExe = false;
+                lineIn >> isExe;
+                uintptr_t addressStart = 0;
+                lineIn >> addressStart;
+                uintptr_t addressEnd = 0;
+                lineIn >> addressEnd;
+                if (lineIn.bad()) {
+                    cerr << "failed to parse line: " << line << endl;
+                    return 1;
+                }
+                data.addModule({fileName, isExe, addressStart, addressEnd});
             }
-            data.addModule({fileName, isExe, addressStart, addressEnd});
         } else if (mode == 't') {
             uintptr_t instructionPointer = 0;
             size_t parentIndex = 0;

@@ -100,31 +100,10 @@ string env(const char* variable)
     return value ? string(value) : string();
 }
 
-struct Module
-{
-    string fileName;
-    uintptr_t addressStart;
-    uintptr_t addressEnd;
-    // to update the module cache and remove unloaded modules
-    bool isLoaded;
-
-    bool operator<(const Module& module) const
-    {
-        return make_tuple(addressStart, addressEnd, fileName) < make_tuple(module.addressStart, module.addressEnd, module.fileName);
-    }
-
-    bool operator!=(const Module& module) const
-    {
-        return make_tuple(addressStart, addressEnd, fileName) != make_tuple(module.addressStart, module.addressEnd, module.fileName);
-    }
-};
-
 struct Data
 {
     Data()
     {
-        modules.reserve(32);
-
         string outputFileName = env("DUMP_HEAPTRACK_OUTPUT");
         if (outputFileName.empty()) {
             // env var might not be set when linked directly into an executable
@@ -160,15 +139,9 @@ struct Data
 
     void updateModuleCache()
     {
-        // check list of loaded modules for unknown ones and remove unloaded modules
-        for (auto& module : modules) {
-            module.isLoaded = false;
-        }
+        fprintf(out, "m -\n");
+        foundExe = false;
         dl_iterate_phdr(dlopen_notify_callback, this);
-        auto it = remove_if(modules.begin(), modules.end(), [] (const Module& module) {
-            return !module.isLoaded;
-        });
-        modules.erase(it, modules.end());
         moduleCacheDirty = false;
     }
 
@@ -178,15 +151,15 @@ struct Data
     static int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void *_data)
     {
         auto data = reinterpret_cast<Data*>(_data);
-        auto& modules = data->modules;
         bool isExe = false;
         const char *fileName = info->dlpi_name;
         const int BUF_SIZE = 1024;
         char buf[BUF_SIZE];
         // If we don't have a filename and we haven't added our main exe yet, do it now.
         if (!fileName || !fileName[0]) {
-            if (modules.empty()) {
+            if (!data->foundExe) {
                 isExe = true;
+                data->foundExe = true;
                 ssize_t ret = readlink("/proc/self/exe", buf, sizeof(buf));
                 if ((ret > 0) && (ret < (ssize_t)sizeof(buf))) {
                     buf[ret] = 0;
@@ -200,19 +173,9 @@ struct Data
 
         for (int i = 0; i < info->dlpi_phnum; i++) {
             if (info->dlpi_phdr[i].p_type == PT_LOAD) {
-                uintptr_t addressStart = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr;
-                uintptr_t addressEnd = addressStart + info->dlpi_phdr[i].p_memsz;
-
-                Module module{fileName, addressStart, addressEnd, true};
-
-                auto it = lower_bound(modules.begin(), modules.end(), module);
-                if (it == modules.end() || *it != module) {
-                    fprintf(data->out, "m %s %d %lx %lx\n", module.fileName.c_str(), isExe,
-                                                            module.addressStart, module.addressEnd);
-                    modules.insert(it, module);
-                } else {
-                    it->isLoaded = true;
-                }
+                const uintptr_t addressStart = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr;
+                const uintptr_t addressEnd = addressStart + info->dlpi_phdr[i].p_memsz;
+                fprintf(data->out, "m %s %d %lx %lx\n", fileName, isExe, addressStart, addressEnd);
             }
         }
 
@@ -257,7 +220,6 @@ struct Data
 
     mutex m_mutex;
 
-    vector<Module> modules;
     TraceTree traceTree;
     /**
      * Note: We use the C stdio API here for performance reasons.
@@ -266,6 +228,7 @@ struct Data
      */
     FILE* out = nullptr;
 
+    bool foundExe = false;
 #ifdef DEBUG_MALLOC_PTRS
     unordered_set<void*> known;
 #endif
