@@ -383,6 +383,7 @@ struct AccumulatedTraceData
         const string opNewStr("operator new(unsigned long)");
         const string opArrNewStr("operator new[](unsigned long)");
         const string mainStr("main");
+        const string libcMainStr("__libc_start_main");
         StringIndex opNewStrIndex;
         StringIndex opArrNewStrIndex;
 
@@ -405,7 +406,7 @@ struct AccumulatedTraceData
                     opNewStrIndex.index = strings.size();
                 } else if (!opArrNewStrIndex && strings.back() == opArrNewStr) {
                     opArrNewStrIndex.index = strings.size();
-                } else if (!mainIndex && strings.back() == mainStr) {
+                } else if (!mainIndex && (strings.back() == mainStr || strings.back() == libcMainStr)) {
                     mainIndex.index = strings.size();
                 }
             } else if (mode == 't') {
