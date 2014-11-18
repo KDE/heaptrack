@@ -115,6 +115,18 @@ struct InstructionPointer
     FunctionIndex functionIndex;
     FileIndex fileIndex;
     int line = 0;
+
+    bool compareWithoutAddress(const InstructionPointer &other) const
+    {
+        return make_tuple(moduleIndex, functionIndex, fileIndex, line)
+             < make_tuple(other.moduleIndex, other.functionIndex, other.fileIndex, other.line);
+    }
+
+    bool equalWithoutAddress(const InstructionPointer &other) const
+    {
+        return make_tuple(moduleIndex, functionIndex, fileIndex, line)
+            == make_tuple(other.moduleIndex, other.functionIndex, other.fileIndex, other.line);
+    }
 };
 
 struct TraceNode
@@ -524,11 +536,17 @@ private:
     void mergeAllocation(const Allocation& allocation)
     {
         const auto trace = findTrace(allocation.traceIndex);
-        auto it = lower_bound(mergedAllocations.begin(), mergedAllocations.end(), trace,
-                                [] (const MergedAllocation& allocation, const TraceNode trace) -> bool {
-                                    return allocation.ipIndex < trace.ipIndex;
+        const auto traceIp = findIp(trace.ipIndex);
+        auto it = lower_bound(mergedAllocations.begin(), mergedAllocations.end(), traceIp,
+                                [this] (const MergedAllocation& allocation, const InstructionPointer traceIp) -> bool {
+                                    // Compare meta data without taking the instruction pointer address into account.
+                                    // This is useful since sometimes, esp. when we lack debug symbols, the same function
+                                    // allocates memory at different IP addresses which is pretty useless information most of the time
+                                    // TODO: make this configurable, but on-by-default
+                                    const auto allocationIp = findIp(allocation.ipIndex);
+                                    return allocationIp.compareWithoutAddress(traceIp);
                                 });
-        if (it == mergedAllocations.end() || it->ipIndex != trace.ipIndex) {
+        if (it == mergedAllocations.end() || !findIp(it->ipIndex).equalWithoutAddress(traceIp)) {
             MergedAllocation merged;
             merged.ipIndex = trace.ipIndex;
             it = mergedAllocations.insert(it, merged);
