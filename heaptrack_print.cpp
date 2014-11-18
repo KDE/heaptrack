@@ -44,6 +44,34 @@ namespace po = boost::program_options;
 
 namespace {
 
+string formatBytes(size_t bytes_)
+{
+    if (bytes_ < 1000) {
+        // no fancy formatting for plain byte values, esp. no .00 factions
+        return to_string(bytes_) + 'B';
+    }
+
+    static const auto units = {
+        "B",
+        "KB",
+        "MB",
+        "GB",
+        "TB"
+    };
+    auto unit = units.begin();
+    size_t i = 0;
+    double bytes = bytes_;
+    while (i < units.size() - 1 && bytes > 1000.) {
+        bytes /= 1000.;
+        ++i;
+        ++unit;
+    }
+    // yeah nice how I round to two decimals, right? :D
+    string bytesStr = to_string(bytes);
+    auto dot = bytesStr.find('.');
+    return bytesStr.substr(0, dot + 3) + *unit;
+}
+
 struct AddressInformation
 {
     string function;
@@ -278,8 +306,8 @@ struct AccumulatedTraceData
         sort(mergedAllocations.begin(), mergedAllocations.end(), sortOrder);
         for (size_t i = 0; i < min(10lu, mergedAllocations.size()); ++i) {
             auto& allocation = mergedAllocations[i];
-            printf(label, allocation.allocations, allocation.allocated,
-                   allocation.leaked, allocation.peak);
+            printf(label, allocation.allocations, formatBytes(allocation.allocated).c_str(),
+                   formatBytes(allocation.leaked).c_str(), formatBytes(allocation.peak).c_str());
             printIp(allocation.ipIndex, cout);
 
             sort(allocation.traces.begin(), allocation.traces.end(), sortOrder);
@@ -287,14 +315,19 @@ struct AccumulatedTraceData
             const size_t subTracesToPrint = 5;
             for (size_t j = 0; j < min(subTracesToPrint, allocation.traces.size()); ++j) {
                 const auto& trace = allocation.traces[j];
-                printf(sublabel, trace.allocations, trace.allocated,
-                       trace.leaked, trace.peak);
+                printf(sublabel, trace.allocations, formatBytes(trace.allocated).c_str(),
+                       formatBytes(trace.leaked).c_str(), formatBytes(trace.peak).c_str());
                 handled += trace.*member;
                 printBacktrace(trace.traceIndex, cout, 2, true);
             }
             if (allocation.traces.size() > subTracesToPrint) {
-                cout << "  and " << (allocation.*member - handled) << " from "
-                     << (allocation.traces.size() - subTracesToPrint) << " other places\n";
+                cout << "  and ";
+                if (member == &AllocationData::allocations) {
+                    cout << (allocation.*member - handled);
+                } else {
+                    cout << formatBytes(allocation.*member - handled);
+                }
+                cout << " from " << (allocation.traces.size() - subTracesToPrint) << " other places\n";
             }
             cout << '\n';
         }
@@ -309,9 +342,9 @@ struct AccumulatedTraceData
             });
         for (size_t i = 0; i < min(10lu, allocations.size()); ++i) {
             const auto& allocation = allocations[i];
-            printf(label, allocation.allocations, allocation.allocated,
-                   allocation.leaked, allocation.peak);
-            printBacktrace(allocation.traceIndex, cout);
+            printf(label, allocation.allocations, formatBytes(allocation.allocated).c_str(),
+                   formatBytes(allocation.leaked).c_str(), formatBytes(allocation.peak).c_str());
+            printBacktrace(allocation.traceIndex, cout, 1);
             cout << '\n';
         }
         cout << endl;
@@ -678,16 +711,16 @@ int main(int argc, char** argv)
         // sort by amount of allocations
         cout << "MOST CALLS TO ALLOCATION FUNCTIONS\n";
         data.printAllocations(&AllocationData::allocations,
-                              "%1$lu calls to allocation functions with %4$lu bytes peak consumption from\n",
-                              "  %1$lu calls with %4$lu bytes peak consumption from: \n");
+                              "%1$lu calls to allocation functions with %4$s peak consumption from\n",
+                              "  %1$lu calls with %4$s peak consumption from: \n");
         cout << endl;
     }
 
     if (printOverallAlloc) {
         cout << "MOST BYTES ALLOCATED OVER TIME (ignoring deallocations)\n";
         data.printAllocations(&AllocationData::allocated,
-                              "%2$lu bytes over %1$lu calls allocated\n",
-                              "  %2$lu bytes over %1$lu calls from:\n");
+                              "%2$s over %1$lu calls allocated\n",
+                              "  %2$s over %1$lu calls from:\n");
         cout << endl;
     }
 
@@ -705,23 +738,23 @@ int main(int argc, char** argv)
         }
 
         data.printAllocations(&AllocationData::peak,
-                              "%4$lu bytes peak memory consumed over %1$lu calls from\n",
-                              "  %4$lu bytes over %1$lu calls from:\n");
+                              "%4$s peak memory consumed over %1$lu calls from\n",
+                              "  %4$s over %1$lu calls from:\n");
     }
 
     if (printLeaks) {
         // sort by amount of leaks
         cout << "MEMORY LEAKS\n";
         data.printAllocations(&AllocationData::leaked,
-                              "%3$lu bytes leaked over %1$lu calls from\n",
-                              "  %3$lu bytes over %1$lu calls from:\n");
+                              "%3$s leaked over %1$lu calls from\n",
+                              "  %3$s over %1$lu calls from:\n");
         cout << endl;
     }
 
-    cout << data.totalAllocated << " bytes allocated in total (ignoring deallocations) over "
+    cout << formatBytes(data.totalAllocated) << " bytes allocated in total (ignoring deallocations) over "
          << data.totalAllocations << " calls to allocation functions.\n"
-         << "peak heap memory consumption: " << data.peak << " bytes\n"
-         << "total memory leaked: " << data.leaked << " bytes\n";
+         << "peak heap memory consumption: " << formatBytes(data.peak) << '\n'
+         << "total memory leaked: " << formatBytes(data.leaked) << '\n';
 
     if (!printHistogram.empty()) {
         ofstream histogram(printHistogram, ios_base::out);
