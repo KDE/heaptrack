@@ -115,12 +115,6 @@ struct Index
     }
 };
 
-template<typename Base>
-istream& operator>>(istream &in, Index<Base> &index)
-{
-    in >> index.index;
-    return in;
-}
 
 template<typename Base>
 ostream& operator<<(ostream &out, const Index<Base> index)
@@ -200,6 +194,92 @@ struct AllocationInfo
     TraceIndex traceIndex;
     size_t size;
 };
+
+/**
+ * Optimized class to speed up reading of the potentially big data files.
+ *
+ * sscanf or istream are just slow when reading plain hex numbers. The
+ * below does all we need and thus far less than what the generic functions
+ * are capable of. We are not locale aware e.g.
+ */
+class LineReader
+{
+public:
+    LineReader()
+        : m_at(0)
+    {
+        m_line.reserve(1024);
+    }
+
+    bool getLine(istream& in)
+    {
+        if (!in.good()) {
+            return false;
+        }
+        std::getline(in, m_line);
+        m_at = 2;
+        return true;
+    }
+
+    char mode() const
+    {
+        return m_line.empty() ? '#' : m_line[0];
+    }
+
+    const string& line() const
+    {
+        return m_line;
+    }
+
+    template<typename T>
+    bool readHex(T& hex)
+    {
+        if (m_at >= m_line.length()) {
+            return false;
+        }
+
+        hex = 0;
+        do {
+            const char c = m_line[m_at];
+            if ('0' <= c && c <= '9') {
+                hex *= 16;
+                hex += c - '0';
+            } else if ('a' <= c && c <= 'f') {
+                hex *= 16;
+                hex += c - 'a' + 10;
+            } else if (c == ' ') {
+                ++m_at;
+                break;
+            } else {
+                return false;
+            }
+            ++m_at;
+        } while (m_at < m_line.length());
+
+        return true;
+    }
+
+    bool operator>>(size_t& hex)
+    {
+        return readHex(hex);
+    }
+
+    bool operator>>(int& hex)
+    {
+        return readHex(hex);
+    }
+
+    template<typename Base>
+    bool operator>>(Index<Base> &index)
+    {
+        return readHex(index.index);
+    }
+
+private:
+    string m_line;
+    size_t m_at;
+};
+
 
 struct AccumulatedTraceData
 {
@@ -407,11 +487,7 @@ struct AccumulatedTraceData
     {
         clear();
 
-        string line;
-        line.reserve(1024);
-
-        stringstream lineIn(ios_base::in);
-        lineIn << hex;
+        LineReader reader;
 
         const string opNewStr("operator new(unsigned long)");
         const string opArrNewStr("operator new[](unsigned long)");
@@ -420,21 +496,12 @@ struct AccumulatedTraceData
         StringIndex opNewStrIndex;
         StringIndex opArrNewStrIndex;
 
-        while (in.good()) {
-            getline(in, line);
-            if (line.empty()) {
+        while (reader.getLine(in)) {
+            if (reader.mode() == '#') {
                 continue;
             }
-            const char mode = line[0];
-            if (mode == '#') {
-                continue;
-            }
-            lineIn.str(line);
-            lineIn.clear();
-            // skip mode and leading whitespace
-            lineIn.seekg(2);
-            if (mode == 's') {
-                strings.push_back(line.substr(2));
+            if (reader.mode() == 's') {
+                strings.push_back(reader.line().substr(2));
                 if (!opNewStrIndex && strings.back() == opNewStr) {
                     opNewStrIndex.index = strings.size();
                 } else if (!opArrNewStrIndex && strings.back() == opArrNewStr) {
@@ -442,10 +509,10 @@ struct AccumulatedTraceData
                 } else if (!mainIndex && (strings.back() == mainStr || strings.back() == libcMainStr)) {
                     mainIndex.index = strings.size();
                 }
-            } else if (mode == 't') {
+            } else if (reader.mode() == 't') {
                 TraceNode node;
-                lineIn >> node.ipIndex;
-                lineIn >> node.parentIndex;
+                reader >> node.ipIndex;
+                reader >> node.parentIndex;
                 // skip operator new and operator new[] at the beginning of traces
                 if (!opNewIpIndices.empty()) {
                     while (true) {
@@ -457,25 +524,25 @@ struct AccumulatedTraceData
                     }
                 }
                 traces.push_back(node);
-            } else if (mode == 'i') {
+            } else if (reader.mode() == 'i') {
                 InstructionPointer ip;
-                lineIn >> ip.instructionPointer;
-                lineIn >> ip.moduleIndex;
-                lineIn >> ip.functionIndex;
-                lineIn >> ip.fileIndex;
-                lineIn >> ip.line;
+                reader >> ip.instructionPointer;
+                reader >> ip.moduleIndex;
+                reader >> ip.functionIndex;
+                reader >> ip.fileIndex;
+                reader >> ip.line;
                 instructionPointers.push_back(ip);
                 if ((opNewStrIndex && opNewStrIndex == ip.functionIndex)
                     || (opArrNewStrIndex && opArrNewStrIndex == ip.functionIndex))
                 {
                     opNewIpIndices.insert(instructionPointers.size());
                 }
-            } else if (mode == '+') {
+            } else if (reader.mode() == '+') {
                 size_t size = 0;
                 TraceIndex traceId;
                 uintptr_t ptr = 0;
-                if (!(lineIn >> size) || !(lineIn >> traceId) || !(lineIn >> ptr)) {
-                    cerr << "failed to parse line: " << line << endl;
+                if (!(reader >> size) || !(reader >> traceId) || !(reader >> ptr)) {
+                    cerr << "failed to parse line: " << reader.line() << endl;
                     return false;
                 }
 
@@ -495,15 +562,15 @@ struct AccumulatedTraceData
                     peak = leaked;
                 }
                 ++sizeHistogram[size];
-            } else if (mode == '-') {
+            } else if (reader.mode() == '-') {
                 uintptr_t ptr = 0;
-                if (!(lineIn >> ptr)) {
-                    cerr << "failed to parse line: " << line << endl;
+                if (!(reader >> ptr)) {
+                    cerr << "failed to parse line: " << reader.line() << endl;
                     return false;
                 }
                 auto ip = activeAllocations.find(ptr);
                 if (ip == activeAllocations.end()) {
-                    cerr << "unknown pointer in line: " << line << endl;
+                    cerr << "unknown pointer in line: " << reader.line() << endl;
                     continue;
                 }
                 const auto info = ip->second;
@@ -519,7 +586,7 @@ struct AccumulatedTraceData
                 }
                 leaked -= info.size;
             } else {
-                cerr << "failed to parse line: " << line << endl;
+                cerr << "failed to parse line: " << reader.line() << endl;
             }
         }
 
