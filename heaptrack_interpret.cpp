@@ -66,40 +66,13 @@ struct AddressInformation
 
 struct Module
 {
-    Module(string _fileName, bool isExe, uintptr_t addressStart, uintptr_t addressEnd)
+    Module(string _fileName, bool isExe, uintptr_t addressStart, uintptr_t addressEnd, backtrace_state* backtraceState)
         : fileName(move(_fileName))
         , addressStart(addressStart)
         , addressEnd(addressEnd)
         , isExe(isExe)
-        , backtraceState(nullptr)
+        , backtraceState(backtraceState)
     {
-        if (boost::algorithm::starts_with(fileName, "linux-vdso.so")) {
-            return;
-        }
-
-        // NOTE: To prevent the same file to be initialized multiple times, we use this map.
-        //       There is also no backtrace_free_state so we don't really loose anything...
-        static unordered_map<string, backtrace_state*> knownStates;
-        auto& state = knownStates[fileName];
-        if (!state) {
-            state = backtrace_create_state(fileName.c_str(), /* we are single threaded, so: not thread safe */ false,
-                                            [] (void *data, const char *msg, int errnum) {
-                                                const Module* module = reinterpret_cast<Module*>(data);
-                                                cerr << "Failed to create backtrace state for file " << module->fileName
-                                                        << ": " << msg << " (error code " << errnum << ")" << endl;
-                                            }, this);
-        }
-        backtraceState = state;
-
-        if (backtraceState) {
-            backtrace_fileline_initialize(backtraceState, addressStart, isExe,
-                                          [] (void *data, const char *msg, int errnum) {
-                                            const Module* module = reinterpret_cast<Module*>(data);
-                                            cerr << "Failed to initialize backtrace fileline for "
-                                                 << (module->isExe ? "executable " : "library ") << module->fileName
-                                                 << ": " << msg << " (error code " << errnum << ")" << endl;
-                                          }, this);
-        }
     }
 
     AddressInformation resolveAddress(uintptr_t address) const
@@ -151,7 +124,7 @@ struct Module
             != make_tuple(module.addressStart, module.addressEnd, module.fileName);
     }
 
-    backtrace_state* backtraceState = nullptr;
+    backtrace_state* backtraceState;
     string fileName;
     uintptr_t addressStart;
     uintptr_t addressEnd;
@@ -189,7 +162,8 @@ struct AccumulatedTraceData
 {
     AccumulatedTraceData()
     {
-        m_modules.reserve(64);
+        m_modules.reserve(256);
+        m_backtraceStates.reserve(64);
         m_internedData.reserve(4096);
         m_encounteredIps.reserve(32768);
     }
@@ -262,9 +236,11 @@ struct AccumulatedTraceData
         return id;
     }
 
-    void addModule(Module&& module)
+    void addModule(const string& fileName, const bool isExe, const uintptr_t addressStart, const uintptr_t addressEnd)
     {
-        m_modules.push_back(move(module));
+        backtrace_state* backtraceState = findBacktraceState(fileName, addressStart, isExe);
+
+        m_modules.emplace_back(fileName, isExe, addressStart, addressEnd, backtraceState);
         m_modulesDirty = true;
     }
 
@@ -302,7 +278,47 @@ struct AccumulatedTraceData
     }
 
 private:
+    /**
+     * Prevent the same file from being initialized multiple times.
+     * This drastically cuts the memory consumption down
+     */
+    backtrace_state* findBacktraceState(const string& fileName, uintptr_t addressStart, bool isExe)
+    {
+        if (boost::algorithm::starts_with(fileName, "linux-vdso.so")) {
+            // prevent warning, since this will always fail
+            return nullptr;
+        }
+
+        auto it = m_backtraceStates.find(fileName);
+        if (it != m_backtraceStates.end()) {
+            return it->second;
+        }
+        auto state = backtrace_create_state(fileName.c_str(), /* we are single threaded, so: not thread safe */ false,
+                                            [] (void *data, const char *msg, int errnum) {
+                                                const Module* module = reinterpret_cast<Module*>(data);
+                                                cerr << "Failed to create backtrace state for file " << module->fileName
+                                                        << ": " << msg << " (error code " << errnum << ")" << endl;
+                                            }, this);
+
+        if (state) {
+            // when we could initialize the backtrace state, we initialize it with the first address
+            // we get since that is the lowest one
+            backtrace_fileline_initialize(state, addressStart, isExe,
+                                        [] (void *data, const char *msg, int errnum) {
+                                            const Module* module = reinterpret_cast<Module*>(data);
+                                            cerr << "Failed to initialize backtrace fileline for "
+                                                << (module->isExe ? "executable " : "library ") << module->fileName
+                                                << ": " << msg << " (error code " << errnum << ")" << endl;
+                                        }, this);
+        }
+
+        m_backtraceStates.insert(it, make_pair(fileName, state));
+
+        return state;
+    }
+
     vector<Module> m_modules;
+    unordered_map<string, backtrace_state*> m_backtraceStates;
     bool m_modulesDirty = false;
 
     unordered_map<string, size_t> m_internedData;
@@ -350,7 +366,7 @@ int main(int /*argc*/, char** /*argv*/)
                     cerr << "failed to parse line: " << line << endl;
                     return 1;
                 }
-                data.addModule({fileName, isExe, addressStart, addressEnd});
+                data.addModule(fileName, isExe, addressStart, addressEnd);
             }
         } else if (mode == 't') {
             uintptr_t instructionPointer = 0;
