@@ -561,7 +561,9 @@ struct AccumulatedTraceData
                 if (leaked > peak) {
                     peak = leaked;
                 }
-                ++sizeHistogram[size];
+                if (printHistogram) {
+                    ++sizeHistogram[size];
+                }
             } else if (reader.mode() == '-') {
                 uintptr_t ptr = 0;
                 if (!(reader >> ptr)) {
@@ -617,6 +619,7 @@ struct AccumulatedTraceData
 
     bool shortenTemplates = false;
     bool mergeBacktraces = true;
+    bool printHistogram = false;
 
     vector<Allocation> allocations;
     vector<MergedAllocation> mergedAllocations;
@@ -741,6 +744,7 @@ int main(int argc, char** argv)
     data.shortenTemplates = vm["shorten-templates"].as<bool>();
     data.mergeBacktraces = vm["merge-backtraces"].as<bool>();
     const string printHistogram = vm["print-histogram"].as<string>();
+    data.printHistogram = !printHistogram.empty();
     const bool printLeaks = vm["print-leaks"].as<bool>();
     const bool printOverallAlloc = vm["print-overall-allocated"].as<bool>();
     const bool printPeaks = vm["print-peaks"].as<bool>();
