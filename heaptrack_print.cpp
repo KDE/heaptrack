@@ -472,12 +472,9 @@ struct AccumulatedTraceData
                 }
             } else if (mode == '+') {
                 size_t size = 0;
-                lineIn >> size;
                 TraceIndex traceId;
-                lineIn >> traceId;
                 uintptr_t ptr = 0;
-                lineIn >> ptr;
-                if (lineIn.bad()) {
+                if (!(lineIn >> size) || !(lineIn >> traceId) || !(lineIn >> ptr)) {
                     cerr << "failed to parse line: " << line << endl;
                     return false;
                 }
@@ -500,8 +497,7 @@ struct AccumulatedTraceData
                 ++sizeHistogram[size];
             } else if (mode == '-') {
                 uintptr_t ptr = 0;
-                lineIn >> ptr;
-                if (lineIn.bad()) {
+                if (!(lineIn >> ptr)) {
                     cerr << "failed to parse line: " << line << endl;
                     return false;
                 }
