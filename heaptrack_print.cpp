@@ -33,6 +33,7 @@
 #include <memory>
 #include <tuple>
 #include <algorithm>
+#include <cassert>
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -635,18 +636,33 @@ struct AccumulatedTraceData
     size_t leaked = 0;
 
 private:
+    // our indices are sequentially increasing thus a new allocation can only ever
+    // occur with an index larger than any other we encountered so far
+    // this can be used to our advantage in speeding up the findAllocation calls.
+    TraceIndex m_maxAllocationTraceIndex;
+
     Allocation& findAllocation(const TraceIndex traceIndex)
     {
-        auto it = lower_bound(allocations.begin(), allocations.end(), traceIndex,
+        if (traceIndex < m_maxAllocationTraceIndex) {
+            // only need to search when the trace index is previously known
+            auto it = lower_bound(allocations.begin(), allocations.end(), traceIndex,
                                 [] (const Allocation& allocation, const TraceIndex traceIndex) -> bool {
                                     return allocation.traceIndex < traceIndex;
                                 });
-        if (it == allocations.end() || it->traceIndex != traceIndex) {
+            assert(it != allocations.end());
+            assert(it->traceIndex == traceIndex);
+            return *it;
+        } else if (traceIndex == m_maxAllocationTraceIndex) {
+            // reuse the last allocation
+            assert(allocations.back().traceIndex == traceIndex);
+        } else {
+            // actually a new allocation
             Allocation allocation;
             allocation.traceIndex = traceIndex;
-            it = allocations.insert(it, allocation);
+            allocations.push_back(allocation);
+            m_maxAllocationTraceIndex = traceIndex;
         }
-        return *it;
+        return allocations.back();
     }
 
     void mergeAllocation(const Allocation& allocation)
