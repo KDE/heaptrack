@@ -546,7 +546,7 @@ struct AccumulatedTraceData
                 uintptr_t ptr = 0;
                 if (!(reader >> size) || !(reader >> traceId) || !(reader >> ptr)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
-                    return false;
+                    continue;
                 }
 
                 activeAllocations[ptr] = {traceId, size};
@@ -571,7 +571,7 @@ struct AccumulatedTraceData
                 uintptr_t ptr = 0;
                 if (!(reader >> ptr)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
-                    return false;
+                    continue;
                 }
                 auto ip = activeAllocations.find(ptr);
                 if (ip == activeAllocations.end()) {
