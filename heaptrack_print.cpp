@@ -202,24 +202,35 @@ struct AccumulatedTraceData
         printIp(findIp(ip), out, indent);
     }
 
-    void printIp(const InstructionPointer& ip, ostream& out, size_t indent = 0) const
+    void printIndent(ostream& out, size_t indent) const
     {
         while (indent--) {
             out << "  ";
         }
-        out << "0x" << hex << ip.instructionPointer << dec;
-        if (ip.moduleIndex) {
-            out << ' ' << stringify(ip.moduleIndex);
-        } else {
-            out << " <unknown module>";
-        }
+    }
+
+    void printIp(const InstructionPointer& ip, ostream& out, const size_t indent = 0) const
+    {
+        printIndent(out, indent);
+
         if (ip.functionIndex) {
-            out << ' ' << prettyFunction(stringify(ip.functionIndex));
+            out << prettyFunction(stringify(ip.functionIndex));
         } else {
-            out << " ??";
+            out << "0x" << hex << ip.instructionPointer << dec;
         }
+
+        out << '\n';
+        printIndent(out, indent + 1);
+
         if (ip.fileIndex) {
-            out << ' ' << stringify(ip.fileIndex) << ':' << ip.line;
+            out << "at " << stringify(ip.fileIndex) << ':' << ip.line << '\n';
+            printIndent(out, indent + 1);
+        }
+
+        if (ip.moduleIndex) {
+            out << "in " << stringify(ip.moduleIndex);
+        } else {
+            out << "in ??";
         }
         out << '\n';
     }
