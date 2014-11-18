@@ -497,9 +497,6 @@ struct AccumulatedTraceData
         StringIndex opArrNewStrIndex;
 
         while (reader.getLine(in)) {
-            if (reader.mode() == '#') {
-                continue;
-            }
             if (reader.mode() == 's') {
                 strings.push_back(reader.line().substr(2));
                 if (!opNewStrIndex && strings.back() == opNewStr) {
@@ -587,6 +584,9 @@ struct AccumulatedTraceData
                     allocation.leaked -= info.size;
                 }
                 leaked -= info.size;
+            } else if (reader.mode() == '#') {
+                // comment or empty line
+                continue;
             } else {
                 cerr << "failed to parse line: " << reader.line() << endl;
             }
