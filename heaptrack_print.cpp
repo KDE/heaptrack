@@ -40,6 +40,8 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/program_options.hpp>
 
+#include "linereader.h"
+
 using namespace std;
 namespace po = boost::program_options;
 
@@ -116,6 +118,11 @@ struct Index
     }
 };
 
+template<typename Base>
+bool operator>>(LineReader& reader, Index<Base> &index)
+{
+    return reader.readHex(index.index);
+}
 
 template<typename Base>
 ostream& operator<<(ostream &out, const Index<Base> index)
@@ -194,97 +201,6 @@ struct AllocationInfo
 {
     TraceIndex traceIndex;
     size_t size;
-};
-
-/**
- * Optimized class to speed up reading of the potentially big data files.
- *
- * sscanf or istream are just slow when reading plain hex numbers. The
- * below does all we need and thus far less than what the generic functions
- * are capable of. We are not locale aware e.g.
- */
-class LineReader
-{
-public:
-    LineReader()
-    {
-        m_line.reserve(1024);
-    }
-
-    bool getLine(istream& in)
-    {
-        if (!in.good()) {
-            return false;
-        }
-        std::getline(in, m_line);
-        m_it = m_line.cbegin();
-        if (m_line.length() > 2) {
-            m_it += 2;
-        }
-        return true;
-    }
-
-    char mode() const
-    {
-        return m_line.empty() ? '#' : m_line[0];
-    }
-
-    const string& line() const
-    {
-        return m_line;
-    }
-
-    template<typename T>
-    bool readHex(T& in)
-    {
-        auto it = m_it;
-        const auto end = m_line.cend();
-        if (it == end) {
-            return false;
-        }
-
-        T hex = 0;
-        do {
-            const char c = *it;
-            if ('0' <= c && c <= '9') {
-                hex *= 16;
-                hex += c - '0';
-            } else if ('a' <= c && c <= 'f') {
-                hex *= 16;
-                hex += c - 'a' + 10;
-            } else if (c == ' ') {
-                ++it;
-                break;
-            } else {
-                return false;
-            }
-            ++it;
-        } while (it != end);
-
-        in = hex;
-        m_it = it;
-        return true;
-    }
-
-    bool operator>>(size_t& hex)
-    {
-        return readHex(hex);
-    }
-
-    bool operator>>(int& hex)
-    {
-        return readHex(hex);
-    }
-
-    template<typename Base>
-    bool operator>>(Index<Base> &index)
-    {
-        return readHex(index.index);
-    }
-
-private:
-    string m_line;
-    string::const_iterator m_it;
 };
 
 struct AccumulatedTraceData

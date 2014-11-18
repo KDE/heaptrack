@@ -34,6 +34,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include "libbacktrace/backtrace.h"
+#include "linereader.h"
 
 using namespace std;
 
@@ -334,47 +335,31 @@ int main(int /*argc*/, char** /*argv*/)
 
     AccumulatedTraceData data;
 
-    string line;
-    line.reserve(1024);
-    stringstream lineIn(ios_base::in);
-    lineIn << hex;
+    LineReader reader;
+    cin >> hex;
     cout << hex;
 
-    while (cin.good()) {
-        getline(cin, line);
-        if (line.empty()) {
-            continue;
-        }
-        const char mode = line[0];
-        lineIn.str(line);
-        lineIn.clear();
-        // skip mode and leading whitespace
-        lineIn.seekg(2);
-        if (mode == 'm') {
+    while (reader.getLine(cin)) {
+        if (reader.mode() == 'm') {
             string fileName;
-            lineIn >> fileName;
+            reader >> fileName;
             if (fileName == "-") {
                 data.clearModules();
             } else {
                 bool isExe = false;
-                lineIn >> isExe;
                 uintptr_t addressStart = 0;
-                lineIn >> addressStart;
                 uintptr_t addressEnd = 0;
-                lineIn >> addressEnd;
-                if (lineIn.bad()) {
-                    cerr << "failed to parse line: " << line << endl;
+                if (!(reader >> isExe) || !(reader >> addressStart) || !(reader >> addressEnd)) {
+                    cerr << "failed to parse line: " << reader.line() << endl;
                     return 1;
                 }
                 data.addModule(fileName, isExe, addressStart, addressEnd);
             }
-        } else if (mode == 't') {
+        } else if (reader.mode() == 't') {
             uintptr_t instructionPointer = 0;
             size_t parentIndex = 0;
-            lineIn >> instructionPointer;
-            lineIn >> parentIndex;
-            if (lineIn.bad()) {
-                cerr << "failed to parse line: " << line << endl;
+            if (!(reader >> instructionPointer) || !(reader >> parentIndex)) {
+                cerr << "failed to parse line: " << reader.line() << endl;
                 return 1;
             }
             // ensure ip is encountered
@@ -382,7 +367,7 @@ int main(int /*argc*/, char** /*argv*/)
             // trace point, map current output index to parent index
             cout << "t " << ipId << ' ' << parentIndex << '\n';
         } else {
-            cout << line << '\n';
+            cout << reader.line() << '\n';
         }
     }
 
