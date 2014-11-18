@@ -206,7 +206,6 @@ class LineReader
 {
 public:
     LineReader()
-        : m_at(0)
     {
         m_line.reserve(1024);
     }
@@ -217,7 +216,10 @@ public:
             return false;
         }
         std::getline(in, m_line);
-        m_at = 2;
+        m_it = m_line.cbegin();
+        if (m_line.length() > 2) {
+            m_it += 2;
+        }
         return true;
     }
 
@@ -232,15 +234,17 @@ public:
     }
 
     template<typename T>
-    bool readHex(T& hex)
+    bool readHex(T& in)
     {
-        if (m_at >= m_line.length()) {
+        auto it = m_it;
+        const auto end = m_line.cend();
+        if (it == end) {
             return false;
         }
 
-        hex = 0;
+        T hex = 0;
         do {
-            const char c = m_line[m_at];
+            const char c = *it;
             if ('0' <= c && c <= '9') {
                 hex *= 16;
                 hex += c - '0';
@@ -248,14 +252,16 @@ public:
                 hex *= 16;
                 hex += c - 'a' + 10;
             } else if (c == ' ') {
-                ++m_at;
+                ++it;
                 break;
             } else {
                 return false;
             }
-            ++m_at;
-        } while (m_at < m_line.length());
+            ++it;
+        } while (it != end);
 
+        in = hex;
+        m_it = it;
         return true;
     }
 
@@ -277,9 +283,8 @@ public:
 
 private:
     string m_line;
-    size_t m_at;
+    string::const_iterator m_it;
 };
-
 
 struct AccumulatedTraceData
 {
