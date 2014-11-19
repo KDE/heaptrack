@@ -24,10 +24,10 @@
  */
 
 #include <cstdio>
+#include <stdio_ext.h>
 #include <cstdlib>
 
 #include <atomic>
-#include <mutex>
 #include <unordered_map>
 #include <string>
 #include <tuple>
@@ -92,6 +92,27 @@ struct HandleGuard
     static thread_local bool inHandler;
 };
 
+/**
+ * Similar to std::lock_guard but operates on the internal stream lock of a FILE*.
+ */
+class LockGuard
+{
+public:
+    LockGuard(FILE* file)
+        : file(file)
+    {
+        flockfile(file);
+    }
+
+    ~LockGuard()
+    {
+        funlockfile(file);
+    }
+
+private:
+    FILE* file;
+};
+
 thread_local bool HandleGuard::inHandler = false;
 
 string env(const char* variable)
@@ -100,10 +121,16 @@ string env(const char* variable)
     return value ? string(value) : string();
 }
 
+void prepare_fork();
+void parent_fork();
+void child_fork();
+
 struct Data
 {
     Data()
     {
+        pthread_atfork(&prepare_fork, &parent_fork, &child_fork);
+
         string outputFileName = env("DUMP_HEAPTRACK_OUTPUT");
         if (outputFileName.empty()) {
             // env var might not be set when linked directly into an executable
@@ -117,6 +144,7 @@ struct Data
         if (!out) {
             boost::replace_all(outputFileName, "$$", to_string(getpid()));
             out = fopen(outputFileName.c_str(), "w");
+            __fsetlocking(out, FSETLOCKING_BYCALLER);
         }
 
         if (!out) {
@@ -134,7 +162,9 @@ struct Data
     ~Data()
     {
         HandleGuard::inHandler = true;
-        fclose(out);
+        if (out) {
+            fclose(out);
+        }
     }
 
     void updateModuleCache()
@@ -189,27 +219,27 @@ struct Data
             return;
         }
 
-        size_t index = 0;
-        {
-            lock_guard<mutex> lock(m_mutex);
-            if (moduleCacheDirty) {
-                updateModuleCache();
-            }
-            index = traceTree.index(trace, out);
+        LockGuard lock(out);
+
+        if (moduleCacheDirty) {
+            updateModuleCache();
+        }
+        const size_t index = traceTree.index(trace, out);
 
 #ifdef DEBUG_MALLOC_PTRS
-            auto it = known.find(ptr);
-            assert(it == known.end());
-            known.insert(ptr);
+        auto it = known.find(ptr);
+        assert(it == known.end());
+        known.insert(ptr);
 #endif
-        }
+
         fprintf(out, "+ %lx %lx %lx\n", size, index, reinterpret_cast<uintptr_t>(ptr));
     }
 
     void handleFree(void* ptr)
     {
+        LockGuard lock(out);
+
 #ifdef DEBUG_MALLOC_PTRS
-        lock_guard<mutex> lock(m_mutex);
         auto it = known.find(ptr);
         assert(it != known.end());
         known.erase(it);
@@ -217,8 +247,6 @@ struct Data
 
         fprintf(out, "- %lx\n", reinterpret_cast<uintptr_t>(ptr));
     }
-
-    mutex m_mutex;
 
     TraceTree traceTree;
     /**
@@ -235,6 +263,26 @@ struct Data
 };
 
 unique_ptr<Data> data;
+
+void prepare_fork()
+{
+    // don't do any custom malloc handling while inside fork
+    HandleGuard::inHandler = true;
+}
+
+void parent_fork()
+{
+    // the parent process can now continue its custom malloc tracking
+    HandleGuard::inHandler = false;
+}
+
+void child_fork()
+{
+    // but the forked child process cleans up itself
+    // this is important to prevent two processes writing to the same file
+    data->out = nullptr;
+    data.reset(nullptr);
+}
 
 template<typename T>
 T findReal(const char* name)
