@@ -280,8 +280,11 @@ void child_fork()
 {
     // but the forked child process cleans up itself
     // this is important to prevent two processes writing to the same file
-    data->out = nullptr;
-    data.reset(nullptr);
+    if (data) {
+        data->out = nullptr;
+        data.reset(nullptr);
+    }
+    HandleGuard::inHandler = true;
 }
 
 template<typename T>
@@ -358,7 +361,7 @@ void* malloc(size_t size)
 
     void* ret = real_malloc(size);
 
-    if (ret && !HandleGuard::inHandler) {
+    if (ret && !HandleGuard::inHandler && data) {
         HandleGuard guard;
         data->handleMalloc(ret, size);
     }
@@ -375,7 +378,7 @@ void free(void* ptr)
     // call handler before handing over the real free implementation
     // to ensure the ptr is not reused in-between and thus the output
     // stays consistent
-    if (ptr && !HandleGuard::inHandler) {
+    if (ptr && !HandleGuard::inHandler && data) {
         HandleGuard guard;
         data->handleFree(ptr);
     }
@@ -391,7 +394,7 @@ void* realloc(void* ptr, size_t size)
 
     void* ret = real_realloc(ptr, size);
 
-    if (ret && !HandleGuard::inHandler) {
+    if (ret && !HandleGuard::inHandler && data) {
         HandleGuard guard;
         if (ptr) {
             data->handleFree(ptr);
@@ -410,7 +413,7 @@ void* calloc(size_t num, size_t size)
 
     void* ret = real_calloc(num, size);
 
-    if (ret && !HandleGuard::inHandler) {
+    if (ret && !HandleGuard::inHandler && data) {
         HandleGuard guard;
         data->handleMalloc(ret, num*size);
     }
@@ -426,7 +429,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
 
     int ret = real_posix_memalign(memptr, alignment, size);
 
-    if (ret && !HandleGuard::inHandler) {
+    if (ret && !HandleGuard::inHandler && data) {
         HandleGuard guard;
         data->handleMalloc(*memptr, size);
     }
@@ -442,7 +445,7 @@ void* aligned_alloc(size_t alignment, size_t size)
 
     void* ret = real_aligned_alloc(alignment, size);
 
-    if (ret && !HandleGuard::inHandler) {
+    if (ret && !HandleGuard::inHandler && data) {
         HandleGuard guard;
         data->handleMalloc(ret, size);
     }
@@ -458,7 +461,7 @@ void* valloc(size_t size)
 
     void* ret = real_valloc(size);
 
-    if (ret && !HandleGuard::inHandler) {
+    if (ret && !HandleGuard::inHandler && data) {
         HandleGuard guard;
         data->handleMalloc(ret, size);
     }
