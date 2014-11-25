@@ -19,3 +19,6 @@
 
 /* Define to 1 if you have the __sync functions */
 #cmakedefine HAVE_SYNC_FUNCTIONS 1
+
+/* Define to 1 if you have the __atomic functions */
+#cmakedefine HAVE_ATOMIC_FUNCTION 1

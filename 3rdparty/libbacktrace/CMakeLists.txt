@@ -100,7 +100,14 @@ check_c_source_compiles (
     __sync_lock_release (&i);}"
     HAVE_SYNC_FUNCTIONS)
 
-if (HAVE_SYNC_FUNCTIONS)
+check_c_source_compiles (
+    "int i;
+    int main() {
+    __atomic_load_n (&i, __ATOMIC_ACQUIRE);
+    __atomic_store_n (&i, i, __ATOMIC_RELEASE);}"
+    HAVE_ATOMIC_FUNCTIONS)
+
+if (HAVE_SYNC_FUNCTIONS OR HAVE_ATOMIC_FUNCTIONS)
     set (BACKTRACE_SUPPORTS_THREADS 1)
 else ()
     set (BACKTRACE_SUPPORTS_THREADS 0)
