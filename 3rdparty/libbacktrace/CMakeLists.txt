@@ -199,7 +199,6 @@ add_library (backtrace STATIC
     posix.c
     print.c
     state.c
-    btrace.cpp
 )
 
 target_link_libraries(backtrace ${LIBUNWIND_LIBRARY})
