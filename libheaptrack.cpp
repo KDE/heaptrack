@@ -466,7 +466,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
 
     int ret = real_posix_memalign(memptr, alignment, size);
 
-    if (ret && !HandleGuard::inHandler && data) {
+    if (!ret && !HandleGuard::inHandler && data) {
         HandleGuard guard;
         data->handleMalloc(*memptr, size);
     }
