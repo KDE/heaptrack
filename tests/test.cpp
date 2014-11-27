@@ -49,7 +49,7 @@ int main()
 
     buf = calloc(5, 5);
     printf("calloc: %p\n", buf);
-    free(buf);
+    cfree(buf);
 
     buf = aligned_alloc(16, 160);
     printf("aligned_alloc: %p\n", buf);

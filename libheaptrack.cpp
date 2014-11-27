@@ -56,6 +56,7 @@ namespace {
 
 using malloc_t = void* (*) (size_t);
 using free_t = void (*) (void*);
+using cfree_t = void (*) (void*);
 using realloc_t = void* (*) (void*, size_t);
 using calloc_t = void* (*) (size_t, size_t);
 using posix_memalign_t = int (*) (void **, size_t, size_t);
@@ -66,6 +67,7 @@ using dlclose_t = int (*) (void*);
 
 malloc_t real_malloc = nullptr;
 free_t real_free = nullptr;
+cfree_t real_cfree = nullptr;
 realloc_t real_realloc = nullptr;
 calloc_t real_calloc = nullptr;
 posix_memalign_t real_posix_memalign = nullptr;
@@ -348,6 +350,7 @@ void init()
         real_dlclose = findReal<dlclose_t>("dlclose");
         real_malloc = findReal<malloc_t>("malloc");
         real_free = findReal<free_t>("free");
+        real_cfree = findReal<cfree_t>("cfree");
         real_realloc = findReal<realloc_t>("realloc");
         real_posix_memalign = findReal<posix_memalign_t>("posix_memalign");
         real_valloc = findReal<valloc_t>("valloc");
@@ -401,6 +404,23 @@ void free(void* ptr)
     }
 
     real_free(ptr);
+}
+
+void cfree(void* ptr)
+{
+    if (!real_cfree) {
+        init();
+    }
+
+    // call handler before handing over the real free implementation
+    // to ensure the ptr is not reused in-between and thus the output
+    // stays consistent
+    if (ptr && !HandleGuard::inHandler && data) {
+        HandleGuard guard;
+        data->handleFree(ptr);
+    }
+
+    real_cfree(ptr);
 }
 
 void* realloc(void* ptr, size_t size)
