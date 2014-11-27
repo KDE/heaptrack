@@ -353,6 +353,9 @@ void init()
     if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
         fprintf(stderr, "Failed to enable per-thread libunwind caching.\n");
     }
+    if (unw_set_cache_log_size(unw_local_addr_space, 10)) {
+        fprintf(stderr, "Failed to set libunwind cache size.\n");
+    }
 
     data.reset(new Data);
 }

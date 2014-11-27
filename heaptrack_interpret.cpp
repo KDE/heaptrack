@@ -67,11 +67,10 @@ struct AddressInformation
 
 struct Module
 {
-    Module(string _fileName, bool isExe, uintptr_t addressStart, uintptr_t addressEnd, backtrace_state* backtraceState)
+    Module(string _fileName, uintptr_t addressStart, uintptr_t addressEnd, backtrace_state* backtraceState)
         : fileName(move(_fileName))
         , addressStart(addressStart)
         , addressEnd(addressEnd)
-        , isExe(isExe)
         , backtraceState(backtraceState)
     {
     }
@@ -129,7 +128,6 @@ struct Module
     string fileName;
     uintptr_t addressStart;
     uintptr_t addressEnd;
-    bool isExe;
 };
 
 struct Allocation
@@ -241,7 +239,7 @@ struct AccumulatedTraceData
     {
         backtrace_state* backtraceState = findBacktraceState(fileName, addressStart, isExe);
 
-        m_modules.emplace_back(fileName, isExe, addressStart, addressEnd, backtraceState);
+        m_modules.emplace_back(fileName, addressStart, addressEnd, backtraceState);
         m_modulesDirty = true;
     }
 
@@ -307,9 +305,9 @@ private:
             backtrace_fileline_initialize(state, addressStart, isExe,
                                         [] (void *data, const char *msg, int errnum) {
                                             const Module* module = reinterpret_cast<Module*>(data);
-                                            cerr << "Failed to initialize backtrace fileline for "
-                                                << (module->isExe ? "executable " : "library ") << module->fileName
-                                                << ": " << msg << " (error code " << errnum << ")" << endl;
+                                            cerr << "Failed to initialize backtrace fileline for module "
+                                                 << module->fileName
+                                                 << ": " << msg << " (error code " << errnum << ")" << endl;
                                         }, this);
         }
 
