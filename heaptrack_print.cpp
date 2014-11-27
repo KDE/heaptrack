@@ -509,6 +509,8 @@ struct AccumulatedTraceData
             } else if (reader.mode() == '#') {
                 // comment or empty line
                 continue;
+            } else if (reader.mode() == 'c') {
+                // TODO: implement time tracking
             } else {
                 cerr << "failed to parse line: " << reader.line() << endl;
             }

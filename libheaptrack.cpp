@@ -40,6 +40,7 @@
 #include <link.h>
 
 #include "tracetree.h"
+#include "timer.h"
 
 /**
  * uncomment this to get extended debug code for known pointers
@@ -157,6 +158,8 @@ struct Data
         // cleanup environment to prevent tracing of child apps
         unsetenv("DUMP_HEAPTRACK_OUTPUT");
         unsetenv("LD_PRELOAD");
+
+        timer.setInterval(1, 0);
     }
 
     ~Data()
@@ -220,7 +223,10 @@ struct Data
         }
 
         LockGuard lock(out);
-
+        if (lastTimerElapsed != timer.timesElapsed()) {
+            lastTimerElapsed = timer.timesElapsed();
+            fprintf(out, "c %lx\n", lastTimerElapsed);
+        }
         if (moduleCacheDirty) {
             updateModuleCache();
         }
@@ -256,10 +262,14 @@ struct Data
      */
     FILE* out = nullptr;
 
+    size_t lastTimerElapsed = 0;
+    Timer timer;
+
     bool foundExe = false;
 #ifdef DEBUG_MALLOC_PTRS
     unordered_set<void*> known;
 #endif
+
 };
 
 unique_ptr<Data> data;
