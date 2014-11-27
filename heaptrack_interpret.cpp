@@ -298,24 +298,19 @@ private:
         };
         CallbackData data = {&fileName};
 
+        auto errorHandler = [] (void *rawData, const char *msg, int errnum) {
+            auto data = reinterpret_cast<const CallbackData*>(rawData);
+            cerr << "Failed to create backtrace state for module " << *data->fileName << ": "
+                 << msg << " (error code " << errnum << ")" << endl;
+        };
+
         auto state = backtrace_create_state(fileName.c_str(), /* we are single threaded, so: not thread safe */ false,
-                                            [] (void *rawData, const char *msg, int errnum) {
-                                                auto data = reinterpret_cast<const CallbackData*>(rawData);
-                                                cerr << "Failed to create backtrace state for module "
-                                                     << *data->fileName << ": " << msg
-                                                     << " (error code " << errnum << ")" << endl;
-                                            }, &data);
+                                            errorHandler, &data);
 
         if (state) {
             // when we could initialize the backtrace state, we initialize it with the first address
             // we get since that is the lowest one
-            backtrace_fileline_initialize(state, addressStart, isExe,
-                                            [] (void *rawData, const char *msg, int errnum) {
-                                                auto data = reinterpret_cast<CallbackData*>(rawData);
-                                                cerr << "Failed to initialize backtrace fileline for module "
-                                                     << *data->fileName << ": " << msg
-                                                     << " (error code " << errnum << ")" << endl;
-                                            }, &data);
+            backtrace_fileline_initialize(state, addressStart, isExe, errorHandler, &data);
         }
 
         m_backtraceStates.insert(it, make_pair(fileName, state));
