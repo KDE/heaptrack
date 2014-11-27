@@ -308,6 +308,9 @@ struct AccumulatedTraceData
         sort(mergedAllocations.begin(), mergedAllocations.end(), sortOrder);
         for (size_t i = 0; i < min(10lu, mergedAllocations.size()); ++i) {
             auto& allocation = mergedAllocations[i];
+            if (!(allocation.*member)) {
+                break;
+            }
             printf(label, allocation.allocations, formatBytes(allocation.allocated).c_str(),
                    formatBytes(allocation.leaked).c_str(), formatBytes(allocation.peak).c_str());
             printIp(allocation.ipIndex, cout);
@@ -344,6 +347,9 @@ struct AccumulatedTraceData
             });
         for (size_t i = 0; i < min(10lu, allocations.size()); ++i) {
             const auto& allocation = allocations[i];
+            if (!(allocation.*member)) {
+                break;
+            }
             printf(label, allocation.allocations, formatBytes(allocation.allocated).c_str(),
                    formatBytes(allocation.leaked).c_str(), formatBytes(allocation.peak).c_str());
             printBacktrace(allocation.traceIndex, cout, 1);
