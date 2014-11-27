@@ -33,6 +33,7 @@
 #include <tuple>
 #include <memory>
 #include <unordered_set>
+#include <mutex>
 
 #include <boost/algorithm/string/replace.hpp>
 
@@ -332,32 +333,35 @@ void* dummy_calloc(size_t num, size_t size)
 
 void init()
 {
-    if (data || HandleGuard::inHandler) {
-        fprintf(stderr, "initialization recursion detected\n");
-        abort();
-    }
+    static once_flag once;
+    call_once(once, [] {
+        if (data || HandleGuard::inHandler) {
+            fprintf(stderr, "initialization recursion detected\n");
+            abort();
+        }
 
-    HandleGuard guard;
+        HandleGuard guard;
 
-    real_calloc = &dummy_calloc;
-    real_calloc = findReal<calloc_t>("calloc");
-    real_dlopen = findReal<dlopen_t>("dlopen");
-    real_dlclose = findReal<dlclose_t>("dlclose");
-    real_malloc = findReal<malloc_t>("malloc");
-    real_free = findReal<free_t>("free");
-    real_realloc = findReal<realloc_t>("realloc");
-    real_posix_memalign = findReal<posix_memalign_t>("posix_memalign");
-    real_valloc = findReal<valloc_t>("valloc");
-    real_aligned_alloc = findReal<aligned_alloc_t>("aligned_alloc");
+        real_calloc = &dummy_calloc;
+        real_calloc = findReal<calloc_t>("calloc");
+        real_dlopen = findReal<dlopen_t>("dlopen");
+        real_dlclose = findReal<dlclose_t>("dlclose");
+        real_malloc = findReal<malloc_t>("malloc");
+        real_free = findReal<free_t>("free");
+        real_realloc = findReal<realloc_t>("realloc");
+        real_posix_memalign = findReal<posix_memalign_t>("posix_memalign");
+        real_valloc = findReal<valloc_t>("valloc");
+        real_aligned_alloc = findReal<aligned_alloc_t>("aligned_alloc");
 
-    if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
-        fprintf(stderr, "Failed to enable per-thread libunwind caching.\n");
-    }
-    if (unw_set_cache_log_size(unw_local_addr_space, 10)) {
-        fprintf(stderr, "Failed to set libunwind cache size.\n");
-    }
+        if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
+            fprintf(stderr, "Failed to enable per-thread libunwind caching.\n");
+        }
+        if (unw_set_cache_log_size(unw_local_addr_space, 10)) {
+            fprintf(stderr, "Failed to set libunwind cache size.\n");
+        }
 
-    data.reset(new Data);
+        data.reset(new Data);
+    });
 }
 
 }
