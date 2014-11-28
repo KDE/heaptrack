@@ -190,7 +190,7 @@ struct Data
 
     void updateModuleCache()
     {
-        fprintf(out, "m -\n");
+        fputs("m -\n", out);
         dl_iterate_phdr(dlopen_notify_callback, this);
         moduleCacheDirty = false;
     }
