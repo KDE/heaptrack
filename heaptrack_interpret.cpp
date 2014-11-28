@@ -24,11 +24,11 @@
  */
 
 #include <iostream>
-#include <sstream>
 #include <unordered_map>
 #include <vector>
 #include <tuple>
 #include <algorithm>
+#include <stdio_ext.h>
 
 #include <cxxabi.h>
 #include <boost/algorithm/string/predicate.hpp>
@@ -337,6 +337,9 @@ int main(int /*argc*/, char** /*argv*/)
     LineReader reader;
 
     string exe;
+
+    __fsetlocking(stdout, FSETLOCKING_BYCALLER);
+    __fsetlocking(stdin, FSETLOCKING_BYCALLER);
 
     while (reader.getLine(cin)) {
         if (reader.mode() == 'x') {
