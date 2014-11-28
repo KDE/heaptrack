@@ -67,10 +67,10 @@ struct AddressInformation
 
 struct Module
 {
-    Module(string _fileName, uintptr_t addressStart, uintptr_t addressEnd, backtrace_state* backtraceState)
-        : fileName(move(_fileName))
-        , addressStart(addressStart)
+    Module(uintptr_t addressStart, uintptr_t addressEnd, backtrace_state* backtraceState, size_t moduleIndex)
+        : addressStart(addressStart)
         , addressEnd(addressEnd)
+        , moduleIndex(moduleIndex)
         , backtraceState(backtraceState)
     {
     }
@@ -89,7 +89,7 @@ struct Module
                             info->file = file ? file : "";
                             info->line = line;
                             return 0;
-                         }, &emptyErrorCallback, &info);
+                         }, [] (void */*data*/, const char */*msg*/, int /*errnum*/) {}, &info);
 
         if (info.function.empty()) {
             backtrace_syminfo(backtraceState, address,
@@ -97,37 +97,30 @@ struct Module
                                 if (symname) {
                                     reinterpret_cast<AddressInformation*>(data)->function = demangle(symname);
                                 }
-                              }, &errorCallback, &info);
+                              }, [] (void */*data*/, const char *msg, int errnum) {
+                                cerr << "Module backtrace error (code " << errnum << "): " << msg << endl;
+                              }, &info);
         }
 
         return info;
     }
 
-    static void errorCallback(void */*data*/, const char *msg, int errnum)
-    {
-        cerr << "Module backtrace error (code " << errnum << "): " << msg << endl;
-    }
-
-    static void emptyErrorCallback(void */*data*/, const char */*msg*/, int /*errnum*/)
-    {
-    }
-
     bool operator<(const Module& module) const
     {
-        return make_tuple(addressStart, addressEnd, fileName)
-             < make_tuple(module.addressStart, module.addressEnd, module.fileName);
+        return make_tuple(addressStart, addressEnd, moduleIndex)
+             < make_tuple(module.addressStart, module.addressEnd, module.moduleIndex);
     }
 
     bool operator!=(const Module& module) const
     {
-        return make_tuple(addressStart, addressEnd, fileName)
-            != make_tuple(module.addressStart, module.addressEnd, module.fileName);
+        return make_tuple(addressStart, addressEnd, moduleIndex)
+            != make_tuple(module.addressStart, module.addressEnd, module.moduleIndex);
     }
 
-    backtrace_state* backtraceState;
-    string fileName;
     uintptr_t addressStart;
     uintptr_t addressEnd;
+    size_t moduleIndex;
+    backtrace_state* backtraceState;
 };
 
 struct Allocation
@@ -191,8 +184,8 @@ struct AccumulatedTraceData
                         (m1.addressStart < m2.addressEnd && m1.addressEnd >= m2.addressEnd))
                     {
                         cerr << "OVERLAPPING MODULES: " << hex
-                             << m1.fileName << " (" << m1.addressStart << " to " << m1.addressEnd << ") and "
-                             << m2.fileName << " (" << m2.addressStart << " to " << m2.addressEnd << ")\n"
+                             << m1.moduleIndex << " (" << m1.addressStart << " to " << m1.addressEnd << ") and "
+                             << m1.moduleIndex << " (" << m2.addressStart << " to " << m2.addressEnd << ")\n"
                              << dec;
                     } else if (m2.addressStart >= m1.addressEnd) {
                         break;
@@ -210,7 +203,7 @@ struct AccumulatedTraceData
                                         return module.addressEnd < ip;
                                     });
         if (module != m_modules.end() && module->addressStart <= ip && module->addressEnd >= ip) {
-            data.moduleIndex = intern(module->fileName);
+            data.moduleIndex = module->moduleIndex;
             const auto info = module->resolveAddress(ip);
             data.fileIndex = intern(info.file);
             data.functionIndex = intern(info.function);
@@ -235,11 +228,10 @@ struct AccumulatedTraceData
         return id;
     }
 
-    void addModule(const string& fileName, const bool isExe, const uintptr_t addressStart, const uintptr_t addressEnd)
+    void addModule(backtrace_state* backtraceState, const size_t moduleIndex,
+                   const uintptr_t addressStart, const uintptr_t addressEnd)
     {
-        backtrace_state* backtraceState = findBacktraceState(fileName, addressStart, isExe);
-
-        m_modules.emplace_back(fileName, addressStart, addressEnd, backtraceState);
+        m_modules.emplace_back(addressStart, addressEnd, backtraceState, moduleIndex);
         m_modulesDirty = true;
     }
 
@@ -276,7 +268,6 @@ struct AccumulatedTraceData
         return ipId;
     }
 
-private:
     /**
      * Prevent the same file from being initialized multiple times.
      * This drastically cuts the memory consumption down
@@ -310,7 +301,13 @@ private:
         if (state) {
             // when we could initialize the backtrace state, we initialize it with the first address
             // we get since that is the lowest one
-            backtrace_fileline_initialize(state, addressStart, isExe, errorHandler, &data);
+            if (!addressStart && isExe) {
+                // the address start should not be zero, that would lead to issues since
+                // libbacktrace then tries to find the start address and fails
+                // we just set it to 1 for the exe, which seems to work
+                addressStart = 1;
+            }
+            backtrace_fileline_initialize(state, addressStart + isExe, isExe, errorHandler, &data);
         }
 
         m_backtraceStates.insert(it, make_pair(fileName, state));
@@ -318,6 +315,7 @@ private:
         return state;
     }
 
+private:
     vector<Module> m_modules;
     unordered_map<string, backtrace_state*> m_backtraceStates;
     bool m_modulesDirty = false;
@@ -339,21 +337,35 @@ int main(int /*argc*/, char** /*argv*/)
     cin >> hex;
     cout << hex;
 
+    string exe;
+
     while (reader.getLine(cin)) {
-        if (reader.mode() == 'm') {
+        if (reader.mode() == 'x') {
+            reader >> exe;
+        } else if (reader.mode() == 'm') {
             string fileName;
             reader >> fileName;
             if (fileName == "-") {
                 data.clearModules();
             } else {
-                bool isExe = false;
+                const bool isExe = (fileName == "x");
+                if (isExe) {
+                    fileName = exe;
+                }
+                const auto moduleIndex = data.intern(fileName);
                 uintptr_t addressStart = 0;
-                uintptr_t addressEnd = 0;
-                if (!(reader >> isExe) || !(reader >> addressStart) || !(reader >> addressEnd)) {
+                if (!(reader >> addressStart)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     return 1;
                 }
-                data.addModule(fileName, isExe, addressStart, addressEnd);
+                auto state = data.findBacktraceState(fileName, addressStart, isExe);
+                uintptr_t vAddr = 0;
+                uintptr_t memSize = 0;
+                while ((reader >> vAddr) && (reader >> memSize)) {
+                    data.addModule(state, moduleIndex,
+                                   addressStart + vAddr,
+                                   addressStart + vAddr + memSize);
+                }
             }
         } else if (reader.mode() == 't') {
             uintptr_t instructionPointer = 0;

@@ -125,6 +125,18 @@ string env(const char* variable)
     return value ? string(value) : string();
 }
 
+string readExe()
+{
+    const int BUF_SIZE = 1024;
+    char buf[BUF_SIZE];
+    ssize_t size = readlink("/proc/self/exe", buf, sizeof(buf));
+    if ((size > 0) && (size < (ssize_t)sizeof(buf))) {
+        return string(buf, size);
+    } else {
+        return {};
+    }
+}
+
 void prepare_fork();
 void parent_fork();
 void child_fork();
@@ -132,6 +144,7 @@ void child_fork();
 struct Data
 {
     Data()
+        : exe(readExe())
     {
         pthread_atfork(&prepare_fork, &parent_fork, &child_fork);
 
@@ -156,6 +169,8 @@ struct Data
             exit(1);
         }
 
+        fprintf(out, "x %s\n", exe.c_str());
+
         // TODO: remember meta data about host application, such as cmdline, date of run, ...
 
         // cleanup environment to prevent tracing of child apps
@@ -176,44 +191,26 @@ struct Data
     void updateModuleCache()
     {
         fprintf(out, "m -\n");
-        foundExe = false;
         dl_iterate_phdr(dlopen_notify_callback, this);
         moduleCacheDirty = false;
     }
 
-    /**
-     * Mostly copied from vogl's src/libbacktrace/btrace.cpp
-     */
     static int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void *_data)
     {
         auto data = reinterpret_cast<Data*>(_data);
-        bool isExe = false;
         const char *fileName = info->dlpi_name;
-        const int BUF_SIZE = 1024;
-        char buf[BUF_SIZE];
-        // If we don't have a filename and we haven't added our main exe yet, do it now.
         if (!fileName || !fileName[0]) {
-            if (!data->foundExe) {
-                isExe = true;
-                data->foundExe = true;
-                ssize_t ret = readlink("/proc/self/exe", buf, sizeof(buf));
-                if ((ret > 0) && (ret < (ssize_t)sizeof(buf))) {
-                    buf[ret] = 0;
-                    fileName = buf;
-                }
-            }
-            if (!fileName || !fileName[0]) {
-                return 0;
-            }
+            fileName = "x";
         }
 
+        fprintf(data->out, "m %s %lx", fileName, info->dlpi_addr);
         for (int i = 0; i < info->dlpi_phnum; i++) {
-            if (info->dlpi_phdr[i].p_type == PT_LOAD) {
-                const uintptr_t addressStart = info->dlpi_addr + info->dlpi_phdr[i].p_vaddr;
-                const uintptr_t addressEnd = addressStart + info->dlpi_phdr[i].p_memsz;
-                fprintf(data->out, "m %s %d %lx %lx\n", fileName, isExe, addressStart, addressEnd);
+            const auto& phdr = info->dlpi_phdr[i];
+            if (phdr.p_type == PT_LOAD) {
+                fprintf(data->out, " %lx %lx", phdr.p_vaddr, phdr.p_memsz);
             }
         }
+        fputc('\n', data->out);
 
         return 0;
     }
@@ -268,7 +265,7 @@ struct Data
     size_t lastTimerElapsed = 0;
     Timer timer;
 
-    bool foundExe = false;
+    string exe;
 #ifdef DEBUG_MALLOC_PTRS
     unordered_set<void*> known;
 #endif
