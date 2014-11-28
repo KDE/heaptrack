@@ -162,9 +162,8 @@ struct AccumulatedTraceData
 
     ~AccumulatedTraceData()
     {
-        cout << dec;
-        cout << "# strings: " << m_internedData.size() << '\n';
-        cout << "# ips: " << m_encounteredIps.size() << '\n';
+        fprintf(stdout, "# strings: %lu\n# ips: %lu\n",
+                m_internedData.size(), m_encounteredIps.size());
     }
 
     ResolvedIP resolve(const uintptr_t ip)
@@ -224,7 +223,9 @@ struct AccumulatedTraceData
         }
         const size_t id = m_internedData.size() + 1;
         m_internedData.insert(it, make_pair(str, id));
-        cout << "s " << str << '\n';
+        fputs("s ", stdout);
+        fputs(str.c_str(), stdout);
+        fputc('\n', stdout);
         return id;
     }
 
@@ -257,14 +258,14 @@ struct AccumulatedTraceData
         m_encounteredIps.insert(it, make_pair(instructionPointer, ipId));
 
         const auto ip = resolve(instructionPointer);
-        cout << "i " << instructionPointer << ' ' << ip.moduleIndex;
+        fprintf(stdout, "i %lx %lx", instructionPointer, ip.moduleIndex);
         if (ip.functionIndex || ip.fileIndex) {
-            cout << ' ' << ip.functionIndex;
+            fprintf(stdout, " %lx", ip.functionIndex);
             if (ip.fileIndex) {
-                cout << ' ' << ip.fileIndex << ' ' << ip.line;
+                fprintf(stdout, " %lx %d", ip.fileIndex, ip.line);
             }
         }
-        cout << '\n';
+        fputc('\n', stdout);
         return ipId;
     }
 
@@ -334,8 +335,6 @@ int main(int /*argc*/, char** /*argv*/)
     AccumulatedTraceData data;
 
     LineReader reader;
-    cin >> hex;
-    cout << hex;
 
     string exe;
 
@@ -377,9 +376,10 @@ int main(int /*argc*/, char** /*argv*/)
             // ensure ip is encountered
             const auto ipId = data.addIp(instructionPointer);
             // trace point, map current output index to parent index
-            cout << "t " << ipId << ' ' << parentIndex << '\n';
+            fprintf(stdout, "t %lx %lx\n", ipId, parentIndex);
         } else {
-            cout << reader.line() << '\n';
+            fputs(reader.line().c_str(), stdout);
+            fputc('\n', stdout);
         }
     }
 
