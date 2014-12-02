@@ -524,7 +524,7 @@ struct AccumulatedTraceData
                     continue;
                 }
                 if (massifOut.is_open()) {
-                    writeMassifSnapshot(timeStamp);
+                    writeMassifSnapshot(timeStamp, false);
                 }
                 timeStamp = newStamp;
             } else if (reader.mode() == 'X') {
@@ -541,7 +541,7 @@ struct AccumulatedTraceData
         activeAllocations.clear();
 
         if (massifOut.is_open()) {
-            writeMassifSnapshot(timeStamp + 1);
+            writeMassifSnapshot(timeStamp + 1, true);
         }
 
         mergedAllocations = mergeAllocations(allocations);
@@ -553,6 +553,8 @@ struct AccumulatedTraceData
     bool mergeBacktraces = true;
     bool printHistogram = false;
     ofstream massifOut;
+    double massifThreshold = 1;
+    size_t massifDetailedFreq = 1;
 
     vector<Allocation> allocations;
     vector<MergedAllocation> mergedAllocations;
@@ -665,9 +667,7 @@ private:
                   << "time_unit: s\n";
     }
 
-    const double relativeThreshold = 0.01;
-
-    void writeMassifSnapshot(size_t snapshot)
+    void writeMassifSnapshot(size_t snapshot, bool isLast)
     {
         massifOut
             << "#-----------\n"
@@ -676,12 +676,15 @@ private:
             << "time=" << double(snapshot) * 0.01 << '\n'
             << "mem_heap_B=" << leaked << '\n'
             << "mem_heap_extra_B=0\n"
-            << "mem_stacks_B=0\n"
-            << "heap_tree=detailed\n";
+            << "mem_stacks_B=0\n";
 
-        const size_t threshold = double(leaked) * relativeThreshold;
-
-        writeMassifBacktrace(allocations, leaked, threshold, IpIndex());
+        if (massifDetailedFreq && (isLast || !(massifSnapshotId % massifDetailedFreq))) {
+            massifOut << "heap_tree=detailed\n";
+            const size_t threshold = double(leaked) * massifThreshold * 0.01;
+            writeMassifBacktrace(allocations, leaked, threshold, IpIndex());
+        } else {
+            massifOut << "heap_tree=empty\n";
+        }
 
         ++massifSnapshotId;
     }
@@ -742,7 +745,7 @@ private:
         if (skipped) {
             printIndent(massifOut, depth, " ");
             massifOut << " n0: " << skippedLeaked << " in " << skipped
-                      << " places, all below massif's threshold (" << (relativeThreshold * 100.) << ")\n";
+                      << " places, all below massif's threshold (" << massifThreshold << ")\n";
         }
     }
 
@@ -774,12 +777,18 @@ int main(int argc, char** argv)
             "Print backtraces to top allocators, sorted by number of calls to allocation functions.")
         ("print-leaks,l", po::value<bool>()->default_value(false)->implicit_value(true),
             "Print backtraces to leaked memory allocations.")
+        ("print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
+            "Print top overall allocators, ignoring memory frees.")
         ("print-histogram,H", po::value<string>()->default_value(string()),
             "Path to output file where an allocation size histogram will be written to.")
         ("print-massif,M", po::value<string>()->default_value(string()),
             "Path to output file where a massif compatible data file will be written to.")
-        ("print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
-            "Print top overall allocators, ignoring memory frees.")
+        ("massif-threshold", po::value<double>()->default_value(1.),
+            "Percentage of current memory usage, below which allocations are aggregated into a 'below threshold' entry.\n"
+            "This is only used in the massif output file so far.\n")
+        ("massif-detailed-freq", po::value<size_t>()->default_value(2),
+            "Frequency of detailed snapshots in the massif output file. Increase this to reduce the file size.\n"
+            "You can set the value to zero to disable detailed snapshots.\n")
         ("help,h",
             "Show this help message.");
     po::positional_options_description p;
@@ -819,7 +828,8 @@ int main(int argc, char** argv)
             cerr << "Failed to open massif output file \"" << printMassif << "\"." << endl;
             return 1;
         }
-        cout << "opened massif output file:" << printMassif << endl;
+        data.massifThreshold = vm["massif-threshold"].as<double>();
+        data.massifDetailedFreq = vm["massif-detailed-freq"].as<size_t>();
     }
     const bool printLeaks = vm["print-leaks"].as<bool>();
     const bool printOverallAlloc = vm["print-overall-allocated"].as<bool>();
