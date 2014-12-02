@@ -705,22 +705,29 @@ private:
             return l.leaked > r.leaked;
         });
 
-        for (auto& merged : mergedAllocations) {
-            if (!merged.leaked) {
-                // list is sorted, so we can bail out now - these entries are uninteresting for massif
-                break;
-            }
+        const auto ip = findIp(location);
 
-            if (merged.leaked >= threshold) {
-                ++numAllocs;
-            } else {
-                ++skipped;
-                skippedLeaked += merged.leaked;
-            }
+        const bool isMain = mainIndex && ip.functionIndex.index == mainIndex.index;
 
-            // skip the first level of the backtrace, otherwise we'd endlessly recurse
-            for (auto& alloc : merged.traces) {
-                alloc.traceIndex = findTrace(alloc.traceIndex).parentIndex;
+        // skip anything below main
+        if (!isMain) {
+            for (auto& merged : mergedAllocations) {
+                if (!merged.leaked) {
+                    // list is sorted, so we can bail out now - these entries are uninteresting for massif
+                    break;
+                }
+
+                // skip items below threshold
+                if (merged.leaked >= threshold) {
+                    ++numAllocs;
+                    // skip the first level of the backtrace, otherwise we'd endlessly recurse
+                    for (auto& alloc : merged.traces) {
+                        alloc.traceIndex = findTrace(alloc.traceIndex).parentIndex;
+                    }
+                } else {
+                    ++skipped;
+                    skippedLeaked += merged.leaked;
+                }
             }
         }
 
@@ -729,8 +736,6 @@ private:
         if (!depth) {
             massifOut << " (heap allocation functions) malloc/new/new[], --alloc-fns, etc.\n";
         } else {
-            const auto ip = findIp(location);
-
             massifOut << " 0x" << hex << ip.instructionPointer << dec
                       << ": ";
             if (ip.functionIndex) {
@@ -759,17 +764,18 @@ private:
             }
         };
 
-        for (const auto& merged : mergedAllocations) {
-            if (merged.leaked && merged.leaked >= threshold) {
-                if (skippedLeaked > merged.leaked) {
-                    // manually inject this entry to keep the output sorted
-                    writeSkipped();
+        if (!isMain) {
+            for (const auto& merged : mergedAllocations) {
+                if (merged.leaked && merged.leaked >= threshold) {
+                    if (skippedLeaked > merged.leaked) {
+                        // manually inject this entry to keep the output sorted
+                        writeSkipped();
+                    }
+                    writeMassifBacktrace(merged.traces, merged.leaked, threshold, merged.ipIndex, depth + 1);
                 }
-                writeMassifBacktrace(merged.traces, merged.leaked, threshold, merged.ipIndex, depth + 1);
             }
+            writeSkipped();
         }
-
-        writeSkipped();
     }
 
     StringIndex mainIndex;
