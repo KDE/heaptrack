@@ -26,6 +26,7 @@
 #include <cstdio>
 #include <stdio_ext.h>
 #include <cstdlib>
+#include <fcntl.h>
 
 #include <atomic>
 #include <unordered_map>
@@ -136,6 +137,24 @@ void writeExe(FILE* out)
     }
 }
 
+void writeCommandLine(FILE* out)
+{
+    fputc('X', out);
+    const int BUF_SIZE = 4096;
+    char buf[BUF_SIZE + 1];
+    auto fd = open("/proc/self/cmdline", O_RDONLY);
+    int bytesRead = read(fd, buf, BUF_SIZE);
+    char *end = buf + bytesRead;
+    for (char *p = buf; p < end;) {
+        fputc(' ', out);
+        fputs(p, out);
+        while (*p++); // skip until start of next 0-terminated section
+    }
+
+    close(fd);
+    fputc('\n', out);
+}
+
 void prepare_fork();
 void parent_fork();
 void child_fork();
@@ -168,6 +187,7 @@ struct Data
         }
 
         writeExe(out);
+        writeCommandLine(out);
 
         // TODO: remember meta data about host application, such as cmdline, date of run, ...
 

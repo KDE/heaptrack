@@ -517,6 +517,8 @@ struct AccumulatedTraceData
                 continue;
             } else if (reader.mode() == 'c') {
                 // TODO: implement time tracking
+            } else if (reader.mode() == 'X') {
+                cout << "Debuggee command was: " << (reader.line().c_str() + 2) << endl;
             } else {
                 cerr << "failed to parse line: " << reader.line() << endl;
             }
