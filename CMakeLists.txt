@@ -7,6 +7,36 @@ find_package(Boost 1.45.0 COMPONENTS iostreams program_options)
 find_package(Threads)
 
 add_subdirectory(3rdparty)
+
+check_library_exists (${LIBUNWIND_LIBRARY} unw_backtrace "" HAVE_UNW_BACKTRACE)
+if (NOT HAVE_UNW_BACKTRACE)
+    message(FATAL_ERROR "Your libunwind version is apparently too old and does not have the unw_backtrace function.")
+endif()
+
+include (CheckCXXSourceCompiles)
+check_cxx_source_compiles(
+    "#include <unordered_map>
+    #include <atomic>
+    thread_local int tls;
+    int main() { return 0; }"
+    HAVE_CXX11_SUPPORT)
+
+if (NOT HAVE_CXX11_SUPPORT)
+    message(FATAL_ERROR "Your compiler is too old and does not support the required C++11 features.")
+endif()
+
+check_cxx_source_compiles(
+    "#include <stdio_ext.h>
+    #include <fcntl.h>
+    #include <dlfcn.h>
+    #include <link.h>
+    int main() { return 0; }"
+    HAVE_LINUX_HEADERS)
+
+if (NOT HAVE_LINUX_HEADERS)
+    message(FATAL_ERROR "You are missing some Linux headers required to compile heaptrack.")
+endif()
+
 add_subdirectory(tests)
 
 include_directories(

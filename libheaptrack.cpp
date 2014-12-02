@@ -24,22 +24,19 @@
  */
 
 #include <cstdio>
-#include <stdio_ext.h>
 #include <cstdlib>
+#include <stdio_ext.h>
 #include <fcntl.h>
+#include <dlfcn.h>
+#include <link.h>
 
 #include <atomic>
-#include <unordered_map>
 #include <string>
-#include <tuple>
 #include <memory>
 #include <unordered_set>
 #include <mutex>
 
 #include <boost/algorithm/string/replace.hpp>
-
-#include <dlfcn.h>
-#include <link.h>
 
 #include "tracetree.h"
 #include "timer.h"
