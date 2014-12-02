@@ -416,6 +416,7 @@ struct AccumulatedTraceData
         clear();
 
         LineReader reader;
+        size_t timeStamp = 0;
 
         const string opNewStr("operator new(unsigned long)");
         const string opArrNewStr("operator new[](unsigned long)");
@@ -517,12 +518,26 @@ struct AccumulatedTraceData
                 continue;
             } else if (reader.mode() == 'c') {
                 // TODO: implement time tracking
+                size_t newStamp = 0;
+                if (!(reader >> newStamp)) {
+                    cerr << "Failed to read time stamp: " << reader.line() << endl;
+                    continue;
+                }
+                if (massifOut.is_open()) {
+                    writeMassifSnapshot(timeStamp);
+                }
+                timeStamp = newStamp;
             } else if (reader.mode() == 'X') {
                 cout << "Debuggee command was: " << (reader.line().c_str() + 2) << endl;
+                if (massifOut.is_open()) {
+                    writeMassifHeader(reader.line().c_str() + 2);
+                }
             } else {
                 cerr << "failed to parse line: " << reader.line() << endl;
             }
         }
+
+        writeMassifSnapshot(timeStamp + 1);
 
         /// these are leaks, but we now have the same data in \c allocations as well
         activeAllocations.clear();
@@ -552,6 +567,7 @@ struct AccumulatedTraceData
     bool shortenTemplates = false;
     bool mergeBacktraces = true;
     bool printHistogram = false;
+    ofstream massifOut;
 
     vector<Allocation> allocations;
     vector<MergedAllocation> mergedAllocations;
@@ -630,12 +646,37 @@ private:
         }
     }
 
+    void writeMassifHeader(const char* command)
+    {
+        // write massif header
+        massifOut << "desc: heaptrack\n"
+                  << "cmd: " << command << '\n'
+                  << "time_unit: s\n";
+    }
+
+    void writeMassifSnapshot(size_t snapshot)
+    {
+        massifOut
+            << "#-----------\n"
+            << "snapshot=" << massifSnapshotId << '\n'
+            << "#-----------\n"
+            << "time=" << double(snapshot) * 0.01 << '\n'
+            << "mem_heap_B=" << leaked << '\n'
+            << "mem_heap_extra_B=0\n"
+            << "mem_stacks_B=0\n"
+            << "heap_tree=empty\n";
+
+        ++massifSnapshotId;
+    }
+
     StringIndex mainIndex;
     unordered_map<uintptr_t, AllocationInfo> activeAllocations;
     vector<InstructionPointer> instructionPointers;
     vector<TraceNode> traces;
     vector<string> strings;
     unordered_set<size_t> opNewIpIndices;
+
+    size_t massifSnapshotId = 0;
 };
 
 }
@@ -658,6 +699,8 @@ int main(int argc, char** argv)
             "Print backtraces to leaked memory allocations.")
         ("print-histogram,H", po::value<string>()->default_value(string()),
             "Path to output file where an allocation size histogram will be written to.")
+        ("print-massif,M", po::value<string>()->default_value(string()),
+            "Path to output file where a massif compatible data file will be written to.")
         ("print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
             "Print top overall allocators, ignoring memory frees.")
         ("help,h",
@@ -692,6 +735,15 @@ int main(int argc, char** argv)
     data.mergeBacktraces = vm["merge-backtraces"].as<bool>();
     const string printHistogram = vm["print-histogram"].as<string>();
     data.printHistogram = !printHistogram.empty();
+    const string printMassif = vm["print-massif"].as<string>();
+    if (!printMassif.empty()) {
+        data.massifOut.open(printMassif, ios_base::out);
+        if (!data.massifOut.is_open())  {
+            cerr << "Failed to open massif output file \"" << printMassif << "\"." << endl;
+            return 1;
+        }
+        cout << "opened massif output file:" << printMassif << endl;
+    }
     const bool printLeaks = vm["print-leaks"].as<bool>();
     const bool printOverallAlloc = vm["print-overall-allocated"].as<bool>();
     const bool printPeaks = vm["print-peaks"].as<bool>();
