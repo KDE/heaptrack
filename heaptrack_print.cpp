@@ -537,28 +537,13 @@ struct AccumulatedTraceData
             }
         }
 
-        writeMassifSnapshot(timeStamp + 1);
-
         /// these are leaks, but we now have the same data in \c allocations as well
         activeAllocations.clear();
 
-        // merge allocations so that different traces that point to the same
-        // instruction pointer at the end where the allocation function is
-        // called are combined
-        // TODO: merge deeper traces, i.e. A,B,C,D and A,B,C,F
-        //       should be merged to A,B,C: D & F
-        //       currently the below will only merge it to: A: B,C,D & B,C,F
-        mergedAllocations.reserve(allocations.size());
-        for (const Allocation& allocation : allocations) {
-            mergeAllocation(allocation);
-        }
-        for (MergedAllocation& merged : mergedAllocations) {
-            for (const Allocation& allocation: merged.traces) {
-                merged.allocated += allocation.allocated;
-                merged.allocations += allocation.allocations;
-                merged.leaked += allocation.leaked;
-                merged.peak += allocation.peak;
-            }
+        if (massifOut.is_open()) {
+            writeMassifSnapshot(timeStamp + 1);
+        } else {
+            mergeAllocations();
         }
 
         return true;
@@ -628,6 +613,29 @@ private:
         it->traces.push_back(allocation);
     }
 
+    // merge allocations so that different traces that point to the same
+    // instruction pointer at the end where the allocation function is
+    // called are combined
+    void mergeAllocations()
+    {
+        // TODO: merge deeper traces, i.e. A,B,C,D and A,B,C,F
+        //       should be merged to A,B,C: D & F
+        //       currently the below will only merge it to: A: B,C,D & B,C,F
+        mergedAllocations.reserve(allocations.size());
+        mergedAllocations.clear();
+        for (const Allocation& allocation : allocations) {
+            mergeAllocation(allocation);
+        }
+        for (MergedAllocation& merged : mergedAllocations) {
+            for (const Allocation& allocation: merged.traces) {
+                merged.allocated += allocation.allocated;
+                merged.allocations += allocation.allocations;
+                merged.leaked += allocation.leaked;
+                merged.peak += allocation.peak;
+            }
+        }
+    }
+
     InstructionPointer findIp(const IpIndex ipIndex) const
     {
         if (!ipIndex || ipIndex.index > instructionPointers.size()) {
@@ -664,7 +672,59 @@ private:
             << "mem_heap_B=" << leaked << '\n'
             << "mem_heap_extra_B=0\n"
             << "mem_stacks_B=0\n"
-            << "heap_tree=empty\n";
+            << "heap_tree=detailed\n";
+
+        mergeAllocations();
+
+        const double relativeThreshold = 0.01;
+        const size_t threshold = double(leaked) * relativeThreshold;
+
+        size_t skippedLeaked = 0;
+        size_t numAllocs = 0;
+        size_t skipped = 0;
+        for (const auto& merged : mergedAllocations) {
+            if (merged.leaked) {
+                if (merged.leaked >= threshold) {
+                    ++numAllocs;
+                } else {
+                    ++skipped;
+                    skippedLeaked += merged.leaked;
+                }
+            }
+        }
+
+        massifOut << 'n' << (numAllocs + (skipped ? 1 : 0)) << ": " << leaked
+                  << " (heap allocation functions) malloc/new/new[], --alloc-fns, etc.\n";
+        for (const auto& merged : mergedAllocations) {
+            if (!merged.leaked || merged.leaked < threshold) {
+                continue;
+            }
+
+            const auto ip = findIp(merged.ipIndex);
+
+            massifOut << " n0: " << merged.leaked << " 0x" << hex << ip.instructionPointer << dec
+                      << ": ";
+            if (ip.functionIndex) {
+                massifOut << stringify(ip.functionIndex);
+            } else {
+                massifOut << "???";
+            }
+
+            massifOut << " (";
+            if (ip.fileIndex) {
+                massifOut << stringify(ip.fileIndex) << ':' << ip.line;
+            } else if (ip.moduleIndex) {
+                massifOut << stringify(ip.moduleIndex);
+            } else {
+                massifOut << "???";
+            }
+            massifOut << ")\n";
+        }
+
+        if (skipped) {
+            massifOut << " n0: " << skippedLeaked << " in " << skipped
+                      << " places, all below massif's threshold (" << (relativeThreshold * 100.) << ")\n";
+        }
 
         ++massifSnapshotId;
     }
