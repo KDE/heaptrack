@@ -696,17 +696,26 @@ private:
         size_t numAllocs = 0;
         size_t skipped = 0;
         auto mergedAllocations = mergeAllocations(allocations);
+        sort(mergedAllocations.begin(), mergedAllocations.end(), [] (const MergedAllocation& l, const MergedAllocation& r) {
+            return l.leaked > r.leaked;
+        });
+
         for (auto& merged : mergedAllocations) {
-            if (merged.leaked) {
-                if (merged.leaked >= threshold) {
-                    ++numAllocs;
-                } else {
-                    ++skipped;
-                    skippedLeaked += merged.leaked;
-                }
-                for (auto& alloc : merged.traces) {
-                    alloc.traceIndex = findTrace(alloc.traceIndex).parentIndex;
-                }
+            if (!merged.leaked) {
+                // list is sorted, so we can bail out now - these entries are uninteresting for massif
+                break;
+            }
+
+            if (merged.leaked >= threshold) {
+                ++numAllocs;
+            } else {
+                ++skipped;
+                skippedLeaked += merged.leaked;
+            }
+
+            // skip the first level of the backtrace, otherwise we'd endlessly recurse
+            for (auto& alloc : merged.traces) {
+                alloc.traceIndex = findTrace(alloc.traceIndex).parentIndex;
             }
         }
 
@@ -736,17 +745,26 @@ private:
             massifOut << ")\n";
         }
 
+        auto writeSkipped = [&] {
+            if (skipped) {
+                printIndent(massifOut, depth, " ");
+                massifOut << " n0: " << skippedLeaked << " in " << skipped
+                        << " places, all below massif's threshold (" << massifThreshold << ")\n";
+                skipped = 0;
+            }
+        };
+
         for (const auto& merged : mergedAllocations) {
             if (merged.leaked && merged.leaked >= threshold) {
+                if (skippedLeaked > merged.leaked) {
+                    // manually inject this entry to keep the output sorted
+                    writeSkipped();
+                }
                 writeMassifBacktrace(merged.traces, merged.leaked, threshold, merged.ipIndex, depth + 1);
             }
         }
 
-        if (skipped) {
-            printIndent(massifOut, depth, " ");
-            massifOut << " n0: " << skippedLeaked << " in " << skipped
-                      << " places, all below massif's threshold (" << massifThreshold << ")\n";
-        }
+        writeSkipped();
     }
 
     StringIndex mainIndex;
