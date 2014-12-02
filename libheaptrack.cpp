@@ -125,15 +125,14 @@ string env(const char* variable)
     return value ? string(value) : string();
 }
 
-string readExe()
+void writeExe(FILE* out)
 {
-    const int BUF_SIZE = 1024;
-    char buf[BUF_SIZE];
-    ssize_t size = readlink("/proc/self/exe", buf, sizeof(buf));
-    if ((size > 0) && (size < (ssize_t)sizeof(buf))) {
-        return string(buf, size);
-    } else {
-        return {};
+    const int BUF_SIZE = 1023;
+    char buf[BUF_SIZE + 1];
+    ssize_t size = readlink("/proc/self/exe", buf, BUF_SIZE);
+    if (size > 0 && size < BUF_SIZE) {
+        buf[size] = 0;
+        fprintf(out, "x %s\n", buf);
     }
 }
 
@@ -144,7 +143,6 @@ void child_fork();
 struct Data
 {
     Data()
-        : exe(readExe())
     {
         pthread_atfork(&prepare_fork, &parent_fork, &child_fork);
 
@@ -169,7 +167,7 @@ struct Data
             exit(1);
         }
 
-        fprintf(out, "x %s\n", exe.c_str());
+        writeExe(out);
 
         // TODO: remember meta data about host application, such as cmdline, date of run, ...
 
@@ -265,7 +263,6 @@ struct Data
     size_t lastTimerElapsed = 0;
     Timer timer;
 
-    string exe;
 #ifdef DEBUG_MALLOC_PTRS
     unordered_set<void*> known;
 #endif
