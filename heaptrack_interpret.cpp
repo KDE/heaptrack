@@ -223,9 +223,7 @@ struct AccumulatedTraceData
         }
         const size_t id = m_internedData.size() + 1;
         m_internedData.insert(it, make_pair(str, id));
-        fputs("s ", stdout);
-        fputs(str.c_str(), stdout);
-        fputc('\n', stdout);
+        fprintf(stdout, "s %s\n", str.c_str());
         return id;
     }
 
