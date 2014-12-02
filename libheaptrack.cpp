@@ -195,7 +195,8 @@ struct Data
         unsetenv("DUMP_HEAPTRACK_OUTPUT");
         unsetenv("LD_PRELOAD");
 
-        timer.setInterval(1, 0);
+        // print a backtrace in every interval
+        timer.setInterval(0, 1000 * 1000 * 10);
     }
 
     ~Data()

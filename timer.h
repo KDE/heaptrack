@@ -28,6 +28,7 @@
 #include <cassert>
 
 #include <limits>
+#include <atomic>
 
 class Timer
 {
@@ -36,23 +37,10 @@ public:
         : m_timesElapsed(0)
         , m_timerId(0)
     {
-        /* Establish handler for timer signal */
-
-        struct sigaction sa;
-        sa.sa_flags = SA_SIGINFO;
-        sa.sa_sigaction = &Timer::handler;
-        sigemptyset(&sa.sa_mask);
-        if (sigaction(SIGRTMIN, &sa, nullptr) == -1) {
-            fprintf(stderr, "Failed to call sigaction in %s:%d: %s",
-                    __FILE__, __LINE__, strerror(errno));
-            return;
-        }
-
-        /* Create the timer */
-
         sigevent sev;
-        sev.sigev_notify = SIGEV_SIGNAL;
-        sev.sigev_signo = SIGRTMIN;
+        sev.sigev_notify = SIGEV_THREAD;
+        sev.sigev_notify_function = &Timer::handler;
+        sev.sigev_notify_attributes = nullptr;
         sev.sigev_value.sival_ptr = this;
         if (timer_create(CLOCK_REALTIME, &sev, &m_timerId) == -1) {
             fprintf(stderr, "Failed to call timer_create in %s:%d: %s",
@@ -88,18 +76,14 @@ public:
     }
 
 private:
-    static void handler(int /*sig*/, siginfo_t *si, void */*uc*/)
+    static void handler(union sigval value)
     {
-        auto overrun = si->si_overrun;
-        if (overrun < 0) {
-            return;
-        }
+        Timer* timer = static_cast<Timer*>(value.sival_ptr);
 
-        Timer* timer = static_cast<Timer*>(si->si_value.sival_ptr);
-        timer->m_timesElapsed += overrun + 1;
+        timer->m_timesElapsed += timer_getoverrun(timer->m_timerId) + 1;
     }
 
-    size_t m_timesElapsed;
+    std::atomic<size_t> m_timesElapsed;
     timer_t m_timerId;
 };
 
