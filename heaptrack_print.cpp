@@ -232,10 +232,10 @@ struct AccumulatedTraceData
         printIp(findIp(ip), out, indent);
     }
 
-    void printIndent(ostream& out, size_t indent) const
+    void printIndent(ostream& out, size_t indent, const char* indentString = "  ") const
     {
         while (indent--) {
-            out << "  ";
+            out << indentString;
         }
     }
 
@@ -542,9 +542,9 @@ struct AccumulatedTraceData
 
         if (massifOut.is_open()) {
             writeMassifSnapshot(timeStamp + 1);
-        } else {
-            mergeAllocations();
         }
+
+        mergedAllocations = mergeAllocations(allocations);
 
         return true;
     }
@@ -592,11 +592,11 @@ private:
         return allocations.back();
     }
 
-    void mergeAllocation(const Allocation& allocation)
+    void mergeAllocation(vector<MergedAllocation>* mergedAllocations, const Allocation& allocation) const
     {
         const auto trace = findTrace(allocation.traceIndex);
         const auto traceIp = findIp(trace.ipIndex);
-        auto it = lower_bound(mergedAllocations.begin(), mergedAllocations.end(), traceIp,
+        auto it = lower_bound(mergedAllocations->begin(), mergedAllocations->end(), traceIp,
                                 [this] (const MergedAllocation& allocation, const InstructionPointer traceIp) -> bool {
                                     // Compare meta data without taking the instruction pointer address into account.
                                     // This is useful since sometimes, esp. when we lack debug symbols, the same function
@@ -605,10 +605,10 @@ private:
                                     const auto allocationIp = findIp(allocation.ipIndex);
                                     return allocationIp.compareWithoutAddress(traceIp);
                                 });
-        if (it == mergedAllocations.end() || !findIp(it->ipIndex).equalWithoutAddress(traceIp)) {
+        if (it == mergedAllocations->end() || !findIp(it->ipIndex).equalWithoutAddress(traceIp)) {
             MergedAllocation merged;
             merged.ipIndex = trace.ipIndex;
-            it = mergedAllocations.insert(it, merged);
+            it = mergedAllocations->insert(it, merged);
         }
         it->traces.push_back(allocation);
     }
@@ -616,17 +616,19 @@ private:
     // merge allocations so that different traces that point to the same
     // instruction pointer at the end where the allocation function is
     // called are combined
-    void mergeAllocations()
+    vector<MergedAllocation> mergeAllocations(const vector<Allocation>& allocations) const
     {
         // TODO: merge deeper traces, i.e. A,B,C,D and A,B,C,F
         //       should be merged to A,B,C: D & F
         //       currently the below will only merge it to: A: B,C,D & B,C,F
-        mergedAllocations.reserve(allocations.size());
-        mergedAllocations.clear();
+        vector<MergedAllocation> ret;
+        ret.reserve(allocations.size());
         for (const Allocation& allocation : allocations) {
-            mergeAllocation(allocation);
+            if (allocation.traceIndex) {
+                mergeAllocation(&ret, allocation);
+            }
         }
-        for (MergedAllocation& merged : mergedAllocations) {
+        for (MergedAllocation& merged : ret) {
             for (const Allocation& allocation: merged.traces) {
                 merged.allocated += allocation.allocated;
                 merged.allocations += allocation.allocations;
@@ -634,6 +636,7 @@ private:
                 merged.peak += allocation.peak;
             }
         }
+        return ret;
     }
 
     InstructionPointer findIp(const IpIndex ipIndex) const
@@ -662,6 +665,8 @@ private:
                   << "time_unit: s\n";
     }
 
+    const double relativeThreshold = 0.01;
+
     void writeMassifSnapshot(size_t snapshot)
     {
         massifOut
@@ -674,15 +679,21 @@ private:
             << "mem_stacks_B=0\n"
             << "heap_tree=detailed\n";
 
-        mergeAllocations();
-
-        const double relativeThreshold = 0.01;
         const size_t threshold = double(leaked) * relativeThreshold;
 
+        writeMassifBacktrace(allocations, leaked, threshold, IpIndex());
+
+        ++massifSnapshotId;
+    }
+
+    void writeMassifBacktrace(const vector<Allocation>& allocations, size_t leaked, size_t threshold,
+                              const IpIndex& location, size_t depth = 0)
+    {
         size_t skippedLeaked = 0;
         size_t numAllocs = 0;
         size_t skipped = 0;
-        for (const auto& merged : mergedAllocations) {
+        auto mergedAllocations = mergeAllocations(allocations);
+        for (auto& merged : mergedAllocations) {
             if (merged.leaked) {
                 if (merged.leaked >= threshold) {
                     ++numAllocs;
@@ -690,19 +701,20 @@ private:
                     ++skipped;
                     skippedLeaked += merged.leaked;
                 }
+                for (auto& alloc : merged.traces) {
+                    alloc.traceIndex = findTrace(alloc.traceIndex).parentIndex;
+                }
             }
         }
 
-        massifOut << 'n' << (numAllocs + (skipped ? 1 : 0)) << ": " << leaked
-                  << " (heap allocation functions) malloc/new/new[], --alloc-fns, etc.\n";
-        for (const auto& merged : mergedAllocations) {
-            if (!merged.leaked || merged.leaked < threshold) {
-                continue;
-            }
+        printIndent(massifOut, depth, " ");
+        massifOut << 'n' << (numAllocs + (skipped ? 1 : 0)) << ": " << leaked;
+        if (!depth) {
+            massifOut << " (heap allocation functions) malloc/new/new[], --alloc-fns, etc.\n";
+        } else {
+            const auto ip = findIp(location);
 
-            const auto ip = findIp(merged.ipIndex);
-
-            massifOut << " n0: " << merged.leaked << " 0x" << hex << ip.instructionPointer << dec
+            massifOut << " 0x" << hex << ip.instructionPointer << dec
                       << ": ";
             if (ip.functionIndex) {
                 massifOut << stringify(ip.functionIndex);
@@ -721,12 +733,17 @@ private:
             massifOut << ")\n";
         }
 
+        for (const auto& merged : mergedAllocations) {
+            if (merged.leaked && merged.leaked >= threshold) {
+                writeMassifBacktrace(merged.traces, merged.leaked, threshold, merged.ipIndex, depth + 1);
+            }
+        }
+
         if (skipped) {
+            printIndent(massifOut, depth, " ");
             massifOut << " n0: " << skippedLeaked << " in " << skipped
                       << " places, all below massif's threshold (" << (relativeThreshold * 100.) << ")\n";
         }
-
-        ++massifSnapshotId;
     }
 
     StringIndex mainIndex;
