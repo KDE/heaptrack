@@ -674,19 +674,34 @@ private:
 
     void writeMassifSnapshot(size_t snapshot, bool isLast)
     {
+        // the heap consumption we annotate this snapshot with
+        size_t heapSize = 0;
+        if (peak > lastMassifPeak) {
+            // if we encountered a peak in this snapshot, use that now
+            // NOTE: this is wrong from a time perspective, but better than
+            // ignoring the peak completely. And the error in time is at most the
+            // inverse of the timer frequency, which is high.
+            // FIXME: we should do something similar with the individual backtraces below
+            // FIXME: non-maximum peaks after a big first one will still be hidden
+            lastMassifPeak = peak;
+            heapSize = lastMassifPeak;
+        } else {
+            heapSize = leaked;
+        }
+
         massifOut
             << "#-----------\n"
             << "snapshot=" << massifSnapshotId << '\n'
             << "#-----------\n"
             << "time=" << double(snapshot) * 0.01 << '\n'
-            << "mem_heap_B=" << leaked << '\n'
+            << "mem_heap_B=" << heapSize << '\n'
             << "mem_heap_extra_B=0\n"
             << "mem_stacks_B=0\n";
 
         if (massifDetailedFreq && (isLast || !(massifSnapshotId % massifDetailedFreq))) {
             massifOut << "heap_tree=detailed\n";
-            const size_t threshold = double(leaked) * massifThreshold * 0.01;
-            writeMassifBacktrace(allocations, leaked, threshold, IpIndex());
+            const size_t threshold = double(heapSize) * massifThreshold * 0.01;
+            writeMassifBacktrace(allocations, heapSize, threshold, IpIndex());
         } else {
             massifOut << "heap_tree=empty\n";
         }
@@ -694,7 +709,7 @@ private:
         ++massifSnapshotId;
     }
 
-    void writeMassifBacktrace(const vector<Allocation>& allocations, size_t leaked, size_t threshold,
+    void writeMassifBacktrace(const vector<Allocation>& allocations, size_t heapSize, size_t threshold,
                               const IpIndex& location, size_t depth = 0)
     {
         size_t skippedLeaked = 0;
@@ -732,7 +747,7 @@ private:
         }
 
         printIndent(massifOut, depth, " ");
-        massifOut << 'n' << (numAllocs + (skipped ? 1 : 0)) << ": " << leaked;
+        massifOut << 'n' << (numAllocs + (skipped ? 1 : 0)) << ": " << heapSize;
         if (!depth) {
             massifOut << " (heap allocation functions) malloc/new/new[], --alloc-fns, etc.\n";
         } else {
@@ -786,6 +801,7 @@ private:
     unordered_set<size_t> opNewIpIndices;
 
     size_t massifSnapshotId = 0;
+    size_t lastMassifPeak = 0;
 };
 
 }
