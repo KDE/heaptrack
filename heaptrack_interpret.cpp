@@ -260,7 +260,7 @@ struct AccumulatedTraceData
         if (ip.functionIndex || ip.fileIndex) {
             fprintf(stdout, " %lx", ip.functionIndex);
             if (ip.fileIndex) {
-                fprintf(stdout, " %lx %d", ip.fileIndex, ip.line);
+                fprintf(stdout, " %lx %x", ip.fileIndex, ip.line);
             }
         }
         fputc('\n', stdout);
