@@ -46,7 +46,6 @@ include_directories(
     ${LIBUNWIND_INCLUDE_DIR}
 )
 
-add_definitions(-D__extern_always_inline=inline)
 add_library(libheaptrack SHARED libheaptrack.cpp)
 # the final .so should be named libheaptrack, not liblibheaptrack
 set_target_properties(libheaptrack PROPERTIES OUTPUT_NAME heaptrack)
