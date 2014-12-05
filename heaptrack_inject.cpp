@@ -32,12 +32,19 @@
 namespace {
 
 auto original_malloc = &malloc;
+auto original_free = &free;
 
 void* overwrite_malloc(size_t size)
 {
     auto ptr = original_malloc(size);
     heaptrack_malloc(ptr, size);
     return ptr;
+}
+
+void overwrite_free(void* ptr)
+{
+    heaptrack_free(ptr);
+    original_free(ptr);
 }
 
 template<typename T, ElfW(Sxword) AddrTag, ElfW(Sxword) SizeTag>
@@ -63,7 +70,7 @@ using elf_string_table = elftable<const char, DT_STRTAB, DT_STRSZ>;
 using elf_jmprel_table = elftable<ElfW(Rela), DT_JMPREL, DT_PLTRELSZ>;
 using elf_symbol_table = elftable<ElfW(Sym), DT_SYMTAB, DT_SYMENT>;
 
-bool try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base)
+void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base)
 {
     elf_symbol_table symbols;
     elf_jmprel_table jmprels;
@@ -77,12 +84,13 @@ bool try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base)
     for (auto rela = jmprels.table; rela < relaend; rela++) {
         auto relsymidx = ELF64_R_SYM(rela->r_info);
         const char *relsymname = strings.table + symbols.table[relsymidx].st_name;
-        if (strcmp("malloc", relsymname) == 0) {
-            *reinterpret_cast<void*(**)(size_t)>(rela->r_offset + base) = &overwrite_malloc;
-            return true;
+        auto addr = rela->r_offset + base;
+        if (!strcmp("malloc", relsymname)) {
+            *reinterpret_cast<void*(**)(size_t)>(addr) = &overwrite_malloc;
+        } else if (!strcmp("free", relsymname)) {
+            *reinterpret_cast<void(**)(void*)>(addr) = &overwrite_free;
         }
     }
-    return false;
 }
 
 int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data)
