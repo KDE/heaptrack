@@ -50,6 +50,8 @@ add_library(libheaptrack SHARED libheaptrack.cpp)
 # the final .so should be named libheaptrack, not liblibheaptrack
 set_target_properties(libheaptrack PROPERTIES OUTPUT_NAME heaptrack)
 target_link_libraries(libheaptrack ${CMAKE_DL_LIBS} backtrace rt)
+add_library(heaptrackinject SHARED heaptrack_inject.cpp)
+target_link_libraries(heaptrackinject PRIVATE libheaptrack)
 
 add_executable(heaptrack_interpret heaptrack_interpret.cpp)
 target_link_libraries(heaptrack_interpret backtrace)

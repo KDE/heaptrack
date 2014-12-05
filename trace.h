@@ -54,7 +54,7 @@ struct Trace
         return m_size;
     }
 
-    bool fill(int skip = 2)
+    bool fill(int skip)
     {
         int size = unw_backtrace(m_data, MAX_SIZE);
         m_size = size > skip ? size - skip : 0;

@@ -23,6 +23,8 @@
  * @brief Collect raw heaptrack data by overloading heap allocation functions.
  */
 
+#include "libheaptrack.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <stdio_ext.h>
@@ -234,7 +236,7 @@ struct Data
     void handleMalloc(void* ptr, size_t size)
     {
         Trace trace;
-        if (!trace.fill()) {
+        if (!trace.fill(3)) {
             return;
         }
 
@@ -371,14 +373,38 @@ void init()
         if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
             fprintf(stderr, "Failed to enable per-thread libunwind caching.\n");
         }
+        if (unw_set_cache_log_size(unw_local_addr_space, 10)) {
+            fprintf(stderr, "Failed to set libunwind cache size.\n");
+        }
 
         data.reset(new Data);
     });
 }
 
 }
-
 extern "C" {
+
+void heaptrack_init()
+{
+    init();
+}
+
+void heaptrack_malloc(void* ptr, size_t size)
+{
+    if (ptr && !HandleGuard::inHandler && data) {
+        HandleGuard guard;
+        data->handleMalloc(ptr, size);
+    }
+}
+
+void heaptrack_free(void* ptr)
+{
+    if (ptr && !HandleGuard::inHandler && data) {
+        HandleGuard guard;
+        data->handleFree(ptr);
+    }
+}
+
 
 /// TODO: memalign, pvalloc, ...?
 
@@ -388,14 +414,9 @@ void* malloc(size_t size)
         init();
     }
 
-    void* ret = real_malloc(size);
-
-    if (ret && !HandleGuard::inHandler && data) {
-        HandleGuard guard;
-        data->handleMalloc(ret, size);
-    }
-
-    return ret;
+    void* ptr = real_malloc(size);
+    heaptrack_malloc(ptr, size);
+    return ptr;
 }
 
 void free(void* ptr)
@@ -407,10 +428,7 @@ void free(void* ptr)
     // call handler before handing over the real free implementation
     // to ensure the ptr is not reused in-between and thus the output
     // stays consistent
-    if (ptr && !HandleGuard::inHandler && data) {
-        HandleGuard guard;
-        data->handleFree(ptr);
-    }
+    heaptrack_free(ptr);
 
     real_free(ptr);
 }

@@ -17,7 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include <stdio.h>
+#include "libheaptrack.h"
+
 #include <link.h>
 #include <string.h>
 #include <stdlib.h>
@@ -34,9 +35,9 @@ auto original_malloc = &malloc;
 
 void* overwrite_malloc(size_t size)
 {
-    auto ret = original_malloc(size);
-    printf("HALLOOOOOO! %lu %p\n", size, ret);
-    return ret;
+    auto ptr = original_malloc(size);
+    heaptrack_malloc(ptr, size);
+    return ptr;
 }
 
 template<typename T, ElfW(Sxword) AddrTag, ElfW(Sxword) SizeTag>
@@ -62,26 +63,22 @@ using elf_string_table = elftable<const char, DT_STRTAB, DT_STRSZ>;
 using elf_jmprel_table = elftable<ElfW(Rela), DT_JMPREL, DT_PLTRELSZ>;
 using elf_symbol_table = elftable<ElfW(Sym), DT_SYMTAB, DT_SYMENT>;
 
-bool overwrite_symbols(const ElfW(Dyn) *dyn)
+bool try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base)
 {
     elf_symbol_table symbols;
     elf_jmprel_table jmprels;
     elf_string_table strings;
+
     for (; dyn->d_tag != DT_NULL; ++dyn) {
         symbols.consume(dyn) || jmprels.consume(dyn) || strings.consume(dyn);
     }
-    printf("\tfound:\tsymtab: %p = %lu, jmptab: %p = %lu, strtab %p = %lu\n",
-            symbols.table, symbols.size,
-            jmprels.table, jmprels.size,
-            strings.table, strings.size);
 
     auto relaend = reinterpret_cast<ElfW(Rela) *>(reinterpret_cast<char *>(jmprels.table) + jmprels.size);
     for (auto rela = jmprels.table; rela < relaend; rela++) {
         auto relsymidx = ELF64_R_SYM(rela->r_info);
         const char *relsymname = strings.table + symbols.table[relsymidx].st_name;
         if (strcmp("malloc", relsymname) == 0) {
-            printf("!!!!!!!!!1 found malloc: %p\n", reinterpret_cast<void *>(rela->r_offset));
-            *reinterpret_cast<void*(**)(size_t)>(rela->r_offset) = &overwrite_malloc;
+            *reinterpret_cast<void*(**)(size_t)>(rela->r_offset + base) = &overwrite_malloc;
             return true;
         }
     }
@@ -90,15 +87,16 @@ bool overwrite_symbols(const ElfW(Dyn) *dyn)
 
 int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data)
 {
-    printf("  iterate dlpi: %s\n", info->dlpi_name);
+    if (strstr(info->dlpi_name, "/ld-linux-x86-64.so") || strstr(info->dlpi_name, "/libheaptrackinject.so")) {
+        /// FIXME: why are these checks required? If I don't filter them out, we'll crash
+        /// when trying to write the malloc symbols found
+        return 0;
+    }
+
     for (auto phdr = info->dlpi_phdr, end = phdr + info->dlpi_phnum; phdr != end; ++phdr) {
         if (phdr->p_type == PT_DYNAMIC && (phdr->p_flags & (PF_W | PF_R)) == (PF_W | PF_R)) {
-            printf("    try dyn with flags=%d\n", phdr->p_flags);
-            if (overwrite_symbols(reinterpret_cast<const ElfW(Dyn) *>(phdr->p_vaddr + info->dlpi_addr))) {
-//                 return 1;
-// NOTE: stopping at the first found malloc symbol makes the "simple" demo work,
-// but more complicated apps with shared libraries still don't work as expected
-            }
+            try_overwrite_symbols(reinterpret_cast<const ElfW(Dyn) *>(phdr->p_vaddr + info->dlpi_addr),
+                                  info->dlpi_addr);
         }
     }
     return 0;
@@ -108,8 +106,8 @@ struct InitializeInjection
 {
     InitializeInjection()
     {
-        printf("init\n");
         dl_iterate_phdr(&iterate_phdrs, nullptr);
+        heaptrack_init();
     }
 } initialize;
 
