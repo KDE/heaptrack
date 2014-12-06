@@ -60,6 +60,44 @@ struct free
     }
 };
 
+struct realloc
+{
+    static constexpr auto name = "realloc";
+    static constexpr auto original = &::realloc;
+
+    static void* hook(void *ptr, size_t size)
+    {
+        auto ret = original(ptr, size);
+        heaptrack_realloc(ptr, size, ret);
+        return ret;
+    }
+};
+
+struct calloc
+{
+    static constexpr auto name = "calloc";
+    static constexpr auto original = &::calloc;
+
+    static void* hook(size_t num, size_t size)
+    {
+        auto ptr = original(num, size);
+        heaptrack_malloc(ptr, num * size);
+        return ptr;
+    }
+};
+
+struct cfree
+{
+    static constexpr auto name = "cfree";
+    static constexpr auto original = &::cfree;
+
+    static void hook(void *ptr)
+    {
+        heaptrack_free(ptr);
+        original(ptr);
+    }
+};
+
 struct dlopen
 {
     static constexpr auto name = "dlopen";
@@ -69,6 +107,7 @@ struct dlopen
     {
         auto ret = original(filename, flag);
         if (ret) {
+            // TODO: we probably need to overwrite the symbols in the new modules as well
             heaptrack_invalidate_module_cache();
         }
         return ret;
@@ -109,6 +148,9 @@ struct hook
 constexpr hook list[] = {
     hook::wrap<malloc>(),
     hook::wrap<free>(),
+    hook::wrap<realloc>(),
+    hook::wrap<calloc>(),
+    hook::wrap<cfree>(),
     hook::wrap<dlopen>(),
     hook::wrap<dlclose>(),
 };

@@ -405,6 +405,17 @@ void heaptrack_free(void* ptr)
     }
 }
 
+void heaptrack_realloc(void* ptr_in, size_t size, void* ptr_out)
+{
+    if (ptr_out && !HandleGuard::inHandler && data) {
+        HandleGuard guard;
+        if (ptr_in) {
+            data->handleFree(ptr_in);
+        }
+        data->handleMalloc(ptr_out, size);
+    }
+}
+
 void heaptrack_invalidate_module_cache()
 {
     moduleCacheDirty = true;
@@ -435,23 +446,6 @@ void free(void* ptr)
     heaptrack_free(ptr);
 
     real_free(ptr);
-}
-
-void cfree(void* ptr)
-{
-    if (!real_cfree) {
-        init();
-    }
-
-    // call handler before handing over the real free implementation
-    // to ensure the ptr is not reused in-between and thus the output
-    // stays consistent
-    if (ptr && !HandleGuard::inHandler && data) {
-        HandleGuard guard;
-        data->handleFree(ptr);
-    }
-
-    real_cfree(ptr);
 }
 
 void* realloc(void* ptr, size_t size)
@@ -487,6 +481,23 @@ void* calloc(size_t num, size_t size)
     }
 
     return ret;
+}
+
+void cfree(void* ptr)
+{
+    if (!real_cfree) {
+        init();
+    }
+
+    // call handler before handing over the real free implementation
+    // to ensure the ptr is not reused in-between and thus the output
+    // stays consistent
+    if (ptr && !HandleGuard::inHandler && data) {
+        HandleGuard guard;
+        data->handleFree(ptr);
+    }
+
+    real_cfree(ptr);
 }
 
 int posix_memalign(void **memptr, size_t alignment, size_t size)
