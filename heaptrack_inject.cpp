@@ -129,6 +129,21 @@ struct dlclose
     }
 };
 
+struct posix_memalign
+{
+    static constexpr auto name = "posix_memalign";
+    static constexpr auto original = &::posix_memalign;
+
+    static int hook(void **memptr, size_t alignment, size_t size)
+    {
+        auto ret = original(memptr, alignment, size);
+        if (!ret) {
+            heaptrack_malloc(*memptr, size);
+        }
+        return ret;
+    }
+};
+
 struct hook
 {
     const char * const name;
@@ -151,6 +166,7 @@ constexpr hook list[] = {
     hook::wrap<realloc>(),
     hook::wrap<calloc>(),
     hook::wrap<cfree>(),
+    hook::wrap<posix_memalign>(),
     hook::wrap<dlopen>(),
     hook::wrap<dlclose>(),
 };
