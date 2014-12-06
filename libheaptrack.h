@@ -23,4 +23,5 @@ extern "C" {
 void heaptrack_init();
 void heaptrack_malloc(void *ptr, size_t size);
 void heaptrack_free(void *ptr);
+void heaptrack_invalidate_module_cache();
 }

@@ -60,6 +60,36 @@ struct free
     }
 };
 
+struct dlopen
+{
+    static constexpr auto name = "dlopen";
+    static constexpr auto original = &::dlopen;
+
+    static void* hook(const char *filename, int flag)
+    {
+        auto ret = original(filename, flag);
+        if (ret) {
+            heaptrack_invalidate_module_cache();
+        }
+        return ret;
+    }
+};
+
+struct dlclose
+{
+    static constexpr auto name = "dlclose";
+    static constexpr auto original = &::dlclose;
+
+    static int hook(void *handle)
+    {
+        auto ret = original(handle);
+        if (!ret) {
+            heaptrack_invalidate_module_cache();
+        }
+        return ret;
+    }
+};
+
 struct hook
 {
     const char * const name;
@@ -72,17 +102,18 @@ struct hook
         static_assert(std::is_convertible<decltype(&Hook::hook), decltype(Hook::original)>::value,
                     "hook is not compatible to original function");
         // TODO: why is (void*) cast allowed, but not reinterpret_cast?
-        return {Hook::name, (void*)(Hook::hook)};
+        return {Hook::name, (void*)(&Hook::hook)};
     }
 };
 
 constexpr hook list[] = {
     hook::wrap<malloc>(),
-    hook::wrap<free>()
+    hook::wrap<free>(),
+    hook::wrap<dlopen>(),
+    hook::wrap<dlclose>(),
 };
 
 }
-
 
 template<typename T, ElfW(Sxword) AddrTag, ElfW(Sxword) SizeTag>
 struct elftable

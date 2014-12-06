@@ -405,6 +405,10 @@ void heaptrack_free(void* ptr)
     }
 }
 
+void heaptrack_invalidate_module_cache()
+{
+    moduleCacheDirty = true;
+}
 
 /// TODO: memalign, pvalloc, ...?
 
