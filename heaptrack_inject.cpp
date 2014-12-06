@@ -60,6 +60,17 @@ struct free
     }
 };
 
+struct hook
+{
+    const char * const name;
+    void* address;
+};
+
+const hook list[] = {
+    {malloc::name, reinterpret_cast<void*>(&malloc::hook)},
+    {free::name, reinterpret_cast<void*>(&free::hook)},
+};
+
 }
 
 
@@ -100,11 +111,12 @@ void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base)
     for (auto rela = jmprels.table; rela < relaend; rela++) {
         auto relsymidx = ELF64_R_SYM(rela->r_info);
         const char *relsymname = strings.table + symbols.table[relsymidx].st_name;
-        auto addr = rela->r_offset + base;
-        if (!strcmp(hooks::malloc::name, relsymname)) {
-            *reinterpret_cast<hooks::malloc::Signature*>(addr) = &hooks::malloc::hook;
-        } else if (!strcmp(hooks::free::name, relsymname)) {
-            *reinterpret_cast<hooks::free::Signature*>(addr) = &hooks::free::hook;
+        auto addr = reinterpret_cast<void**>(rela->r_offset + base);
+        for (const auto& hook : hooks::list) {
+            if (!strcmp(hook.name, relsymname)) {
+                *addr = hook.address;
+                break;
+            }
         }
     }
 }
