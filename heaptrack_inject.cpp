@@ -31,21 +31,37 @@
 
 namespace {
 
-auto original_malloc = &malloc;
-auto original_free = &free;
+namespace hooks {
 
-void* overwrite_malloc(size_t size)
+struct malloc
 {
-    auto ptr = original_malloc(size);
-    heaptrack_malloc(ptr, size);
-    return ptr;
+    static constexpr auto name = "malloc";
+    static constexpr auto original = &::malloc;
+    using Signature = void* (*) (size_t);
+
+    static void* hook(size_t size)
+    {
+        auto ptr = original(size);
+        heaptrack_malloc(ptr, size);
+        return ptr;
+    }
+};
+
+struct free
+{
+    static constexpr auto name = "free";
+    static constexpr auto original = &::free;
+    using Signature = void (*) (void*);
+
+    static void hook(void *ptr)
+    {
+        heaptrack_free(ptr);
+        original(ptr);
+    }
+};
+
 }
 
-void overwrite_free(void* ptr)
-{
-    heaptrack_free(ptr);
-    original_free(ptr);
-}
 
 template<typename T, ElfW(Sxword) AddrTag, ElfW(Sxword) SizeTag>
 struct elftable
@@ -85,10 +101,10 @@ void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base)
         auto relsymidx = ELF64_R_SYM(rela->r_info);
         const char *relsymname = strings.table + symbols.table[relsymidx].st_name;
         auto addr = rela->r_offset + base;
-        if (!strcmp("malloc", relsymname)) {
-            *reinterpret_cast<void*(**)(size_t)>(addr) = &overwrite_malloc;
-        } else if (!strcmp("free", relsymname)) {
-            *reinterpret_cast<void(**)(void*)>(addr) = &overwrite_free;
+        if (!strcmp(hooks::malloc::name, relsymname)) {
+            *reinterpret_cast<hooks::malloc::Signature*>(addr) = &hooks::malloc::hook;
+        } else if (!strcmp(hooks::free::name, relsymname)) {
+            *reinterpret_cast<hooks::free::Signature*>(addr) = &hooks::free::hook;
         }
     }
 }
