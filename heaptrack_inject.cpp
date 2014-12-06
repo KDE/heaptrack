@@ -37,7 +37,6 @@ struct malloc
 {
     static constexpr auto name = "malloc";
     static constexpr auto original = &::malloc;
-    using Signature = void* (*) (size_t);
 
     static void* hook(size_t size)
     {
@@ -51,7 +50,6 @@ struct free
 {
     static constexpr auto name = "free";
     static constexpr auto original = &::free;
-    using Signature = void (*) (void*);
 
     static void hook(void *ptr)
     {
@@ -64,11 +62,19 @@ struct hook
 {
     const char * const name;
     void* address;
+
+    template<typename Hook>
+    static constexpr hook wrap()
+    {
+        static_assert(sizeof(&Hook::hook) == sizeof(void*), "Mismatched pointer sizes");
+        // TODO: why is (void*) cast allowed, but not reinterpret_cast?
+        return {Hook::name, (void*)(Hook::hook)};
+    }
 };
 
-const hook list[] = {
-    {malloc::name, reinterpret_cast<void*>(&malloc::hook)},
-    {free::name, reinterpret_cast<void*>(&free::hook)},
+constexpr hook list[] = {
+    hook::wrap<malloc>(),
+    hook::wrap<free>()
 };
 
 }
