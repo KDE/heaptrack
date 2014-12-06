@@ -23,6 +23,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <type_traits>
+
 /**
  * @file heaptrack_inject.cpp
  *
@@ -67,6 +69,8 @@ struct hook
     static constexpr hook wrap()
     {
         static_assert(sizeof(&Hook::hook) == sizeof(void*), "Mismatched pointer sizes");
+        static_assert(std::is_convertible<decltype(&Hook::hook), decltype(Hook::original)>::value,
+                    "hook is not compatible to original function");
         // TODO: why is (void*) cast allowed, but not reinterpret_cast?
         return {Hook::name, (void*)(Hook::hook)};
     }
