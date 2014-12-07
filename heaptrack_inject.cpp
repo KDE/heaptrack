@@ -22,6 +22,7 @@
 #include <link.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/mman.h>
 
 #include <type_traits>
 
@@ -213,6 +214,11 @@ void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base)
         auto addr = reinterpret_cast<void**>(rela->r_offset + base);
         for (const auto& hook : hooks::list) {
             if (!strcmp(hook.name, relsymname)) {
+                // try to make the page read/write accessible, which is hackish
+                // but apparently required for some shared libraries
+                void *page = (void *)((intptr_t)addr & ~(0x1000 - 1));
+                mprotect(page, 0x1000, PROT_READ | PROT_WRITE);
+                // now actually inject our hook
                 *addr = hook.address;
                 break;
             }
@@ -222,14 +228,13 @@ void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base)
 
 int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data)
 {
-    if (strstr(info->dlpi_name, "/ld-linux-x86-64.so") || strstr(info->dlpi_name, "/libheaptrackinject.so")) {
-        /// FIXME: why are these checks required? If I don't filter them out, we'll crash
-        /// when trying to write the malloc symbols found
+    if (strstr(info->dlpi_name, "/libheaptrackinject.so")) {
+        // do not
         return 0;
     }
 
     for (auto phdr = info->dlpi_phdr, end = phdr + info->dlpi_phnum; phdr != end; ++phdr) {
-        if (phdr->p_type == PT_DYNAMIC && (phdr->p_flags & (PF_W | PF_R)) == (PF_W | PF_R)) {
+        if (phdr->p_type == PT_DYNAMIC) {
             try_overwrite_symbols(reinterpret_cast<const ElfW(Dyn) *>(phdr->p_vaddr + info->dlpi_addr),
                                   info->dlpi_addr);
         }
