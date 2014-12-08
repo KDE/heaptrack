@@ -34,6 +34,7 @@
 #include <tuple>
 #include <algorithm>
 #include <cassert>
+#include <iomanip>
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -47,33 +48,42 @@ namespace po = boost::program_options;
 
 namespace {
 
-string formatBytes(size_t bytes_)
+class formatBytes
 {
-    if (bytes_ < 1000) {
-        // no fancy formatting for plain byte values, esp. no .00 factions
-        return to_string(bytes_) + 'B';
+public:
+    formatBytes(size_t bytes)
+        : m_bytes(bytes)
+    {
     }
 
-    static const auto units = {
-        "B",
-        "KB",
-        "MB",
-        "GB",
-        "TB"
-    };
-    auto unit = units.begin();
-    size_t i = 0;
-    double bytes = bytes_;
-    while (i < units.size() - 1 && bytes > 1000.) {
-        bytes /= 1000.;
-        ++i;
-        ++unit;
+    friend ostream& operator<<(ostream& out, const formatBytes data)
+    {
+        if (data.m_bytes < 1000) {
+            // no fancy formatting for plain byte values, esp. no .00 factions
+            return out << data.m_bytes << 'B';
+        }
+
+        static const auto units = {
+            "B",
+            "KB",
+            "MB",
+            "GB",
+            "TB"
+        };
+        auto unit = units.begin();
+        size_t i = 0;
+        double bytes = data.m_bytes;
+        while (i < units.size() - 1 && bytes > 1000.) {
+            bytes /= 1000.;
+            ++i;
+            ++unit;
+        }
+        out << fixed << setprecision(2) << bytes << *unit;
     }
-    // yeah nice how I round to two decimals, right? :D
-    string bytesStr = to_string(bytes);
-    auto dot = bytesStr.find('.');
-    return bytesStr.substr(0, dot + 3) + *unit;
-}
+
+private:
+    size_t m_bytes;
+};
 
 struct AddressInformation
 {
