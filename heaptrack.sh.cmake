@@ -19,7 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 
-if [ "$1" = "--help" -o "$1" = "-h" ]; then
+usage() {
     echo "Usage: $0 [--debug|-d] DEBUGGEE [ARGUMENT]..."
     echo
     echo "A heap memory usage profiler. It uses LD_PRELOAD to track all"
@@ -41,25 +41,44 @@ if [ "$1" = "--help" -o "$1" = "-h" ]; then
     echo "  -d, --debug    Run the debuggee in GDB and heaptrack."
     echo "  ARGUMENT       Any number of arguments that will be passed verbatim"
     echo "                 to the debuggee."
+    echo "  -h, --help     Show this help message and exit."
     echo
     exit 0
-fi
+}
 
 debug=
-if [ "$1" = "--debug" -o "$1" = "-d" ]; then
-    debug=1
-    shift 1;
-fi
+client=
+clientargs=
 
-if [ ! -x "$(which $1)" ]; then
-    echo "Error: Debuggee \"$1\" is not an executable."
-    echo
-    echo "Usage: $0 [--debug|-d] DEBUGGEE [ARGS...]"
-    exit 1
-fi
+while true; do
+    case "$1" in
+        "-d") ;&
+        "--debug")
+            debug=1
+            shift 1
+            ;;
+        "-h") ;&
+        "--help")
+            usage
+            exit 0
+            ;;
+        *)
+            if [ ! -x "$(which $1 2> /dev/null)" ]; then
+                echo "Error: Debuggee \"$1\" is not an executable."
+                echo
+                echo "Usage: $0 [--debug|-d] [--help|-h] DEBUGGEE [ARGS...]"
+                exit 1
+            fi
+            client="$1"
+            shift 1
+            clientargs="$@"
+            break;
+            ;;
+    esac
+done
 
 # put output into current pwd
-output=$(pwd)/heaptrack.$(basename $1).$$
+output=$(pwd)/heaptrack.$(basename $client).$$
 
 # find preload library and interpreter executable using relative paths
 EXE_PATH=$(readlink -f $(dirname $0))
@@ -94,11 +113,11 @@ echo "starting application, this might take some time..."
 echo "output will be written to $output"
 
 if [ -z "$debug" ]; then
-  LD_PRELOAD=$LIBHEAPTRACK DUMP_HEAPTRACK_OUTPUT="$pipe" $@
+  LD_PRELOAD=$LIBHEAPTRACK DUMP_HEAPTRACK_OUTPUT="$pipe" $client $clientargs
 else
   gdb --eval-command="set environment LD_PRELOAD=$LIBHEAPTRACK" \
       --eval-command="set environment DUMP_HEAPTRACK_OUTPUT=$pipe" \
-      --eval-command="run" --args $@
+      --eval-command="run" --args $client $clientargs
 fi
 
 wait $debuggee
