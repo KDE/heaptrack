@@ -289,8 +289,8 @@ struct AccumulatedTraceData
         };
     }
 
-    template<typename T>
-    void printAllocations(T AllocationData::* member, const char* label, const char* sublabel)
+    template<typename T, typename LabelPrinter, typename SubLabelPrinter>
+    void printAllocations(T AllocationData::* member, LabelPrinter label, SubLabelPrinter sublabel)
     {
         if (mergeBacktraces) {
             printMerged(member, label, sublabel);
@@ -299,8 +299,8 @@ struct AccumulatedTraceData
         }
     }
 
-    template<typename T>
-    void printMerged(T AllocationData::* member, const char* label, const char* sublabel)
+    template<typename T, typename LabelPrinter, typename SubLabelPrinter>
+    void printMerged(T AllocationData::* member, LabelPrinter label, SubLabelPrinter sublabel)
     {
         auto sortOrder = [member] (const AllocationData& l, const AllocationData& r) {
             return l.*member > r.*member;
@@ -311,8 +311,7 @@ struct AccumulatedTraceData
             if (!(allocation.*member)) {
                 break;
             }
-            printf(label, allocation.allocations, formatBytes(allocation.allocated).c_str(),
-                   formatBytes(allocation.leaked).c_str(), formatBytes(allocation.peak).c_str());
+            label(allocation);
             printIp(allocation.ipIndex, cout);
 
             sort(allocation.traces.begin(), allocation.traces.end(), sortOrder);
@@ -320,8 +319,7 @@ struct AccumulatedTraceData
             const size_t subTracesToPrint = 5;
             for (size_t j = 0; j < min(subTracesToPrint, allocation.traces.size()); ++j) {
                 const auto& trace = allocation.traces[j];
-                printf(sublabel, trace.allocations, formatBytes(trace.allocated).c_str(),
-                       formatBytes(trace.leaked).c_str(), formatBytes(trace.peak).c_str());
+                sublabel(trace);
                 handled += trace.*member;
                 printBacktrace(trace.traceIndex, cout, 2, true);
             }
@@ -338,8 +336,8 @@ struct AccumulatedTraceData
         }
     }
 
-    template<typename T>
-    void printUnmerged(T AllocationData::* member, const char* label)
+    template<typename T, typename LabelPrinter>
+    void printUnmerged(T AllocationData::* member, LabelPrinter label)
     {
         sort(allocations.begin(), allocations.end(),
             [member] (const Allocation& l, const Allocation &r) {
@@ -350,8 +348,7 @@ struct AccumulatedTraceData
             if (!(allocation.*member)) {
                 break;
             }
-            printf(label, allocation.allocations, formatBytes(allocation.allocated).c_str(),
-                   formatBytes(allocation.leaked).c_str(), formatBytes(allocation.peak).c_str());
+            label(allocation);
             printBacktrace(allocation.traceIndex, cout, 1);
             cout << '\n';
         }
@@ -908,17 +905,21 @@ int main(int argc, char** argv)
     if (printAllocs) {
         // sort by amount of allocations
         cout << "MOST CALLS TO ALLOCATION FUNCTIONS\n";
-        data.printAllocations(&AllocationData::allocations,
-                              "%1$lu calls to allocation functions with %4$s peak consumption from\n",
-                              "  %1$lu calls with %4$s peak consumption from: \n");
+        data.printAllocations(&AllocationData::allocations, [] (const AllocationData& data) {
+            cout << data.allocations << " calls to allocation functions with " << formatBytes(data.peak) << " peak consumption from\n";
+        }, [] (const AllocationData& data) {
+            cout << data.allocations << " calls with " << formatBytes(data.peak) << " peak consumption from:\n";
+        });
         cout << endl;
     }
 
     if (printOverallAlloc) {
         cout << "MOST BYTES ALLOCATED OVER TIME (ignoring deallocations)\n";
-        data.printAllocations(&AllocationData::allocated,
-                              "%2$s over %1$lu calls allocated\n",
-                              "  %2$s over %1$lu calls from:\n");
+        data.printAllocations(&AllocationData::allocated, [] (const AllocationData& data) {
+            cout << formatBytes(data.allocated) << " allocated over " << data.allocations << " calls from\n";
+        }, [] (const AllocationData& data) {
+            cout << formatBytes(data.allocated) << " allocated over " << data.allocations << " calls from:\n";
+        });
         cout << endl;
     }
 
@@ -935,17 +936,21 @@ int main(int argc, char** argv)
                     " For an accurate overview, disable backtrace merging.\n";
         }
 
-        data.printAllocations(&AllocationData::peak,
-                              "%4$s peak memory consumed over %1$lu calls from\n",
-                              "  %4$s over %1$lu calls from:\n");
+        data.printAllocations(&AllocationData::peak, [] (const AllocationData& data) {
+            cout << formatBytes(data.peak) << " peak memory consumed over " << data.allocations << " calls from\n";
+        }, [] (const AllocationData& data) {
+            cout << formatBytes(data.peak) << " consumed over " << data.allocations << " calls from:\n";
+        });
     }
 
     if (printLeaks) {
         // sort by amount of leaks
         cout << "MEMORY LEAKS\n";
-        data.printAllocations(&AllocationData::leaked,
-                              "%3$s leaked over %1$lu calls from\n",
-                              "  %3$s over %1$lu calls from:\n");
+        data.printAllocations(&AllocationData::leaked, [] (const AllocationData& data) {
+            cout << formatBytes(data.leaked) << " leaked over " << data.allocations << " calls from\n";
+        }, [] (const AllocationData& data) {
+            cout << formatBytes(data.leaked) << " leaked over " << data.allocations << " calls from:\n";
+        });
         cout << endl;
     }
 
