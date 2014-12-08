@@ -306,7 +306,7 @@ struct AccumulatedTraceData
                 // we just set it to 1 for the exe, which seems to work
                 addressStart = 1;
             }
-            backtrace_fileline_initialize(state, addressStart + isExe, isExe, errorHandler, &data);
+            backtrace_fileline_initialize(state, addressStart, isExe, errorHandler, &data);
         }
 
         m_backtraceStates.insert(it, make_pair(fileName, state));
