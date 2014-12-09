@@ -332,6 +332,8 @@ void heaptrack_init(const char *outputFileName_, void (*initCallbackBefore) (), 
     // cleanup environment to prevent tracing of child apps
     unsetenv("DUMP_HEAPTRACK_OUTPUT");
 
+    moduleCacheDirty.store(true);
+
     // print a backtrace in every interval
     data.store(new Data);
 
