@@ -158,7 +158,6 @@ struct hook
         static_assert(sizeof(&Hook::hook) == sizeof(void*), "Mismatched pointer sizes");
         static_assert(std::is_convertible<decltype(&Hook::hook), decltype(Hook::original)>::value,
                       "hook is not compatible to original function");
-        static_assert(&Hook::hook != Hook::original, "Recursion detected");
         // TODO: why is (void*) cast allowed, but not reinterpret_cast?
         return {Hook::name, (void*)(&Hook::hook), (void*)(Hook::original)};
     }
