@@ -33,22 +33,17 @@ namespace {
 
 namespace hooks {
 
-template<typename SignatureT>
+template<typename SignatureT, typename Base>
 struct hook
 {
-    hook(const char* const name)
-        : name(name)
-    {}
-
     using Signature = SignatureT*;
     Signature original = nullptr;
 
-    const char * const name;
     void init()
     {
-        auto ret = dlsym(RTLD_NEXT, name);
+        auto ret = dlsym(RTLD_NEXT, Base::identifier);
         if (!ret) {
-            fprintf(stderr, "Could not find original function %s\n", name);
+            fprintf(stderr, "Could not find original function %s\n", Base::identifier);
             abort();
         }
         original = reinterpret_cast<Signature>(ret);
@@ -66,16 +61,19 @@ struct hook
     }
 };
 
-hook<decltype(::malloc)> malloc{"malloc"};
-hook<decltype(::free)> free{"free"};
-hook<decltype(::calloc)> calloc{"calloc"};
-hook<decltype(::cfree)> cfree{"cfree"};
-hook<decltype(::realloc)> realloc{"realloc"};
-hook<decltype(::posix_memalign)> posix_memalign{"posix_memalign"};
-hook<decltype(::valloc)> valloc{"valloc"};
-hook<decltype(::aligned_alloc)> aligned_alloc{"aligned_alloc"};
-hook<decltype(::dlopen)> dlopen{"dlopen"};
-hook<decltype(::dlclose)> dlclose{"dlclose"};
+#define HOOK(name) struct name ## _t : public hook<decltype(::name), name ## _t> { \
+    static constexpr const char* identifier = #name; } name
+
+HOOK(malloc);
+HOOK(free);
+HOOK(calloc);
+HOOK(cfree);
+HOOK(realloc);
+HOOK(posix_memalign);
+HOOK(valloc);
+HOOK(aligned_alloc);
+HOOK(dlopen);
+HOOK(dlclose);
 
 /**
  * Dummy implementation, since the call to dlsym from findReal triggers a call to calloc.
