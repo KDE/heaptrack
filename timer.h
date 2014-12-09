@@ -47,6 +47,19 @@ public:
                     __FILE__, __LINE__, strerror(errno));
             return;
         }
+
+        /* Start/Stop the timer */
+        itimerspec its;
+        its.it_value.tv_sec = 0;
+        its.it_value.tv_nsec = 10 * 1000 * 1000;
+        its.it_interval.tv_sec = its.it_value.tv_sec;
+        its.it_interval.tv_nsec = its.it_value.tv_nsec;
+
+        if (timer_settime(m_timerId, 0, &its, nullptr) == -1) {
+            fprintf(stderr, "Failed to call timer_settime in %s:%d: %s",
+                    __FILE__, __LINE__, strerror(errno));
+            return;
+        }
     }
 
     ~Timer()
@@ -57,22 +70,6 @@ public:
     size_t timesElapsed() const
     {
         return m_timesElapsed;
-    }
-
-    void setInterval(time_t seconds, long long nanoseconds)
-    {
-        /* Start/Stop the timer */
-        itimerspec its;
-        its.it_value.tv_sec = seconds;
-        its.it_value.tv_nsec = nanoseconds;
-        its.it_interval.tv_sec = seconds;
-        its.it_interval.tv_nsec = nanoseconds;
-
-        if (timer_settime(m_timerId, 0, &its, nullptr) == -1) {
-            fprintf(stderr, "Failed to call timer_settime in %s:%d: %s",
-                    __FILE__, __LINE__, strerror(errno));
-            return;
-        }
     }
 
 private:

@@ -50,6 +50,12 @@ struct TraceEdge
 class TraceTree
 {
 public:
+    void clear()
+    {
+        m_root.children.clear();
+        m_index = 1;
+    }
+
     /**
      * Index the data in @p trace and return the index of the last instruction pointer.
      *
