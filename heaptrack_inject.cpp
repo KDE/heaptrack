@@ -35,6 +35,8 @@
 
 namespace {
 
+void overwrite_symbols();
+
 namespace hooks {
 
 struct malloc
@@ -109,8 +111,8 @@ struct dlopen
     {
         auto ret = original(filename, flag);
         if (ret) {
-            // TODO: we probably need to overwrite the symbols in the new modules as well
             heaptrack_invalidate_module_cache();
+            overwrite_symbols();
         }
         return ret;
     }
@@ -249,6 +251,11 @@ int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data)
     return 0;
 }
 
+void overwrite_symbols()
+{
+    dl_iterate_phdr(&iterate_phdrs, nullptr);
+}
+
 }
 
 extern "C" {
@@ -256,7 +263,7 @@ extern "C" {
 void heaptrack_inject(const char *outputFileName)
 {
     heaptrack_init(outputFileName, [] () {
-        dl_iterate_phdr(&iterate_phdrs, nullptr);
+        overwrite_symbols();
     }, [] () {
         auto out = heaptrack_output_file();
         fprintf(out, "A BEGIN_MALLOC_INFO\n");
