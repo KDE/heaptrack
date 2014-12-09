@@ -13,6 +13,8 @@ if (NOT HAVE_UNW_BACKTRACE)
     message(FATAL_ERROR "Your libunwind version is apparently too old and does not have the unw_backtrace function.")
 endif()
 
+check_library_exists (${LIBUNWIND_LIBRARY} _ULx86_64_set_cache_log_size "" HAVE_UNW_SET_CACHE_LOG_SIZE)
+
 include (CheckCXXSourceCompiles)
 check_cxx_source_compiles(
     "#include <unordered_map>

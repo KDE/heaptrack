@@ -333,9 +333,11 @@ void heaptrack_init(const char *outputFileName, void (*initCallbackBefore) (), v
         if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
             fprintf(stderr, "Failed to enable per-thread libunwind caching.\n");
         }
+#if HAVE_UNW_SET_CACHE_LOG_SIZE
         if (unw_set_cache_log_size(unw_local_addr_space, 10)) {
             fprintf(stderr, "Failed to set libunwind cache size.\n");
         }
+#endif
 
         data.reset(new Data(outputFileName, stopCallback));
 
