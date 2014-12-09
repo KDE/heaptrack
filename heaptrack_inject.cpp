@@ -150,6 +150,7 @@ struct hook
 {
     const char * const name;
     void* address;
+    void* originalAddress;
 
     template<typename Hook>
     static constexpr hook wrap()
@@ -159,7 +160,7 @@ struct hook
                       "hook is not compatible to original function");
         static_assert(&Hook::hook != Hook::original, "Recursion detected");
         // TODO: why is (void*) cast allowed, but not reinterpret_cast?
-        return {Hook::name, (void*)(&Hook::hook)};
+        return {Hook::name, (void*)(&Hook::hook), (void*)(Hook::original)};
     }
 };
 
@@ -199,7 +200,7 @@ using elf_string_table = elftable<const char, DT_STRTAB, DT_STRSZ>;
 using elf_jmprel_table = elftable<ElfW(Rela), DT_JMPREL, DT_PLTRELSZ>;
 using elf_symbol_table = elftable<ElfW(Sym), DT_SYMTAB, DT_SYMENT>;
 
-void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base)
+void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base, const bool restore)
 {
     elf_symbol_table symbols;
     elf_jmprel_table jmprels;
@@ -220,8 +221,13 @@ void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base)
                 // but apparently required for some shared libraries
                 void *page = (void *)((intptr_t)addr & ~(0x1000 - 1));
                 mprotect(page, 0x1000, PROT_READ | PROT_WRITE);
-                // now actually inject our hook
-                *addr = hook.address;
+                if (restore) {
+                    // restore the original address on shutdown
+                    *addr = hook.originalAddress;
+                } else {
+                    // now actually inject our hook
+                    *addr = hook.address;
+                }
                 break;
             }
         }
@@ -238,7 +244,7 @@ int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data)
     for (auto phdr = info->dlpi_phdr, end = phdr + info->dlpi_phnum; phdr != end; ++phdr) {
         if (phdr->p_type == PT_DYNAMIC) {
             try_overwrite_symbols(reinterpret_cast<const ElfW(Dyn) *>(phdr->p_vaddr + info->dlpi_addr),
-                                  info->dlpi_addr);
+                                  info->dlpi_addr, data != nullptr);
         }
     }
     return 0;
@@ -257,6 +263,10 @@ void heaptrack_inject(const char *outputFileName)
         fprintf(out, "A BEGIN_MALLOC_INFO\n");
         malloc_info(0, out);
         fprintf(out, "\nA END_MALLOC_INFO\n");
+    }, [] () {
+        printf("shutting down heaptrack\n");
+        bool do_shutdown = true;
+        dl_iterate_phdr(&iterate_phdrs, &do_shutdown);
     });
 }
 

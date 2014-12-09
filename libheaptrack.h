@@ -20,7 +20,9 @@
 #include <cstdio>
 
 extern "C" {
-void heaptrack_init(const char *outputFileName, void (*initCallbackBefore) (), void (*initCallbackAfter) ());
+void heaptrack_init(const char *outputFileName,
+                    void (*initCallbackBefore) (), void (*initCallbackAfter) (),
+                    void (*stopCallback) ());
 void heaptrack_stop();
 FILE* heaptrack_output_file();
 void heaptrack_malloc(void *ptr, size_t size);

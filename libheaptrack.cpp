@@ -131,7 +131,8 @@ void child_fork();
 
 struct Data
 {
-    Data(const char *outputFileName_)
+    Data(const char *outputFileName_, void (*stopCallback)())
+        : stopCallback(stopCallback)
     {
         pthread_atfork(&prepare_fork, &parent_fork, &child_fork);
 
@@ -277,6 +278,8 @@ struct Data
     size_t lastTimerElapsed = 0;
     Timer timer;
 
+    void (*stopCallback)() = nullptr;
+
 #ifdef DEBUG_MALLOC_PTRS
     unordered_set<void*> known;
 #endif
@@ -311,7 +314,8 @@ void child_fork()
 }
 extern "C" {
 
-void heaptrack_init(const char *outputFileName, void (*initCallbackBefore) (), void (*initCallbackAfter) ())
+void heaptrack_init(const char *outputFileName, void (*initCallbackBefore) (), void (*initCallbackAfter) (),
+                    void (*stopCallback) ())
 {
     HandleGuard guard;
 
@@ -333,7 +337,7 @@ void heaptrack_init(const char *outputFileName, void (*initCallbackBefore) (), v
             fprintf(stderr, "Failed to set libunwind cache size.\n");
         }
 
-        data.reset(new Data(outputFileName));
+        data.reset(new Data(outputFileName, stopCallback));
 
         if (initCallbackAfter) {
             initCallbackAfter();
@@ -344,7 +348,9 @@ void heaptrack_init(const char *outputFileName, void (*initCallbackBefore) (), v
 void heaptrack_stop()
 {
     HandleGuard guard;
-    printf("stopping heaptrack\n");
+    if (data && data->stopCallback) {
+        data->stopCallback();
+    }
     data.reset(nullptr);
 }
 
