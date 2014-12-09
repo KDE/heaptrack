@@ -181,7 +181,10 @@ struct Data
 
     void updateModuleCache()
     {
-        fputs("m -\n", out);
+        if (fputs("m -\n", out) == EOF) {
+            heaptrack_stop();
+            return;
+        }
         dl_iterate_phdr(dlopen_notify_callback, this);
         moduleCacheDirty = false;
     }
@@ -194,14 +197,23 @@ struct Data
             fileName = "x";
         }
 
-        fprintf(data->out, "m %s %lx", fileName, info->dlpi_addr);
+        if (fprintf(data->out, "m %s %lx", fileName, info->dlpi_addr) < 0) {
+            heaptrack_stop();
+            return 1;
+        }
         for (int i = 0; i < info->dlpi_phnum; i++) {
             const auto& phdr = info->dlpi_phdr[i];
             if (phdr.p_type == PT_LOAD) {
-                fprintf(data->out, " %lx %lx", phdr.p_vaddr, phdr.p_memsz);
+                if (fprintf(data->out, " %lx %lx", phdr.p_vaddr, phdr.p_memsz) < 0) {
+                    heaptrack_stop();
+                    return 1;
+                }
             }
         }
-        fputc('\n', data->out);
+        if (fputc('\n', data->out) == EOF) {
+            heaptrack_stop();
+            return 1;
+        }
 
         return 0;
     }
@@ -216,7 +228,10 @@ struct Data
         LockGuard lock(out);
         if (lastTimerElapsed != timer.timesElapsed()) {
             lastTimerElapsed = timer.timesElapsed();
-            fprintf(out, "c %lx\n", lastTimerElapsed);
+            if (fprintf(out, "c %lx\n", lastTimerElapsed) < 0) {
+                heaptrack_stop();
+                return;
+            }
         }
         if (moduleCacheDirty) {
             updateModuleCache();
@@ -229,7 +244,10 @@ struct Data
         known.insert(ptr);
 #endif
 
-        fprintf(out, "+ %lx %lx %lx\n", size, index, reinterpret_cast<uintptr_t>(ptr));
+        if (fprintf(out, "+ %lx %lx %lx\n", size, index, reinterpret_cast<uintptr_t>(ptr)) < 0) {
+            heaptrack_stop();
+            return;
+        }
     }
 
     void handleFree(void* ptr)
@@ -242,7 +260,10 @@ struct Data
         known.erase(it);
 #endif
 
-        fprintf(out, "- %lx\n", reinterpret_cast<uintptr_t>(ptr));
+        if (fprintf(out, "- %lx\n", reinterpret_cast<uintptr_t>(ptr)) < 0) {
+            heaptrack_stop();
+            return;
+        }
     }
 
     TraceTree traceTree;
@@ -318,6 +339,13 @@ void heaptrack_init(const char *outputFileName, void (*initCallbackBefore) (), v
             initCallbackAfter();
         }
     });
+}
+
+void heaptrack_stop()
+{
+    HandleGuard guard;
+    printf("stopping heaptrack\n");
+    data.reset(nullptr);
 }
 
 FILE* heaptrack_output_file()

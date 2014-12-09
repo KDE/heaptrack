@@ -248,7 +248,7 @@ int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data)
 
 extern "C" {
 
-void init_heaptrack_inject(const char *outputFileName)
+void heaptrack_inject(const char *outputFileName)
 {
     heaptrack_init(outputFileName, [] () {
         dl_iterate_phdr(&iterate_phdrs, nullptr);

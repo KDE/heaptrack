@@ -21,6 +21,7 @@
 
 extern "C" {
 void heaptrack_init(const char *outputFileName, void (*initCallbackBefore) (), void (*initCallbackAfter) ());
+void heaptrack_stop();
 FILE* heaptrack_output_file();
 void heaptrack_malloc(void *ptr, size_t size);
 void heaptrack_free(void *ptr);

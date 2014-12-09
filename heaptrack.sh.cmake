@@ -136,6 +136,7 @@ trap "rm -f $pipe" EXIT
 output="$output.gz"
 "$INTERPRETER" < $pipe | gzip -c > "$output" &
 debuggee=$!
+trap "kill $debuggee > /dev/null" EXIT
 
 echo "starting application, this might take some time..."
 echo "output will be written to $output"
@@ -150,7 +151,7 @@ else
   else
     gdb -p $pid \
         --eval-command="call (void) dlopen(\"$LIBHEAPTRACK_INJECT\", 0x002)" \
-        --eval-command="call (void) init_heaptrack_inject(\"$pipe\")" \
+        --eval-command="call (void) heaptrack_inject(\"$pipe\")" \
         --eval-command="detach" --eval-command="quit"
   fi
 fi
