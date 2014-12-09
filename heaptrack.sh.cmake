@@ -136,7 +136,7 @@ trap "rm -f $pipe" EXIT
 output="$output.gz"
 "$INTERPRETER" < $pipe | gzip -c > "$output" &
 debuggee=$!
-trap "kill $debuggee > /dev/null" EXIT
+trap "kill $debuggee 2> /dev/null" EXIT
 
 echo "starting application, this might take some time..."
 echo "output will be written to $output"
