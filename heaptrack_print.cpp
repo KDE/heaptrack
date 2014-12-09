@@ -78,7 +78,7 @@ public:
             ++i;
             ++unit;
         }
-        out << fixed << setprecision(2) << bytes << *unit;
+        return out << fixed << setprecision(2) << bytes << *unit;
     }
 
 private:
