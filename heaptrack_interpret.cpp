@@ -24,6 +24,7 @@
  */
 
 #include <iostream>
+#include <sstream>
 #include <unordered_map>
 #include <vector>
 #include <tuple>
@@ -31,7 +32,10 @@
 #include <stdio_ext.h>
 
 #include <cxxabi.h>
+
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include "libbacktrace/backtrace.h"
 #include "linereader.h"
@@ -378,6 +382,22 @@ int main(int /*argc*/, char** /*argv*/)
             const auto ipId = data.addIp(instructionPointer);
             // trace point, map current output index to parent index
             fprintf(stdout, "t %lx %lx\n", ipId, parentIndex);
+        } else if (reader.mode() == 'A') {
+            // we attached, and now have to parse the malloc_info to get some baseline
+            stringstream xml;
+            while (reader.getLine(cin) && reader.mode() != 'A') {
+                xml << reader.line();
+            }
+            boost::property_tree::ptree pt;
+            boost::property_tree::read_xml(xml, pt);
+            size_t current = 0;
+            for (const auto& element : pt.get_child("malloc")) {
+                if (element.first == "system" && element.second.get<string>("<xmlattr>.type") == "current") {
+                    current = element.second.get<size_t>("<xmlattr>.size");
+                    break;
+                }
+            }
+            fprintf(stdout, "A %lx\n", current);
         } else {
             fputs(reader.line().c_str(), stdout);
             fputc('\n', stdout);

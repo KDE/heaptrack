@@ -20,9 +20,10 @@
 #include "libheaptrack.h"
 
 #include <link.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
 #include <sys/mman.h>
+#include <malloc.h>
 
 #include <type_traits>
 
@@ -155,7 +156,8 @@ struct hook
     {
         static_assert(sizeof(&Hook::hook) == sizeof(void*), "Mismatched pointer sizes");
         static_assert(std::is_convertible<decltype(&Hook::hook), decltype(Hook::original)>::value,
-                    "hook is not compatible to original function");
+                      "hook is not compatible to original function");
+        static_assert(&Hook::hook != Hook::original, "Recursion detected");
         // TODO: why is (void*) cast allowed, but not reinterpret_cast?
         return {Hook::name, (void*)(&Hook::hook)};
     }
@@ -228,8 +230,8 @@ void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base)
 
 int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data)
 {
-    if (strstr(info->dlpi_name, "/libheaptrackinject.so")) {
-        // do not
+    if (strstr(info->dlpi_name, "/libheaptrack_inject.so")) {
+        // prevent infinite recursion: do not overwrite our own symbols
         return 0;
     }
 
@@ -242,13 +244,20 @@ int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data)
     return 0;
 }
 
-struct InitializeInjection
+}
+
+extern "C" {
+
+void init_heaptrack_inject(const char *outputFileName)
 {
-    InitializeInjection()
-    {
+    heaptrack_init(outputFileName, [] () {
         dl_iterate_phdr(&iterate_phdrs, nullptr);
-        heaptrack_init();
-    }
-} initialize;
+    }, [] () {
+        auto out = heaptrack_output_file();
+        fprintf(out, "A BEGIN_MALLOC_INFO\n");
+        malloc_info(0, out);
+        fprintf(out, "\nA END_MALLOC_INFO\n");
+    });
+}
 
 }

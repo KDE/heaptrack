@@ -47,6 +47,7 @@ usage() {
 }
 
 debug=
+pid=
 client=
 clientargs=
 
@@ -62,6 +63,26 @@ while true; do
             usage
             exit 0
             ;;
+        "-p") ;&
+        "--pid")
+            pid=$2
+            if [ -z "$pid" ]; then
+                echo "Missing PID argument."
+                exit 1
+            fi
+            client=$(ps --no-headers -c -o comm -p $pid)
+            if [ -z "$client" ]; then
+                echo "Cannot attach to unknown process with PID $pid."
+                exit 1
+            fi
+            shift 2
+            echo $@
+            if [ ! -z "$@" ]; then
+                echo "You cannot specify a debuggee and a pid at the same time."
+                exit 1
+            fi
+            break
+            ;;
         *)
             if [ ! -x "$(which $1 2> /dev/null)" ]; then
                 echo "Error: Debuggee \"$1\" is not an executable."
@@ -72,7 +93,7 @@ while true; do
             client="$1"
             shift 1
             clientargs="$@"
-            break;
+            break
             ;;
     esac
 done
@@ -92,12 +113,19 @@ if [ ! -f "$INTERPRETER" ]; then
 fi
 INTERPRETER=$(readlink -f "$INTERPRETER")
 
-LIBHEAPTRACK="$EXE_PATH/$LIB_REL_PATH/libheaptrack.so"
-if [ ! -f "$LIBHEAPTRACK" ]; then
-    echo "Could not find heaptrack preload library$LIBHEAPTRACK"
+LIBHEAPTRACK_PRELOAD="$EXE_PATH/$LIB_REL_PATH/libheaptrack_preload.so"
+if [ ! -f "$LIBHEAPTRACK_PRELOAD" ]; then
+    echo "Could not find heaptrack preload library $LIBHEAPTRACK_PRELOAD"
     exit 1
 fi
-LIBHEAPTRACK=$(readlink -f "$LIBHEAPTRACK")
+LIBHEAPTRACK_PRELOAD=$(readlink -f "$LIBHEAPTRACK_PRELOAD")
+
+LIBHEAPTRACK_INJECT="$EXE_PATH/$LIB_REL_PATH/libheaptrack_inject.so"
+if [ ! -f "$LIBHEAPTRACK_INJECT" ]; then
+    echo "Could not find heaptrack inject library $LIBHEAPTRACK_INJECT"
+    exit 1
+fi
+LIBHEAPTRACK_INJECT=$(readlink -f "$LIBHEAPTRACK_INJECT")
 
 # setup named pipe to read data from
 pipe=/tmp/heaptrack_fifo$$
@@ -112,12 +140,19 @@ debuggee=$!
 echo "starting application, this might take some time..."
 echo "output will be written to $output"
 
-if [ -z "$debug" ]; then
-  LD_PRELOAD=$LIBHEAPTRACK DUMP_HEAPTRACK_OUTPUT="$pipe" $client $clientargs
+if [ -z "$debug" ] && [ -z "$pid" ]; then
+  LD_PRELOAD=$LIBHEAPTRACK_PRELOAD DUMP_HEAPTRACK_OUTPUT="$pipe" $client $clientargs
 else
-  gdb --eval-command="set environment LD_PRELOAD=$LIBHEAPTRACK" \
-      --eval-command="set environment DUMP_HEAPTRACK_OUTPUT=$pipe" \
-      --eval-command="run" --args $client $clientargs
+  if [ -z "$pid" ]; then
+    gdb --eval-command="set environment LD_PRELOAD=$LIBHEAPTRACK_PRELOAD" \
+        --eval-command="set environment DUMP_HEAPTRACK_OUTPUT=$pipe" \
+        --eval-command="run" --args $client $clientargs
+  else
+    gdb -p $pid \
+        --eval-command="call (void) dlopen(\"$LIBHEAPTRACK_INJECT\", 0x002)" \
+        --eval-command="call (void) init_heaptrack_inject(\"$pipe\")" \
+        --eval-command="detach" --eval-command="quit"
+  fi
 fi
 
 wait $debuggee

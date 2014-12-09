@@ -46,12 +46,10 @@ include_directories(
     ${LIBUNWIND_INCLUDE_DIR}
 )
 
-add_library(libheaptrack SHARED libheaptrack.cpp)
-# the final .so should be named libheaptrack, not liblibheaptrack
-set_target_properties(libheaptrack PROPERTIES OUTPUT_NAME heaptrack)
-target_link_libraries(libheaptrack ${CMAKE_DL_LIBS} backtrace rt)
-add_library(heaptrackinject SHARED heaptrack_inject.cpp)
-target_link_libraries(heaptrackinject PRIVATE libheaptrack)
+add_library(heaptrack_preload MODULE heaptrack_preload.cpp libheaptrack.cpp)
+target_link_libraries(heaptrack_preload PRIVATE ${CMAKE_DL_LIBS} backtrace rt)
+add_library(heaptrack_inject MODULE heaptrack_inject.cpp libheaptrack.cpp)
+target_link_libraries(heaptrack_inject PRIVATE ${CMAKE_DL_LIBS} backtrace rt)
 
 add_executable(heaptrack_interpret heaptrack_interpret.cpp)
 target_link_libraries(heaptrack_interpret backtrace)
@@ -70,11 +68,12 @@ file(RELATIVE_PATH LIBEXEC_REL_PATH
 
 file(RELATIVE_PATH LIB_REL_PATH
     "${CMAKE_INSTALL_PREFIX}/${BIN_INSTALL_DIR}"
-    "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}")
+    "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/heaptrack")
 
 configure_file(heaptrack.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/heaptrack @ONLY)
 
 install(TARGETS heaptrack_print RUNTIME DESTINATION ${BIN_INSTALL_DIR})
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/heaptrack DESTINATION ${BIN_INSTALL_DIR})
-install(TARGETS libheaptrack LIBRARY DESTINATION ${LIB_INSTALL_DIR})
 install(TARGETS heaptrack_interpret RUNTIME DESTINATION ${LIBEXEC_INSTALL_DIR})
+install(TARGETS heaptrack_inject LIBRARY DESTINATION ${LIB_INSTALL_DIR}/heaptrack/)
+install(TARGETS heaptrack_preload LIBRARY DESTINATION ${LIB_INSTALL_DIR}/heaptrack/)

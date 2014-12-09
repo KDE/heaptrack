@@ -503,7 +503,9 @@ struct AccumulatedTraceData
                 }
                 auto ip = activeAllocations.find(ptr);
                 if (ip == activeAllocations.end()) {
-                    cerr << "unknown pointer in line: " << reader.line() << endl;
+                    if (!fromAttached) {
+                        cerr << "unknown pointer in line: " << reader.line() << endl;
+                    }
                     continue;
                 }
                 const auto info = ip->second;
@@ -511,7 +513,9 @@ struct AccumulatedTraceData
 
                 auto& allocation = findAllocation(info.traceIndex);
                 if (!allocation.allocations || allocation.leaked < info.size) {
-                    cerr << "inconsistent allocation info, underflowed allocations of " << info.traceIndex << endl;
+                    if (!fromAttached) {
+                        cerr << "inconsistent allocation info, underflowed allocations of " << info.traceIndex << endl;
+                    }
                     allocation.leaked = 0;
                     allocation.allocations = 0;
                 } else {
@@ -537,6 +541,15 @@ struct AccumulatedTraceData
                 if (massifOut.is_open()) {
                     writeMassifHeader(reader.line().c_str() + 2);
                 }
+            } else if (reader.mode() == 'A') {
+                size_t current = 0;
+                if (!(reader >> current)) {
+                    cerr << "Failed to read current size after attaching." << endl;
+                    continue;
+                }
+                leaked = current;
+                peak = current;
+                fromAttached = true;
             } else {
                 cerr << "failed to parse line: " << reader.line() << endl;
             }
@@ -557,6 +570,7 @@ struct AccumulatedTraceData
     bool shortenTemplates = false;
     bool mergeBacktraces = true;
     bool printHistogram = false;
+    bool fromAttached = false;
     ofstream massifOut;
     double massifThreshold = 1;
     size_t massifDetailedFreq = 1;

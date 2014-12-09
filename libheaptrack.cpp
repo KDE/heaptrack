@@ -29,7 +29,6 @@
 #include <cstdlib>
 #include <stdio_ext.h>
 #include <fcntl.h>
-#include <dlfcn.h>
 #include <link.h>
 
 #include <atomic>
@@ -53,28 +52,6 @@
 using namespace std;
 
 namespace {
-
-using malloc_t = void* (*) (size_t);
-using free_t = void (*) (void*);
-using cfree_t = void (*) (void*);
-using realloc_t = void* (*) (void*, size_t);
-using calloc_t = void* (*) (size_t, size_t);
-using posix_memalign_t = int (*) (void **, size_t, size_t);
-using valloc_t = void* (*) (size_t);
-using aligned_alloc_t = void* (*) (size_t, size_t);
-using dlopen_t = void* (*) (const char*, int);
-using dlclose_t = int (*) (void*);
-
-malloc_t real_malloc = nullptr;
-free_t real_free = nullptr;
-cfree_t real_cfree = nullptr;
-realloc_t real_realloc = nullptr;
-calloc_t real_calloc = nullptr;
-posix_memalign_t real_posix_memalign = nullptr;
-valloc_t real_valloc = nullptr;
-aligned_alloc_t real_aligned_alloc = nullptr;
-dlopen_t real_dlopen = nullptr;
-dlclose_t real_dlclose = nullptr;
 
 // threadsafe stuff
 atomic<bool> moduleCacheDirty(true);
@@ -119,12 +96,6 @@ private:
 
 thread_local bool HandleGuard::inHandler = false;
 
-string env(const char* variable)
-{
-    const char* value = getenv(variable);
-    return value ? string(value) : string();
-}
-
 void writeExe(FILE* out)
 {
     const int BUF_SIZE = 1023;
@@ -160,11 +131,14 @@ void child_fork();
 
 struct Data
 {
-    Data()
+    Data(const char *outputFileName_)
     {
         pthread_atfork(&prepare_fork, &parent_fork, &child_fork);
 
-        string outputFileName = env("DUMP_HEAPTRACK_OUTPUT");
+        string outputFileName;
+        if (outputFileName_) {
+            outputFileName.assign(outputFileName_);
+        }
         if (outputFileName.empty()) {
             // env var might not be set when linked directly into an executable
             outputFileName = "heaptrack.$$";
@@ -192,7 +166,6 @@ struct Data
 
         // cleanup environment to prevent tracing of child apps
         unsetenv("DUMP_HEAPTRACK_OUTPUT");
-        unsetenv("LD_PRELOAD");
 
         // print a backtrace in every interval
         timer.setInterval(0, 1000 * 1000 * 10);
@@ -314,61 +287,23 @@ void child_fork()
     HandleGuard::inHandler = true;
 }
 
-template<typename T>
-T findReal(const char* name)
-{
-    auto ret = dlsym(RTLD_NEXT, name);
-    if (!ret) {
-        fprintf(stderr, "Could not find original function %s\n", name);
-        abort();
-    }
-    return reinterpret_cast<T>(ret);
 }
+extern "C" {
 
-/**
- * Dummy implementation, since the call to dlsym from findReal triggers a call to calloc.
- *
- * This is only called at startup and will eventually be replaced by the "proper" calloc implementation.
- */
-void* dummy_calloc(size_t num, size_t size)
+void heaptrack_init(const char *outputFileName, void (*initCallbackBefore) (), void (*initCallbackAfter) ())
 {
-    const size_t MAX_SIZE = 1024;
-    static char* buf[MAX_SIZE];
-    static size_t offset = 0;
-    if (!offset) {
-        memset(buf, 0, MAX_SIZE);
-    }
-    size_t oldOffset = offset;
-    offset += num * size;
-    if (offset >= MAX_SIZE) {
-        fprintf(stderr, "failed to initialize, dummy calloc buf size exhausted: %lu requested, %lu available\n", offset, MAX_SIZE);
-        abort();
-    }
-    return buf + oldOffset;
-}
+    HandleGuard guard;
 
-void init()
-{
     static once_flag once;
-    call_once(once, [] {
-        if (data || HandleGuard::inHandler) {
+    call_once(once, [=] {
+        if (data) {
             fprintf(stderr, "initialization recursion detected\n");
             abort();
         }
 
-        HandleGuard guard;
-
-        real_calloc = &dummy_calloc;
-        real_calloc = findReal<calloc_t>("calloc");
-        real_dlopen = findReal<dlopen_t>("dlopen");
-        real_dlclose = findReal<dlclose_t>("dlclose");
-        real_malloc = findReal<malloc_t>("malloc");
-        real_free = findReal<free_t>("free");
-        real_cfree = findReal<cfree_t>("cfree");
-        real_realloc = findReal<realloc_t>("realloc");
-        real_posix_memalign = findReal<posix_memalign_t>("posix_memalign");
-        real_valloc = findReal<valloc_t>("valloc");
-        real_aligned_alloc = findReal<aligned_alloc_t>("aligned_alloc");
+        if (initCallbackBefore) {
+            initCallbackBefore();
+        }
 
         if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
             fprintf(stderr, "Failed to enable per-thread libunwind caching.\n");
@@ -377,16 +312,17 @@ void init()
             fprintf(stderr, "Failed to set libunwind cache size.\n");
         }
 
-        data.reset(new Data);
+        data.reset(new Data(outputFileName));
+
+        if (initCallbackAfter) {
+            initCallbackAfter();
+        }
     });
 }
 
-}
-extern "C" {
-
-void heaptrack_init()
+FILE* heaptrack_output_file()
 {
-    init();
+    return data ? data->out : nullptr;
 }
 
 void heaptrack_malloc(void* ptr, size_t size)
@@ -419,163 +355,6 @@ void heaptrack_realloc(void* ptr_in, size_t size, void* ptr_out)
 void heaptrack_invalidate_module_cache()
 {
     moduleCacheDirty = true;
-}
-
-/// TODO: memalign, pvalloc, ...?
-
-void* malloc(size_t size)
-{
-    if (!real_malloc) {
-        init();
-    }
-
-    void* ptr = real_malloc(size);
-    heaptrack_malloc(ptr, size);
-    return ptr;
-}
-
-void free(void* ptr)
-{
-    if (!real_free) {
-        init();
-    }
-
-    // call handler before handing over the real free implementation
-    // to ensure the ptr is not reused in-between and thus the output
-    // stays consistent
-    heaptrack_free(ptr);
-
-    real_free(ptr);
-}
-
-void* realloc(void* ptr, size_t size)
-{
-    if (!real_realloc) {
-        init();
-    }
-
-    void* ret = real_realloc(ptr, size);
-
-    if (ret && !HandleGuard::inHandler && data) {
-        HandleGuard guard;
-        if (ptr) {
-            data->handleFree(ptr);
-        }
-        data->handleMalloc(ret, size);
-    }
-
-    return ret;
-}
-
-void* calloc(size_t num, size_t size)
-{
-    if (!real_calloc) {
-        init();
-    }
-
-    void* ret = real_calloc(num, size);
-
-    if (ret && !HandleGuard::inHandler && data) {
-        HandleGuard guard;
-        data->handleMalloc(ret, num*size);
-    }
-
-    return ret;
-}
-
-void cfree(void* ptr)
-{
-    if (!real_cfree) {
-        init();
-    }
-
-    // call handler before handing over the real free implementation
-    // to ensure the ptr is not reused in-between and thus the output
-    // stays consistent
-    if (ptr && !HandleGuard::inHandler && data) {
-        HandleGuard guard;
-        data->handleFree(ptr);
-    }
-
-    real_cfree(ptr);
-}
-
-int posix_memalign(void **memptr, size_t alignment, size_t size)
-{
-    if (!real_posix_memalign) {
-        init();
-    }
-
-    int ret = real_posix_memalign(memptr, alignment, size);
-
-    if (!ret && !HandleGuard::inHandler && data) {
-        HandleGuard guard;
-        data->handleMalloc(*memptr, size);
-    }
-
-    return ret;
-}
-
-void* aligned_alloc(size_t alignment, size_t size)
-{
-    if (!real_aligned_alloc) {
-        init();
-    }
-
-    void* ret = real_aligned_alloc(alignment, size);
-
-    if (ret && !HandleGuard::inHandler && data) {
-        HandleGuard guard;
-        data->handleMalloc(ret, size);
-    }
-
-    return ret;
-}
-
-void* valloc(size_t size)
-{
-    if (!real_valloc) {
-        init();
-    }
-
-    void* ret = real_valloc(size);
-
-    if (ret && !HandleGuard::inHandler && data) {
-        HandleGuard guard;
-        data->handleMalloc(ret, size);
-    }
-
-    return ret;
-}
-
-void *dlopen(const char *filename, int flag)
-{
-    if (!real_dlopen) {
-        init();
-    }
-
-    void* ret = real_dlopen(filename, flag);
-
-    if (ret) {
-        moduleCacheDirty = true;
-    }
-
-    return ret;
-}
-
-int dlclose(void *handle)
-{
-    if (!real_dlclose) {
-        init();
-    }
-
-    int ret = real_dlclose(handle);
-
-    if (!ret) {
-        moduleCacheDirty = true;
-    }
-
-    return ret;
 }
 
 }
