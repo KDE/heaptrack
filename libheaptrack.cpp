@@ -36,11 +36,11 @@
 #include <memory>
 #include <unordered_set>
 #include <mutex>
+#include <thread>
 
 #include <boost/algorithm/string/replace.hpp>
 
 #include "tracetree.h"
-#include "timer.h"
 
 /**
  * uncomment this to get extended debug code for known pointers
@@ -166,15 +166,35 @@ void updateModuleCache(FILE* out)
 
 struct Data
 {
+    Data()
+    {
+        timerThread = thread([&] () {
+            using clock = chrono::steady_clock;
+            const auto start = clock::now();
+            while (!stopTimerThread) {
+                // TODO: make interval customizable
+                this_thread::sleep_for(chrono::milliseconds(10));
+                auto elapsed = chrono::duration_cast<chrono::milliseconds>(clock::now() - start);
+
+                if (FILE* out = outputHandle.load()) {
+                    LockGuard lock(out);
+                    if (fprintf(out, "c %lx\n", elapsed.count()) < 0) {
+                        heaptrack_stop();
+                        return;
+                    }
+                }
+            }
+        });
+    }
+
+    ~Data()
+    {
+        stopTimerThread = true;
+        timerThread.join();
+    }
+
     void handleMalloc(void* ptr, size_t size, const Trace &trace, FILE* out)
     {
-        if (lastTimerElapsed != timer.timesElapsed()) {
-            lastTimerElapsed = timer.timesElapsed();
-            if (fprintf(out, "c %lx\n", lastTimerElapsed) < 0) {
-                heaptrack_stop();
-                return;
-            }
-        }
         if (moduleCacheDirty) {
             updateModuleCache(out);
         }
@@ -208,8 +228,8 @@ struct Data
 
     TraceTree traceTree;
 
-    size_t lastTimerElapsed = 0;
-    Timer timer;
+    atomic<bool> stopTimerThread;
+    thread timerThread;
 
 #ifdef DEBUG_MALLOC_PTRS
     unordered_set<void*> known;
@@ -337,7 +357,6 @@ void heaptrack_stop()
     HandleGuard guard;
     if (outputHandle) {
         flockfile(outputHandle.load());
-        printf("shutting down heaptrack!\n");
         fclose(outputHandle.exchange(nullptr));
         delete data.exchange(nullptr);
         if (auto stop = s_stopCallback.exchange(nullptr)) {

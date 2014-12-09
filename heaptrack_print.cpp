@@ -533,7 +533,6 @@ struct AccumulatedTraceData
                 // comment or empty line
                 continue;
             } else if (reader.mode() == 'c') {
-                // TODO: implement time tracking
                 size_t newStamp = 0;
                 if (!(reader >> newStamp)) {
                     cerr << "Failed to read time stamp: " << reader.line() << endl;
@@ -693,7 +692,7 @@ private:
                   << "time_unit: s\n";
     }
 
-    void writeMassifSnapshot(size_t snapshot, bool isLast)
+    void writeMassifSnapshot(size_t timeStamp, bool isLast)
     {
         // the heap consumption we annotate this snapshot with
         size_t heapSize = 0;
@@ -714,7 +713,7 @@ private:
             << "#-----------\n"
             << "snapshot=" << massifSnapshotId << '\n'
             << "#-----------\n"
-            << "time=" << double(snapshot) * 0.01 << '\n'
+            << "time=" << (0.001 * timeStamp) << '\n'
             << "mem_heap_B=" << heapSize << '\n'
             << "mem_heap_extra_B=0\n"
             << "mem_stacks_B=0\n";

@@ -263,7 +263,6 @@ void heaptrack_inject(const char *outputFileName)
         malloc_info(0, out);
         fprintf(out, "\nA END_MALLOC_INFO\n");
     }, [] () {
-        printf("shutting down heaptrack\n");
         bool do_shutdown = true;
         dl_iterate_phdr(&iterate_phdrs, &do_shutdown);
     });
