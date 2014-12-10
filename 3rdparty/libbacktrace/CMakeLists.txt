@@ -199,6 +199,7 @@ add_library (backtrace STATIC
     posix.c
     print.c
     state.c
+    sort.c
 )
 
 target_link_libraries(backtrace ${LIBUNWIND_LIBRARY})

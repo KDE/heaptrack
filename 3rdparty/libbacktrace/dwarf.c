@@ -43,16 +43,6 @@ POSSIBILITY OF SUCH DAMAGE.  */
 #include "backtrace.h"
 #include "internal.h"
 
-//$$$ mikesart added
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch"
-#if defined(__clang__)
-#pragma GCC diagnostic ignored "-Wtautological-constant-out-of-range-compare"
-#endif
-#endif
-//$$$
-
 #if !defined(HAVE_DECL_STRNLEN) || !HAVE_DECL_STRNLEN
 
 /* If strnlen is not declared, provide our own version.  */
@@ -767,10 +757,10 @@ read_attribute (enum dwarf_form form, struct dwarf_buf *buf,
       return 1;
     case DW_FORM_indirect:
       {
-	uint64_t dw_form;
+	uint64_t form;
 
-	dw_form = read_uleb128 (buf);
-	return read_attribute ((enum dwarf_form) dw_form, buf, is_dwarf64,
+	form = read_uleb128 (buf);
+	return read_attribute ((enum dwarf_form) form, buf, is_dwarf64,
 			       version, addrsize, dwarf_str, dwarf_str_size,
 			       val);
       }
@@ -1097,7 +1087,7 @@ read_abbrevs (struct backtrace_state *state, uint64_t abbrev_offset,
 	break;
 
       a.code = code;
-      a.tag = (enum dwarf_tag)(uint32_t)read_uleb128 (&abbrev_buf);
+      a.tag = (enum dwarf_tag) read_uleb128 (&abbrev_buf);
       a.has_children = read_byte (&abbrev_buf);
 
       count_buf = abbrev_buf;
@@ -1144,8 +1134,8 @@ read_abbrevs (struct backtrace_state *state, uint64_t abbrev_offset,
       ++num_abbrevs;
     }
 
-  qsort (abbrevs->abbrevs, abbrevs->num_abbrevs, sizeof (struct abbrev),
-	 abbrev_compare);
+  backtrace_qsort (abbrevs->abbrevs, abbrevs->num_abbrevs,
+		   sizeof (struct abbrev), abbrev_compare);
 
   return 1;
 
@@ -2026,7 +2016,7 @@ read_line_info (struct backtrace_state *state, struct dwarf_data *ddata,
     goto fail;
 
   ln = (struct line *) vec.vec.base;
-  qsort (ln, vec.count, sizeof (struct line), line_compare);
+  backtrace_qsort (ln, vec.count, sizeof (struct line), line_compare);
 
   *lines = ln;
   *lines_count = vec.count;
@@ -2486,9 +2476,9 @@ read_function_entry (struct backtrace_state *state, struct dwarf_data *ddata,
 		    return 0;
 
 		  faddrs = (struct function_addrs *) fvec.vec.base;
-		  qsort (faddrs, fvec.count,
-			 sizeof (struct function_addrs),
-			 function_addrs_compare);
+		  backtrace_qsort (faddrs, fvec.count,
+				   sizeof (struct function_addrs),
+				   function_addrs_compare);
 
 		  function->function_addrs = faddrs;
 		  function->function_addrs_count = fvec.count;
@@ -2565,8 +2555,8 @@ read_function_info (struct backtrace_state *state, struct dwarf_data *ddata,
       fvec->count = 0;
     }
 
-  qsort (addrs, addrs_count, sizeof (struct function_addrs),
-	 function_addrs_compare);
+  backtrace_qsort (addrs, addrs_count, sizeof (struct function_addrs),
+		   function_addrs_compare);
 
   *ret_addrs = addrs;
   *ret_addrs_count = addrs_count;
@@ -2658,8 +2648,6 @@ dwarf_lookup_pc (struct backtrace_state *state, struct dwarf_data *ddata,
       *found = 0;
       return 0;
     }
-
-//$ TODO mikesart: this isn't the case with clang. We need to search all ranges...
 
   /* If there are multiple ranges that contain PC, use the last one,
      in order to produce predictable results.  If we assume that all
@@ -2781,11 +2769,11 @@ dwarf_lookup_pc (struct backtrace_state *state, struct dwarf_data *ddata,
 
       if (entry->u->abs_filename == NULL)
 	{
-	  const char *entry_filename;
+	  const char *filename;
 
-	  entry_filename = entry->u->filename;
-	  if (entry_filename != NULL
-	      && !IS_ABSOLUTE_PATH (entry_filename)
+	  filename = entry->u->filename;
+	  if (filename != NULL
+	      && !IS_ABSOLUTE_PATH (filename)
 	      && entry->u->comp_dir != NULL)
 	    {
 	      size_t filename_len;
@@ -2793,7 +2781,7 @@ dwarf_lookup_pc (struct backtrace_state *state, struct dwarf_data *ddata,
 	      size_t dir_len;
 	      char *s;
 
-	      filename_len = strlen (entry_filename);
+	      filename_len = strlen (filename);
 	      dir = entry->u->comp_dir;
 	      dir_len = strlen (dir);
 	      s = (char *) backtrace_alloc (state, dir_len + filename_len + 2,
@@ -2806,10 +2794,10 @@ dwarf_lookup_pc (struct backtrace_state *state, struct dwarf_data *ddata,
 	      memcpy (s, dir, dir_len);
 	      /* FIXME: Should use backslash if DOS file system.  */
 	      s[dir_len] = '/';
-	      memcpy (s + dir_len + 1, entry_filename, filename_len + 1);
-	      entry_filename = s;
+	      memcpy (s + dir_len + 1, filename, filename_len + 1);
+	      filename = s;
 	    }
-	  entry->u->abs_filename = entry_filename;
+	  entry->u->abs_filename = filename;
 	}
 
       return callback (data, pc, entry->u->abs_filename, 0, NULL);
@@ -2935,7 +2923,8 @@ build_dwarf_data (struct backtrace_state *state,
     return NULL;
   addrs = (struct unit_addrs *) addrs_vec.vec.base;
   addrs_count = addrs_vec.count;
-  qsort (addrs, addrs_count, sizeof (struct unit_addrs), unit_addrs_compare);
+  backtrace_qsort (addrs, addrs_count, sizeof (struct unit_addrs),
+		   unit_addrs_compare);
 
   fdata = ((struct dwarf_data *)
 	   backtrace_alloc (state, sizeof (struct dwarf_data),

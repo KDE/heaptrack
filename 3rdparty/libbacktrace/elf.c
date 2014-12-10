@@ -35,9 +35,6 @@ POSSIBILITY OF SUCH DAMAGE.  */
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
-#include <unistd.h>
-#include <limits.h>
-#include <pwd.h>
 
 #ifdef HAVE_DL_ITERATE_PHDR
 #include <link.h>
@@ -127,6 +124,7 @@ typedef uint32_t b_elf_wxword;  /* 32-bit Elf_Word, 64-bit ELF_Xword.  */
 typedef uint64_t b_elf_addr;    /* Elf_Addr.  */
 typedef uint64_t b_elf_off;     /* Elf_Off.  */
 typedef uint64_t b_elf_xword;   /* Elf_Xword.  */
+typedef int64_t  b_elf_sxword;  /* Elf_Sxword.  */
 
 typedef uint64_t b_elf_wxword;  /* 32-bit Elf_Word, 64-bit ELF_Xword.  */
 
@@ -235,7 +233,6 @@ enum debug_section
   DEBUG_ABBREV,
   DEBUG_RANGES,
   DEBUG_STR,
-  GNU_DEBUGLINK,
   DEBUG_MAX
 };
 
@@ -247,8 +244,7 @@ static const char * const debug_section_names[DEBUG_MAX] =
   ".debug_line",
   ".debug_abbrev",
   ".debug_ranges",
-  ".debug_str",
-  ".gnu_debuglink"
+  ".debug_str"
 };
 
 /* Information we gather for the sections we care about.  */
@@ -419,8 +415,8 @@ elf_initialize_syminfo (struct backtrace_state *state,
       ++j;
     }
 
-  qsort (elf_symbols, elf_symbol_count, sizeof (struct elf_symbol),
-	 elf_symbol_compare);
+  backtrace_qsort (elf_symbols, elf_symbol_count, sizeof (struct elf_symbol),
+		   elf_symbol_compare);
 
   sdata->next = NULL;
   sdata->symbols = elf_symbols;
@@ -530,189 +526,16 @@ elf_syminfo (struct backtrace_state *state, uintptr_t addr,
     callback (data, addr, sym->name, sym->address, sym->size);
 }
 
-/* Search this section for the .gnu_debuglink build id uuid. */
-
-static uint32_t 
-elf_parse_gnu_buildid(const uint8_t *data, size_t len, uint8_t uuid[20])
-{
-    typedef struct
-    {
-        uint32_t name_len;  // Length of note name
-        uint32_t desc_len;  // Length of note descriptor
-        uint32_t type;      // Type of note (1 is ABI_TAG, 3 is BUILD_ID)
-        char name[4];       // "GNU\0"
-        uint8_t uuid[16];   // This can be 16 or 20 bytes
-    } elf_notehdr;
-
-    /* Try to parse the note section (ie .note.gnu.build-id|.notes|.note|...) and get the build id.
-       BuildID documentation: https://fedoraproject.org/wiki/Releases/FeatureBuildId */
-    static const uint32_t s_gnu_build_id = 3; // NT_GNU_BUILD_ID from elf.h
-
-    while (len >= sizeof(elf_notehdr))
-    {
-        const elf_notehdr *notehdr = (const elf_notehdr *)data;
-        uint32_t name_len = (notehdr->name_len + 3) & ~3;
-        uint32_t desc_len = (notehdr->desc_len + 3) & ~3;
-        size_t offset_next_note = name_len + desc_len;
-
-        /* 16 bytes is UUID|MD5, 20 bytes is SHA1 */
-        if ((notehdr->type == s_gnu_build_id) &&
-            (desc_len == 16 || desc_len == 20) &&
-            (name_len == 4) && !strcmp(notehdr->name, "GNU"))
-        {
-            const uint8_t *uuidbuf = data + offsetof(elf_notehdr, uuid);
-
-            memcpy(uuid, uuidbuf, desc_len);
-            return desc_len;
-        }
-
-        if (offset_next_note >= len)
-            break;
-        data += offset_next_note;
-        len -= offset_next_note;
-    }
-
-    return 0;
-}
-
-static void
-uuid_to_str(char *uuid_str, const uint8_t *uuid, int len) 
-{
-    int i;
-    static const char hex[] = "0123456789abcdef";
-
-    for (i = 0; i < len; i++)
-      {
-        uint8_t c = *uuid++;
-
-        *uuid_str++ = hex[c >> 4];
-        *uuid_str++ = hex[c & 0xf];
-      }    
-    *uuid_str = 0;
-}
+/* Add the backtrace data for one ELF file.  Returns 1 on success,
+   0 on failure (in both cases descriptor is closed) or -1 if exe
+   is non-zero and the ELF file is ET_DYN, which tells the caller that
+   elf_add will need to be called on the descriptor again after
+   base_address is determined.  */
 
 static int
-elf_add (struct backtrace_state *state, const char *filename, uintptr_t base_address,
+elf_add (struct backtrace_state *state, int descriptor, uintptr_t base_address,
 	 backtrace_error_callback error_callback, void *data,
-	 fileline *fileline_fn, int *found_sym, int *found_dwarf, int exe,
-         const uint8_t *uuid_to_match, uint32_t uuid_to_match_len);
-
-/* Search and add the backtrace for a gnu_debuglink file. */
-
-static int
-elf_add_gnu_debuglink (struct backtrace_state *state, const char *modulename, const char *gnu_debuglink,
-                       uintptr_t base_address, backtrace_error_callback error_callback, void *data,
-               	       fileline *fileline_fn, int *found_sym, int *found_dwarf,
-                       const uint8_t *uuid_to_match, uint32_t uuid_to_match_len)
-{
-  int pass;
-  char file[PATH_MAX];
-  char uuid_str[20 * 2 + 1];
-  const char *homedir = NULL;
-  const char *modulefile = strrchr(modulename, '/');
-  int moduledirlen = modulefile ? (modulefile - modulename) : 0;
-
-  uuid_to_str(uuid_str, uuid_to_match, uuid_to_match_len); 
-
-  for (pass = 0;; ++pass)
-    {
-      file[0] = 0;
-
-      switch (pass)
-      {
-      case 0:
-        /* Try the gnu_debuglink filename we were passed in. */
-        strncpy(file, gnu_debuglink, sizeof(file));
-        break;
-
-      case 1:
-        if (moduledirlen > 0)
-        {
-          /* Try current module directory. */
-          snprintf(file, sizeof(file), "%.*s/%s", moduledirlen, modulename, gnu_debuglink);
-        }
-        break;
-
-      case 2:
-        {
-          /* current exe directory. */
-          char buf[PATH_MAX];
-          int len = readlink("/proc/self/exe", buf, sizeof(buf));
-          if (len > 0)
-            {
-              snprintf(file, sizeof(file), "%.*s/%s", len, buf, gnu_debuglink);
-            }
-        }
-        break;
-
-      case 3:
-        if (moduledirlen > 0)
-        {
-          /* Try /lib/x86_64-linux-gnu/libc-2.15.so --> /usr/lib/debug/lib/x86_64-linux-gnu/libc-2.15.so */
-          snprintf(file, sizeof(file), "/usr/lib/debug%.*s/%s", moduledirlen, modulename, gnu_debuglink);
-        }
-        break;
-
-      case 4:
-        {
-          struct passwd *pw = getpwuid(getuid());
-          homedir = pw ? pw->pw_dir : NULL;
-          if (homedir)
-            {
-              /* try ~/.debug/.build-id/af/1da84a6c83719a4c92cc6e7144623c5a1d1f6d */
-              snprintf(file, sizeof(file), "%s/.debug/.build-id/%.2s/%s", homedir, uuid_str, uuid_str + 2);
-            }
-        }
-        break;
-
-      case 5:
-        if (homedir)
-        {
-            /* try /home/mikesart/.debug/.build-id/af/1da84a6c83719a4c92cc6e7144623c5a1d1f6d.debug */
-            snprintf(file, sizeof(file), "%s/.debug/.build-id/%.2s/%s.debug", homedir, uuid_str, uuid_str + 2);
-        }
-        break;
-
-      case 6:
-          snprintf(file, sizeof(file), "%s/.build-id/%.2s/%s.debug", "/mnt/symstoresymbols/Debug", uuid_str, uuid_str + 2);
-          //$ TODO: mikesart
-          // Check debug-file-directory from .gdbinit maybe?
-          //   /mnt/symstoresymbols/Debug/.build-id/f5/a99d37b2b105c50bccc3fd87e4cd27492f3032.debug
-          //   set debug-file-directory /usr/lib/debug:/mnt/symstoresymbols/debug
-          break;
-
-      default:
-        return 0;
-      }
-
-      file[sizeof(file) - 1] = 0;
-
-      /* If we've got a filename and the file exists, try loading it. */
-
-      if (file[0] && (access(file, F_OK) == 0))
-        {
-          if (elf_add(state, file, base_address,
-                      error_callback, data,
-                      fileline_fn, found_sym, found_dwarf, 0,
-                      uuid_to_match, uuid_to_match_len))
-          {
-            /* Success. Woot! Return our fresh new symbols. */
-            return 1;
-          }
-        }
-    }
-
-  return 0;
-}
-
-
-/* Add the backtrace data for one ELF file.  */
-
-static int
-elf_add (struct backtrace_state *state, const char *filename, uintptr_t base_address,
-	 backtrace_error_callback error_callback, void *data,
-	 fileline *fileline_fn, int *found_sym, int *found_dwarf, int exe,
-         const uint8_t *uuid_to_match, uint32_t uuid_to_match_len)
+	 fileline *fileline_fn, int *found_sym, int *found_dwarf, int exe)
 {
   struct backtrace_view ehdr_view;
   b_elf_ehdr ehdr;
@@ -740,9 +563,6 @@ elf_add (struct backtrace_state *state, const char *filename, uintptr_t base_add
   off_t max_offset;
   struct backtrace_view debug_view;
   int debug_view_valid;
-  int retval = 0;
-  uint32_t uuid_len = 0;
-  uint8_t uuid[20];
 
   *found_sym = 0;
   *found_dwarf = 0;
@@ -752,10 +572,6 @@ elf_add (struct backtrace_state *state, const char *filename, uintptr_t base_add
   symtab_view_valid = 0;
   strtab_view_valid = 0;
   debug_view_valid = 0;
-
-  int descriptor = backtrace_open (filename, error_callback, data, NULL);
-  if (descriptor < 0)
-    return 0;
 
   if (!backtrace_get_view (state, descriptor, 0, sizeof ehdr, error_callback,
 			   data, &ehdr_view))
@@ -807,7 +623,7 @@ elf_add (struct backtrace_state *state, const char *filename, uintptr_t base_add
     if (base_address && (ehdr.e_type != ET_DYN))
       base_address = 0;
     else if (!base_address && (ehdr.e_type == ET_DYN))
-      goto succeeded;
+      return -1;
   }
 
   shoff = ehdr.e_shoff;
@@ -879,7 +695,6 @@ elf_add (struct backtrace_state *state, const char *filename, uintptr_t base_add
   dynsym_shndx = 0;
 
   memset (sections, 0, sizeof sections);
-  memset (uuid, 0, sizeof(uuid));
 
   /* Look for the symbol table.  */
   for (i = 1; i < shnum; ++i)
@@ -895,18 +710,6 @@ elf_add (struct backtrace_state *state, const char *filename, uintptr_t base_add
 	symtab_shndx = i;
       else if (shdr->sh_type == SHT_DYNSYM)
 	dynsym_shndx = i;
-      else if ((shdr->sh_type == SHT_NOTE) && (uuid_len == 0))
-      {
-        struct backtrace_view note_view;
-
-        if (backtrace_get_view (state, descriptor, shdr->sh_offset,
-                                 shdr->sh_size, error_callback, data,
-                                 &note_view))
-        {
-          uuid_len = elf_parse_gnu_buildid(note_view.data, shdr->sh_size, uuid);
-          backtrace_release_view (state, &note_view, error_callback, data);
-        }
-      }
 
       sh_name = shdr->sh_name;
       if (sh_name >= shstr_size)
@@ -926,53 +729,6 @@ elf_add (struct backtrace_state *state, const char *filename, uintptr_t base_add
 	      break;
 	    }
 	}
-    }
-
-  if (uuid_to_match_len)
-    {
-      /* We're supposed to be looking for a gnu_debuglink file... */
-
-      /* Found debug file but uuids don't match... */
-      if ((uuid_to_match_len != uuid_len) || memcmp(uuid_to_match, uuid, uuid_len))
-        goto fail;
-
-      /* Found debug file, but no .debuginfo in it? */
-      if (!sections[DEBUG_INFO].size)
-        goto fail;
-    }
-  else if (uuid_len && !sections[DEBUG_INFO].size && sections[GNU_DEBUGLINK].size)
-    {
-      /* We're not searching for a gnu_debuglink file, we have no .debug_info section, we
-         have a uuid, and we have a gnu_debuglink filename - try looking for this debug file. */
-      struct backtrace_view gnu_debuglink_view;
-
-      if (backtrace_get_view (state, descriptor, sections[GNU_DEBUGLINK].offset,
-		              sections[GNU_DEBUGLINK].size, error_callback, data,
-		              &gnu_debuglink_view))
-        {
-          int added = 0;
-          int debug_found_sym = 0;
-          int debug_found_dwarf = 0;
-          const char *gnu_debuglink_file = gnu_debuglink_view.data;
-
-          if (gnu_debuglink_file && gnu_debuglink_file[0])
-            {
-              added = elf_add_gnu_debuglink (state, filename, gnu_debuglink_file, base_address, error_callback,
-                                             data, fileline_fn, &debug_found_sym, &debug_found_dwarf,
-                                             uuid, uuid_len);
-            }
-
-          backtrace_release_view (state, &gnu_debuglink_view, error_callback, data);
-          gnu_debuglink_file = NULL;
-
-          /* If we found symbols of any kind, head on out... */
-          if (added && (debug_found_sym || debug_found_dwarf))
-            {
-              *found_sym = debug_found_sym;
-              *found_dwarf = debug_found_dwarf;
-              goto succeeded;
-            }
-        }
     }
 
   if (symtab_shndx == 0)
@@ -1056,10 +812,7 @@ elf_add (struct backtrace_state *state, const char *filename, uintptr_t base_add
   if (min_offset == 0 || max_offset == 0)
     {
       if (!backtrace_close (descriptor, error_callback, data))
-      {
-        descriptor = -1;
 	goto fail;
-      }
       *fileline_fn = elf_nodebug;
       return 1;
     }
@@ -1072,10 +825,7 @@ elf_add (struct backtrace_state *state, const char *filename, uintptr_t base_add
 
   /* We've read all we need from the executable.  */
   if (!backtrace_close (descriptor, error_callback, data))
-  {
-    descriptor = -1;
     goto fail;
-  }
   descriptor = -1;
 
   for (i = 0; i < (int) DEBUG_MAX; ++i)
@@ -1102,14 +852,11 @@ elf_add (struct backtrace_state *state, const char *filename, uintptr_t base_add
 			    error_callback, data, fileline_fn))
     goto fail;
 
-  state->debug_filename = backtrace_strdup(state, filename, error_callback, data);
   *found_dwarf = 1;
+
   return 1;
 
-succeeded:
-  retval = 1;
-
-fail:
+ fail:
   if (shdrs_view_valid)
     backtrace_release_view (state, &shdrs_view, error_callback, data);
   if (names_view_valid)
@@ -1122,7 +869,7 @@ fail:
     backtrace_release_view (state, &debug_view, error_callback, data);
   if (descriptor != -1)
     backtrace_close (descriptor, error_callback, data);
-  return retval;
+  return 0;
 }
 
 /* Data passed to phdr_callback.  */
@@ -1135,7 +882,7 @@ struct phdr_data
   fileline *fileline_fn;
   int *found_sym;
   int *found_dwarf;
-  const char * exe_filename;
+  int exe_descriptor;
 };
 
 /* Callback passed to dl_iterate_phdr.  Load debug info from shared
@@ -1146,24 +893,37 @@ phdr_callback (struct dl_phdr_info *info, size_t size ATTRIBUTE_UNUSED,
 	       void *pdata)
 {
   struct phdr_data *pd = (struct phdr_data *) pdata;
+  int descriptor;
+  int does_not_exist;
   fileline elf_fileline_fn;
   int found_dwarf;
-  const char * filename = info->dlpi_name;
 
   /* There is not much we can do if we don't have the module name,
      unless executable is ET_DYN, where we expect the very first
      phdr_callback to be for the PIE.  */
-  if (filename == NULL || filename[0] == '\0')
+  if (info->dlpi_name == NULL || info->dlpi_name[0] == '\0')
     {
-      if (!pd->exe_filename)
+      if (pd->exe_descriptor == -1)
 	return 0;
-      filename = pd->exe_filename;
-      pd->exe_filename = NULL;
+      descriptor = pd->exe_descriptor;
+      pd->exe_descriptor = -1;
+    }
+  else
+    {
+      if (pd->exe_descriptor != -1)
+	{
+	  backtrace_close (pd->exe_descriptor, pd->error_callback, pd->data);
+	  pd->exe_descriptor = -1;
+	}
+
+      descriptor = backtrace_open (info->dlpi_name, pd->error_callback,
+				   pd->data, &does_not_exist);
+      if (descriptor < 0)
+	return 0;
     }
 
-  if (elf_add (pd->state, filename, info->dlpi_addr, pd->error_callback,
-	       pd->data, &elf_fileline_fn, pd->found_sym, &found_dwarf, 0,
-               NULL, 0))
+  if (elf_add (pd->state, descriptor, info->dlpi_addr, pd->error_callback,
+	       pd->data, &elf_fileline_fn, pd->found_sym, &found_dwarf, 0))
     {
       if (found_dwarf)
 	{
@@ -1180,7 +940,7 @@ phdr_callback (struct dl_phdr_info *info, size_t size ATTRIBUTE_UNUSED,
    sections.  */
 
 int
-backtrace_initialize (struct backtrace_state *state, const char *filename,
+backtrace_initialize (struct backtrace_state *state, int descriptor,
 		      uintptr_t base_address, int is_exe,
 		      backtrace_error_callback error_callback,
 		      void *data, fileline *fileline_fn)
@@ -1190,8 +950,8 @@ backtrace_initialize (struct backtrace_state *state, const char *filename,
   int found_dwarf;
   fileline elf_fileline_fn;
 
-  ret = elf_add (state, filename, base_address, error_callback, data, &elf_fileline_fn,
-		&found_sym, &found_dwarf, is_exe, NULL, 0);
+  ret = elf_add (state, descriptor, base_address, error_callback, data, &elf_fileline_fn,
+		&found_sym, &found_dwarf, is_exe);
   if (!ret)
     return 0;
 
@@ -1205,8 +965,8 @@ backtrace_initialize (struct backtrace_state *state, const char *filename,
       pd.fileline_fn = &elf_fileline_fn;
       pd.found_sym = &found_sym;
       pd.found_dwarf = &found_dwarf;
-      pd.exe_filename = filename;
-    
+      pd.exe_descriptor = ret < 0 ? descriptor : -1;
+
       dl_iterate_phdr (phdr_callback, (void *) &pd);
     }
 
@@ -1240,137 +1000,4 @@ backtrace_initialize (struct backtrace_state *state, const char *filename,
     }
 
   return 1;
-}
-
-static void
-elf_get_uuid_error_callback(void *data, const char *msg, int errnum)
-{
-    // Do nothing here. elf_get_uuid() will return the error.
-}
-
-int
-elf_get_uuid (struct backtrace_state *state,
-              const char *filename, uint8_t uuid[20], int *uuid_len)
-{
-  struct backtrace_view ehdr_view;
-  b_elf_ehdr ehdr;
-  off_t shoff;
-  unsigned int shnum;
-  struct backtrace_view shdrs_view;
-  int shdrs_view_valid = 0;
-  const b_elf_shdr *shdrs;
-  unsigned int i;
-  void *data = NULL;
-  int retval = 0;
-  struct backtrace_state *state_alloced = NULL;
-
-  if (!state)
-  {
-      state_alloced = backtrace_create_state(filename, 0, elf_get_uuid_error_callback, NULL);
-      state = state_alloced;
-  }
-
-  int descriptor = backtrace_open (filename, elf_get_uuid_error_callback, data, NULL);
-  if (descriptor < 0)
-    return 0;
-
-  if (!backtrace_get_view (state, descriptor, 0, sizeof ehdr, elf_get_uuid_error_callback,
-			   data, &ehdr_view))
-    goto fail;
-
-  memcpy (&ehdr, ehdr_view.data, sizeof ehdr);
-
-  backtrace_release_view (state, &ehdr_view, elf_get_uuid_error_callback, data);
-
-  if (ehdr.e_ident[EI_MAG0] != ELFMAG0
-      || ehdr.e_ident[EI_MAG1] != ELFMAG1
-      || ehdr.e_ident[EI_MAG2] != ELFMAG2
-      || ehdr.e_ident[EI_MAG3] != ELFMAG3)
-    {
-      // elf_get_uuid_error_callback (data, "executable file is not ELF", 0);
-      goto fail;
-    }
-  if (ehdr.e_ident[EI_VERSION] != EV_CURRENT)
-    {
-      // elf_get_uuid_error_callback (data, "executable file is unrecognized ELF version", 0);
-      goto fail;
-    }
-
-#if BACKTRACE_ELF_SIZE == 32
-#define BACKTRACE_ELFCLASS ELFCLASS32
-#else
-#define BACKTRACE_ELFCLASS ELFCLASS64
-#endif
-
-  if (ehdr.e_ident[EI_CLASS] != BACKTRACE_ELFCLASS)
-    {
-      // elf_get_uuid_error_callback (data, "executable file is unexpected ELF class", 0);
-      goto fail;
-    }
-
-  if (ehdr.e_ident[EI_DATA] != ELFDATA2LSB
-      && ehdr.e_ident[EI_DATA] != ELFDATA2MSB)
-    {
-      // elf_get_uuid_error_callback (data, "executable file has unknown endianness", 0);
-      goto fail;
-    }
-
-  shoff = ehdr.e_shoff;
-  shnum = ehdr.e_shnum;
-
-  if ((shnum == 0) && (shoff != 0))
-    {
-      struct backtrace_view shdr_view;
-      const b_elf_shdr *shdr;
-
-      if (!backtrace_get_view (state, descriptor, shoff, sizeof shdr,
-			       elf_get_uuid_error_callback, data, &shdr_view))
-	goto fail;
-
-      shdr = (const b_elf_shdr *) shdr_view.data;
-
-      if (shnum == 0)
-	shnum = shdr->sh_size;
-
-      backtrace_release_view (state, &shdr_view, elf_get_uuid_error_callback, data);
-    }
-
-  if (!backtrace_get_view (state, descriptor, shoff + sizeof (b_elf_shdr),
-			   (shnum - 1) * sizeof (b_elf_shdr),
-			   elf_get_uuid_error_callback, data, &shdrs_view))
-    goto fail;
-  shdrs_view_valid = 1;
-  shdrs = (const b_elf_shdr *) shdrs_view.data;
-
-  for (i = 1; i < shnum; ++i)
-    {
-      const b_elf_shdr *shdr = &shdrs[i - 1];
-
-      if (shdr->sh_type == SHT_NOTE)
-      {
-        struct backtrace_view note_view;
-
-        if (backtrace_get_view (state, descriptor, shdr->sh_offset,
-                                 shdr->sh_size, elf_get_uuid_error_callback, data,
-                                 &note_view))
-        {
-          *uuid_len = elf_parse_gnu_buildid(note_view.data, shdr->sh_size, uuid);
-          backtrace_release_view (state, &note_view, elf_get_uuid_error_callback, data);
-          if (*uuid_len)
-          {
-             retval = 1;
-             break;
-          }
-        }
-      }
-    }
-
-fail:
-  if (shdrs_view_valid)
-    backtrace_release_view (state, &shdrs_view, elf_get_uuid_error_callback, data);
-  if (descriptor != -1)
-    backtrace_close (descriptor, elf_get_uuid_error_callback, data);
-  if (state_alloced)
-    backtrace_free(state_alloced, state_alloced, sizeof(*state_alloced), elf_get_uuid_error_callback, NULL);
-  return retval;
 }

@@ -128,8 +128,6 @@ struct backtrace_state
 {
   /* The name of the executable.  */
   const char *filename;
-  /* The name of the debug symbols filename.  */
-  const char *debug_filename;
   /* Non-zero if threaded.  */
   int threaded;
   /* The master lock for fileline_fn, fileline_data, syminfo_fn,
@@ -198,6 +196,11 @@ extern int backtrace_close (int descriptor,
 			    backtrace_error_callback error_callback,
 			    void *data);
 
+/* Sort without using memory.  */
+
+extern void backtrace_qsort (void *base, size_t count, size_t size,
+			     int (*compar) (const void *, const void *));
+
 /* Allocate memory.  This is like malloc.  */
 
 extern void *backtrace_alloc (struct backtrace_state *state, size_t size,
@@ -210,12 +213,6 @@ extern void backtrace_free (struct backtrace_state *state, void *mem,
 			    size_t size,
 			    backtrace_error_callback error_callback,
 			    void *data);
-
-/* Allocate memory like strdup. */
-
-extern char *backtrace_strdup (struct backtrace_state *state, const char *str,
-                               backtrace_error_callback error_callback,
-                               void *data) ATTRIBUTE_MALLOC;
 
 /* A growable vector of some struct.  This is used for more efficient
    allocation when we don't know the final size of some group of data
@@ -269,9 +266,9 @@ extern int backtrace_vector_release (struct backtrace_state *state,
    appropriate one.  */
 
 extern int backtrace_initialize (struct backtrace_state *state,
-				 const char *filename,
- 				 uintptr_t base_address,
-                 int is_exe,
+				 int descriptor,
+				 uintptr_t base_address,
+				 int is_exe,
 				 backtrace_error_callback error_callback,
 				 void *data,
 				 fileline *fileline_fn);

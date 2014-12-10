@@ -192,19 +192,14 @@ extern int backtrace_syminfo (struct backtrace_state *state, uintptr_t addr,
 			      backtrace_error_callback error_callback,
 			      void *data);
 
+//BEGIN custom
+
 /* Add a single file to a backtrace_state with a base_address. */
 
-extern int backtrace_fileline_initialize (struct backtrace_state *state, uintptr_t base_address,
-                                          int is_exe, backtrace_error_callback error_callback, void *data);
+extern int backtrace_fileline_initialize(struct backtrace_state *state, uintptr_t base_address,
+                                         int is_exe, backtrace_error_callback error_callback, void *data);
 
-/* Get the debug filename (or return NULL if not found). */
-
-extern const char *backtrace_get_debug_filename (struct backtrace_state *state);
-                              
-/* Given a filename, try to find the buildid for it. */
-
-extern int elf_get_uuid (struct backtrace_state *state,
-                         const char *filename, uint8_t uuid[20], int *uuid_len);
+//END custom
 
 #ifdef __cplusplus
 } /* End extern "C".  */
