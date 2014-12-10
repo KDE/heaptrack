@@ -43,6 +43,19 @@ POSSIBILITY OF SUCH DAMAGE.  */
 #include "backtrace.h"
 #include "internal.h"
 
+// silence warnings arising from the stub dwarf2.h
+// see also: https://gcc.gnu.org/ml/gcc-patches/2013-05/msg00412.html
+// esp. https://gcc.gnu.org/ml/gcc-patches/2013-05/msg01095.html
+//$$$ mikesart added
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch"
+#if defined(__clang__)
+#pragma GCC diagnostic ignored "-Wtautological-constant-out-of-range-compare"
+#endif
+#endif
+//$$$
+
 #if !defined(HAVE_DECL_STRNLEN) || !HAVE_DECL_STRNLEN
 
 /* If strnlen is not declared, provide our own version.  */
