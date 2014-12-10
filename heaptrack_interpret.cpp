@@ -38,6 +38,7 @@
 #include <boost/property_tree/ptree.hpp>
 
 #include "libbacktrace/backtrace.h"
+#include "libbacktrace/internal.h"
 #include "linereader.h"
 
 using namespace std;
@@ -295,22 +296,23 @@ struct AccumulatedTraceData
         auto errorHandler = [] (void *rawData, const char *msg, int errnum) {
             auto data = reinterpret_cast<const CallbackData*>(rawData);
             cerr << "Failed to create backtrace state for module " << *data->fileName << ": "
-                 << msg << " (error code " << errnum << ")" << endl;
+                 << msg << " / " << strerror(errnum) << " (error code " << errnum << ")" << endl;
         };
 
         auto state = backtrace_create_state(fileName.c_str(), /* we are single threaded, so: not thread safe */ false,
                                             errorHandler, &data);
 
         if (state) {
-            // when we could initialize the backtrace state, we initialize it with the first address
-            // we get since that is the lowest one
-            if (!addressStart && isExe) {
-                // the address start should not be zero, that would lead to issues since
-                // libbacktrace then tries to find the start address and fails
-                // we just set it to 1 for the exe, which seems to work
-                addressStart = 1;
+            const int descriptor = backtrace_open(fileName.c_str(), errorHandler, &data, nullptr);
+            if (descriptor >= 1) {
+                int foundSym = 0;
+                int foundDwarf = 0;
+                auto ret = elf_add(state, descriptor, addressStart, errorHandler, &data,
+                                   &state->fileline_fn, &foundSym, &foundDwarf, isExe);
+                if (ret && foundSym) {
+                    state->syminfo_fn = &elf_syminfo;
+                }
             }
-            backtrace_fileline_initialize(state, addressStart, isExe, errorHandler, &data);
         }
 
         m_backtraceStates.insert(it, make_pair(fileName, state));

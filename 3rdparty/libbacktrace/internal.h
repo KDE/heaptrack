@@ -33,6 +33,10 @@ POSSIBILITY OF SUCH DAMAGE.  */
 #ifndef BACKTRACE_INTERNAL_H
 #define BACKTRACE_INTERNAL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* We assume that <sys/types.h> and "backtrace.h" have already been
    included.  */
 
@@ -267,8 +271,6 @@ extern int backtrace_vector_release (struct backtrace_state *state,
 
 extern int backtrace_initialize (struct backtrace_state *state,
 				 int descriptor,
-				 uintptr_t base_address,
-				 int is_exe,
 				 backtrace_error_callback error_callback,
 				 void *data,
 				 fileline *fileline_fn);
@@ -290,5 +292,20 @@ extern int backtrace_dwarf_add (struct backtrace_state *state,
 				int is_bigendian,
 				backtrace_error_callback error_callback,
 				void *data, fileline *fileline_fn);
+
+//BEGIN HEAPTRACK
+// the following internal functions are used by heaptrack, and thus must be made exported here
+extern int elf_add (struct backtrace_state *state, int descriptor, uintptr_t base_address,
+				backtrace_error_callback error_callback, void *data,
+				fileline *fileline_fn, int *found_sym, int *found_dwarf, int exe);
+extern void elf_syminfo (struct backtrace_state *state, uintptr_t addr,
+				backtrace_syminfo_callback callback,
+				backtrace_error_callback error_callback ATTRIBUTE_UNUSED,
+				void *data);
+//END HEAPTRACK
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -49,7 +49,7 @@ POSSIBILITY OF SUCH DAMAGE.  */
    on success, 0 on failure.  */
 
 static int
-fileline_initialize (struct backtrace_state *state, uintptr_t base_address, int is_exe,
+fileline_initialize (struct backtrace_state *state,
 		     backtrace_error_callback error_callback, void *data)
 {
   int failed;
@@ -113,7 +113,7 @@ fileline_initialize (struct backtrace_state *state, uintptr_t base_address, int 
 	  called_error_callback = 1;
 	  break;
 	}
-      if (descriptor >= 0 || base_address)
+      if (descriptor >= 0)
 	break;
     }
 
@@ -133,7 +133,7 @@ fileline_initialize (struct backtrace_state *state, uintptr_t base_address, int 
 
   if (!failed)
     {
-      if (!backtrace_initialize (state, descriptor, base_address, is_exe, error_callback, data,
+      if (!backtrace_initialize (state, descriptor, error_callback, data,
 				 &fileline_fn))
 	failed = 1;
     }
@@ -160,15 +160,6 @@ fileline_initialize (struct backtrace_state *state, uintptr_t base_address, int 
   return 1;
 }
 
-/* Initialize the fileline information from a user specified filename.  Returns 1
-   on success, 0 on failure.  */
-
-int
-backtrace_fileline_initialize (struct backtrace_state *state, uintptr_t base_address, int is_exe,
-                               backtrace_error_callback error_callback, void *data)
-{
-    return fileline_initialize (state, base_address, is_exe, error_callback, data);
-}
 /* Given a PC, find the file name, line number, and function name.  */
 
 int
@@ -176,7 +167,7 @@ backtrace_pcinfo (struct backtrace_state *state, uintptr_t pc,
 		  backtrace_full_callback callback,
 		  backtrace_error_callback error_callback, void *data)
 {
-  if (!fileline_initialize (state, 0, 1, error_callback, data))
+  if (!fileline_initialize (state, error_callback, data))
     return 0;
 
   if (state->fileline_initialization_failed)
@@ -192,7 +183,7 @@ backtrace_syminfo (struct backtrace_state *state, uintptr_t pc,
 		   backtrace_syminfo_callback callback,
 		   backtrace_error_callback error_callback, void *data)
 {
-  if (!fileline_initialize (state, 0, 1, error_callback, data))
+  if (!fileline_initialize (state, error_callback, data))
     return 0;
 
   if (state->fileline_initialization_failed)

@@ -192,15 +192,6 @@ extern int backtrace_syminfo (struct backtrace_state *state, uintptr_t addr,
 			      backtrace_error_callback error_callback,
 			      void *data);
 
-//BEGIN custom
-
-/* Add a single file to a backtrace_state with a base_address. */
-
-extern int backtrace_fileline_initialize(struct backtrace_state *state, uintptr_t base_address,
-                                         int is_exe, backtrace_error_callback error_callback, void *data);
-
-//END custom
-
 #ifdef __cplusplus
 } /* End extern "C".  */
 #endif

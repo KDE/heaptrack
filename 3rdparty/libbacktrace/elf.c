@@ -281,10 +281,6 @@ struct elf_syminfo_data
   struct elf_symbol *symbols;
   /* The number of symbols.  */
   size_t count;
-  /* The base address for this module. */
-  uintptr_t base_address;
-  /* Address symbols size. */
-  uintptr_t symbol_size;
 };
 
 /* A dummy callback function used when we can't find any debug info.  */
@@ -362,7 +358,6 @@ elf_initialize_syminfo (struct backtrace_state *state,
   size_t elf_symbol_count;
   size_t elf_symbol_size;
   struct elf_symbol *elf_symbols;
-  size_t symbol_size = 0;
   size_t i;
   unsigned int j;
 
@@ -409,9 +404,6 @@ elf_initialize_syminfo (struct backtrace_state *state,
       elf_symbols[j].name = (const char *) strtab + sym->st_name;
       elf_symbols[j].address = sym->st_value + base_address;
       elf_symbols[j].size = sym->st_size;
-
-      if (symbol_size < sym->st_value + sym->st_size)
-        symbol_size = sym->st_value + sym->st_size;
       ++j;
     }
 
@@ -421,8 +413,6 @@ elf_initialize_syminfo (struct backtrace_state *state,
   sdata->next = NULL;
   sdata->symbols = elf_symbols;
   sdata->count = elf_symbol_count;
-  sdata->base_address = base_address;
-  sdata->symbol_size = symbol_size;
 
   return 1;
 }
@@ -471,7 +461,7 @@ elf_add_syminfo_data (struct backtrace_state *state,
 
 /* Return the symbol name and value for an ADDR.  */
 
-static void
+void
 elf_syminfo (struct backtrace_state *state, uintptr_t addr,
 	     backtrace_syminfo_callback callback,
 	     backtrace_error_callback error_callback ATTRIBUTE_UNUSED,
@@ -486,14 +476,11 @@ elf_syminfo (struct backtrace_state *state, uintptr_t addr,
 	   edata != NULL;
 	   edata = edata->next)
 	{
-          if ((addr >= edata->base_address) && (addr < edata->base_address + edata->symbol_size))
-            {
-	      sym = ((struct elf_symbol *)
-		     bsearch (&addr, edata->symbols, edata->count,
-			      sizeof (struct elf_symbol), elf_symbol_search));
-	      if (sym != NULL)
-	        break;
-            }
+	  sym = ((struct elf_symbol *)
+		 bsearch (&addr, edata->symbols, edata->count,
+			  sizeof (struct elf_symbol), elf_symbol_search));
+	  if (sym != NULL)
+	    break;
 	}
     }
   else
@@ -507,14 +494,11 @@ elf_syminfo (struct backtrace_state *state, uintptr_t addr,
 	  if (edata == NULL)
 	    break;
 
-          if ((addr >= edata->base_address) && (addr < edata->base_address + edata->symbol_size))
-            {
-	      sym = ((struct elf_symbol *)
-		     bsearch (&addr, edata->symbols, edata->count,
-			      sizeof (struct elf_symbol), elf_symbol_search));
-	      if (sym != NULL)
-	        break;
-            }
+	  sym = ((struct elf_symbol *)
+		 bsearch (&addr, edata->symbols, edata->count,
+			  sizeof (struct elf_symbol), elf_symbol_search));
+	  if (sym != NULL)
+	    break;
 
 	  pp = &edata->next;
 	}
@@ -532,7 +516,7 @@ elf_syminfo (struct backtrace_state *state, uintptr_t addr,
    elf_add will need to be called on the descriptor again after
    base_address is determined.  */
 
-static int
+int
 elf_add (struct backtrace_state *state, int descriptor, uintptr_t base_address,
 	 backtrace_error_callback error_callback, void *data,
 	 fileline *fileline_fn, int *found_sym, int *found_dwarf, int exe)
@@ -617,14 +601,8 @@ elf_add (struct backtrace_state *state, int descriptor, uintptr_t base_address,
   /* If the executable is ET_DYN, it is either a PIE, or we are running
      directly a shared library with .interp.  We need to wait for
      dl_iterate_phdr in that case to determine the actual base_address.  */
-  if (exe)
-  {
-    /* If we were given a base address and this isn't PIE, set addr to 0. */
-    if (base_address && (ehdr.e_type != ET_DYN))
-      base_address = 0;
-    else if (!base_address && (ehdr.e_type == ET_DYN))
-      return -1;
-  }
+  if (exe && ehdr.e_type == ET_DYN)
+    return -1;
 
   shoff = ehdr.e_shoff;
   shnum = ehdr.e_shnum;
@@ -941,7 +919,6 @@ phdr_callback (struct dl_phdr_info *info, size_t size ATTRIBUTE_UNUSED,
 
 int
 backtrace_initialize (struct backtrace_state *state, int descriptor,
-		      uintptr_t base_address, int is_exe,
 		      backtrace_error_callback error_callback,
 		      void *data, fileline *fileline_fn)
 {
@@ -949,26 +926,22 @@ backtrace_initialize (struct backtrace_state *state, int descriptor,
   int found_sym;
   int found_dwarf;
   fileline elf_fileline_fn;
+  struct phdr_data pd;
 
-  ret = elf_add (state, descriptor, base_address, error_callback, data, &elf_fileline_fn,
-		&found_sym, &found_dwarf, is_exe);
+  ret = elf_add (state, descriptor, 0, error_callback, data, &elf_fileline_fn,
+		 &found_sym, &found_dwarf, 1);
   if (!ret)
     return 0;
 
-  if (!base_address)
-    {
-      struct phdr_data pd;
+  pd.state = state;
+  pd.error_callback = error_callback;
+  pd.data = data;
+  pd.fileline_fn = &elf_fileline_fn;
+  pd.found_sym = &found_sym;
+  pd.found_dwarf = &found_dwarf;
+  pd.exe_descriptor = ret < 0 ? descriptor : -1;
 
-      pd.state = state;
-      pd.error_callback = error_callback;
-      pd.data = data;
-      pd.fileline_fn = &elf_fileline_fn;
-      pd.found_sym = &found_sym;
-      pd.found_dwarf = &found_dwarf;
-      pd.exe_descriptor = ret < 0 ? descriptor : -1;
-
-      dl_iterate_phdr (phdr_callback, (void *) &pd);
-    }
+  dl_iterate_phdr (phdr_callback, (void *) &pd);
 
   if (!state->threaded)
     {
