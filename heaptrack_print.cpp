@@ -554,8 +554,10 @@ struct AccumulatedTraceData
         /// these are leaks, but we now have the same data in \c allocations as well
         activeAllocations.clear();
 
+        totalTime = max(timeStamp, size_t(1));
+
         if (massifOut.is_open()) {
-            writeMassifSnapshot(timeStamp + 1, true);
+            writeMassifSnapshot(totalTime, true);
         }
 
         mergedAllocations = mergeAllocations(allocations);
@@ -578,6 +580,7 @@ struct AccumulatedTraceData
     size_t totalAllocations = 0;
     size_t peak = 0;
     size_t leaked = 0;
+    size_t totalTime = 0;
 
 private:
     // our indices are sequentially increasing thus a new allocation can only ever
@@ -967,8 +970,12 @@ int main(int argc, char** argv)
         cout << endl;
     }
 
-    cout << formatBytes(data.totalAllocated) << " bytes allocated in total (ignoring deallocations) over "
-         << data.totalAllocations << " calls to allocation functions.\n"
+    const double totalTimeS = 0.001 * data.totalTime;
+    cout << "total runtime: " << fixed << totalTimeS << "s.\n"
+         << "bytes allocated in total (ignoring deallocations): " << formatBytes(data.totalAllocated)
+            << " (" << formatBytes(data.totalAllocated / totalTimeS) << "/s)" << '\n'
+         << "calls to allocation functions: " << data.totalAllocations
+            << " (" << size_t(data.totalAllocations / totalTimeS) << "/s)\n"
          << "peak heap memory consumption: " << formatBytes(data.peak) << '\n'
          << "total memory leaked: " << formatBytes(data.leaked) << '\n';
 

@@ -166,23 +166,15 @@ void updateModuleCache(FILE* out)
 
 struct Data
 {
+    using clock = chrono::steady_clock;
     Data()
+        : start(clock::now())
     {
         timerThread = thread([&] () {
-            using clock = chrono::steady_clock;
-            const auto start = clock::now();
             while (!stopTimerThread) {
                 // TODO: make interval customizable
                 this_thread::sleep_for(chrono::milliseconds(10));
-                auto elapsed = chrono::duration_cast<chrono::milliseconds>(clock::now() - start);
-
-                if (FILE* out = outputHandle.load()) {
-                    LockGuard lock(out);
-                    if (fprintf(out, "c %lx\n", elapsed.count()) < 0) {
-                        heaptrack_stop();
-                        return;
-                    }
-                }
+                writeTimestamp();
             }
         });
     }
@@ -191,6 +183,19 @@ struct Data
     {
         stopTimerThread = true;
         timerThread.join();
+    }
+
+    void writeTimestamp()
+    {
+        auto elapsed = chrono::duration_cast<chrono::milliseconds>(clock::now() - start);
+
+        if (FILE* out = outputHandle.load()) {
+            LockGuard lock(out);
+            if (fprintf(out, "c %lx\n", elapsed.count()) < 0) {
+                heaptrack_stop();
+                return;
+            }
+        }
     }
 
     void handleMalloc(void* ptr, size_t size, const Trace &trace, FILE* out)
@@ -230,6 +235,7 @@ struct Data
 
     atomic<bool> stopTimerThread;
     thread timerThread;
+    chrono::time_point<clock> start;
 
 #ifdef DEBUG_MALLOC_PTRS
     unordered_set<void*> known;
@@ -356,15 +362,25 @@ void heaptrack_init(const char *outputFileName_, void (*initCallbackBefore) (), 
 
 void heaptrack_stop()
 {
+    static atomic<bool> isStopping(false);
+    bool expected = false;
+    if (!isStopping.compare_exchange_strong(expected, true)) {
+        return;
+    }
     HandleGuard guard;
     if (outputHandle) {
         flockfile(outputHandle.load());
+        if (data) {
+            data.load()->writeTimestamp();
+        }
         fclose(outputHandle.exchange(nullptr));
         delete data.exchange(nullptr);
         if (auto stop = s_stopCallback.exchange(nullptr)) {
             stop();
         }
     }
+    expected = true;
+    isStopping.compare_exchange_strong(expected, false);
 }
 
 FILE* heaptrack_output_file()
