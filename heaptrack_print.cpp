@@ -85,13 +85,6 @@ private:
     size_t m_bytes;
 };
 
-struct AddressInformation
-{
-    string function;
-    string file;
-    int line = 0;
-};
-
 // sadly, C++ doesn't yet have opaque typedefs
 template<typename Base>
 struct Index
