@@ -16,7 +16,7 @@ struct Foo {
 void asdf()
 {
     int* i = new int;
-    printf("i in asdf: %p\n", i);
+    printf("i in asdf: %p\n", (void*)i);
 }
 
 void bar()
@@ -34,7 +34,7 @@ static Foo foo;
 int main()
 {
     Foo* f = new Foo;
-    printf("new Foo: %p\n", f);
+    printf("new Foo: %p\n", (void*)f);
     delete f;
 
     char* c = new char[1000];

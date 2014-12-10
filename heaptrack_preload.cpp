@@ -126,7 +126,7 @@ extern "C" {
 
 /// TODO: memalign, pvalloc, ...?
 
-void* malloc(size_t size)
+void* malloc(size_t size) throw()
 {
     if (!hooks::malloc) {
         hooks::init();
@@ -137,7 +137,7 @@ void* malloc(size_t size)
     return ptr;
 }
 
-void free(void* ptr)
+void free(void* ptr) throw()
 {
     if (!hooks::free) {
         hooks::init();
@@ -151,7 +151,7 @@ void free(void* ptr)
     hooks::free(ptr);
 }
 
-void* realloc(void* ptr, size_t size)
+void* realloc(void* ptr, size_t size) throw()
 {
     if (!hooks::realloc) {
         hooks::init();
@@ -166,7 +166,7 @@ void* realloc(void* ptr, size_t size)
     return ret;
 }
 
-void* calloc(size_t num, size_t size)
+void* calloc(size_t num, size_t size) throw()
 {
     if (!hooks::calloc) {
         hooks::init();
@@ -181,7 +181,7 @@ void* calloc(size_t num, size_t size)
     return ret;
 }
 
-void cfree(void* ptr)
+void cfree(void* ptr) throw()
 {
     if (!hooks::cfree) {
         hooks::init();
@@ -197,7 +197,7 @@ void cfree(void* ptr)
     hooks::cfree(ptr);
 }
 
-int posix_memalign(void **memptr, size_t alignment, size_t size)
+int posix_memalign(void **memptr, size_t alignment, size_t size) throw()
 {
     if (!hooks::posix_memalign) {
         hooks::init();
@@ -212,7 +212,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size)
     return ret;
 }
 
-void* aligned_alloc(size_t alignment, size_t size)
+void* aligned_alloc(size_t alignment, size_t size) throw()
 {
     if (!hooks::aligned_alloc) {
         hooks::init();
@@ -227,7 +227,7 @@ void* aligned_alloc(size_t alignment, size_t size)
     return ret;
 }
 
-void* valloc(size_t size)
+void* valloc(size_t size) throw()
 {
     if (!hooks::valloc) {
         hooks::init();
@@ -242,7 +242,7 @@ void* valloc(size_t size)
     return ret;
 }
 
-void *dlopen(const char *filename, int flag)
+void *dlopen(const char *filename, int flag) throw()
 {
     if (!hooks::dlopen) {
         hooks::init();
@@ -257,7 +257,7 @@ void *dlopen(const char *filename, int flag)
     return ret;
 }
 
-int dlclose(void *handle)
+int dlclose(void *handle) throw()
 {
     if (!hooks::dlclose) {
         hooks::init();
