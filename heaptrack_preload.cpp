@@ -39,7 +39,7 @@ struct hook
     using Signature = SignatureT*;
     Signature original = nullptr;
 
-    void init()
+    void init() noexcept
     {
         auto ret = dlsym(RTLD_NEXT, Base::identifier);
         if (!ret) {
@@ -50,12 +50,12 @@ struct hook
     }
 
     template<typename... Args>
-    auto operator() (Args... args) const -> decltype(original(args...))
+    auto operator() (Args... args) const noexcept -> decltype(original(args...))
     {
         return original(args...);
     }
 
-    explicit operator bool () const
+    explicit operator bool () const noexcept
     {
         return original;
     }
@@ -80,7 +80,7 @@ HOOK(dlclose);
  *
  * This is only called at startup and will eventually be replaced by the "proper" calloc implementation.
  */
-void* dummy_calloc(size_t num, size_t size)
+void* dummy_calloc(size_t num, size_t size) noexcept
 {
     const size_t MAX_SIZE = 1024;
     static char* buf[MAX_SIZE];
@@ -126,7 +126,7 @@ extern "C" {
 
 /// TODO: memalign, pvalloc, ...?
 
-void* malloc(size_t size) throw()
+void* malloc(size_t size) noexcept
 {
     if (!hooks::malloc) {
         hooks::init();
@@ -137,7 +137,7 @@ void* malloc(size_t size) throw()
     return ptr;
 }
 
-void free(void* ptr) throw()
+void free(void* ptr) noexcept
 {
     if (!hooks::free) {
         hooks::init();
@@ -151,7 +151,7 @@ void free(void* ptr) throw()
     hooks::free(ptr);
 }
 
-void* realloc(void* ptr, size_t size) throw()
+void* realloc(void* ptr, size_t size) noexcept
 {
     if (!hooks::realloc) {
         hooks::init();
@@ -166,7 +166,7 @@ void* realloc(void* ptr, size_t size) throw()
     return ret;
 }
 
-void* calloc(size_t num, size_t size) throw()
+void* calloc(size_t num, size_t size) noexcept
 {
     if (!hooks::calloc) {
         hooks::init();
@@ -181,7 +181,7 @@ void* calloc(size_t num, size_t size) throw()
     return ret;
 }
 
-void cfree(void* ptr) throw()
+void cfree(void* ptr) noexcept
 {
     if (!hooks::cfree) {
         hooks::init();
@@ -197,7 +197,7 @@ void cfree(void* ptr) throw()
     hooks::cfree(ptr);
 }
 
-int posix_memalign(void **memptr, size_t alignment, size_t size) throw()
+int posix_memalign(void **memptr, size_t alignment, size_t size) noexcept
 {
     if (!hooks::posix_memalign) {
         hooks::init();
@@ -212,7 +212,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) throw()
     return ret;
 }
 
-void* aligned_alloc(size_t alignment, size_t size) throw()
+void* aligned_alloc(size_t alignment, size_t size) noexcept
 {
     if (!hooks::aligned_alloc) {
         hooks::init();
@@ -227,7 +227,7 @@ void* aligned_alloc(size_t alignment, size_t size) throw()
     return ret;
 }
 
-void* valloc(size_t size) throw()
+void* valloc(size_t size) noexcept
 {
     if (!hooks::valloc) {
         hooks::init();
@@ -242,7 +242,7 @@ void* valloc(size_t size) throw()
     return ret;
 }
 
-void *dlopen(const char *filename, int flag) throw()
+void *dlopen(const char *filename, int flag) noexcept
 {
     if (!hooks::dlopen) {
         hooks::init();
@@ -257,7 +257,7 @@ void *dlopen(const char *filename, int flag) throw()
     return ret;
 }
 
-int dlclose(void *handle) throw()
+int dlclose(void *handle) noexcept
 {
     if (!hooks::dlclose) {
         hooks::init();

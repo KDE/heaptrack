@@ -35,7 +35,7 @@
 
 namespace {
 
-void overwrite_symbols();
+void overwrite_symbols() noexcept;
 
 namespace hooks {
 
@@ -44,7 +44,7 @@ struct malloc
     static constexpr auto name = "malloc";
     static constexpr auto original = &::malloc;
 
-    static void* hook(size_t size)
+    static void* hook(size_t size) noexcept
     {
         auto ptr = original(size);
         heaptrack_malloc(ptr, size);
@@ -57,7 +57,7 @@ struct free
     static constexpr auto name = "free";
     static constexpr auto original = &::free;
 
-    static void hook(void *ptr)
+    static void hook(void *ptr) noexcept
     {
         heaptrack_free(ptr);
         original(ptr);
@@ -69,7 +69,7 @@ struct realloc
     static constexpr auto name = "realloc";
     static constexpr auto original = &::realloc;
 
-    static void* hook(void *ptr, size_t size)
+    static void* hook(void *ptr, size_t size) noexcept
     {
         auto ret = original(ptr, size);
         heaptrack_realloc(ptr, size, ret);
@@ -82,7 +82,7 @@ struct calloc
     static constexpr auto name = "calloc";
     static constexpr auto original = &::calloc;
 
-    static void* hook(size_t num, size_t size)
+    static void* hook(size_t num, size_t size) noexcept
     {
         auto ptr = original(num, size);
         heaptrack_malloc(ptr, num * size);
@@ -95,7 +95,7 @@ struct cfree
     static constexpr auto name = "cfree";
     static constexpr auto original = &::cfree;
 
-    static void hook(void *ptr)
+    static void hook(void *ptr) noexcept
     {
         heaptrack_free(ptr);
         original(ptr);
@@ -107,7 +107,7 @@ struct dlopen
     static constexpr auto name = "dlopen";
     static constexpr auto original = &::dlopen;
 
-    static void* hook(const char *filename, int flag)
+    static void* hook(const char *filename, int flag) noexcept
     {
         auto ret = original(filename, flag);
         if (ret) {
@@ -123,7 +123,7 @@ struct dlclose
     static constexpr auto name = "dlclose";
     static constexpr auto original = &::dlclose;
 
-    static int hook(void *handle)
+    static int hook(void *handle) noexcept
     {
         auto ret = original(handle);
         if (!ret) {
@@ -138,7 +138,7 @@ struct posix_memalign
     static constexpr auto name = "posix_memalign";
     static constexpr auto original = &::posix_memalign;
 
-    static int hook(void **memptr, size_t alignment, size_t size)
+    static int hook(void **memptr, size_t alignment, size_t size) noexcept
     {
         auto ret = original(memptr, alignment, size);
         if (!ret) {
@@ -155,7 +155,7 @@ struct hook
     void* originalAddress;
 
     template<typename Hook>
-    static constexpr hook wrap()
+    static constexpr hook wrap() noexcept
     {
         static_assert(sizeof(&Hook::hook) == sizeof(void*), "Mismatched pointer sizes");
         static_assert(std::is_convertible<decltype(&Hook::hook), decltype(Hook::original)>::value,
@@ -184,7 +184,7 @@ struct elftable
     T* table = nullptr;
     ElfW(Xword) size = ElfW(Xword)();
 
-    bool consume(const ElfW(Dyn) *dyn)
+    bool consume(const ElfW(Dyn) *dyn) noexcept
     {
         if (dyn->d_tag == AddrTag) {
             table = reinterpret_cast<T*>(dyn->d_un.d_ptr);
@@ -201,7 +201,7 @@ using elf_string_table = elftable<const char, DT_STRTAB, DT_STRSZ>;
 using elf_jmprel_table = elftable<ElfW(Rela), DT_JMPREL, DT_PLTRELSZ>;
 using elf_symbol_table = elftable<ElfW(Sym), DT_SYMTAB, DT_SYMENT>;
 
-void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base, const bool restore)
+void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base, const bool restore) noexcept
 {
     elf_symbol_table symbols;
     elf_jmprel_table jmprels;
@@ -235,7 +235,7 @@ void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base, const bo
     }
 }
 
-int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data)
+int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data) noexcept
 {
     if (strstr(info->dlpi_name, "/libheaptrack_inject.so")) {
         // prevent infinite recursion: do not overwrite our own symbols
@@ -251,7 +251,7 @@ int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data)
     return 0;
 }
 
-void overwrite_symbols()
+void overwrite_symbols() noexcept
 {
     dl_iterate_phdr(&iterate_phdrs, nullptr);
 }
@@ -260,7 +260,7 @@ void overwrite_symbols()
 
 extern "C" {
 
-void heaptrack_inject(const char *outputFileName)
+void heaptrack_inject(const char *outputFileName) noexcept
 {
     heaptrack_init(outputFileName, [] () {
         overwrite_symbols();
