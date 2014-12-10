@@ -92,15 +92,6 @@ struct AddressInformation
     int line = 0;
 };
 
-ostream& operator<<(ostream& out, const AddressInformation& info)
-{
-    out << info.function;
-    if (!info.file.empty()) {
-        out << " in " << info.file << ':' << info.line;
-    }
-    return out;
-}
-
 // sadly, C++ doesn't yet have opaque typedefs
 template<typename Base>
 struct Index
@@ -387,7 +378,6 @@ struct AccumulatedTraceData
             const auto c = function[i];
             if ((c == '<' || c == '>') && ret.size() >= 8) {
                 // don't get confused by C++ operators
-                auto end = ret.end();
                 const char* cmp = "operator";
                 if (ret.back() == c) {
                     // skip second angle bracket for operator<< or operator>>
