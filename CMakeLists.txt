@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.9)
 project(heaptrack)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wpedantic")
@@ -51,9 +51,9 @@ include_directories(
 configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 add_library(heaptrack_preload MODULE heaptrack_preload.cpp libheaptrack.cpp)
-target_link_libraries(heaptrack_preload PRIVATE ${CMAKE_DL_LIBS} backtrace rt)
+target_link_libraries(heaptrack_preload LINK_PRIVATE ${CMAKE_DL_LIBS} backtrace rt)
 add_library(heaptrack_inject MODULE heaptrack_inject.cpp libheaptrack.cpp)
-target_link_libraries(heaptrack_inject PRIVATE ${CMAKE_DL_LIBS} backtrace rt)
+target_link_libraries(heaptrack_inject LINK_PRIVATE ${CMAKE_DL_LIBS} backtrace rt)
 
 add_executable(heaptrack_interpret heaptrack_interpret.cpp)
 target_link_libraries(heaptrack_interpret backtrace)
