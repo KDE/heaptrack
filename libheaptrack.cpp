@@ -41,6 +41,7 @@
 #include <boost/algorithm/string/replace.hpp>
 
 #include "tracetree.h"
+#include "config.h"
 
 /**
  * uncomment this to get extended debug code for known pointers
@@ -298,8 +299,8 @@ void heaptrack_init(const char *outputFileName_, void (*initCallbackBefore) (), 
     if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
         fprintf(stderr, "Failed to enable per-thread libunwind caching.\n");
     }
-#if HAVE_UNW_SET_CACHE_LOG_SIZE
-    if (unw_set_cache_log_size(unw_local_addr_space, 10)) {
+#if HAVE_UNW_SET_CACHE_SIZE
+    if (unw_set_cache_size(unw_local_addr_space, 1024)) {
         fprintf(stderr, "Failed to set libunwind cache size.\n");
     }
 #endif

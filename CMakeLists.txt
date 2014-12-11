@@ -13,7 +13,7 @@ if (NOT HAVE_UNW_BACKTRACE)
     message(FATAL_ERROR "Your libunwind version is apparently too old and does not have the unw_backtrace function.")
 endif()
 
-check_library_exists (${LIBUNWIND_LIBRARY} _ULx86_64_set_cache_log_size "" HAVE_UNW_SET_CACHE_LOG_SIZE)
+check_library_exists (${LIBUNWIND_LIBRARY} _ULx86_64_set_cache_size "" HAVE_UNW_SET_CACHE_SIZE)
 
 include (CheckCXXSourceCompiles)
 check_cxx_source_compiles(
@@ -47,6 +47,8 @@ include_directories(
     3rdparty/
     ${LIBUNWIND_INCLUDE_DIR}
 )
+
+configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 add_library(heaptrack_preload MODULE heaptrack_preload.cpp libheaptrack.cpp)
 target_link_libraries(heaptrack_preload PRIVATE ${CMAKE_DL_LIBS} backtrace rt)
