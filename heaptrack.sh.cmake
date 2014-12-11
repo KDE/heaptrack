@@ -130,13 +130,17 @@ LIBHEAPTRACK_INJECT=$(readlink -f "$LIBHEAPTRACK_INJECT")
 # setup named pipe to read data from
 pipe=/tmp/heaptrack_fifo$$
 mkfifo $pipe
-trap "rm -f $pipe" EXIT
 
 # interpret the data and compress the output on the fly
 output="$output.gz"
 "$INTERPRETER" < $pipe | gzip -c > "$output" &
 debuggee=$!
-trap "kill $debuggee 2> /dev/null" EXIT
+
+function cleanup {
+    rm -f "$pipe"
+    kill "$debuggee" 2> /dev/null
+}
+trap cleanup EXIT
 
 echo "starting application, this might take some time..."
 echo "output will be written to $output"
