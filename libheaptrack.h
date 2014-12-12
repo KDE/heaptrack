@@ -20,13 +20,22 @@
 #include <cstdio>
 
 extern "C" {
+using heaptrack_callback_t = void (*) ();
+using heaptrack_callback_initialized_t = void (*) (FILE*);
+
 void heaptrack_init(const char *outputFileName,
-                    void (*initCallbackBefore) (), void (*initCallbackAfter) (),
-                    void (*stopCallback) ());
+                    heaptrack_callback_t initCallbackBefore,
+                    heaptrack_callback_initialized_t initCallbackAfter,
+                    heaptrack_callback_t stopCallback);
+
 void heaptrack_stop();
-FILE* heaptrack_output_file();
+
 void heaptrack_malloc(void *ptr, size_t size);
+
 void heaptrack_free(void *ptr);
+
 void heaptrack_realloc(void *ptr_in, size_t size, void *ptr_out);
+
 void heaptrack_invalidate_module_cache();
+
 }

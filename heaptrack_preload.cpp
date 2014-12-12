@@ -115,6 +115,7 @@ void init()
 
         // cleanup environment to prevent tracing of child apps
         unsetenv("LD_PRELOAD");
+        unsetenv("DUMP_HEAPTRACK_OUTPUT");
     }, nullptr, nullptr);
 }
 

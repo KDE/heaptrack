@@ -264,8 +264,7 @@ void heaptrack_inject(const char *outputFileName) noexcept
 {
     heaptrack_init(outputFileName, [] () {
         overwrite_symbols();
-    }, [] () {
-        auto out = heaptrack_output_file();
+    }, [] (FILE* out) {
         fprintf(out, "A BEGIN_MALLOC_INFO\n");
         malloc_info(0, out);
         fprintf(out, "\nA END_MALLOC_INFO\n");
