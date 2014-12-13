@@ -221,11 +221,6 @@ struct AccumulatedTraceData
         opNewIpIndices.clear();
     }
 
-    void printIp(const IpIndex ip, ostream &out, const size_t indent = 0) const
-    {
-        printIp(findIp(ip), out, indent);
-    }
-
     void printIndent(ostream& out, size_t indent, const char* indentString = "  ") const
     {
         while (indent--) {
@@ -233,28 +228,28 @@ struct AccumulatedTraceData
         }
     }
 
-    void printIp(const InstructionPointer& ip, ostream& out, const size_t indent = 0) const
+    void printIp(const IpIndex ip, ostream &out) const
     {
-        printIndent(out, indent);
+        printIp(findIp(ip), out);
+    }
 
+    void printIp(const InstructionPointer& ip, ostream& out) const
+    {
         if (ip.functionIndex) {
             out << prettyFunction(stringify(ip.functionIndex));
         } else {
             out << "0x" << hex << ip.instructionPointer << dec;
         }
 
-        out << '\n';
-        printIndent(out, indent + 1);
 
         if (ip.fileIndex) {
-            out << "at " << stringify(ip.fileIndex) << ':' << ip.line << '\n';
-            printIndent(out, indent + 1);
+            out << " at " << stringify(ip.fileIndex) << ':' << ip.line;
         }
 
         if (ip.moduleIndex) {
-            out << "in " << stringify(ip.moduleIndex);
+            out << " in " << stringify(ip.moduleIndex);
         } else {
-            out << "in ??";
+            out << " in ??";
         }
         out << '\n';
     }
@@ -271,7 +266,8 @@ struct AccumulatedTraceData
         while (node.ipIndex) {
             const auto& ip = findIp(node.ipIndex);
             if (!skipFirst) {
-                printIp(ip, out, indent);
+                printIndent(cout, indent);
+                printIp(ip, out);
             }
             skipFirst = false;
 
@@ -306,27 +302,67 @@ struct AccumulatedTraceData
                 break;
             }
             label(allocation);
+            cout << "| ";
             printIp(allocation.ipIndex, cout);
-
-            sort(allocation.traces.begin(), allocation.traces.end(), sortOrder);
-            size_t handled = 0;
-            const size_t subTracesToPrint = 5;
-            for (size_t j = 0; j < min(subTracesToPrint, allocation.traces.size()); ++j) {
-                const auto& trace = allocation.traces[j];
-                sublabel(trace);
-                handled += trace.*member;
-                printBacktrace(trace.traceIndex, cout, 2, true);
-            }
-            if (allocation.traces.size() > subTracesToPrint) {
-                cout << "  and ";
-                if (member == &AllocationData::allocations) {
-                    cout << (allocation.*member - handled);
-                } else {
-                    cout << formatBytes(allocation.*member - handled);
-                }
-                cout << " from " << (allocation.traces.size() - subTracesToPrint) << " other places\n";
-            }
+            printMergedBacktrace(member, sublabel, allocation.*member * massifThreshold * 0.01,
+                                 allocation.traces, allocation.*member);
             cout << '\n';
+        }
+    }
+
+    template<typename T, typename SubLabelPrinter>
+    void printMergedBacktrace(T AllocationData::* member, SubLabelPrinter sublabel, size_t threshold,
+                              const vector<Allocation> &allocations, T parentHandled, unsigned depth = 1)
+    {
+        auto sortOrder = [member] (const AllocationData& l, const AllocationData& r) {
+            return l.*member > r.*member;
+        };
+
+        auto merged = mergeAllocations(allocations, true);
+        sort(merged.begin(), merged.end(), sortOrder);
+        if (merged.size() == 1) {
+            --depth;
+        }
+        size_t handled = 0;
+        const size_t subTracesToPrint = 5;
+        size_t j = 0;
+        for (;j < min(subTracesToPrint, merged.size()); ++j) {
+            auto& trace = merged[j];
+            const auto cost = trace.*member;
+            if (cost < threshold) {
+                break;
+            }
+            if (merged.size() > 1) {
+                printIndent(cout, depth - 1, "  ");
+                cout << "| ";
+                sublabel(trace);
+            }
+            handled += cost;
+
+            if (merged.size() == 1) {
+                printIndent(cout, depth, "  ");
+                cout << "- ";
+            } else {
+                printIndent(cout, depth - 1, "  ");
+                cout << "+ ";
+            }
+            printIp(trace.ipIndex, cout);
+
+            const bool isMain = mainIndex && findIp(trace.ipIndex).functionIndex.index == mainIndex.index;
+            if (!isMain) {
+                printMergedBacktrace(member, sublabel, threshold, trace.traces, cost, depth + 1);
+            }
+        }
+        if (parentHandled > handled) {
+            const auto unhandled = parentHandled - handled;
+            printIndent(cout, depth - 1, "  ");
+            cout << "- and ";
+            if (member == &AllocationData::allocations) {
+                cout << unhandled;
+            } else {
+                cout << formatBytes(unhandled);
+            }
+            cout << " from " << (merged.size() - j) << " other places\n";
         }
     }
 
@@ -605,9 +641,16 @@ private:
         return allocations.back();
     }
 
-    void mergeAllocation(vector<MergedAllocation>* mergedAllocations, const Allocation& allocation) const
+    void mergeAllocation(vector<MergedAllocation>* mergedAllocations, Allocation allocation, bool skipFirst) const
     {
-        const auto trace = findTrace(allocation.traceIndex);
+        auto trace = findTrace(allocation.traceIndex);
+        if (skipFirst) {
+            allocation.traceIndex = trace.parentIndex;
+            trace = findTrace(allocation.traceIndex);
+        }
+        if (!trace.ipIndex) {
+            return;
+        }
         const auto traceIp = findIp(trace.ipIndex);
         auto it = lower_bound(mergedAllocations->begin(), mergedAllocations->end(), traceIp,
                                 [this] (const MergedAllocation& allocation, const InstructionPointer traceIp) -> bool {
@@ -629,7 +672,7 @@ private:
     // merge allocations so that different traces that point to the same
     // instruction pointer at the end where the allocation function is
     // called are combined
-    vector<MergedAllocation> mergeAllocations(const vector<Allocation>& allocations) const
+    vector<MergedAllocation> mergeAllocations(const vector<Allocation>& allocations, bool skipFirst = false) const
     {
         // TODO: merge deeper traces, i.e. A,B,C,D and A,B,C,F
         //       should be merged to A,B,C: D & F
@@ -637,9 +680,7 @@ private:
         vector<MergedAllocation> ret;
         ret.reserve(allocations.size());
         for (const Allocation& allocation : allocations) {
-            if (allocation.traceIndex) {
-                mergeAllocation(&ret, allocation);
-            }
+            mergeAllocation(&ret, allocation, skipFirst);
         }
         for (MergedAllocation& merged : ret) {
             for (const Allocation& allocation: merged.traces) {
