@@ -262,6 +262,10 @@ struct AccumulatedTraceData
     void printBacktrace(const TraceIndex traceIndex, ostream& out,
                         const size_t indent = 0, bool skipFirst = false) const
     {
+        if (!traceIndex) {
+            out << "  ??";
+            return;
+        }
         printBacktrace(findTrace(traceIndex), out, indent, skipFirst);
     }
 
@@ -592,7 +596,7 @@ private:
             assert(it != allocations.end());
             assert(it->traceIndex == traceIndex);
             return *it;
-        } else if (traceIndex == m_maxAllocationTraceIndex) {
+        } else if (traceIndex == m_maxAllocationTraceIndex && !allocations.empty()) {
             // reuse the last allocation
             assert(allocations.back().traceIndex == traceIndex);
         } else {

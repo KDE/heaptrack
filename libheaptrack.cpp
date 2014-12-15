@@ -536,9 +536,6 @@ void heaptrack_malloc(void* ptr, size_t size)
         debugLog<VeryVerboseOutput>("heaptrack_malloc(%p, %lu)", ptr, size);
 
         Trace trace;
-        if (!trace.fill(2)) {
-            return;
-        }
 
         HeapTrack heaptrack(guard);
         heaptrack.handleMalloc(ptr, size, trace);
