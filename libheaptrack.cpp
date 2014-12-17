@@ -183,7 +183,7 @@ public:
     ~HeapTrack()
     {
         debugLog<VeryVerboseOutput>("%s", "releasing lock");
-        s_locked.store(false, std::memory_order_release);
+        s_locked.store(false, memory_order_release);
     }
 
     void initialize(const char* fileName,
@@ -416,7 +416,7 @@ private:
     HeapTrack(AdditionalLockCheck lockCheck)
     {
         debugLog<VeryVerboseOutput>("%s", "acquiring lock");
-        while (s_locked.exchange(true, std::memory_order_acquire) && lockCheck()) {
+        while (s_locked.exchange(true, memory_order_acquire) && lockCheck()) {
             this_thread::sleep_for(chrono::microseconds(1));
         }
         debugLog<VeryVerboseOutput>("%s", "lock acquired");
