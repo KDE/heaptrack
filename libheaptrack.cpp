@@ -417,7 +417,7 @@ private:
     {
         debugLog<VeryVerboseOutput>("%s", "acquiring lock");
         while (s_locked.exchange(true, std::memory_order_acquire) && lockCheck()) {
-            std::this_thread::yield();
+            this_thread::sleep_for(chrono::microseconds(1));
         }
         debugLog<VeryVerboseOutput>("%s", "lock acquired");
     }
