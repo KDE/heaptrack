@@ -416,7 +416,7 @@ private:
     HeapTrack(AdditionalLockCheck lockCheck)
     {
         debugLog<VeryVerboseOutput>("%s", "acquiring lock");
-        while (s_locked.exchange(true, std::memory_order_relaxed) && lockCheck()) {
+        while (s_locked.exchange(true, std::memory_order_acquire) && lockCheck()) {
             std::this_thread::yield();
         }
         debugLog<VeryVerboseOutput>("%s", "lock acquired");
