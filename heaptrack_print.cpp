@@ -206,7 +206,6 @@ struct AccumulatedTraceData
         strings.reserve(4096);
         allocations.reserve(16384);
         activeAllocations.reserve(65536);
-        opNewIpIndices.reserve(16);
         stopIndices.reserve(4);
     }
 
@@ -219,7 +218,6 @@ struct AccumulatedTraceData
         mergedAllocations.clear();
         allocations.clear();
         activeAllocations.clear();
-        opNewIpIndices.clear();
     }
 
     void printIp(const IpIndex ip, ostream &out, const size_t indent = 0) const
@@ -413,10 +411,14 @@ struct AccumulatedTraceData
         LineReader reader;
         size_t timeStamp = 0;
 
-        const string opNewStr("operator new(unsigned long)");
-        const string opArrNewStr("operator new[](unsigned long)");
-        StringIndex opNewStrIndex;
-        StringIndex opArrNewStrIndex;
+        vector<StringIndex> opNewStrIndices;
+        opNewStrIndices.reserve(16);
+        vector<IpIndex> opNewIpIndices;
+        opNewIpIndices.reserve(16);
+        vector<string> opNewStrings = {
+            "operator new(unsigned long)",
+            "operator new[](unsigned long)"
+        };
 
         vector<string> stopStrings = {
             "main",
@@ -427,17 +429,18 @@ struct AccumulatedTraceData
         while (reader.getLine(in)) {
             if (reader.mode() == 's') {
                 strings.push_back(reader.line().substr(2));
-                if (!opNewStrIndex && strings.back() == opNewStr) {
-                    opNewStrIndex.index = strings.size();
-                } else if (!opArrNewStrIndex && strings.back() == opArrNewStr) {
-                    opArrNewStrIndex.index = strings.size();
+                StringIndex index;
+                index.index = strings.size();
+
+                auto opNewIt = find(opNewStrings.begin(), opNewStrings.end(), strings.back());
+                if (opNewIt != opNewStrings.end()) {
+                    opNewStrIndices.push_back(index);
+                    opNewStrings.erase(opNewIt);
                 } else {
-                    auto it = find(stopStrings.begin(), stopStrings.end(), strings.back());
-                    if (it != stopStrings.end()) {
-                        StringIndex index;
-                        index.index = strings.size();
+                    auto stopIt = find(stopStrings.begin(), stopStrings.end(), strings.back());
+                    if (stopIt != stopStrings.end()) {
                         stopIndices.push_back(index);
-                        stopStrings.erase(it);
+                        stopStrings.erase(stopIt);
                     }
                 }
             } else if (reader.mode() == 't') {
@@ -445,14 +448,8 @@ struct AccumulatedTraceData
                 reader >> node.ipIndex;
                 reader >> node.parentIndex;
                 // skip operator new and operator new[] at the beginning of traces
-                if (!opNewIpIndices.empty()) {
-                    while (true) {
-                        if (opNewIpIndices.find(node.ipIndex.index) != opNewIpIndices.end()) {
-                            node = findTrace(node.parentIndex);
-                        } else {
-                            break;
-                        }
-                    }
+                while (find(opNewIpIndices.begin(), opNewIpIndices.end(), node.ipIndex) != opNewIpIndices.end()) {
+                    node = findTrace(node.parentIndex);
                 }
                 traces.push_back(node);
             } else if (reader.mode() == 'i') {
@@ -463,10 +460,10 @@ struct AccumulatedTraceData
                 reader >> ip.fileIndex;
                 reader >> ip.line;
                 instructionPointers.push_back(ip);
-                if ((opNewStrIndex && opNewStrIndex == ip.functionIndex)
-                    || (opArrNewStrIndex && opArrNewStrIndex == ip.functionIndex))
-                {
-                    opNewIpIndices.insert(instructionPointers.size());
+                if (find(opNewStrIndices.begin(), opNewStrIndices.end(), ip.functionIndex) != opNewStrIndices.end()) {
+                    IpIndex index;
+                    index.index = instructionPointers.size();
+                    opNewIpIndices.push_back(index);
                 }
             } else if (reader.mode() == '+') {
                 size_t size = 0;
@@ -819,7 +816,6 @@ private:
     vector<InstructionPointer> instructionPointers;
     vector<TraceNode> traces;
     vector<string> strings;
-    unordered_set<size_t> opNewIpIndices;
 
     size_t massifSnapshotId = 0;
     size_t lastMassifPeak = 0;
