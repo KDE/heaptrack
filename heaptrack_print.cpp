@@ -207,11 +207,12 @@ struct AccumulatedTraceData
         allocations.reserve(16384);
         activeAllocations.reserve(65536);
         opNewIpIndices.reserve(16);
+        stopIndices.reserve(4);
     }
 
     void clear()
     {
-        mainIndex.index = 0;
+        stopIndices.clear();
         instructionPointers.clear();
         traces.clear();
         strings.clear();
@@ -279,7 +280,7 @@ struct AccumulatedTraceData
             }
             skipFirst = false;
 
-            if (mainIndex && ip.functionIndex.index == mainIndex.index) {
+            if (isStopIndex(ip.functionIndex)) {
                 break;
             }
 
@@ -414,11 +415,14 @@ struct AccumulatedTraceData
 
         const string opNewStr("operator new(unsigned long)");
         const string opArrNewStr("operator new[](unsigned long)");
-        const string mainStr("main");
-        const string libcMainStr("__libc_start_main");
-        bool mainStrIsLibC = false;
         StringIndex opNewStrIndex;
         StringIndex opArrNewStrIndex;
+
+        vector<string> stopStrings = {
+            "main",
+            "__libc_start_main",
+            "__static_initialization_and_destruction_0"
+        };
 
         while (reader.getLine(in)) {
             if (reader.mode() == 's') {
@@ -427,12 +431,14 @@ struct AccumulatedTraceData
                     opNewStrIndex.index = strings.size();
                 } else if (!opArrNewStrIndex && strings.back() == opArrNewStr) {
                     opArrNewStrIndex.index = strings.size();
-                } else if ((mainStrIsLibC || !mainIndex) && strings.back() == mainStr) {
-                    mainIndex.index = strings.size();
-                    mainStrIsLibC = false;
-                } else if (!mainIndex && strings.back() == libcMainStr) {
-                    mainIndex.index = strings.size();
-                    mainStrIsLibC = true;
+                } else {
+                    auto it = find(stopStrings.begin(), stopStrings.end(), strings.back());
+                    if (it != stopStrings.end()) {
+                        StringIndex index;
+                        index.index = strings.size();
+                        stopIndices.push_back(index);
+                        stopStrings.erase(it);
+                    }
                 }
             } else if (reader.mode() == 't') {
                 TraceNode node;
@@ -732,10 +738,9 @@ private:
 
         const auto ip = findIp(location);
 
-        const bool isMain = mainIndex && ip.functionIndex.index == mainIndex.index;
-
         // skip anything below main
-        if (!isMain) {
+        const bool shouldStop = isStopIndex(ip.functionIndex);
+        if (!shouldStop) {
             for (auto& merged : mergedAllocations) {
                 if (!merged.leaked) {
                     // list is sorted, so we can bail out now - these entries are uninteresting for massif
@@ -789,7 +794,7 @@ private:
             }
         };
 
-        if (!isMain) {
+        if (!shouldStop) {
             for (const auto& merged : mergedAllocations) {
                 if (merged.leaked && merged.leaked >= threshold) {
                     if (skippedLeaked > merged.leaked) {
@@ -803,7 +808,13 @@ private:
         }
     }
 
-    StringIndex mainIndex;
+    bool isStopIndex(const StringIndex index) const
+    {
+        return find(stopIndices.begin(), stopIndices.end(), index) != stopIndices.end();
+    }
+
+    // indices of functions that should stop the backtrace, e.g. main or static initialization
+    vector<StringIndex> stopIndices;
     unordered_map<uintptr_t, AllocationInfo> activeAllocations;
     vector<InstructionPointer> instructionPointers;
     vector<TraceNode> traces;
