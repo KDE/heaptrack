@@ -153,8 +153,10 @@ else
         --eval-command="set environment DUMP_HEAPTRACK_OUTPUT=$pipe" \
         --eval-command="run" --args $client $clientargs
   else
-    gdb -p $pid \
+    gdb -n -iex="set auto-solib-add off" -p $pid \
+        --eval-command="sharedlibrary libdl" \
         --eval-command="call (void) dlopen(\"$LIBHEAPTRACK_INJECT\", 0x002)" \
+        --eval-command="sharedlibrary libheaptrack_inject" \
         --eval-command="call (void) heaptrack_inject(\"$pipe\")" \
         --eval-command="detach" --eval-command="quit"
   fi
