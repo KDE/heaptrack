@@ -484,7 +484,7 @@ private:
 
         TraceTree traceTree;
 
-        chrono::time_point<clock> start = clock::now();
+        const chrono::time_point<clock> start = clock::now();
         atomic<bool> stopTimerThread{false};
         thread timerThread;
 
