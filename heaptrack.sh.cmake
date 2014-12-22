@@ -139,6 +139,10 @@ debuggee=$!
 function cleanup {
     rm -f "$pipe"
     kill "$debuggee" 2> /dev/null
+
+    echo "Heaptrack finished! Now run the following to investigate the data:"
+    echo
+    echo "  heaptrack_print $output | less"
 }
 trap cleanup EXIT
 
@@ -163,9 +167,5 @@ else
 fi
 
 wait $debuggee
-
-echo "Heaptrack finished! Now run the following to investigate the data:"
-echo
-echo "  heaptrack_print $output | less"
 
 # kate: hl Bash
