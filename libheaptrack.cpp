@@ -450,7 +450,11 @@ private:
         {
             debugLog<MinimalOutput>("%s", "destroying LockedData");
             stopTimerThread = true;
-            timerThread.join();
+            if (timerThread.joinable()) {
+                try {
+                    timerThread.join();
+                } catch(std::system_error) {}
+            }
 
             if (out) {
                 fclose(out);
