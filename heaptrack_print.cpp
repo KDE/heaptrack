@@ -489,6 +489,10 @@ struct AccumulatedTraceData
                 if (leaked > peak) {
                     peak = leaked;
                 }
+                if (leaked > lastMassifPeak && massifOut.is_open()) {
+                    massifAllocations = allocations;
+                    lastMassifPeak = leaked;
+                }
                 if (printHistogram) {
                     ++sizeHistogram[size];
                 }
@@ -682,39 +686,29 @@ private:
 
     void writeMassifSnapshot(size_t timeStamp, bool isLast)
     {
-        // the heap consumption we annotate this snapshot with
-        size_t heapSize = 0;
-        if (peak > lastMassifPeak) {
-            // if we encountered a peak in this snapshot, use that now
-            // NOTE: this is wrong from a time perspective, but better than
-            // ignoring the peak completely. And the error in time is at most the
-            // inverse of the timer frequency, which is high.
-            // FIXME: we should do something similar with the individual backtraces below
-            // FIXME: non-maximum peaks after a big first one will still be hidden
-            lastMassifPeak = peak;
-            heapSize = lastMassifPeak;
-        } else {
-            heapSize = leaked;
+        if (!lastMassifPeak) {
+            lastMassifPeak = leaked;
+            massifAllocations = allocations;
         }
-
         massifOut
             << "#-----------\n"
             << "snapshot=" << massifSnapshotId << '\n'
             << "#-----------\n"
             << "time=" << (0.001 * timeStamp) << '\n'
-            << "mem_heap_B=" << heapSize << '\n'
+            << "mem_heap_B=" << lastMassifPeak << '\n'
             << "mem_heap_extra_B=0\n"
             << "mem_stacks_B=0\n";
 
         if (massifDetailedFreq && (isLast || !(massifSnapshotId % massifDetailedFreq))) {
             massifOut << "heap_tree=detailed\n";
-            const size_t threshold = double(heapSize) * massifThreshold * 0.01;
-            writeMassifBacktrace(allocations, heapSize, threshold, IpIndex());
+            const size_t threshold = double(lastMassifPeak) * massifThreshold * 0.01;
+            writeMassifBacktrace(massifAllocations, lastMassifPeak, threshold, IpIndex());
         } else {
             massifOut << "heap_tree=empty\n";
         }
 
         ++massifSnapshotId;
+        lastMassifPeak = 0;
     }
 
     void writeMassifBacktrace(const vector<Allocation>& allocations, size_t heapSize, size_t threshold,
@@ -814,6 +808,7 @@ private:
 
     size_t massifSnapshotId = 0;
     size_t lastMassifPeak = 0;
+    vector<Allocation> massifAllocations;
 };
 
 }
