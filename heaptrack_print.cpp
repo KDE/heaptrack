@@ -538,13 +538,8 @@ struct AccumulatedTraceData
                     writeMassifHeader(reader.line().c_str() + 2);
                 }
             } else if (reader.mode() == 'A') {
-                size_t current = 0;
-                if (!(reader >> current)) {
-                    cerr << "Failed to read current size after attaching." << endl;
-                    continue;
-                }
-                leaked = current;
-                peak = current;
+                leaked = 0;
+                peak = 0;
                 fromAttached = true;
             } else {
                 cerr << "failed to parse line: " << reader.line() << endl;

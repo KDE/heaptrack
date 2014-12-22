@@ -265,9 +265,7 @@ void heaptrack_inject(const char *outputFileName) noexcept
     heaptrack_init(outputFileName, [] () {
         overwrite_symbols();
     }, [] (FILE* out) {
-        fprintf(out, "A BEGIN_MALLOC_INFO\n");
-        malloc_info(0, out);
-        fprintf(out, "\nA END_MALLOC_INFO\n");
+        fprintf(out, "A\n");
     }, [] () {
         bool do_shutdown = true;
         dl_iterate_phdr(&iterate_phdrs, &do_shutdown);
