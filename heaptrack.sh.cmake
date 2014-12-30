@@ -49,7 +49,6 @@ usage() {
 debug=
 pid=
 client=
-clientargs=
 
 while true; do
     case "$1" in
@@ -84,7 +83,7 @@ while true; do
             break
             ;;
         *)
-            if [ ! -x "$(which $1 2> /dev/null)" ]; then
+            if [ ! -x "$(which "$1" 2> /dev/null)" ]; then
                 echo "Error: Debuggee \"$1\" is not an executable."
                 echo
                 echo "Usage: $0 [--debug|-d] [--help|-h] DEBUGGEE [ARGS...]"
@@ -92,14 +91,13 @@ while true; do
             fi
             client="$1"
             shift 1
-            clientargs="$@"
             break
             ;;
     esac
 done
 
 # put output into current pwd
-output=$(pwd)/heaptrack.$(basename $client).$$
+output=$(pwd)/heaptrack.$(basename "$client").$$
 
 # find preload library and interpreter executable using relative paths
 EXE_PATH=$(readlink -f $(dirname $0))
@@ -142,20 +140,20 @@ function cleanup {
 
     echo "Heaptrack finished! Now run the following to investigate the data:"
     echo
-    echo "  heaptrack_print $output | less"
+    echo "  heaptrack_print \"$output\" | less"
 }
 trap cleanup EXIT
 
 echo "starting application, this might take some time..."
-echo "output will be written to $output"
+echo "output will be written to \"$output\""
 
 if [ -z "$debug" ] && [ -z "$pid" ]; then
-  LD_PRELOAD=$LIBHEAPTRACK_PRELOAD DUMP_HEAPTRACK_OUTPUT="$pipe" $client $clientargs
+  LD_PRELOAD=$LIBHEAPTRACK_PRELOAD DUMP_HEAPTRACK_OUTPUT="$pipe" "$client" "$@"
 else
   if [ -z "$pid" ]; then
     gdb --eval-command="set environment LD_PRELOAD=$LIBHEAPTRACK_PRELOAD" \
         --eval-command="set environment DUMP_HEAPTRACK_OUTPUT=$pipe" \
-        --eval-command="run" --args $client $clientargs
+        --eval-command="run" --args "$client" "$@"
   else
     gdb --batch-silent -n -iex="set auto-solib-add off" -p $pid \
         --eval-command="sharedlibrary libdl" \
