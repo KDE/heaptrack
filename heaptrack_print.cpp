@@ -559,6 +559,7 @@ struct AccumulatedTraceData
             writeMassifSnapshot(totalTime, true);
         }
 
+        filterAllocations();
         mergedAllocations = mergeAllocations(allocations);
 
         return true;
@@ -571,6 +572,7 @@ struct AccumulatedTraceData
     ofstream massifOut;
     double massifThreshold = 1;
     size_t massifDetailedFreq = 1;
+    string filterBtFunction;
 
     vector<Allocation> allocations;
     vector<MergedAllocation> mergedAllocations;
@@ -799,6 +801,27 @@ private:
         return find(stopIndices.begin(), stopIndices.end(), index) != stopIndices.end();
     }
 
+    void filterAllocations()
+    {
+        if (filterBtFunction.empty()) {
+            return;
+        }
+        allocations.erase(remove_if(allocations.begin(), allocations.end(), [&] (const Allocation& allocation) -> bool {
+            auto node = findTrace(allocation.traceIndex);
+            while (node.ipIndex) {
+                const auto& ip = findIp(node.ipIndex);
+                if (isStopIndex(ip.functionIndex)) {
+                    break;
+                }
+                if (stringify(ip.functionIndex).find(filterBtFunction) != string::npos) {
+                    return false;
+                }
+                node = findTrace(node.parentIndex);
+            };
+            return true;
+        }), allocations.end());
+    }
+
     // indices of functions that should stop the backtrace, e.g. main or static initialization
     vector<StringIndex> stopIndices;
     unordered_map<uintptr_t, AllocationInfo> activeAllocations;
@@ -841,6 +864,8 @@ int main(int argc, char** argv)
         ("massif-detailed-freq", po::value<size_t>()->default_value(2),
             "Frequency of detailed snapshots in the massif output file. Increase this to reduce the file size.\n"
             "You can set the value to zero to disable detailed snapshots.\n")
+        ("filter-bt-function", po::value<string>()->default_value(string()),
+            "Only print allocations where the backtrace contains the given function.")
         ("help,h",
             "Show this help message.");
     po::positional_options_description p;
@@ -871,6 +896,7 @@ int main(int argc, char** argv)
     const auto inputFile = vm["file"].as<string>();
     data.shortenTemplates = vm["shorten-templates"].as<bool>();
     data.mergeBacktraces = vm["merge-backtraces"].as<bool>();
+    data.filterBtFunction = vm["filter-bt-function"].as<string>();
     const string printHistogram = vm["print-histogram"].as<string>();
     data.printHistogram = !printHistogram.empty();
     const string printMassif = vm["print-massif"].as<string>();
