@@ -148,7 +148,7 @@ echo "starting application, this might take some time..."
 echo "output will be written to \"$output\""
 
 if [ -z "$debug" ] && [ -z "$pid" ]; then
-  LD_PRELOAD=$LIBHEAPTRACK_PRELOAD DUMP_HEAPTRACK_OUTPUT="$pipe" "$client" "$@"
+  LD_PRELOAD=$LIBHEAPTRACK_PRELOAD${LD_PRELOAD:+:$LD_PRELOAD} DUMP_HEAPTRACK_OUTPUT="$pipe" "$client" "$@"
 else
   if [ -z "$pid" ]; then
     gdb --eval-command="set environment LD_PRELOAD=$LIBHEAPTRACK_PRELOAD" \
