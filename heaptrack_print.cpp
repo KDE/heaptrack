@@ -303,7 +303,7 @@ struct AccumulatedTraceData
             return l.*member > r.*member;
         };
         sort(mergedAllocations.begin(), mergedAllocations.end(), sortOrder);
-        for (size_t i = 0; i < min(10lu, mergedAllocations.size()); ++i) {
+        for (size_t i = 0; i < min(size_t(10), mergedAllocations.size()); ++i) {
             auto& allocation = mergedAllocations[i];
             if (!(allocation.*member)) {
                 break;
@@ -340,7 +340,7 @@ struct AccumulatedTraceData
             [member] (const Allocation& l, const Allocation &r) {
                 return l.*member > r.*member;
             });
-        for (size_t i = 0; i < min(10lu, allocations.size()); ++i) {
+        for (size_t i = 0; i < min(size_t(10), allocations.size()); ++i) {
             const auto& allocation = allocations[i];
             if (!(allocation.*member)) {
                 break;
