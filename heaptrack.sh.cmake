@@ -21,6 +21,7 @@
 
 usage() {
     echo "Usage: $0 [--debug|-d] DEBUGGEE [ARGUMENT]..."
+    echo "or:    $0 [--debug|-d] -p PID"
     echo
     echo "A heap memory usage profiler. It uses LD_PRELOAD to track all"
     echo "calls to the core memory allocation functions and logs these"
@@ -34,8 +35,13 @@ usage() {
     echo "To evaluate the generated heaptrack data, use heaptrack_print."
     echo
     echo "Mandatory arguments to heaptrack:"
-    echo "  DEBUGGEE        The name or path to the application that should"
+    echo "  DEBUGGEE       The name or path to the application that should"
     echo "                 be run with heaptrack analyzation enabled."
+    echo
+    echo "Alternatively, to attach to a running process:"
+    echo "  -p, --pid PID  The process ID of a running process into which"
+    echo "                 heaptrack will be injected. This only works with"
+    echo "                 applications that already link against libdl."
     echo
     echo "Optional arguments to heaptrack:"
     echo "  -d, --debug    Run the debuggee in GDB and heaptrack."
@@ -144,23 +150,26 @@ function cleanup {
 }
 trap cleanup EXIT
 
-echo "starting application, this might take some time..."
-echo "output will be written to \"$output\""
+echo "heaptrack output will be written to \"$output\""
 
 if [ -z "$debug" ] && [ -z "$pid" ]; then
+  echo "starting application, this might take some time..."
   LD_PRELOAD=$LIBHEAPTRACK_PRELOAD${LD_PRELOAD:+:$LD_PRELOAD} DUMP_HEAPTRACK_OUTPUT="$pipe" "$client" "$@"
 else
   if [ -z "$pid" ]; then
+    echo "starting application in GDB, this might take some time..."
     gdb --eval-command="set environment LD_PRELOAD=$LIBHEAPTRACK_PRELOAD" \
         --eval-command="set environment DUMP_HEAPTRACK_OUTPUT=$pipe" \
         --eval-command="run" --args "$client" "$@"
   else
+    echo "injecting heaptrack into application via GDB, this might take some time..."
     gdb --batch-silent -n -iex="set auto-solib-add off" -p $pid \
         --eval-command="sharedlibrary libdl" \
         --eval-command="call (void) dlopen(\"$LIBHEAPTRACK_INJECT\", 0x002)" \
         --eval-command="sharedlibrary libheaptrack_inject" \
         --eval-command="call (void) heaptrack_inject(\"$pipe\")" \
         --eval-command="detach"
+    echo "injection finished"
   fi
 fi
 
