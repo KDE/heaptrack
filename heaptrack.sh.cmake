@@ -106,7 +106,7 @@ done
 output=$(pwd)/heaptrack.$(basename "$client").$$
 
 # find preload library and interpreter executable using relative paths
-EXE_PATH=$(readlink -f $(dirname $0))
+EXE_PATH=$(readlink -f $(dirname $(readlink -f $0)))
 LIB_REL_PATH="@LIB_REL_PATH@"
 LIBEXEC_REL_PATH="@LIBEXEC_REL_PATH@"
 
