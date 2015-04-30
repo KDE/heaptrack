@@ -29,6 +29,8 @@
 
 using namespace std;
 
+#define HAVE_ALIGNED_ALLOC defined(_ISOC11_SOURCE)
+
 namespace {
 
 namespace hooks {
@@ -71,7 +73,9 @@ HOOK(cfree);
 HOOK(realloc);
 HOOK(posix_memalign);
 HOOK(valloc);
+#if HAVE_ALIGNED_ALLOC
 HOOK(aligned_alloc);
+#endif
 HOOK(dlopen);
 HOOK(dlclose);
 
@@ -111,7 +115,9 @@ void init()
         hooks::realloc.init();
         hooks::posix_memalign.init();
         hooks::valloc.init();
+#if HAVE_ALIGNED_ALLOC
         hooks::aligned_alloc.init();
+#endif
 
         // cleanup environment to prevent tracing of child apps
         unsetenv("LD_PRELOAD");
@@ -213,6 +219,7 @@ int posix_memalign(void **memptr, size_t alignment, size_t size) noexcept
     return ret;
 }
 
+#if HAVE_ALIGNED_ALLOC
 void* aligned_alloc(size_t alignment, size_t size) noexcept
 {
     if (!hooks::aligned_alloc) {
@@ -227,6 +234,7 @@ void* aligned_alloc(size_t alignment, size_t size) noexcept
 
     return ret;
 }
+#endif
 
 void* valloc(size_t size) noexcept
 {
