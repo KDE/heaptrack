@@ -1,6 +1,8 @@
 #include <cstdlib>
 #include <cstdio>
 
+#define HAVE_ALIGNED_ALLOC defined(_ISOC11_SOURCE)
+
 struct Foo {
     Foo()
         : i(new int)
@@ -51,9 +53,11 @@ int main()
     printf("calloc: %p\n", buf);
     cfree(buf);
 
+#if HAVE_ALIGNED_ALLOC
     buf = aligned_alloc(16, 160);
     printf("aligned_alloc: %p\n", buf);
     free(buf);
+#endif
 
     buf = valloc(32);
     printf("valloc: %p\n", buf);

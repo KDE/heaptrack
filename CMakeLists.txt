@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(heaptrack)
 
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wpedantic")
 
-find_package(Boost 1.45.0 REQUIRED COMPONENTS iostreams program_options)
+find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options)
 find_package(Threads REQUIRED)
 find_package(Qt5 NO_MODULE QUIET OPTIONAL_COMPONENTS Widgets)
 if(Qt5_FOUND)

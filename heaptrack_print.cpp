@@ -315,7 +315,7 @@ int main(int argc, char** argv)
 {
     po::options_description desc("Options");
     desc.add_options()
-        ("file,f", po::value<string>()->required(),
+        ("file,f", po::value<string>(),
             "The heaptrack data file to print.")
         ("shorten-templates,t", po::value<bool>()->default_value(true)->implicit_value(true),
             "Shorten template identifiers.")
@@ -363,6 +363,14 @@ int main(int argc, char** argv)
     } catch (const po::error& error) {
         cerr << "ERROR: " << error.what() << endl
              << endl << desc << endl;
+        return 1;
+    }
+
+    if (!vm.count("file")) {
+        // NOTE: stay backwards compatible to old boost 1.41 available in RHEL 6
+        //       otherwise, we could simplify this by setting the file option
+        //       as ->required() using the new 1.42 boost API
+        cerr << "ERROR: the option '--file' is required but missing\n\n" << desc << endl;
         return 1;
     }
 
