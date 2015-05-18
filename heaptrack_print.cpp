@@ -1010,7 +1010,7 @@ int main(int argc, char** argv)
     if (!printHistogram.empty()) {
         ofstream histogram(printHistogram, ios_base::out);
         if (!histogram.is_open()) {
-            cerr << "Failed to open histogram output file \"" << histogram << "\"." << endl;
+            cerr << "Failed to open histogram output file \"" << printHistogram << "\"." << endl;
         } else {
             for (auto entry : data.sizeHistogram) {
                 histogram << entry.first << '\t' << entry.second << '\n';
