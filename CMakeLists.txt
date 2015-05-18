@@ -5,6 +5,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wpedantic")
 
 find_package(Boost 1.45.0 REQUIRED COMPONENTS iostreams program_options)
 find_package(Threads REQUIRED)
+find_package(Qt5 NO_MODULE QUIET OPTIONAL_COMPONENTS Widgets)
+if(Qt5_FOUND)
+    add_subdirectory(gui)
+endif()
 
 add_subdirectory(3rdparty)
 
@@ -58,8 +62,9 @@ target_link_libraries(heaptrack_inject LINK_PRIVATE ${CMAKE_DL_LIBS} ${CMAKE_THR
 add_executable(heaptrack_interpret heaptrack_interpret.cpp)
 target_link_libraries(heaptrack_interpret backtrace)
 
+add_library(sharedprint STATIC accumulatedtracedata.cpp)
 add_executable(heaptrack_print heaptrack_print.cpp)
-target_link_libraries(heaptrack_print ${Boost_LIBRARIES})
+target_link_libraries(heaptrack_print ${Boost_LIBRARIES} sharedprint)
 
 set(BIN_INSTALL_DIR "bin")
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
