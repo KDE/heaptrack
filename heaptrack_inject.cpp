@@ -207,17 +207,19 @@ void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base, const bo
     elf_jmprel_table jmprels;
     elf_string_table strings;
 
+    // initialize the elf tables
     for (; dyn->d_tag != DT_NULL; ++dyn) {
         symbols.consume(dyn) || jmprels.consume(dyn) || strings.consume(dyn);
     }
 
-    auto relaend = reinterpret_cast<ElfW(Rela) *>(reinterpret_cast<char *>(jmprels.table) + jmprels.size);
-    for (auto rela = jmprels.table; rela < relaend; rela++) {
-        auto relsymidx = ELF64_R_SYM(rela->r_info);
-        const char *relsymname = strings.table + symbols.table[relsymidx].st_name;
+    // find symbols to overwrite
+    const auto rela_end = reinterpret_cast<ElfW(Rela) *>(reinterpret_cast<char *>(jmprels.table) + jmprels.size);
+    for (auto rela = jmprels.table; rela < rela_end; rela++) {
+        const auto index = ELF64_R_SYM(rela->r_info);
+        const char *symname = strings.table + symbols.table[index].st_name;
         auto addr = reinterpret_cast<void**>(rela->r_offset + base);
         for (const auto& hook : hooks::list) {
-            if (!strcmp(hook.name, relsymname)) {
+            if (!strcmp(hook.name, symname)) {
                 // try to make the page read/write accessible, which is hackish
                 // but apparently required for some shared libraries
                 void *page = (void *)((intptr_t)addr & ~(0x1000 - 1));
