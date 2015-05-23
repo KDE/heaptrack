@@ -240,6 +240,9 @@ int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data) noexcept
     if (strstr(info->dlpi_name, "/libheaptrack_inject.so")) {
         // prevent infinite recursion: do not overwrite our own symbols
         return 0;
+    } else if (strstr(info->dlpi_name, "/ld-linux")) {
+        // prevent strange crashes due to overwriting the free symbol in ld-linux
+        return 0;
     }
 
     for (auto phdr = info->dlpi_phdr, end = phdr + info->dlpi_phnum; phdr != end; ++phdr) {
