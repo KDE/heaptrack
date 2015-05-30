@@ -48,6 +48,7 @@ usage() {
     echo "  ARGUMENT       Any number of arguments that will be passed verbatim"
     echo "                 to the debuggee."
     echo "  -h, --help     Show this help message and exit."
+    echo "  -v, --version  Displays version information."
     echo
     exit 0
 }
@@ -87,6 +88,11 @@ while true; do
                 exit 1
             fi
             break
+            ;;
+        "-v") ;&
+        "--version")
+            echo "heaptrack @HEAPTRACK_VERSION_MAJOR@.@HEAPTRACK_VERSION_MINOR@.@HEAPTRACK_VERSION_PATCH@"
+            exit 0
             ;;
         *)
             if [ ! -x "$(which "$1" 2> /dev/null)" ]; then

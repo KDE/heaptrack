@@ -42,6 +42,7 @@
 #include <boost/program_options.hpp>
 
 #include "linereader.h"
+#include "config.h"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -867,7 +868,9 @@ int main(int argc, char** argv)
         ("filter-bt-function", po::value<string>()->default_value(string()),
             "Only print allocations where the backtrace contains the given function.")
         ("help,h",
-            "Show this help message.");
+            "Show this help message.")
+        ("version,v",
+            "Displays version information.");
     po::positional_options_description p;
     p.add("file", -1);
 
@@ -882,7 +885,10 @@ int main(int argc, char** argv)
                 << "about calls to heap allocation functions such as malloc, operator new etc. pp.\n"
                 << "This print utility can then be used to analyze the generated data files.\n\n"
                 << desc << endl;
-            return 1;
+            return 0;
+        } else if (vm.count("version")) {
+            cout << "heaptrack_print " << HEAPTRACK_VERSION_STRING << endl;
+            return 0;
         }
         po::notify(vm);
     } catch (const po::error& error) {
