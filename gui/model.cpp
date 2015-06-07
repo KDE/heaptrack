@@ -102,6 +102,10 @@ QVariant Model::data(const QModelIndex& index, int role) const
 
         if (role == Qt::DisplayRole) {
             return allocationData(trace, m_data.findTrace(trace.traceIndex).ipIndex, static_cast<Columns>(index.column()));
+        } else if (role == Qt::ToolTipRole) {
+            stringstream stream;
+            m_data.printBacktrace(trace.traceIndex, stream);
+            return QString::fromStdString(stream.str());
         }
         return QVariant();
     }
