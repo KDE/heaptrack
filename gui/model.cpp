@@ -56,8 +56,12 @@ QVariant Model::headerData(int section, Qt::Orientation orientation, int role) c
         return QVariant();
     }
     switch (static_cast<Columns>(section)) {
-        case LocationColumn:
-            return tr("Location");
+        case FileColumn:
+            return tr("File");
+        case FunctionColumn:
+            return tr("Function");
+        case ModuleColumn:
+            return tr("Module");
         case AllocationsColumn:
             return tr("Allocations");
         case PeakColumn:
@@ -92,8 +96,24 @@ QVariant Model::data(const QModelIndex& index, int role) const
             return static_cast<quint64>(allocation.leaked);
         case AllocatedColumn:
             return static_cast<quint64>(allocation.allocated);
-        case LocationColumn:
+        case FileColumn:
+        case ModuleColumn:
+        case FunctionColumn: {
+            const auto& ip = m_data.findIp(allocation.ipIndex);
+            if (index.column() == FunctionColumn) {
+                if (ip.functionIndex) {
+                    return QString::fromStdString(m_data.prettyFunction(m_data.stringify(ip.functionIndex)));
+                } else {
+                    return QLatin1String("0x") + QString::number(ip.instructionPointer, 16);
+                }
+            } else if (index.column() == ModuleColumn) {
+                return QString::fromStdString(m_data.stringify(ip.moduleIndex));
+            } else if (ip.fileIndex) {
+                auto file = QString::fromStdString(m_data.stringify(ip.fileIndex));
+                return file + QLatin1Char(':') + QString::number(ip.line);
+            }
             return QVariant();
+        }
         case NUM_COLUMNS:
             break;
         }

@@ -36,7 +36,9 @@ public:
         PeakColumn,
         LeakedColumn,
         AllocatedColumn,
-        LocationColumn,
+        FunctionColumn,
+        FileColumn,
+        ModuleColumn,
         NUM_COLUMNS
     };
 
