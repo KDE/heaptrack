@@ -74,31 +74,60 @@ QVariant Model::headerData(int section, Qt::Orientation orientation, int role) c
 
 QVariant Model::data(const QModelIndex& index, int role) const
 {
+    if (index.parent().isValid()
+        || index.row() < 0 || index.row() > m_data.mergedAllocations.size()
+        || index.column() < 0 || index.column() > NUM_COLUMNS)
+    {
+        return QVariant();
+    }
+
+    const auto& allocation = m_data.mergedAllocations[index.row()];
+    if (role == Qt::DisplayRole) {
+        switch (static_cast<Columns>(index.column())) {
+        case AllocationsColumn:
+            return QVariant::fromValue(allocation.allocations);
+        case PeakColumn:
+            return QVariant::fromValue(allocation.peak);
+        case LeakedColumn:
+            return QVariant::fromValue(allocation.leaked);
+        case AllocatedColumn:
+            return QVariant::fromValue(allocation.allocated);
+        case LocationColumn:
+            return QVariant();
+        case NUM_COLUMNS:
+            break;
+        }
+    }
     return QVariant();
 }
 
-QModelIndex Model::index(int row, int column, const QModelIndex& parent) const
+QModelIndex Model::index(int row, int column, const QModelIndex& /*parent*/) const
 {
-    return QModelIndex();
+    return createIndex(row, column);
 }
 
-QModelIndex Model::parent(const QModelIndex& child) const
+QModelIndex Model::parent(const QModelIndex& /*child*/) const
 {
     return QModelIndex();
 }
 
 int Model::rowCount(const QModelIndex& parent) const
 {
-    return 0;
+    if (parent.isValid()) {
+        return 0;
+    }
+    return m_data.mergedAllocations.size();
 }
 
-int Model::columnCount(const QModelIndex& parent) const
+int Model::columnCount(const QModelIndex& /*parent*/) const
 {
     return NUM_COLUMNS;
 }
 
 void Model::loadFile(const QString& file)
 {
+    beginResetModel();
     m_data.read(file.toStdString());
+    endResetModel();
     emit dataReady(generateSummary(m_data));
 }
