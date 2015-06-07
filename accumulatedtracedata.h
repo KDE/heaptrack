@@ -198,6 +198,14 @@ struct AccumulatedTraceData
 
     void filterAllocations();
 
+    void printIndent(std::ostream& out, size_t indent, const char* indentString = "  ") const;
+    void printIp(const IpIndex ip, std::ostream &out, const size_t indent = 0) const;
+    void printIp(const InstructionPointer& ip, std::ostream& out, const size_t indent = 0) const;
+    void printBacktrace(const TraceIndex traceIndex, std::ostream& out,
+                        const size_t indent = 0, bool skipFirst = false) const;
+    void printBacktrace(TraceNode node, std::ostream& out, const size_t indent = 0,
+                        bool skipFirst = false) const;
+
     // indices of functions that should stop the backtrace, e.g. main or static initialization
     std::vector<StringIndex> stopIndices;
     std::unordered_map<uintptr_t, AllocationInfo> activeAllocations;

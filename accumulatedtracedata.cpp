@@ -444,3 +444,69 @@ void AccumulatedTraceData::filterAllocations()
         return true;
     }), allocations.end());
 }
+
+void AccumulatedTraceData::printIndent(ostream& out, size_t indent, const char* indentString) const
+{
+    while (indent--) {
+        out << indentString;
+    }
+}
+
+void AccumulatedTraceData::printIp(const IpIndex ip, ostream &out, const size_t indent) const
+{
+    printIp(findIp(ip), out, indent);
+}
+
+void AccumulatedTraceData::printIp(const InstructionPointer& ip, ostream& out, const size_t indent) const
+{
+    printIndent(out, indent);
+
+    if (ip.functionIndex) {
+        out << prettyFunction(stringify(ip.functionIndex));
+    } else {
+        out << "0x" << hex << ip.instructionPointer << dec;
+    }
+
+    out << '\n';
+    printIndent(out, indent + 1);
+
+    if (ip.fileIndex) {
+        out << "at " << stringify(ip.fileIndex) << ':' << ip.line << '\n';
+        printIndent(out, indent + 1);
+    }
+
+    if (ip.moduleIndex) {
+        out << "in " << stringify(ip.moduleIndex);
+    } else {
+        out << "in ??";
+    }
+    out << '\n';
+}
+
+void AccumulatedTraceData::printBacktrace(const TraceIndex traceIndex, ostream& out,
+                                          const size_t indent, bool skipFirst) const
+{
+    if (!traceIndex) {
+        out << "  ??";
+        return;
+    }
+    printBacktrace(findTrace(traceIndex), out, indent, skipFirst);
+}
+
+void AccumulatedTraceData::printBacktrace(TraceNode node, ostream& out, const size_t indent,
+                                          bool skipFirst) const
+{
+    while (node.ipIndex) {
+        const auto& ip = findIp(node.ipIndex);
+        if (!skipFirst) {
+            printIp(ip, out, indent);
+        }
+        skipFirst = false;
+
+        if (isStopIndex(ip.functionIndex)) {
+            break;
+        }
+
+        node = findTrace(node.parentIndex);
+    };
+}
