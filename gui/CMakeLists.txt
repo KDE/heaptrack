@@ -16,6 +16,7 @@ add_executable(heaptrack_gui
     mainwindow.cpp
     model.cpp
     modeltest.cpp
+    proxy.cpp
     ${UIFILES}
 )
 

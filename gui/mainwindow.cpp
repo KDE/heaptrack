@@ -26,6 +26,7 @@
 #include <iostream>
 
 #include "model.h"
+#include "proxy.h"
 
 using namespace std;
 
@@ -35,15 +36,13 @@ MainWindow::MainWindow(QWidget* parent)
     , m_model(new Model(this))
 {
     m_ui->setupUi(this);
-    auto proxy = new KRecursiveFilterProxyModel(m_model);
+    auto proxy = new Proxy(m_model);
     proxy->setSourceModel(m_model);
     m_ui->results->setModel(proxy);
 
     connect(m_model, &Model::dataReady,
             this, &MainWindow::dataReady);
 
-    // TODO: also filter by module, file
-    proxy->setFilterKeyColumn(Model::FunctionColumn);
     connect(m_ui->filter, &QLineEdit::textChanged,
             proxy, &QSortFilterProxyModel::setFilterFixedString);
 }
