@@ -7,8 +7,6 @@ qt5_wrap_ui(UIFILES
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings)
-include(ECMOptionalAddSubdirectory)
-include(ECMInstallIcons)
 include(ECMAddTests)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
@@ -34,4 +32,4 @@ target_link_libraries(heaptrack_gui
     ${Boost_LIBRARIES}
     sharedprint)
 
-install(TARGETS heaptrack_gui RUNTIME DESTINATION "bin")
+install(TARGETS heaptrack_gui ${INSTALL_TARGETS_DEFAULT_ARGS})
