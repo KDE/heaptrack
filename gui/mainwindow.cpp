@@ -21,7 +21,7 @@
 
 #include <ui_mainwindow.h>
 
-#include <QSortFilterProxyModel>
+#include <KRecursiveFilterProxyModel>
 
 #include <iostream>
 
@@ -30,11 +30,12 @@
 using namespace std;
 
 MainWindow::MainWindow(QWidget* parent)
-    : m_ui(new Ui::MainWindow)
+    : QMainWindow(parent)
+    , m_ui(new Ui::MainWindow)
     , m_model(new Model(this))
 {
     m_ui->setupUi(this);
-    auto proxy = new QSortFilterProxyModel(m_model);
+    auto proxy = new KRecursiveFilterProxyModel(m_model);
     proxy->setSourceModel(m_model);
     m_ui->results->setModel(proxy);
 

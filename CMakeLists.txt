@@ -7,16 +7,24 @@ set(HEAPTRACK_VERSION_PATCH 0)
 set(HEAPTRACK_LIB_VERSION 1.0.0)
 set(HEAPTRACK_LIB_SOVERSION 1)
 
+find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options)
+find_package(Threads REQUIRED)
+find_package(Qt5 5.2.0 NO_MODULE OPTIONAL_COMPONENTS Widgets)
+find_package(ECM 1.0.0 NO_MODULE)
+
+include(FeatureSummary)
+
+if(Qt5_FOUND AND ECM_FOUND)
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
+    find_package(KF5 OPTIONAL_COMPONENTS CoreAddons I18n ItemModels)
+    if (KF5_FOUND)
+        add_subdirectory(gui)
+    endif()
+endif()
+
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wpedantic")
-
-find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options)
-find_package(Threads REQUIRED)
-find_package(Qt5 NO_MODULE QUIET OPTIONAL_COMPONENTS Widgets)
-if(Qt5_FOUND)
-    add_subdirectory(gui)
-endif()
 
 add_subdirectory(3rdparty)
 
@@ -96,3 +104,5 @@ install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/heaptrack DESTINATION ${BIN_INSTALL
 install(TARGETS heaptrack_interpret RUNTIME DESTINATION ${LIBEXEC_INSTALL_DIR})
 install(TARGETS heaptrack_inject LIBRARY DESTINATION ${LIB_INSTALL_DIR}/heaptrack/)
 install(TARGETS heaptrack_preload LIBRARY DESTINATION ${LIB_INSTALL_DIR}/heaptrack/)
+
+feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

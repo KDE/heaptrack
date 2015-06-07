@@ -50,8 +50,8 @@ int parentRow(const QModelIndex& child)
 }
 
 Model::Model(QObject* parent)
+    : QAbstractItemModel(parent)
 {
-
 }
 
 Model::~Model()
@@ -86,7 +86,7 @@ QVariant Model::headerData(int section, Qt::Orientation orientation, int role) c
 
 QVariant Model::data(const QModelIndex& index, int role) const
 {
-    if (index.row() < 0 || index.row() > m_data.mergedAllocations.size()
+    if (index.row() < 0 || static_cast<size_t>(index.row()) > m_data.mergedAllocations.size()
         || index.column() < 0 || index.column() > NUM_COLUMNS)
     {
         return QVariant();
@@ -142,7 +142,7 @@ QModelIndex Model::parent(const QModelIndex& child) const
 int Model::rowCount(const QModelIndex& parent) const
 {
     if (parent.isValid()) {
-        if (parent.column() != 0 || parent.row() < 0 || parent.row() >= m_data.mergedAllocations.size()
+        if (parent.column() != 0 || parent.row() < 0 || static_cast<size_t>(parent.row()) >= m_data.mergedAllocations.size()
             || parentRow(parent) != -1)
         {
             return 0;
@@ -185,13 +185,13 @@ QVariant Model::allocationData(const AllocationData& allocation, const IpIndex& 
             if (ip.functionIndex) {
                 return QString::fromStdString(m_data.prettyFunction(m_data.stringify(ip.functionIndex)));
             } else {
-                return QLatin1String("0x") + QString::number(ip.instructionPointer, 16);
+                return static_cast<QString>(QLatin1String("0x") + QString::number(ip.instructionPointer, 16));
             }
         } else if (column == ModuleColumn) {
             return QString::fromStdString(m_data.stringify(ip.moduleIndex));
         } else if (ip.fileIndex) {
             auto file = QString::fromStdString(m_data.stringify(ip.fileIndex));
-            return file + QLatin1Char(':') + QString::number(ip.line);
+            return static_cast<QString>(file + QLatin1Char(':') + QString::number(ip.line));
         } else {
             return QString();
         }

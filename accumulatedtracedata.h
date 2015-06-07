@@ -144,7 +144,7 @@ struct AllocationInfo
 struct AccumulatedTraceData
 {
     AccumulatedTraceData();
-    ~AccumulatedTraceData() = default;
+    virtual ~AccumulatedTraceData() = default;
 
     virtual void handleTimeStamp(size_t newStamp, size_t oldStamp);
     virtual void handleAllocation();
