@@ -28,21 +28,47 @@ Proxy::Proxy(QObject* parent)
 
 Proxy::~Proxy() = default;
 
-bool Proxy::acceptRow(int source_row, const QModelIndex& source_parent) const
+void Proxy::setFunctionFilter(const QString& functionFilter)
+{
+    m_functionFilter = functionFilter;
+    invalidate();
+}
+
+void Proxy::setFileFilter(const QString& fileFilter)
+{
+    m_fileFilter = fileFilter;
+    invalidate();
+}
+
+void Proxy::setModuleFilter(const QString& moduleFilter)
+{
+    m_moduleFilter = moduleFilter;
+    invalidate();
+}
+
+bool Proxy::acceptRow(int sourceRow, const QModelIndex& sourceParent) const
 {
     auto source = sourceModel();
     if (!source) {
         return false;
     }
-    const auto& needle = filterRegExp().pattern();
-    if (needle.isEmpty()) {
-        return true;
-    }
-    for (auto column : {Model::FunctionColumn, Model::FileColumn, Model::ModuleColumn}) {
-        const auto& haystack = source->index(source_row, column, source_parent).data(Qt::DisplayRole).toString();
-        if (haystack.contains(needle)) {
-            return true;
+    if (!m_functionFilter.isEmpty()) {
+        const auto& function = source->index(sourceRow, Model::FunctionColumn, sourceParent).data().toString();
+        if (!function.contains(m_functionFilter)) {
+            return false;
         }
     }
-    return false;
+    if (!m_fileFilter.isEmpty()) {
+        const auto& file = source->index(sourceRow, Model::FileColumn, sourceParent).data().toString();
+        if (!file.contains(m_fileFilter)) {
+            return false;
+        }
+    }
+    if (!m_moduleFilter.isEmpty()) {
+        const auto& module = source->index(sourceRow, Model::ModuleColumn, sourceParent).data().toString();
+        if (!module.contains(m_moduleFilter)) {
+            return false;
+        }
+    }
+    return true;
 }

@@ -43,8 +43,12 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_model, &Model::dataReady,
             this, &MainWindow::dataReady);
 
-    connect(m_ui->filter, &QLineEdit::textChanged,
-            proxy, &QSortFilterProxyModel::setFilterFixedString);
+    connect(m_ui->filterFunction, &QLineEdit::textChanged,
+            proxy, &Proxy::setFunctionFilter);
+    connect(m_ui->filterFile, &QLineEdit::textChanged,
+            proxy, &Proxy::setFileFilter);
+    connect(m_ui->filterModule, &QLineEdit::textChanged,
+            proxy, &Proxy::setModuleFilter);
 }
 
 MainWindow::~MainWindow()

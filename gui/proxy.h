@@ -29,8 +29,17 @@ public:
     explicit Proxy(QObject* parent);
     virtual ~Proxy();
 
-protected:
+public slots:
+    void setFunctionFilter(const QString& functionFilter);
+    void setFileFilter(const QString& fileFilter);
+    void setModuleFilter(const QString& moduleFilter);
+
+private:
     bool acceptRow(int source_row, const QModelIndex& source_parent) const override;
+
+    QString m_functionFilter;
+    QString m_fileFilter;
+    QString m_moduleFilter;
 };
 
 #endif // PROXY_H
