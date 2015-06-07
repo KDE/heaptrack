@@ -35,11 +35,16 @@ MainWindow::MainWindow(QWidget* parent)
 {
     m_ui->setupUi(this);
     auto proxy = new QSortFilterProxyModel(m_model);
-    proxy->setSourceModel(m_model);/*
-    proxy->setDynamicSortFilter(true);*/
+    proxy->setSourceModel(m_model);
     m_ui->results->setModel(proxy);
+
     connect(m_model, &Model::dataReady,
             this, &MainWindow::dataReady);
+
+    // TODO: also filter by module, file
+    proxy->setFilterKeyColumn(Model::FunctionColumn);
+    connect(m_ui->filter, &QLineEdit::textChanged,
+            proxy, &QSortFilterProxyModel::setFilterFixedString);
 }
 
 MainWindow::~MainWindow()

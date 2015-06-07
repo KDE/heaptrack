@@ -23,6 +23,13 @@
      </widget>
     </item>
     <item>
+     <widget class="QLineEdit" name="filter">
+      <property name="placeholderText">
+       <string>filter...</string>
+      </property>
+     </widget>
+    </item>
+    <item>
      <widget class="QTreeView" name="results">
       <property name="alternatingRowColors">
        <bool>true</bool>
