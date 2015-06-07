@@ -22,30 +22,10 @@
 #include <ui_mainwindow.h>
 
 #include <iostream>
-#include <sstream>
 
 #include "model.h"
-#include "../accumulatedtracedata.h"
 
 using namespace std;
-
-namespace {
-QString generateSummary(const AccumulatedTraceData& data)
-{
-    stringstream stream;
-    const double totalTimeS = 0.001 * data.totalTime;
-    stream << "<qt>"
-           << "<strong>total runtime</strong>: " << fixed << totalTimeS << "s.<br/>"
-           << "<strong>bytes allocated in total</strong> (ignoring deallocations): " << formatBytes(data.totalAllocated)
-             << " (" << formatBytes(data.totalAllocated / totalTimeS) << "/s)<br/>"
-           << "<strong>calls to allocation functions</strong>: " << data.totalAllocations
-             << " (" << size_t(data.totalAllocations / totalTimeS) << "/s)<br/>"
-           << "<strong>peak heap memory consumption</strong>: " << formatBytes(data.peak) << "<br/>"
-           << "<strong>total memory leaked</strong>: " << formatBytes(data.leaked) << "<br/>";
-    stream << "</qt>";
-    return QString::fromStdString(stream.str());
-}
-}
 
 MainWindow::MainWindow(QWidget* parent)
     : m_ui(new Ui::MainWindow)
@@ -53,17 +33,22 @@ MainWindow::MainWindow(QWidget* parent)
 {
     m_ui->setupUi(this);
     m_ui->results->setModel(m_model);
+    connect(m_model, &Model::dataReady,
+            this, &MainWindow::dataReady);
 }
 
 MainWindow::~MainWindow()
 {
 }
 
+void MainWindow::dataReady(const QString& summary)
+{
+    m_ui->summary->setText(summary);
+}
+
 void MainWindow::loadFile(const QString& file)
 {
     cout << "Loading file " << qPrintable(file) << ", this might take some time - please wait." << endl;
-    AccumulatedTraceData data;
-    data.read(file.toStdString());
 
-    m_ui->summary->setText(generateSummary(data));
+    m_model->loadFile(file);
 }

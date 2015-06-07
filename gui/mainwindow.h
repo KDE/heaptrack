@@ -36,6 +36,9 @@ public:
 
     void loadFile(const QString& path);
 
+private slots:
+    void dataReady(const QString& summary);
+
 private:
     QScopedPointer<Ui::MainWindow> m_ui;
     Model* m_model;

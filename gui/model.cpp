@@ -19,6 +19,28 @@
 
 #include "model.h"
 
+#include <sstream>
+
+using namespace std;
+
+namespace {
+QString generateSummary(const AccumulatedTraceData& data)
+{
+    stringstream stream;
+    const double totalTimeS = 0.001 * data.totalTime;
+    stream << "<qt>"
+           << "<strong>total runtime</strong>: " << fixed << totalTimeS << "s.<br/>"
+           << "<strong>bytes allocated in total</strong> (ignoring deallocations): " << formatBytes(data.totalAllocated)
+             << " (" << formatBytes(data.totalAllocated / totalTimeS) << "/s)<br/>"
+           << "<strong>calls to allocation functions</strong>: " << data.totalAllocations
+             << " (" << size_t(data.totalAllocations / totalTimeS) << "/s)<br/>"
+           << "<strong>peak heap memory consumption</strong>: " << formatBytes(data.peak) << "<br/>"
+           << "<strong>total memory leaked</strong>: " << formatBytes(data.leaked) << "<br/>";
+    stream << "</qt>";
+    return QString::fromStdString(stream.str());
+}
+}
+
 Model::Model(QObject* parent)
 {
 
@@ -73,4 +95,10 @@ int Model::rowCount(const QModelIndex& parent) const
 int Model::columnCount(const QModelIndex& parent) const
 {
     return NUM_COLUMNS;
+}
+
+void Model::loadFile(const QString& file)
+{
+    m_data.read(file.toStdString());
+    emit dataReady(generateSummary(m_data));
 }
