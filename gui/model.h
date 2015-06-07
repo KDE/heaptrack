@@ -55,6 +55,8 @@ signals:
     void dataReady(const QString& summary);
 
 private:
+    QVariant allocationData(const AllocationData& data, const IpIndex& ipIndex, Columns column) const;
+
     AccumulatedTraceData m_data;
 };
 

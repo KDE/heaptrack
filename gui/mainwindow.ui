@@ -35,7 +35,7 @@
        <bool>true</bool>
       </property>
       <property name="rootIsDecorated">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="uniformRowHeights">
        <bool>true</bool>
