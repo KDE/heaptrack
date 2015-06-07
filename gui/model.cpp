@@ -61,7 +61,7 @@ Model::~Model()
 QVariant Model::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation != Qt::Horizontal || role != Qt::DisplayRole || section < 0 || section >= NUM_COLUMNS) {
-        return QVariant();
+        return {};
     }
     switch (static_cast<Columns>(section)) {
         case FileColumn:
@@ -81,21 +81,19 @@ QVariant Model::headerData(int section, Qt::Orientation orientation, int role) c
         case NUM_COLUMNS:
             break;
     }
-    return QVariant();
+    return {};
 }
 
 QVariant Model::data(const QModelIndex& index, int role) const
 {
-    if (index.row() < 0 || static_cast<size_t>(index.row()) > m_data.mergedAllocations.size()
-        || index.column() < 0 || index.column() > NUM_COLUMNS)
-    {
-        return QVariant();
+    if (index.row() < 0 || index.column() < 0 || index.column() > NUM_COLUMNS) {
+        return {};
     }
     const auto parent = index.parent();
     if (parent.isValid()) {
         // child level
-        if (parent.parent().isValid()) {
-            return QVariant();
+        if (parent.parent().isValid() || static_cast<size_t>(parent.row()) > m_data.mergedAllocations.size()) {
+            return {};
         }
         const auto& allocation = m_data.mergedAllocations[parent.row()];
         const auto& trace = allocation.traces[index.row()];
@@ -110,15 +108,18 @@ QVariant Model::data(const QModelIndex& index, int role) const
             m_data.printBacktrace(trace.traceIndex, stream);
             return QString::fromStdString(stream.str());
         }
-        return QVariant();
+        return {};
     }
 
     // top-level
+    if (static_cast<size_t>(index.row()) > m_data.mergedAllocations.size()) {
+        return {};
+    }
     const auto& allocation = m_data.mergedAllocations[index.row()];
     if (role == Qt::DisplayRole) {
         return allocationData(allocation, allocation.ipIndex, static_cast<Columns>(index.column()));
     }
-    return QVariant();
+    return {};
 }
 
 QModelIndex Model::index(int row, int column, const QModelIndex& parent) const
@@ -200,5 +201,5 @@ QVariant Model::allocationData(const AllocationData& allocation, const IpIndex& 
     case NUM_COLUMNS:
         break;
     }
-    return QVariant();
+    return {};
 }
