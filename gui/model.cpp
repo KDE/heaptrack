@@ -101,7 +101,10 @@ QVariant Model::data(const QModelIndex& index, int role) const
         const auto& trace = allocation.traces[index.row()];
 
         if (role == Qt::DisplayRole) {
-            return allocationData(trace, m_data.findTrace(trace.traceIndex).ipIndex, static_cast<Columns>(index.column()));
+            auto node = m_data.findTrace(trace.traceIndex);
+            // skip first level, it is duplicated on the top-level
+            node = m_data.findTrace(node.parentIndex);
+            return allocationData(trace, node.ipIndex, static_cast<Columns>(index.column()));
         } else if (role == Qt::ToolTipRole) {
             stringstream stream;
             m_data.printBacktrace(trace.traceIndex, stream);
