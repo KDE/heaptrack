@@ -28,20 +28,6 @@
 #include <unordered_map>
 #include <map>
 
-class formatBytes
-{
-public:
-    formatBytes(size_t bytes)
-        : m_bytes(bytes)
-    {
-    }
-
-    friend std::ostream& operator<<(std::ostream& out, const formatBytes data);
-
-private:
-    size_t m_bytes;
-};
-
 // sadly, C++ doesn't yet have opaque typedefs
 template<typename Base>
 struct Index

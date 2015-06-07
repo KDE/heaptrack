@@ -28,11 +28,53 @@
 #include "accumulatedtracedata.h"
 
 #include <iostream>
+#include <iomanip>
 
 #include "config.h"
 
 using namespace std;
 namespace po = boost::program_options;
+
+namespace {
+
+class formatBytes
+{
+public:
+    formatBytes(size_t bytes)
+        : m_bytes(bytes)
+    {
+    }
+
+    friend std::ostream& operator<<(std::ostream& out, const formatBytes data);
+
+private:
+    size_t m_bytes;
+};
+
+ostream& operator<<(ostream& out, const formatBytes data)
+{
+    if (data.m_bytes < 1000) {
+        // no fancy formatting for plain byte values, esp. no .00 factions
+        return out << data.m_bytes << 'B';
+    }
+
+    static const auto units = {
+        "B",
+        "KB",
+        "MB",
+        "GB",
+        "TB"
+    };
+    auto unit = units.begin();
+    size_t i = 0;
+    double bytes = data.m_bytes;
+    while (i < units.size() - 1 && bytes > 1000.) {
+        bytes /= 1000.;
+        ++i;
+        ++unit;
+    }
+    return out << fixed << setprecision(2) << bytes << *unit;
+}
 
 struct Printer final : public AccumulatedTraceData
 {
@@ -246,6 +288,7 @@ struct Printer final : public AccumulatedTraceData
     size_t lastMassifPeak = 0;
     vector<Allocation> massifAllocations;
 };
+}
 
 int main(int argc, char** argv)
 {

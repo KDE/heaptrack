@@ -23,7 +23,6 @@
 #include <memory>
 #include <algorithm>
 #include <cassert>
-#include <iomanip>
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -32,31 +31,6 @@
 #include "linereader.h"
 
 using namespace std;
-
-ostream& operator<<(ostream& out, const formatBytes data)
-{
-    if (data.m_bytes < 1000) {
-        // no fancy formatting for plain byte values, esp. no .00 factions
-        return out << data.m_bytes << 'B';
-    }
-
-    static const auto units = {
-        "B",
-        "KB",
-        "MB",
-        "GB",
-        "TB"
-    };
-    auto unit = units.begin();
-    size_t i = 0;
-    double bytes = data.m_bytes;
-    while (i < units.size() - 1 && bytes > 1000.) {
-        bytes /= 1000.;
-        ++i;
-        ++unit;
-    }
-    return out << fixed << setprecision(2) << bytes << *unit;
-}
 
 namespace {
 
