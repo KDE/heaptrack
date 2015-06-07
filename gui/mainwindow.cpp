@@ -21,6 +21,8 @@
 
 #include <ui_mainwindow.h>
 
+#include <QSortFilterProxyModel>
+
 #include <iostream>
 
 #include "model.h"
@@ -32,7 +34,10 @@ MainWindow::MainWindow(QWidget* parent)
     , m_model(new Model(this))
 {
     m_ui->setupUi(this);
-    m_ui->results->setModel(m_model);
+    auto proxy = new QSortFilterProxyModel(m_model);
+    proxy->setSourceModel(m_model);/*
+    proxy->setDynamicSortFilter(true);*/
+    m_ui->results->setModel(proxy);
     connect(m_model, &Model::dataReady,
             this, &MainWindow::dataReady);
 }

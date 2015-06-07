@@ -85,13 +85,13 @@ QVariant Model::data(const QModelIndex& index, int role) const
     if (role == Qt::DisplayRole) {
         switch (static_cast<Columns>(index.column())) {
         case AllocationsColumn:
-            return QVariant::fromValue(allocation.allocations);
+            return static_cast<quint64>(allocation.allocations);
         case PeakColumn:
-            return QVariant::fromValue(allocation.peak);
+            return static_cast<quint64>(allocation.peak);
         case LeakedColumn:
-            return QVariant::fromValue(allocation.leaked);
+            return static_cast<quint64>(allocation.leaked);
         case AllocatedColumn:
-            return QVariant::fromValue(allocation.allocated);
+            return static_cast<quint64>(allocation.allocated);
         case LocationColumn:
             return QVariant();
         case NUM_COLUMNS:
