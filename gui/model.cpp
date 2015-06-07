@@ -189,6 +189,8 @@ QVariant Model::allocationData(const AllocationData& allocation, const IpIndex& 
         } else if (ip.fileIndex) {
             auto file = QString::fromStdString(m_data.stringify(ip.fileIndex));
             return file + QLatin1Char(':') + QString::number(ip.line);
+        } else {
+            return QString();
         }
         break;
     }
