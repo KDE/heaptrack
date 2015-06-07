@@ -10,6 +10,7 @@ add_executable(heaptrack_gui
     gui.cpp
     mainwindow.cpp
     model.cpp
+    modeltest.cpp
     ${UIFILES}
 )
 
