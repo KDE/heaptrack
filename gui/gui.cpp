@@ -29,13 +29,10 @@ int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
-    if (app.arguments().size() != 2) {
-        cerr << "Missing path to heaptrack data file." << endl;
-        return 1;
-    }
-
     MainWindow window;
-    window.loadFile(app.arguments().last());
+    if (app.arguments().size() > 1) {
+        window.loadFile(app.arguments().last());
+    }
     window.show();
 
     return app.exec();

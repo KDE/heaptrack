@@ -21,6 +21,8 @@
 
 #include <QDebug>
 
+#include <ThreadWeaver/ThreadWeaver>
+
 #include <sstream>
 
 using namespace std;
@@ -46,7 +48,6 @@ int parentRow(const QModelIndex& child)
 {
     return child.isValid() ? static_cast<int>(child.internalId()) : -1;
 }
-
 }
 
 Model::Model(QObject* parent)
@@ -161,10 +162,13 @@ int Model::columnCount(const QModelIndex& /*parent*/) const
 
 void Model::loadFile(const QString& file)
 {
-    beginResetModel();
-    m_data.read(file.toStdString());
-    endResetModel();
-    emit dataReady(generateSummary(m_data));
+    using namespace ThreadWeaver;
+    stream() << make_job([=]() {
+        beginResetModel();
+        m_data.read(file.toStdString());
+        endResetModel();
+        emit dataReady(generateSummary(m_data));
+    });
 }
 
 QVariant Model::allocationData(const AllocationData& allocation, const IpIndex& ipIndex, Columns column) const

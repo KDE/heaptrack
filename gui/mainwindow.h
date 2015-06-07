@@ -30,11 +30,14 @@ class Model;
 
 class MainWindow : public QMainWindow
 {
+    Q_OBJECT
 public:
     MainWindow(QWidget* parent = nullptr);
     virtual ~MainWindow();
 
+public slots:
     void loadFile(const QString& path);
+    void openFile();
 
 private slots:
     void dataReady(const QString& summary);

@@ -30,6 +30,9 @@ add_definitions(-Wall
 target_link_libraries(heaptrack_gui
     Qt5::Widgets
     KF5::ItemModels
+    KF5::ThreadWeaver
+    KF5::ConfigWidgets
+    KF5::I18n
     ${Boost_LIBRARIES}
     sharedprint)
 

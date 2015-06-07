@@ -22,8 +22,10 @@
 #include <ui_mainwindow.h>
 
 #include <KRecursiveFilterProxyModel>
+#include <KStandardAction>
+#include <KLocalizedString>
 
-#include <iostream>
+#include <QFileDialog>
 
 #include "model.h"
 #include "proxy.h"
@@ -40,6 +42,11 @@ MainWindow::MainWindow(QWidget* parent)
     proxy->setSourceModel(m_model);
     m_ui->results->setModel(proxy);
 
+    m_ui->pages->setCurrentWidget(m_ui->openPage);
+    // TODO: proper progress report
+    m_ui->loadingProgress->setMinimum(0);
+    m_ui->loadingProgress->setMaximum(0);
+
     connect(m_model, &Model::dataReady,
             this, &MainWindow::dataReady);
 
@@ -49,6 +56,11 @@ MainWindow::MainWindow(QWidget* parent)
             proxy, &Proxy::setFileFilter);
     connect(m_ui->filterModule, &QLineEdit::textChanged,
             proxy, &Proxy::setModuleFilter);
+
+    auto openFile = KStandardAction::open(this, SLOT(openFile()), this);
+    m_ui->openFile->setDefaultAction(openFile);
+
+    setWindowTitle(i18n("Heaptrack"));
 }
 
 MainWindow::~MainWindow()
@@ -58,11 +70,23 @@ MainWindow::~MainWindow()
 void MainWindow::dataReady(const QString& summary)
 {
     m_ui->summary->setText(summary);
+    m_ui->pages->setCurrentWidget(m_ui->resultsPage);
 }
 
 void MainWindow::loadFile(const QString& file)
 {
-    cout << "Loading file " << qPrintable(file) << ", this might take some time - please wait." << endl;
-
+    m_ui->loadingLabel->setText(i18n("Loading file %1, please wait...", file));
+    setWindowTitle(i18nc("%1: file name that is open", "Heaptrack - %1", file));
+    m_ui->pages->setCurrentWidget(m_ui->loadingPage);
     m_model->loadFile(file);
+}
+
+void MainWindow::openFile()
+{
+    auto dialog = new QFileDialog(this, i18n("Open Heaptrack Output File"), {}, i18n("Heaptrack data files (heaptrack.*)"));
+    dialog->setAttribute(Qt::WA_DeleteOnClose, true);
+    dialog->setFileMode(QFileDialog::ExistingFile);
+    connect(dialog, &QFileDialog::fileSelected,
+            this, &MainWindow::loadFile);
+    dialog->show();
 }
