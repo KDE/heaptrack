@@ -45,7 +45,7 @@ public:
     {
     }
 
-    friend std::ostream& operator<<(std::ostream& out, const formatBytes data);
+    friend ostream& operator<<(ostream& out, const formatBytes data);
 
 private:
     size_t m_bytes;
@@ -78,6 +78,144 @@ ostream& operator<<(ostream& out, const formatBytes data)
 
 struct Printer final : public AccumulatedTraceData
 {
+    void finalize()
+    {
+        filterAllocations();
+        mergedAllocations = mergeAllocations(allocations);
+    }
+
+    void mergeAllocation(vector<MergedAllocation>* mergedAllocations, const Allocation& allocation) const
+    {
+        const auto trace = findTrace(allocation.traceIndex);
+        const auto traceIp = findIp(trace.ipIndex);
+        auto it = lower_bound(mergedAllocations->begin(), mergedAllocations->end(), traceIp,
+                                [this] (const MergedAllocation& allocation, const InstructionPointer traceIp) -> bool {
+                                    // Compare meta data without taking the instruction pointer address into account.
+                                    // This is useful since sometimes, esp. when we lack debug symbols, the same function
+                                    // allocates memory at different IP addresses which is pretty useless information most of the time
+                                    // TODO: make this configurable, but on-by-default
+                                    const auto allocationIp = findIp(allocation.ipIndex);
+                                    return allocationIp.compareWithoutAddress(traceIp);
+                                });
+        if (it == mergedAllocations->end() || !findIp(it->ipIndex).equalWithoutAddress(traceIp)) {
+            MergedAllocation merged;
+            merged.ipIndex = trace.ipIndex;
+            it = mergedAllocations->insert(it, merged);
+        }
+        it->traces.push_back(allocation);
+    }
+
+    // merge allocations so that different traces that point to the same
+    // instruction pointer at the end where the allocation function is
+    // called are combined
+    vector<MergedAllocation> mergeAllocations(const vector<Allocation>& allocations) const
+    {
+        // TODO: merge deeper traces, i.e. A,B,C,D and A,B,C,F
+        //       should be merged to A,B,C: D & F
+        //       currently the below will only merge it to: A: B,C,D & B,C,F
+        vector<MergedAllocation> ret;
+        ret.reserve(allocations.size());
+        for (const Allocation& allocation : allocations) {
+            if (allocation.traceIndex) {
+                mergeAllocation(&ret, allocation);
+            }
+        }
+        for (MergedAllocation& merged : ret) {
+            for (const Allocation& allocation: merged.traces) {
+                merged.allocated += allocation.allocated;
+                merged.allocations += allocation.allocations;
+                merged.leaked += allocation.leaked;
+                merged.peak += allocation.peak;
+            }
+        }
+        return ret;
+    }
+
+    void filterAllocations()
+    {
+        if (filterBtFunction.empty()) {
+            return;
+        }
+        allocations.erase(remove_if(allocations.begin(), allocations.end(), [&] (const Allocation& allocation) -> bool {
+            auto node = findTrace(allocation.traceIndex);
+            while (node.ipIndex) {
+                const auto& ip = findIp(node.ipIndex);
+                if (isStopIndex(ip.functionIndex)) {
+                    break;
+                }
+                if (stringify(ip.functionIndex).find(filterBtFunction) != string::npos) {
+                    return false;
+                }
+                node = findTrace(node.parentIndex);
+            };
+            return true;
+        }), allocations.end());
+    }
+
+    void printIndent(ostream& out, size_t indent, const char* indentString = "  ") const
+    {
+        while (indent--) {
+            out << indentString;
+        }
+    }
+
+    void printIp(const IpIndex ip, ostream &out, const size_t indent = 0) const
+    {
+        printIp(findIp(ip), out, indent);
+    }
+
+    void printIp(const InstructionPointer& ip, ostream& out, const size_t indent = 0) const
+    {
+        printIndent(out, indent);
+
+        if (ip.functionIndex) {
+            out << prettyFunction(stringify(ip.functionIndex));
+        } else {
+            out << "0x" << hex << ip.instructionPointer << dec;
+        }
+
+        out << '\n';
+        printIndent(out, indent + 1);
+
+        if (ip.fileIndex) {
+            out << "at " << stringify(ip.fileIndex) << ':' << ip.line << '\n';
+            printIndent(out, indent + 1);
+        }
+
+        if (ip.moduleIndex) {
+            out << "in " << stringify(ip.moduleIndex);
+        } else {
+            out << "in ??";
+        }
+        out << '\n';
+    }
+
+    void printBacktrace(const TraceIndex traceIndex, ostream& out, const size_t indent = 0, bool skipFirst = false) const
+    {
+        if (!traceIndex) {
+            out << "  ??";
+            return;
+        }
+        printBacktrace(findTrace(traceIndex), out, indent, skipFirst);
+    }
+
+    void printBacktrace(TraceNode node, ostream& out, const size_t indent = 0, bool skipFirst = false) const
+    {
+        while (node.ipIndex) {
+            const auto& ip = findIp(node.ipIndex);
+            if (!skipFirst) {
+                printIp(ip, out, indent);
+            }
+            skipFirst = false;
+
+            if (isStopIndex(ip.functionIndex)) {
+                break;
+            }
+
+            node = findTrace(node.parentIndex);
+        };
+    }
+
     template<typename T, typename LabelPrinter, typename SubLabelPrinter>
     void printAllocations(T AllocationData::* member, LabelPrinter label, SubLabelPrinter sublabel)
     {
@@ -279,14 +417,24 @@ struct Printer final : public AccumulatedTraceData
 
     void handleDebuggee(const char* command) override
     {
+        cout << "Debuggee command was: " << command << endl;
         if (massifOut.is_open()) {
             writeMassifHeader(command);
         }
     }
 
+    bool mergeBacktraces = true;
+
+    vector<MergedAllocation> mergedAllocations;
+
     size_t massifSnapshotId = 0;
     size_t lastMassifPeak = 0;
     vector<Allocation> massifAllocations;
+    ofstream massifOut;
+    double massifThreshold = 1;
+    size_t massifDetailedFreq = 1;
+
+    string filterBtFunction;
 };
 }
 
@@ -385,6 +533,7 @@ int main(int argc, char** argv)
     if (!data.read(inputFile)) {
         return 1;
     }
+    data.finalize();
 
     cout << "finished reading file, now analyzing data:\n" << endl;
 

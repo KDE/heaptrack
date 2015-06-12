@@ -23,9 +23,13 @@
 #include <QTextStream>
 
 #include <KFormat>
+#include <KLocalizedString>
 #include <ThreadWeaver/ThreadWeaver>
 
 #include <sstream>
+#include <cmath>
+
+#include "../accumulatedtracedata.h"
 
 using namespace std;
 
@@ -36,6 +40,7 @@ QString generateSummary(const AccumulatedTraceData& data)
     KFormat format;
     QTextStream stream(&ret);
     const double totalTimeS = 0.001 * data.totalTime;
+    /// TODO: translate
     stream << "<qt>"
            << "<strong>total runtime</strong>: " << totalTimeS << "s.<br/>"
            << "<strong>bytes allocated in total</strong> (ignoring deallocations): " << format.formatByteSize(data.totalAllocated, 2)
@@ -48,15 +53,118 @@ QString generateSummary(const AccumulatedTraceData& data)
     return ret;
 }
 
-int parentRow(const QModelIndex& child)
+int indexOf(const RowData* row, const QVector<RowData>& siblings)
 {
-    return child.isValid() ? static_cast<int>(child.internalId()) : -1;
+    Q_ASSERT(siblings.data() <= row);
+    Q_ASSERT(siblings.data() + siblings.size() > row);
+    return row - siblings.data();
 }
+
+const RowData* rowAt(const QVector<RowData>& rows, int row)
+{
+    Q_ASSERT(rows.size() > row);
+    return rows.data() + row;
+}
+
+struct StringCache
+{
+    StringCache(const AccumulatedTraceData& data)
+    {
+        m_strings.resize(data.strings.size());
+        transform(data.strings.begin(), data.strings.end(),
+                  m_strings.begin(), [] (const string& str) { return QString::fromStdString(str); });
+    }
+
+    QString func(const InstructionPointer& ip) const
+    {
+        if (ip.functionIndex) {
+            // TODO: support removal of template arguments
+            return stringify(ip.functionIndex);
+        } else {
+            return static_cast<QString>(QLatin1String("0x") + QString::number(ip.instructionPointer, 16));
+        }
+    }
+
+    QString file(const InstructionPointer& ip) const
+    {
+        if (ip.fileIndex) {
+            auto file = stringify(ip.fileIndex);
+            return file + QLatin1Char(':') + QString::number(ip.line);
+        } else {
+            return {};
+        }
+    }
+
+    QString module(const InstructionPointer& ip) const
+    {
+        return stringify(ip.moduleIndex);
+    }
+
+    QString stringify(const StringIndex index) const
+    {
+        if (!index || index.index > m_strings.size()) {
+            return {};
+        } else {
+            return m_strings.at(index.index - 1);
+        }
+    }
+
+    LocationData location(const InstructionPointer& ip) const
+    {
+        return {func(ip), file(ip), module(ip)};
+    }
+
+    vector<QString> m_strings;
+};
+
+void setParents(QVector<RowData>& children, const RowData* parent)
+{
+    for (auto& row: children) {
+        row.parent = parent;
+        setParents(row.children, &row);
+    }
+}
+
+QVector<RowData> mergeAllocations(const AccumulatedTraceData& data)
+{
+    QVector<RowData> topRows;
+    StringCache strings(data);
+    // merge allocations, leave parent pointers invalid (their location may change)
+    for (const auto& allocation : data.allocations) {
+        auto traceIndex = allocation.traceIndex;
+        auto rows = &topRows;
+        while (traceIndex) {
+            const auto& trace = data.findTrace(traceIndex);
+            const auto& ip = data.findIp(trace.ipIndex);
+            // TODO: only store the IpIndex and use that
+            auto location = strings.location(ip);
+            auto it = lower_bound(rows->begin(), rows->end(), location);
+            if (it != rows->end() && it->location == location) {
+                it->allocated += allocation.allocated;
+                it->allocations += allocation.allocations;
+                it->leaked += allocation.leaked;
+                it->peak = max(it->peak, static_cast<quint64>(allocation.peak));
+            } else {
+                it = rows->insert(it, {allocation.allocations, allocation.allocated, allocation.leaked, allocation.peak,
+                                        location, nullptr, {}});
+            }
+            traceIndex = trace.parentIndex;
+            rows = &it->children;
+        }
+    }
+    // now set the parents, the data is constant from here on
+    setParents(topRows, nullptr);
+    return topRows;
+}
+
 }
 
 Model::Model(QObject* parent)
     : QAbstractItemModel(parent)
 {
+    qRegisterMetaType<QVector<RowData>>();
+    connect(this, &Model::dataReadyBackground,
+            this, &Model::dataReadyForeground);
 }
 
 Model::~Model()
@@ -94,35 +202,55 @@ QVariant Model::data(const QModelIndex& index, int role) const
     if (index.row() < 0 || index.column() < 0 || index.column() > NUM_COLUMNS) {
         return {};
     }
-    const auto parent = index.parent();
-    if (parent.isValid()) {
-        // child level
-        if (parent.parent().isValid() || static_cast<size_t>(parent.row()) > m_data.mergedAllocations.size()) {
-            return {};
-        }
-        const auto& allocation = m_data.mergedAllocations[parent.row()];
-        const auto& trace = allocation.traces[index.row()];
-
-        if (role == Qt::DisplayRole) {
-            auto node = m_data.findTrace(trace.traceIndex);
-            // skip first level, it is duplicated on the top-level
-            node = m_data.findTrace(node.parentIndex);
-            return allocationData(trace, node.ipIndex, static_cast<Columns>(index.column()));
-        } else if (role == Qt::ToolTipRole) {
-            stringstream stream;
-            m_data.printBacktrace(trace.traceIndex, stream);
-            return QString::fromStdString(stream.str());
-        }
-        return {};
-    }
-
-    // top-level
-    if (static_cast<size_t>(index.row()) > m_data.mergedAllocations.size()) {
-        return {};
-    }
-    const auto& allocation = m_data.mergedAllocations[index.row()];
+    const auto row = toRow(index);
     if (role == Qt::DisplayRole) {
-        return allocationData(allocation, allocation.ipIndex, static_cast<Columns>(index.column()));
+        switch (static_cast<Columns>(index.column())) {
+        case AllocatedColumn:
+            return row->allocated;
+        case AllocationsColumn:
+            return row->allocations;
+        case PeakColumn:
+            return row->peak;
+        case LeakedColumn:
+            return row->leaked;
+        case FunctionColumn:
+            return row->location.function;
+        case ModuleColumn:
+            return row->location.module;
+        case FileColumn:
+            return row->location.file;
+        case NUM_COLUMNS:
+            break;
+        }
+    } else if (role == Qt::ToolTipRole) {
+        QString tooltip;
+        QTextStream stream(&tooltip);
+        stream << "<qt><pre>";
+        stream << i18nc("1: function, 2: file, 3: module", "%1\n  at %2\n  in %3",
+                        row->location.function, row->location.file, row->location.module);
+        stream << '\n';
+        KFormat format;
+        stream << i18n("allocated %1 over %2 calls, peak at %3, leaked %4",
+                       format.formatByteSize(row->allocated), row->allocations,
+                       format.formatByteSize(row->peak), format.formatByteSize(row->leaked));
+        stream << '\n';
+        if (!row->children.isEmpty()) {
+            stream << '\n' << i18n("backtrace:") << '\n';
+            auto child = row;
+            int max = 5;
+            while (child->children.count() == 1 && max-- > 0) {
+                stream << "\n";
+                stream << i18nc("1: function, 2: file, 3: module", "%1\n  at %2\n  in %3",
+                                child->location.function, child->location.file, child->location.module);
+                child = child->children.data();
+            }
+            if (child->children.count() > 1) {
+                stream << "\n";
+                stream << i18np("called from one location", "called from %1 locations", child->children.count());
+            }
+        }
+        stream << "</pre></qt>";
+        return tooltip;
     }
     return {};
 }
@@ -132,31 +260,31 @@ QModelIndex Model::index(int row, int column, const QModelIndex& parent) const
     if (row < 0 || column  < 0 || column >= NUM_COLUMNS || row >= rowCount(parent)) {
         return QModelIndex();
     }
-    return createIndex(row, column, static_cast<quintptr>(parent.row()));
+    return createIndex(row, column, const_cast<void*>(reinterpret_cast<const void*>(toRow(parent))));
 }
 
 QModelIndex Model::parent(const QModelIndex& child) const
 {
-    const auto parent = parentRow(child);
-    if (parent == -1) {
-        return QModelIndex();
-    } else {
-        return createIndex(parent, 0, -1);
+    if (!child.isValid()) {
+        return {};
     }
+    const auto parent = toParentRow(child);
+    if (!parent) {
+        return {};
+    }
+    return createIndex(rowOf(parent), 0, const_cast<void*>(reinterpret_cast<const void*>(parent->parent)));
 }
 
 int Model::rowCount(const QModelIndex& parent) const
 {
-    if (parent.isValid()) {
-        if (parent.column() != 0 || parent.row() < 0 || static_cast<size_t>(parent.row()) >= m_data.mergedAllocations.size()
-            || parentRow(parent) != -1)
-        {
-            return 0;
-        } else {
-            return m_data.mergedAllocations[parent.row()].traces.size();
-        }
+    if (!parent.isValid()) {
+        return m_data.size();
+    } else if (parent.column() != 0) {
+        return 0;
     }
-    return m_data.mergedAllocations.size();
+    auto row = toRow(parent);
+    Q_ASSERT(row);
+    return row->children.size();
 }
 
 int Model::columnCount(const QModelIndex& /*parent*/) const
@@ -164,50 +292,48 @@ int Model::columnCount(const QModelIndex& /*parent*/) const
     return NUM_COLUMNS;
 }
 
-void Model::loadFile(const QString& file)
+void Model::loadFile(const QString& path)
 {
+    qDebug() << "load file" << path;
     using namespace ThreadWeaver;
     stream() << make_job([=]() {
-        beginResetModel();
-        m_data.read(file.toStdString());
-        endResetModel();
-        emit dataReady(generateSummary(m_data));
+        AccumulatedTraceData data;
+        data.read(path.toStdString());
+        emit dataReadyBackground(mergeAllocations(data), generateSummary(data));
     });
 }
 
-QVariant Model::allocationData(const AllocationData& allocation, const IpIndex& ipIndex, Columns column) const
+void Model::dataReadyForeground(const QVector<RowData>& data, const QString& summary)
 {
-    switch (column) {
-    case AllocationsColumn:
-        return static_cast<quint64>(allocation.allocations);
-    case PeakColumn:
-        return static_cast<quint64>(allocation.peak);
-    case LeakedColumn:
-        return static_cast<quint64>(allocation.leaked);
-    case AllocatedColumn:
-        return static_cast<quint64>(allocation.allocated);
-    case FileColumn:
-    case ModuleColumn:
-    case FunctionColumn: {
-        const auto& ip = m_data.findIp(ipIndex);
-        if (column == FunctionColumn) {
-            if (ip.functionIndex) {
-                return QString::fromStdString(m_data.prettyFunction(m_data.stringify(ip.functionIndex)));
-            } else {
-                return static_cast<QString>(QLatin1String("0x") + QString::number(ip.instructionPointer, 16));
-            }
-        } else if (column == ModuleColumn) {
-            return QString::fromStdString(m_data.stringify(ip.moduleIndex));
-        } else if (ip.fileIndex) {
-            auto file = QString::fromStdString(m_data.stringify(ip.fileIndex));
-            return static_cast<QString>(file + QLatin1Char(':') + QString::number(ip.line));
-        } else {
-            return QString();
-        }
-        break;
+    beginResetModel();
+    m_data = data;
+    endResetModel();
+    emit dataReady(summary);
+}
+
+const RowData* Model::toRow(const QModelIndex& index) const
+{
+    if (!index.isValid()) {
+        return nullptr;
     }
-    case NUM_COLUMNS:
-        break;
+    if (const auto parent = toParentRow(index)) {
+        return rowAt(parent->children, index.row());
+    } else {
+        return rowAt(m_data, index.row());
     }
-    return {};
+}
+
+const RowData* Model::toParentRow(const QModelIndex& index) const
+{
+    Q_ASSERT(index.isValid());
+    return static_cast<const RowData*>(index.internalPointer());
+}
+
+int Model::rowOf(const RowData* row) const
+{
+    if (auto parent = row->parent) {
+        return indexOf(row, parent->children);
+    } else {
+        return indexOf(row, m_data);
+    }
 }

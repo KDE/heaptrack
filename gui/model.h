@@ -21,8 +21,50 @@
 #define MODEL_H
 
 #include <QAbstractItemModel>
+#include <QVector>
 
-#include "../accumulatedtracedata.h"
+struct LocationData
+{
+    QString function;
+    QString file;
+    QString module;
+    bool operator==(const LocationData& rhs) const
+    {
+        return function == rhs.function
+            && file == rhs.file
+            && module == rhs.module;
+    }
+    bool operator<(const LocationData& rhs) const
+    {
+        int i = function.compare(rhs.function);
+        if (!i) {
+            i = file.compare(rhs.file);
+        }
+        if (!i) {
+            i = module.compare(rhs.module);
+        }
+        return i < 0;
+    }
+};
+
+struct RowData
+{
+    quint64 allocations;
+    quint64 peak;
+    quint64 leaked;
+    quint64 allocated;
+    LocationData location;
+    const RowData* parent;
+    QVector<RowData> children;
+    bool operator<(const LocationData& rhs) const
+    {
+        return location < rhs;
+    }
+};
+
+Q_DECLARE_TYPEINFO(RowData, Q_MOVABLE_TYPE);
+
+Q_DECLARE_METATYPE(QVector<RowData>)
 
 class Model : public QAbstractItemModel
 {
@@ -49,15 +91,26 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
-    void loadFile(const QString& file);
+    void loadFile(const QString& path);
 
 signals:
     void dataReady(const QString& summary);
 
-private:
-    QVariant allocationData(const AllocationData& data, const IpIndex& ipIndex, Columns column) const;
+    /// emitted from the background for message passing into the foreground
+    void dataReadyBackground(const QVector<RowData>& data, const QString& summary);
 
-    AccumulatedTraceData m_data;
+private:
+    /// called in the main thread to actually reset the data of this model and notify views
+    void dataReadyForeground(const QVector<RowData>& data, const QString& summary);
+
+    /// @return the row resembled by @p index
+    const RowData* toRow(const QModelIndex& index) const;
+    /// @return the parent row containing @p index
+    const RowData* toParentRow(const QModelIndex& index) const;
+    /// @return the row number of @p row in its parent
+    int rowOf(const RowData* row) const;
+
+    QVector<RowData> m_data;
 };
 
 #endif // MODEL_H

@@ -65,7 +65,6 @@ void AccumulatedTraceData::clear()
     instructionPointers.clear();
     traces.clear();
     strings.clear();
-    mergedAllocations.clear();
     allocations.clear();
     activeAllocations.clear();
 }
@@ -280,7 +279,6 @@ bool AccumulatedTraceData::read(istream& in)
             handleTimeStamp(timeStamp, newStamp);
             timeStamp = newStamp;
         } else if (reader.mode() == 'X') {
-            cout << "Debuggee command was: " << (reader.line().c_str() + 2) << endl;
             handleDebuggee(reader.line().c_str() + 2);
         } else if (reader.mode() == 'A') {
             leaked = 0;
@@ -297,9 +295,6 @@ bool AccumulatedTraceData::read(istream& in)
     totalTime = max(timeStamp, size_t(1));
 
     handleTimeStamp(timeStamp, totalTime);
-
-    filterAllocations();
-    mergedAllocations = mergeAllocations(allocations);
 
     return true;
 }
@@ -328,53 +323,6 @@ Allocation& AccumulatedTraceData::findAllocation(const TraceIndex traceIndex)
     return allocations.back();
 }
 
-void AccumulatedTraceData::mergeAllocation(vector<MergedAllocation>* mergedAllocations, const Allocation& allocation) const
-{
-    const auto trace = findTrace(allocation.traceIndex);
-    const auto traceIp = findIp(trace.ipIndex);
-    auto it = lower_bound(mergedAllocations->begin(), mergedAllocations->end(), traceIp,
-                            [this] (const MergedAllocation& allocation, const InstructionPointer traceIp) -> bool {
-                                // Compare meta data without taking the instruction pointer address into account.
-                                // This is useful since sometimes, esp. when we lack debug symbols, the same function
-                                // allocates memory at different IP addresses which is pretty useless information most of the time
-                                // TODO: make this configurable, but on-by-default
-                                const auto allocationIp = findIp(allocation.ipIndex);
-                                return allocationIp.compareWithoutAddress(traceIp);
-                            });
-    if (it == mergedAllocations->end() || !findIp(it->ipIndex).equalWithoutAddress(traceIp)) {
-        MergedAllocation merged;
-        merged.ipIndex = trace.ipIndex;
-        it = mergedAllocations->insert(it, merged);
-    }
-    it->traces.push_back(allocation);
-}
-
-// merge allocations so that different traces that point to the same
-// instruction pointer at the end where the allocation function is
-// called are combined
-vector<MergedAllocation> AccumulatedTraceData::mergeAllocations(const vector<Allocation>& allocations) const
-{
-    // TODO: merge deeper traces, i.e. A,B,C,D and A,B,C,F
-    //       should be merged to A,B,C: D & F
-    //       currently the below will only merge it to: A: B,C,D & B,C,F
-    vector<MergedAllocation> ret;
-    ret.reserve(allocations.size());
-    for (const Allocation& allocation : allocations) {
-        if (allocation.traceIndex) {
-            mergeAllocation(&ret, allocation);
-        }
-    }
-    for (MergedAllocation& merged : ret) {
-        for (const Allocation& allocation: merged.traces) {
-            merged.allocated += allocation.allocated;
-            merged.allocations += allocation.allocations;
-            merged.leaked += allocation.leaked;
-            merged.peak += allocation.peak;
-        }
-    }
-    return ret;
-}
-
 InstructionPointer AccumulatedTraceData::findIp(const IpIndex ipIndex) const
 {
     if (!ipIndex || ipIndex.index > instructionPointers.size()) {
@@ -396,91 +344,4 @@ TraceNode AccumulatedTraceData::findTrace(const TraceIndex traceIndex) const
 bool AccumulatedTraceData::isStopIndex(const StringIndex index) const
 {
     return find(stopIndices.begin(), stopIndices.end(), index) != stopIndices.end();
-}
-
-void AccumulatedTraceData::filterAllocations()
-{
-    if (filterBtFunction.empty()) {
-        return;
-    }
-    allocations.erase(remove_if(allocations.begin(), allocations.end(), [&] (const Allocation& allocation) -> bool {
-        auto node = findTrace(allocation.traceIndex);
-        while (node.ipIndex) {
-            const auto& ip = findIp(node.ipIndex);
-            if (isStopIndex(ip.functionIndex)) {
-                break;
-            }
-            if (stringify(ip.functionIndex).find(filterBtFunction) != string::npos) {
-                return false;
-            }
-            node = findTrace(node.parentIndex);
-        };
-        return true;
-    }), allocations.end());
-}
-
-void AccumulatedTraceData::printIndent(ostream& out, size_t indent, const char* indentString) const
-{
-    while (indent--) {
-        out << indentString;
-    }
-}
-
-void AccumulatedTraceData::printIp(const IpIndex ip, ostream &out, const size_t indent) const
-{
-    printIp(findIp(ip), out, indent);
-}
-
-void AccumulatedTraceData::printIp(const InstructionPointer& ip, ostream& out, const size_t indent) const
-{
-    printIndent(out, indent);
-
-    if (ip.functionIndex) {
-        out << prettyFunction(stringify(ip.functionIndex));
-    } else {
-        out << "0x" << hex << ip.instructionPointer << dec;
-    }
-
-    out << '\n';
-    printIndent(out, indent + 1);
-
-    if (ip.fileIndex) {
-        out << "at " << stringify(ip.fileIndex) << ':' << ip.line << '\n';
-        printIndent(out, indent + 1);
-    }
-
-    if (ip.moduleIndex) {
-        out << "in " << stringify(ip.moduleIndex);
-    } else {
-        out << "in ??";
-    }
-    out << '\n';
-}
-
-void AccumulatedTraceData::printBacktrace(const TraceIndex traceIndex, ostream& out,
-                                          const size_t indent, bool skipFirst) const
-{
-    if (!traceIndex) {
-        out << "  ??";
-        return;
-    }
-    printBacktrace(findTrace(traceIndex), out, indent, skipFirst);
-}
-
-void AccumulatedTraceData::printBacktrace(TraceNode node, ostream& out, const size_t indent,
-                                          bool skipFirst) const
-{
-    while (node.ipIndex) {
-        const auto& ip = findIp(node.ipIndex);
-        if (!skipFirst) {
-            printIp(ip, out, indent);
-        }
-        skipFirst = false;
-
-        if (isStopIndex(ip.functionIndex)) {
-            break;
-        }
-
-        node = findTrace(node.parentIndex);
-    };
 }

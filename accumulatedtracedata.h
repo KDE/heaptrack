@@ -145,16 +145,10 @@ struct AccumulatedTraceData
     bool read(std::istream& in);
 
     bool shortenTemplates = false;
-    bool mergeBacktraces = true;
     bool printHistogram = false;
     bool fromAttached = false;
-    std::ofstream massifOut;
-    double massifThreshold = 1;
-    size_t massifDetailedFreq = 1;
-    std::string filterBtFunction;
 
     std::vector<Allocation> allocations;
-    std::vector<MergedAllocation> mergedAllocations;
     std::map<size_t, size_t> sizeHistogram;
     size_t totalAllocated = 0;
     size_t totalAllocations = 0;
@@ -169,28 +163,11 @@ struct AccumulatedTraceData
 
     Allocation& findAllocation(const TraceIndex traceIndex);
 
-    void mergeAllocation(std::vector<MergedAllocation>* mergedAllocations, const Allocation& allocation) const;
-
-    // merge allocations so that different traces that point to the same
-    // instruction pointer at the end where the allocation function is
-    // called are combined
-    std::vector<MergedAllocation> mergeAllocations(const std::vector<Allocation>& allocations) const;
-
     InstructionPointer findIp(const IpIndex ipIndex) const;
 
     TraceNode findTrace(const TraceIndex traceIndex) const;
 
     bool isStopIndex(const StringIndex index) const;
-
-    void filterAllocations();
-
-    void printIndent(std::ostream& out, size_t indent, const char* indentString = "  ") const;
-    void printIp(const IpIndex ip, std::ostream &out, const size_t indent = 0) const;
-    void printIp(const InstructionPointer& ip, std::ostream& out, const size_t indent = 0) const;
-    void printBacktrace(const TraceIndex traceIndex, std::ostream& out,
-                        const size_t indent = 0, bool skipFirst = false) const;
-    void printBacktrace(TraceNode node, std::ostream& out, const size_t indent = 0,
-                        bool skipFirst = false) const;
 
     // indices of functions that should stop the backtrace, e.g. main or static initialization
     std::vector<StringIndex> stopIndices;
