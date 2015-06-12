@@ -40,15 +40,14 @@ QString generateSummary(const AccumulatedTraceData& data)
     KFormat format;
     QTextStream stream(&ret);
     const double totalTimeS = 0.001 * data.totalTime;
-    /// TODO: translate
     stream << "<qt>"
-           << "<strong>total runtime</strong>: " << totalTimeS << "s.<br/>"
-           << "<strong>bytes allocated in total</strong> (ignoring deallocations): " << format.formatByteSize(data.totalAllocated, 2)
-             << " (" << format.formatByteSize(data.totalAllocated / totalTimeS) << "/s)<br/>"
-           << "<strong>calls to allocation functions</strong>: " << data.totalAllocations
-             << " (" << size_t(data.totalAllocations / totalTimeS) << "/s)<br/>"
-           << "<strong>peak heap memory consumption</strong>: " << format.formatByteSize(data.peak) << "<br/>"
-           << "<strong>total memory leaked</strong>: " << format.formatByteSize(data.leaked) << "<br/>";
+           << i18n("<strong>total runtime</strong>: %1s", totalTimeS) << "<br/>"
+           << i18n("<strong>bytes allocated in total</strong> (ignoring deallocations): %1 (%2/s)",
+                   format.formatByteSize(data.totalAllocated, 2), format.formatByteSize(data.totalAllocated / totalTimeS)) << "<br/>"
+           << i18n("<strong>calls to allocation functions</strong>: %1 (%2/s)",
+                   data.totalAllocations, quint64(data.totalAllocations / totalTimeS)) << "<br/>"
+           << i18n("<strong>peak heap memory consumption</strong>: %1", format.formatByteSize(data.peak)) << "<br/>"
+           << i18n("<strong>total memory leaked</strong>: %1", format.formatByteSize(data.leaked)) << "<br/>";
     stream << "</qt>";
     return ret;
 }
@@ -178,19 +177,19 @@ QVariant Model::headerData(int section, Qt::Orientation orientation, int role) c
     }
     switch (static_cast<Columns>(section)) {
         case FileColumn:
-            return tr("File");
+            return i18n("File");
         case FunctionColumn:
-            return tr("Function");
+            return i18n("Function");
         case ModuleColumn:
-            return tr("Module");
+            return i18n("Module");
         case AllocationsColumn:
-            return tr("Allocations");
+            return i18n("Allocations");
         case PeakColumn:
-            return tr("Peak");
+            return i18n("Peak");
         case LeakedColumn:
-            return tr("Leaked");
+            return i18n("Leaked");
         case AllocatedColumn:
-            return tr("Allocated");
+            return i18n("Allocated");
         case NUM_COLUMNS:
             break;
     }
@@ -294,7 +293,6 @@ int Model::columnCount(const QModelIndex& /*parent*/) const
 
 void Model::loadFile(const QString& path)
 {
-    qDebug() << "load file" << path;
     using namespace ThreadWeaver;
     stream() << make_job([=]() {
         AccumulatedTraceData data;
