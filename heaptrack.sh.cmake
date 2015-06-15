@@ -32,7 +32,7 @@ usage() {
     echo "  * Where is heap memory being allocated, and how often?"
     echo "  * How much space are heap individual allocations requesting?"
     echo
-    echo "To evaluate the generated heaptrack data, use heaptrack_print."
+    echo "To evaluate the generated heaptrack data, use heaptrack_print or heaptrack_gui."
     echo
     echo "Mandatory arguments to heaptrack:"
     echo "  DEBUGGEE       The name or path to the application that should"
@@ -155,7 +155,11 @@ function cleanup {
 
     echo "Heaptrack finished! Now run the following to investigate the data:"
     echo
-    echo "  heaptrack_print \"$output\" | less"
+    if [[ "$(which heaptrack_gui)" != "" ]]; then
+        echo "  heaptrack_gui \"$output\""
+    else
+        echo "  heaptrack_print \"$output\" | less"
+    fi
 }
 trap cleanup EXIT
 
