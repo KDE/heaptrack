@@ -17,35 +17,25 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef CHARTPROXY_H
+#define CHARTPROXY_H
 
-#include <QMainWindow>
+#include <QSortFilterProxyModel>
 
-namespace Ui {
-class MainWindow;
-}
-
-class BottomUpModel;
-class ChartModel;
-class Parser;
-
-class MainWindow : public QMainWindow
+class ChartProxy : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    MainWindow(QWidget* parent = nullptr);
-    virtual ~MainWindow();
+    explicit ChartProxy(const QString& label, int column, QObject* parent = nullptr);
+    virtual ~ChartProxy();
 
-public slots:
-    void loadFile(const QString& path);
-    void openFile();
+protected:
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    bool filterAcceptsColumn(int sourceColumn, const QModelIndex& sourceParent) const override;
 
 private:
-    QScopedPointer<Ui::MainWindow> m_ui;
-    BottomUpModel* m_bottomUpModel;
-    ChartModel* m_chartModel;
-    Parser* m_parser;
+    QString m_label;
+    int m_column;
 };
 
-#endif // MAINWINDOW_H
+#endif //CHARTPROXY_H

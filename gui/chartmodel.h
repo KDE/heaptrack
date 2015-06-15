@@ -26,7 +26,8 @@
 struct ChartRow
 {
     quint64 timeStamp;
-    quint64 cost;
+    quint64 leaked;
+    quint64 allocations;
 };
 
 Q_DECLARE_TYPEINFO(ChartRow, Q_MOVABLE_TYPE);
@@ -37,7 +38,7 @@ class ChartModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    explicit ChartModel(const QString& label, QObject* parent = nullptr);
+    explicit ChartModel(QObject* parent = nullptr);
     virtual ~ChartModel();
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -50,7 +51,6 @@ public slots:
 
 private:
     ChartData m_data;
-    QString m_label;
 };
 
 #endif // CHARTMODEL_H

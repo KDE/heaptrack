@@ -28,6 +28,7 @@ class Plotter;
 }
 
 class ChartModel;
+class QAbstractItemModel;
 
 class ChartWidget : public QWidget
 {
@@ -36,12 +37,11 @@ public:
     explicit ChartWidget(QWidget* parent = nullptr);
     virtual ~ChartWidget();
 
-    void setModel(ChartModel* model);
+    void setModel(QAbstractItemModel* model);
 
 private:
     KChart::Chart* m_chart;
     KChart::Plotter* m_plotter;
-    ChartModel* m_model;
 };
 
 #endif // CHARTWIDGET_H

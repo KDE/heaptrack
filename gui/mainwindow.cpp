@@ -31,6 +31,7 @@
 #include "bottomupproxy.h"
 #include "parser.h"
 #include "chartmodel.h"
+#include "chartproxy.h"
 
 using namespace std;
 
@@ -38,6 +39,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_ui(new Ui::MainWindow)
     , m_bottomUpModel(new BottomUpModel(this))
+    , m_chartModel(new ChartModel(this))
     , m_parser(new Parser(this))
 {
     m_ui->setupUi(this);
@@ -47,13 +49,18 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->loadingProgress->setMinimum(0);
     m_ui->loadingProgress->setMaximum(0);
 
-    auto leakedModel = new ChartModel(i18n("Memory Consumption"), this);
-    m_ui->memoryConsumptionTab->setModel(leakedModel);
+    auto memoryConsumptionProxy = new ChartProxy(i18n("Memory Consumption"), 1, this);
+    memoryConsumptionProxy->setSourceModel(m_chartModel);
+    m_ui->memoryConsumptionTab->setModel(memoryConsumptionProxy);
+
+    auto allocationsProxy = new ChartProxy(i18n("Memory Allocations"), 2, this);
+    allocationsProxy->setSourceModel(m_chartModel);
+    m_ui->allocationsTab->setModel(allocationsProxy);
 
     connect(m_parser, &Parser::bottomUpDataAvailable,
             m_bottomUpModel, &BottomUpModel::resetData);
-    connect(m_parser, &Parser::leakedDataAvailable,
-            leakedModel, &ChartModel::resetData);
+    connect(m_parser, &Parser::chartDataAvailable,
+            m_chartModel, &ChartModel::resetData);
     connect(m_parser, &Parser::summaryAvailable,
             m_ui->summary, &QLabel::setText);
     connect(m_parser, &Parser::finished,

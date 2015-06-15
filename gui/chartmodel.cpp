@@ -27,16 +27,14 @@
 
 #include "modeltest.h"
 
-ChartModel::ChartModel(const QString& label, QObject* parent)
+ChartModel::ChartModel(QObject* parent)
     : QAbstractTableModel(parent)
-    , m_label(label)
 {
     qRegisterMetaType<ChartData>();
     new ModelTest(this);
 }
 
 ChartModel::~ChartModel() = default;
-
 
 QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
@@ -46,11 +44,9 @@ QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int ro
             return QPen(Qt::red);
         } else if ( role == KChart::DatasetBrushRole ) {
             return QBrush(Qt::red);
-        } else if ( role == Qt::DisplayRole ) {
-            return m_label;
         }
     }
-    return QAbstractTableModel::headerData(section, orientation, role);
+    return {};
 }
 
 QVariant ChartModel::data(const QModelIndex& index, int role) const
@@ -92,14 +88,16 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
     const auto& data= m_data.at(index.row());
     if (index.column() == 0) {
         return data.timeStamp;
+    } else if (index.column() == 1) {
+        return data.leaked;
     } else {
-        return data.cost;
+        return data.allocations;
     }
 }
 
 int ChartModel::columnCount(const QModelIndex& /*parent*/) const
 {
-    return 2;
+    return 3;
 }
 
 int ChartModel::rowCount(const QModelIndex& parent) const

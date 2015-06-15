@@ -171,6 +171,11 @@
             <string>Memory Consumption</string>
            </attribute>
           </widget>
+          <widget class="ChartWidget" name="allocationsTab">
+           <attribute name="title">
+            <string>Allocations</string>
+           </attribute>
+          </widget>
          </widget>
         </item>
        </layout>

@@ -38,7 +38,7 @@ public slots:
 signals:
     void summaryAvailable(const QString& summary);
     void bottomUpDataAvailable(const BottomUpData& data);
-    void leakedDataAvailable(const ChartData& data);
+    void chartDataAvailable(const ChartData& data);
     void finished();
 };
 

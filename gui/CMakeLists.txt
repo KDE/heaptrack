@@ -18,6 +18,7 @@ add_executable(heaptrack_gui
     bottomupproxy.cpp
     chartwidget.cpp
     chartmodel.cpp
+    chartproxy.cpp
     modeltest.cpp
     parser.cpp
     ${UIFILES}

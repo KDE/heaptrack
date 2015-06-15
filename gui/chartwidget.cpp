@@ -78,7 +78,6 @@ ChartWidget::ChartWidget(QWidget* parent)
     : QWidget(parent)
     , m_chart(new KChart::Chart(this))
     , m_plotter(new Plotter(this))
-    , m_model(nullptr)
 {
     auto layout = new QVBoxLayout(this);
     layout->addWidget(m_chart);
@@ -113,9 +112,8 @@ ChartWidget::ChartWidget(QWidget* parent)
 
 ChartWidget::~ChartWidget() = default;
 
-void ChartWidget::setModel(ChartModel* model)
+void ChartWidget::setModel(QAbstractItemModel* model)
 {
-    m_model = model;
     m_plotter->setModel(model);
 }
 

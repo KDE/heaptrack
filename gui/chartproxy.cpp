@@ -17,35 +17,26 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#include "chartproxy.h"
 
-#include <QMainWindow>
+ChartProxy::ChartProxy(const QString& label, int column, QObject* parent)
+    : QSortFilterProxyModel(parent)
+    , m_label(label)
+    , m_column(column)
+{}
 
-namespace Ui {
-class MainWindow;
+ChartProxy::~ChartProxy() = default;
+
+QVariant ChartProxy::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    Q_ASSERT(orientation != Qt::Horizontal || section < columnCount());
+    if (section == 0 && orientation == Qt::Horizontal && role == Qt::DisplayRole) {
+        return m_label;
+    }
+    return QSortFilterProxyModel::headerData(section, orientation, role);
 }
 
-class BottomUpModel;
-class ChartModel;
-class Parser;
-
-class MainWindow : public QMainWindow
+bool ChartProxy::filterAcceptsColumn(int sourceColumn, const QModelIndex& /*sourceParent*/) const
 {
-    Q_OBJECT
-public:
-    MainWindow(QWidget* parent = nullptr);
-    virtual ~MainWindow();
-
-public slots:
-    void loadFile(const QString& path);
-    void openFile();
-
-private:
-    QScopedPointer<Ui::MainWindow> m_ui;
-    BottomUpModel* m_bottomUpModel;
-    ChartModel* m_chartModel;
-    Parser* m_parser;
-};
-
-#endif // MAINWINDOW_H
+    return sourceColumn == 0 || sourceColumn == m_column;
+}
