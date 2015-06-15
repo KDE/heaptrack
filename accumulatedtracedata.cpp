@@ -69,19 +69,6 @@ void AccumulatedTraceData::clear()
     activeAllocations.clear();
 }
 
-void AccumulatedTraceData::handleTimeStamp(size_t /*newStamp*/, size_t /*oldStamp*/)
-{
-}
-
-void AccumulatedTraceData::handleAllocation()
-{
-}
-
-void AccumulatedTraceData::handleDebuggee(const char* command)
-{
-    debuggee = command;
-}
-
 const string& AccumulatedTraceData::stringify(const StringIndex stringId) const
 {
     if (!stringId || stringId.index > strings.size()) {

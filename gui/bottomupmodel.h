@@ -17,8 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef BOTTOMUPMODEL_H
+#define BOTTOMUPMODEL_H
 
 #include <QAbstractItemModel>
 #include <QVector>
@@ -63,15 +63,15 @@ struct RowData
 };
 
 Q_DECLARE_TYPEINFO(RowData, Q_MOVABLE_TYPE);
+using BottomUpData = QVector<RowData>;
+Q_DECLARE_METATYPE(BottomUpData)
 
-Q_DECLARE_METATYPE(QVector<RowData>)
-
-class Model : public QAbstractItemModel
+class BottomUpModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:
-    Model(QObject* parent);
-    virtual ~Model();
+    BottomUpModel(QObject* parent);
+    virtual ~BottomUpModel();
 
     enum Columns {
         AllocationsColumn,
@@ -92,18 +92,10 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
-    void loadFile(const QString& path);
-
-signals:
-    void dataReady(const QString& summary);
-
-    /// emitted from the background for message passing into the foreground
-    void dataReadyBackground(const QVector<RowData>& data, const QString& summary);
+public slots:
+    void resetData(const BottomUpData& data);
 
 private:
-    /// called in the main thread to actually reset the data of this model and notify views
-    void dataReadyForeground(const QVector<RowData>& data, const QString& summary);
-
     /// @return the row resembled by @p index
     const RowData* toRow(const QModelIndex& index) const;
     /// @return the parent row containing @p index
@@ -111,8 +103,8 @@ private:
     /// @return the row number of @p row in its parent
     int rowOf(const RowData* row) const;
 
-    QVector<RowData> m_data;
+    BottomUpData m_data;
 };
 
-#endif // MODEL_H
+#endif // BOTTOMUPMODEL_H
 

@@ -91,61 +91,86 @@
          </widget>
         </item>
         <item>
-         <widget class="QWidget" name="widget" native="true">
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <property name="spacing">
-            <number>0</number>
-           </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QLineEdit" name="filterFunction">
-             <property name="placeholderText">
-              <string>filter by function...</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="filterFile">
-             <property name="placeholderText">
-              <string>filter by file...</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="filterModule">
-             <property name="placeholderText">
-              <string>filter by module...</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QTreeView" name="results">
-          <property name="alternatingRowColors">
-           <bool>true</bool>
+         <widget class="QTabWidget" name="tabWidget">
+          <property name="currentIndex">
+           <number>0</number>
           </property>
-          <property name="rootIsDecorated">
-           <bool>true</bool>
-          </property>
-          <property name="uniformRowHeights">
-           <bool>true</bool>
-          </property>
-          <property name="sortingEnabled">
-           <bool>true</bool>
-          </property>
+          <widget class="QWidget" name="bottomUpTab">
+           <attribute name="title">
+            <string>Bottom-Up</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout">
+            <item>
+             <widget class="QWidget" name="widget" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLineEdit" name="filterFunction">
+                 <property name="placeholderText">
+                  <string>filter by function...</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="filterFile">
+                 <property name="placeholderText">
+                  <string>filter by file...</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="filterModule">
+                 <property name="placeholderText">
+                  <string>filter by module...</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTreeView" name="results">
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="rootIsDecorated">
+               <bool>true</bool>
+              </property>
+              <property name="uniformRowHeights">
+               <bool>true</bool>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+           <zorder>results</zorder>
+           <zorder>filterFile</zorder>
+           <zorder>filterFunction</zorder>
+           <zorder>filterModule</zorder>
+           <zorder>widget</zorder>
+           <zorder>results</zorder>
+          </widget>
+          <widget class="QWidget" name="memoryConsumptionTab">
+           <attribute name="title">
+            <string>Memory Consumption</string>
+           </attribute>
+          </widget>
          </widget>
         </item>
        </layout>

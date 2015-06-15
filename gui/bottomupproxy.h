@@ -17,17 +17,17 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef PROXY_H
-#define PROXY_H
+#ifndef BOTTOMUPPROXY_H
+#define BOTTOMUPPROXY_H
 
 #include <KRecursiveFilterProxyModel>
 
-class Proxy final : public KRecursiveFilterProxyModel
+class BottomUpProxy final : public KRecursiveFilterProxyModel
 {
     Q_OBJECT
 public:
-    explicit Proxy(QObject* parent);
-    virtual ~Proxy();
+    explicit BottomUpProxy(QObject* parent = nullptr);
+    virtual ~BottomUpProxy();
 
 public slots:
     void setFunctionFilter(const QString& functionFilter);
@@ -42,4 +42,4 @@ private:
     QString m_moduleFilter;
 };
 
-#endif // PROXY_H
+#endif //BOTTOMUP PROXY_H

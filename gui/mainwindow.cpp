@@ -27,39 +27,48 @@
 
 #include <QFileDialog>
 
-#include "model.h"
-#include "proxy.h"
+#include "bottomupmodel.h"
+#include "bottomupproxy.h"
+#include "parser.h"
 
 using namespace std;
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_ui(new Ui::MainWindow)
-    , m_model(new Model(this))
+    , m_bottomUpModel(new BottomUpModel(this))
+    , m_parser(new Parser(this))
 {
     m_ui->setupUi(this);
-    auto proxy = new Proxy(m_model);
-    proxy->setSourceModel(m_model);
-    m_ui->results->setModel(proxy);
+    
+    // TODO: renable eventually
+    m_ui->tabWidget->removeTab(1);
 
     m_ui->pages->setCurrentWidget(m_ui->openPage);
     // TODO: proper progress report
     m_ui->loadingProgress->setMinimum(0);
     m_ui->loadingProgress->setMaximum(0);
 
-    connect(m_model, &Model::dataReady,
-            this, &MainWindow::dataReady);
+    connect(m_parser, &Parser::bottomUpDataAvailable,
+            m_bottomUpModel, &BottomUpModel::resetData);
+    connect(m_parser, &Parser::summaryAvailable,
+            m_ui->summary, &QLabel::setText);
+    connect(m_parser, &Parser::finished,
+            this, [&] { m_ui->pages->setCurrentWidget(m_ui->resultsPage); });
 
-    m_ui->results->hideColumn(Model::FunctionColumn);
-    m_ui->results->hideColumn(Model::FileColumn);
-    m_ui->results->hideColumn(Model::ModuleColumn);
+    auto bottomUpProxy = new BottomUpProxy(m_bottomUpModel);
+    bottomUpProxy->setSourceModel(m_bottomUpModel);
+    m_ui->results->setModel(bottomUpProxy);
+    m_ui->results->hideColumn(BottomUpModel::FunctionColumn);
+    m_ui->results->hideColumn(BottomUpModel::FileColumn);
+    m_ui->results->hideColumn(BottomUpModel::ModuleColumn);
 
     connect(m_ui->filterFunction, &QLineEdit::textChanged,
-            proxy, &Proxy::setFunctionFilter);
+            bottomUpProxy, &BottomUpProxy::setFunctionFilter);
     connect(m_ui->filterFile, &QLineEdit::textChanged,
-            proxy, &Proxy::setFileFilter);
+            bottomUpProxy, &BottomUpProxy::setFileFilter);
     connect(m_ui->filterModule, &QLineEdit::textChanged,
-            proxy, &Proxy::setModuleFilter);
+            bottomUpProxy, &BottomUpProxy::setModuleFilter);
 
     auto openFile = KStandardAction::open(this, SLOT(openFile()), this);
     m_ui->openFile->setDefaultAction(openFile);
@@ -71,18 +80,12 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::dataReady(const QString& summary)
-{
-    m_ui->summary->setText(summary);
-    m_ui->pages->setCurrentWidget(m_ui->resultsPage);
-}
-
 void MainWindow::loadFile(const QString& file)
 {
     m_ui->loadingLabel->setText(i18n("Loading file %1, please wait...", file));
     setWindowTitle(i18nc("%1: file name that is open", "Heaptrack - %1", file));
     m_ui->pages->setCurrentWidget(m_ui->loadingPage);
-    m_model->loadFile(file);
+    m_parser->parse(file);
 }
 
 void MainWindow::openFile()

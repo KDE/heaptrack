@@ -14,9 +14,10 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(heaptrack_gui
     gui.cpp
     mainwindow.cpp
-    model.cpp
+    bottomupmodel.cpp
+    bottomupproxy.cpp
     modeltest.cpp
-    proxy.cpp
+    parser.cpp
     ${UIFILES}
 )
 

@@ -17,33 +17,27 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef PARSER_H
+#define PARSER_H
 
-#include <QMainWindow>
+#include <QObject>
 
-namespace Ui {
-class MainWindow;
-}
+#include "bottomupmodel.h"
 
-class BottomUpModel;
-class Parser;
-
-class MainWindow : public QMainWindow
+class Parser : public QObject
 {
     Q_OBJECT
 public:
-    MainWindow(QWidget* parent = nullptr);
-    virtual ~MainWindow();
+    explicit Parser(QObject* parent = nullptr);
+    virtual ~Parser();
 
 public slots:
-    void loadFile(const QString& path);
-    void openFile();
+    void parse(const QString& path);
 
-private:
-    QScopedPointer<Ui::MainWindow> m_ui;
-    BottomUpModel* m_bottomUpModel;
-    Parser* m_parser;
+signals:
+    void summaryAvailable(const QString& summary);
+    void bottomUpDataAvailable(const BottomUpData& data);
+    void finished();
 };
 
-#endif // MAINWINDOW_H
+#endif // PARSER_H

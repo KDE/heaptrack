@@ -132,9 +132,9 @@ struct AccumulatedTraceData
     AccumulatedTraceData();
     virtual ~AccumulatedTraceData() = default;
 
-    virtual void handleTimeStamp(size_t newStamp, size_t oldStamp);
-    virtual void handleAllocation();
-    virtual void handleDebuggee(const char* command);
+    virtual void handleTimeStamp(size_t newStamp, size_t oldStamp) = 0;
+    virtual void handleAllocation() = 0;
+    virtual void handleDebuggee(const char* command) = 0;
 
     void clear();
     const std::string& stringify(const StringIndex stringId) const;
@@ -155,7 +155,6 @@ struct AccumulatedTraceData
     size_t peak = 0;
     size_t leaked = 0;
     size_t totalTime = 0;
-    std::string debuggee;
 
     // our indices are sequentially increasing thus a new allocation can only ever
     // occur with an index larger than any other we encountered so far
