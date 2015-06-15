@@ -36,6 +36,7 @@ struct ParserData final : public AccumulatedTraceData
 {
     ParserData()
     {
+        chartData.push_back({0, 0, 0, 0});
     }
 
     void handleTimeStamp(size_t /*newStamp*/, size_t oldStamp)
