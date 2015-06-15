@@ -340,7 +340,7 @@ public:
     }
 
 private:
-    static int dlopen_notify_callback(struct dl_phdr_info *info, size_t /*size*/, void *data)
+    static int dl_iterate_phdr_callback(struct dl_phdr_info *info, size_t /*size*/, void *data)
     {
         auto heaptrack = reinterpret_cast<HeapTrack*>(data);
         const char *fileName = info->dlpi_name;
@@ -406,7 +406,7 @@ private:
             writeError();
             return;
         }
-        dl_iterate_phdr(&dlopen_notify_callback, s_data->out);
+        dl_iterate_phdr(&dl_iterate_phdr_callback, s_data->out);
         s_data->moduleCacheDirty = false;
     }
 
