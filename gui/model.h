@@ -81,6 +81,7 @@ public:
         FunctionColumn,
         FileColumn,
         ModuleColumn,
+        LocationColumn,
         NUM_COLUMNS
     };
 

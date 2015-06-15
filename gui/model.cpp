@@ -219,6 +219,10 @@ QVariant Model::data(const QModelIndex& index, int role) const
             return row->location.module;
         case FileColumn:
             return row->location.file;
+        case LocationColumn:
+            return i18n("%1 in %2 (%3)", row->location.function,
+                        row->location.file.isEmpty() ? QStringLiteral("??") : row->location.file,
+                        row->location.module);
         case NUM_COLUMNS:
             break;
         }

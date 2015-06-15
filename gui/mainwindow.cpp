@@ -50,6 +50,10 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_model, &Model::dataReady,
             this, &MainWindow::dataReady);
 
+    m_ui->results->hideColumn(Model::FunctionColumn);
+    m_ui->results->hideColumn(Model::FileColumn);
+    m_ui->results->hideColumn(Model::ModuleColumn);
+
     connect(m_ui->filterFunction, &QLineEdit::textChanged,
             proxy, &Proxy::setFunctionFilter);
     connect(m_ui->filterFile, &QLineEdit::textChanged,
