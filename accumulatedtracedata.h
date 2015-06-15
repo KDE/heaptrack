@@ -155,6 +155,7 @@ struct AccumulatedTraceData
     size_t peak = 0;
     size_t leaked = 0;
     size_t totalTime = 0;
+    std::string debuggee;
 
     // our indices are sequentially increasing thus a new allocation can only ever
     // occur with an index larger than any other we encountered so far

@@ -79,6 +79,7 @@ void AccumulatedTraceData::handleAllocation()
 
 void AccumulatedTraceData::handleDebuggee(const char* command)
 {
+    debuggee = command;
 }
 
 const string& AccumulatedTraceData::stringify(const StringIndex stringId) const

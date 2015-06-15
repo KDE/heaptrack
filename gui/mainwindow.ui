@@ -83,7 +83,10 @@
         <item>
          <widget class="QLabel" name="summary">
           <property name="text">
-           <string/>
+           <string notr="true">summary goes here</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
