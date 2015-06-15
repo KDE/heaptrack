@@ -95,6 +95,9 @@ while true; do
             exit 0
             ;;
         *)
+            if [[ "$1" == "--" ]]; then
+                shift 1
+            fi
             if [ ! -x "$(which "$1" 2> /dev/null)" ]; then
                 echo "Error: Debuggee \"$1\" is not an executable."
                 echo
