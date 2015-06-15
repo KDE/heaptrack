@@ -18,22 +18,48 @@
  */
 
 #include <QApplication>
+#include <QCommandLineParser>
+
+#include <KAboutData>
+#include <KLocalizedString>
 
 #include "mainwindow.h"
-
-#include <iostream>
-
-using namespace std;
 
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
+    KAboutData aboutData(QStringLiteral("heaptrack_gui"), i18n("Heaptrack GUI"), QStringLiteral("0.1"),
+                         i18n("A visualizer for heaptrack data files."), KAboutLicense::LGPL,
+                         i18n("Copyright 2015, Milian Wolff <mail@milianw.de>"), QString(), QStringLiteral("mail@milianw.de"));
 
-    MainWindow window;
-    if (app.arguments().size() > 1) {
-        window.loadFile(app.arguments().last());
+    aboutData.addAuthor(i18n("Milian Wolff"), i18n("Original author, maintainer"),
+                        QStringLiteral("mail@milianw.de"), QStringLiteral("http://milianw.de"));
+
+    aboutData.setOrganizationDomain("kde.org");
+    KAboutData::setApplicationData(aboutData);
+
+    app.setApplicationName(aboutData.componentName());
+    app.setApplicationDisplayName(aboutData.displayName());
+    app.setOrganizationDomain(aboutData.organizationDomain());
+    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("office-chart-area")));
+    app.setApplicationVersion(aboutData.version());
+
+    QCommandLineParser parser;
+    KAboutData::setApplicationData(aboutData);
+    parser.addVersionOption();
+    parser.addHelpOption();
+    aboutData.setupCommandLine(&parser);
+
+    parser.addPositionalArgument(QStringLiteral("files"), i18n( "Files to load" ), i18n("[FILE...]"));
+
+    parser.process(app);
+    aboutData.processCommandLine(&parser);
+
+    foreach (const QString &file, parser.positionalArguments()) {
+        MainWindow* window = new MainWindow;
+        window->loadFile(file);
+        window->show();
     }
-    window.show();
 
     return app.exec();
 }
