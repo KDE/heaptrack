@@ -41,13 +41,14 @@ struct ParserData final : public AccumulatedTraceData
 
     void handleTimeStamp(size_t /*newStamp*/, size_t oldStamp)
     {
-        chartData.push_back({oldStamp, timestampData.leaked, totalAllocations, totalAllocated});
-        timestampData = {};
+        maxLeakedSinceLastTimeStamp = max(maxLeakedSinceLastTimeStamp, leaked);
+        chartData.push_back({oldStamp, maxLeakedSinceLastTimeStamp, totalAllocations, totalAllocated});
+        maxLeakedSinceLastTimeStamp = 0;
     }
 
     void handleAllocation()
     {
-        timestampData.leaked = max(timestampData.leaked, leaked);
+        maxLeakedSinceLastTimeStamp = max(maxLeakedSinceLastTimeStamp, leaked);
     }
 
     void handleDebuggee(const char* command)
@@ -58,10 +59,7 @@ struct ParserData final : public AccumulatedTraceData
     string debuggee;
 
     ChartData chartData;
-    struct TimestampData {
-        size_t leaked = 0;
-    };
-    TimestampData timestampData;
+    size_t maxLeakedSinceLastTimeStamp = 0;
 };
 
 QString generateSummary(const ParserData& data)
