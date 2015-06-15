@@ -62,8 +62,13 @@ enum DebugVerbosity
     VeryVerboseOutput,
 };
 
+// change this to add more debug output to stderr
 constexpr const DebugVerbosity s_debugVerbosity = NoDebugOutput;
 
+/**
+ * Call this to optionally show debug information but give the compiler
+ * a hand in removing it all if debug output is disabled.
+ */
 template<DebugVerbosity debugLevel, typename... Args>
 inline void debugLog(const char fmt[], Args... args)
 {
