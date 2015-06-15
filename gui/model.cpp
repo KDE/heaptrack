@@ -173,26 +173,55 @@ Model::~Model()
 
 QVariant Model::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (orientation != Qt::Horizontal || role != Qt::DisplayRole || section < 0 || section >= NUM_COLUMNS) {
+    if (orientation != Qt::Horizontal || section < 0 || section >= NUM_COLUMNS) {
         return {};
     }
-    switch (static_cast<Columns>(section)) {
-        case FileColumn:
-            return i18n("File");
-        case FunctionColumn:
-            return i18n("Function");
-        case ModuleColumn:
-            return i18n("Module");
-        case AllocationsColumn:
-            return i18n("Allocations");
-        case PeakColumn:
-            return i18n("Peak");
-        case LeakedColumn:
-            return i18n("Leaked");
-        case AllocatedColumn:
-            return i18n("Allocated");
-        case NUM_COLUMNS:
-            break;
+    if (role == Qt::DisplayRole) {
+        switch (static_cast<Columns>(section)) {
+            case FileColumn:
+                return i18n("File");
+            case FunctionColumn:
+                return i18n("Function");
+            case ModuleColumn:
+                return i18n("Module");
+            case AllocationsColumn:
+                return i18n("Allocations [-]");
+            case PeakColumn:
+                return i18n("Peak [B]");
+            case LeakedColumn:
+                return i18n("Leaked [B]");
+            case AllocatedColumn:
+                return i18n("Allocated [B]");
+            case LocationColumn:
+                return i18n("Location");
+            case NUM_COLUMNS:
+                break;
+        }
+    } else if (role == Qt::ToolTipRole) {
+        switch (static_cast<Columns>(section)) {
+            case FileColumn:
+                return i18n("<qt>The file and line number where the allocation function was called from. "
+                            "May be empty when debug information is missing.</qt>");
+            case FunctionColumn:
+                return i18n("<qt>The parent function that called an allocation function. "
+                            "May be unknown when debug information is missing.</qt>");
+            case ModuleColumn:
+                return i18n("<qt>The module, i.e. executable or shared library, from which an allocation function was called.</qt>");
+            case AllocationsColumn:
+                return i18n("<qt>The number of times an allocation function was called from this location.</qt>");
+            case PeakColumn:
+                return i18n("<qt>The maximum heap memory in bytes consumed from allocations originating at this location. "
+                            "This takes deallocations into account.</qt>");
+            case LeakedColumn:
+                return i18n("<qt>The bytes allocated at this location that have not been deallocated.</qt>");
+            case AllocatedColumn:
+                return i18n("<qt>The sum of all bytes allocated from this location, ignoring deallocations.</qt>");
+            case LocationColumn:
+                return i18n("<qt>The location from which an allocation function was called. Function symbol and file information "
+                            "may be unknown when debug information was missing when heaptrack was run.</qt>");
+            case NUM_COLUMNS:
+                break;
+        }
     }
     return {};
 }
