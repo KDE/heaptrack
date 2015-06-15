@@ -30,6 +30,7 @@
 #include "bottomupmodel.h"
 #include "bottomupproxy.h"
 #include "parser.h"
+#include "chartmodel.h"
 
 using namespace std;
 
@@ -40,17 +41,19 @@ MainWindow::MainWindow(QWidget* parent)
     , m_parser(new Parser(this))
 {
     m_ui->setupUi(this);
-    
-    // TODO: renable eventually
-    m_ui->tabWidget->removeTab(1);
 
     m_ui->pages->setCurrentWidget(m_ui->openPage);
     // TODO: proper progress report
     m_ui->loadingProgress->setMinimum(0);
     m_ui->loadingProgress->setMaximum(0);
 
+    auto leakedModel = new ChartModel(i18n("Memory Consumption"), this);
+    m_ui->memoryConsumptionTab->setModel(leakedModel);
+
     connect(m_parser, &Parser::bottomUpDataAvailable,
             m_bottomUpModel, &BottomUpModel::resetData);
+    connect(m_parser, &Parser::leakedDataAvailable,
+            leakedModel, &ChartModel::resetData);
     connect(m_parser, &Parser::summaryAvailable,
             m_ui->summary, &QLabel::setText);
     connect(m_parser, &Parser::finished,

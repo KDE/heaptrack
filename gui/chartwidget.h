@@ -17,29 +17,31 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef CHARTWIDGET_H
+#define CHARTWIDGET_H
 
-#include <QObject>
+#include <QWidget>
 
-#include "bottomupmodel.h"
-#include "chartmodel.h"
+namespace KChart {
+class Chart;
+class Plotter;
+}
 
-class Parser : public QObject
+class ChartModel;
+
+class ChartWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Parser(QObject* parent = nullptr);
-    virtual ~Parser();
+    explicit ChartWidget(QWidget* parent = nullptr);
+    virtual ~ChartWidget();
 
-public slots:
-    void parse(const QString& path);
+    void setModel(ChartModel* model);
 
-signals:
-    void summaryAvailable(const QString& summary);
-    void bottomUpDataAvailable(const BottomUpData& data);
-    void leakedDataAvailable(const ChartData& data);
-    void finished();
+private:
+    KChart::Chart* m_chart;
+    KChart::Plotter* m_plotter;
+    ChartModel* m_model;
 };
 
-#endif // PARSER_H
+#endif // CHARTWIDGET_H

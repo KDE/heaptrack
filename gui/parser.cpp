@@ -38,12 +38,15 @@ struct ParserData final : public AccumulatedTraceData
     {
     }
 
-    void handleTimeStamp(size_t /*newStamp*/, size_t /*oldStamp*/)
+    void handleTimeStamp(size_t /*newStamp*/, size_t oldStamp)
     {
+        m_leaked.push_back({static_cast<quint64>(oldStamp), static_cast<quint64>(timestampData.leaked)});
+        timestampData = {};
     }
 
     void handleAllocation()
     {
+        timestampData.leaked = max(timestampData.leaked, leaked);
     }
 
     void handleDebuggee(const char* command)
@@ -52,6 +55,12 @@ struct ParserData final : public AccumulatedTraceData
     }
 
     string debuggee;
+
+    ChartData m_leaked;
+    struct TimestampData {
+        size_t leaked = 0;
+    };
+    TimestampData timestampData;
 };
 
 QString generateSummary(const ParserData& data)
@@ -179,6 +188,7 @@ void Parser::parse(const QString& path)
         data.read(path.toStdString());
         emit summaryAvailable(generateSummary(data));
         emit bottomUpDataAvailable(mergeAllocations(data));
+        emit leakedDataAvailable(data.m_leaked);
         emit finished();
     });
 }

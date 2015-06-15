@@ -166,7 +166,7 @@
            <zorder>widget</zorder>
            <zorder>results</zorder>
           </widget>
-          <widget class="QWidget" name="memoryConsumptionTab">
+          <widget class="ChartWidget" name="memoryConsumptionTab">
            <attribute name="title">
             <string>Memory Consumption</string>
            </attribute>
@@ -180,6 +180,14 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ChartWidget</class>
+   <extends>QWidget</extends>
+   <header>chartwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -16,6 +16,8 @@ add_executable(heaptrack_gui
     mainwindow.cpp
     bottomupmodel.cpp
     bottomupproxy.cpp
+    chartwidget.cpp
+    chartmodel.cpp
     modeltest.cpp
     parser.cpp
     ${UIFILES}
@@ -34,6 +36,7 @@ target_link_libraries(heaptrack_gui
     KF5::ThreadWeaver
     KF5::ConfigWidgets
     KF5::I18n
+    KChart
     ${Boost_LIBRARIES}
     sharedprint)
 
