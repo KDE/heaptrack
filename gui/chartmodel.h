@@ -28,6 +28,7 @@ struct ChartRow
     quint64 timeStamp;
     quint64 leaked;
     quint64 allocations;
+    quint64 allocated;
 };
 
 Q_DECLARE_TYPEINFO(ChartRow, Q_MOVABLE_TYPE);

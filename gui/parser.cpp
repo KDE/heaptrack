@@ -40,7 +40,7 @@ struct ParserData final : public AccumulatedTraceData
 
     void handleTimeStamp(size_t /*newStamp*/, size_t oldStamp)
     {
-        chartData.push_back({oldStamp, timestampData.leaked, totalAllocations});
+        chartData.push_back({oldStamp, timestampData.leaked, totalAllocations, totalAllocated});
         timestampData = {};
     }
 

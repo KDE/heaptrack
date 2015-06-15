@@ -90,14 +90,16 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
         return data.timeStamp;
     } else if (index.column() == 1) {
         return data.leaked;
-    } else {
+    } else if (index.column() == 2) {
         return data.allocations;
+    } else {
+        return data.allocated;
     }
 }
 
 int ChartModel::columnCount(const QModelIndex& /*parent*/) const
 {
-    return 3;
+    return 4;
 }
 
 int ChartModel::rowCount(const QModelIndex& parent) const

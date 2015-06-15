@@ -166,14 +166,19 @@
            <zorder>widget</zorder>
            <zorder>results</zorder>
           </widget>
-          <widget class="ChartWidget" name="memoryConsumptionTab">
+          <widget class="ChartWidget" name="leakedTab">
            <attribute name="title">
-            <string>Memory Consumption</string>
+            <string>Leaked</string>
            </attribute>
           </widget>
           <widget class="ChartWidget" name="allocationsTab">
            <attribute name="title">
             <string>Allocations</string>
+           </attribute>
+          </widget>
+          <widget class="ChartWidget" name="allocatedTab">
+           <attribute name="title">
+            <string>Allocated</string>
            </attribute>
           </widget>
          </widget>

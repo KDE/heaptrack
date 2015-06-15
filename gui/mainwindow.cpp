@@ -49,13 +49,17 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->loadingProgress->setMinimum(0);
     m_ui->loadingProgress->setMaximum(0);
 
-    auto memoryConsumptionProxy = new ChartProxy(i18n("Memory Consumption"), 1, this);
-    memoryConsumptionProxy->setSourceModel(m_chartModel);
-    m_ui->memoryConsumptionTab->setModel(memoryConsumptionProxy);
+    auto leakedProxy = new ChartProxy(i18n("Memory Leaked"), 1, this);
+    leakedProxy->setSourceModel(m_chartModel);
+    m_ui->leakedTab->setModel(leakedProxy);
 
     auto allocationsProxy = new ChartProxy(i18n("Memory Allocations"), 2, this);
     allocationsProxy->setSourceModel(m_chartModel);
     m_ui->allocationsTab->setModel(allocationsProxy);
+
+    auto allocatedProxy = new ChartProxy(i18n("Memory Allocated"), 3, this);
+    allocatedProxy->setSourceModel(m_chartModel);
+    m_ui->allocatedTab->setModel(allocatedProxy);
 
     connect(m_parser, &Parser::bottomUpDataAvailable,
             m_bottomUpModel, &BottomUpModel::resetData);
