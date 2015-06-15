@@ -70,10 +70,10 @@ public:
             if (!ip) {
                 continue;
             }
-            auto it = std::find_if(parent->children.begin(), parent->children.end(), [ip] (const TraceEdge& l) {
-                return l.instructionPointer == ip;
+            auto it = std::lower_bound(parent->children.begin(), parent->children.end(), ip, [] (const TraceEdge& l, const Trace::ip_t ip) {
+                return l.instructionPointer < ip;
             });
-            if (it == parent->children.end()) {
+            if (it == parent->children.end() || it->instructionPointer != ip) {
                 index = m_index++;
                 it = parent->children.insert(it, {ip, index, {}});
                 fprintf(out, "t %lx %lx\n", reinterpret_cast<uintptr_t>(ip), parent->index);
