@@ -333,15 +333,14 @@ int main(int /*argc*/, char** /*argv*/)
 {
     // optimize: we only have a single thread
     ios_base::sync_with_stdio(false);
+    __fsetlocking(stdout, FSETLOCKING_BYCALLER);
+    __fsetlocking(stdin, FSETLOCKING_BYCALLER);
 
     AccumulatedTraceData data;
 
     LineReader reader;
 
     string exe;
-
-    __fsetlocking(stdout, FSETLOCKING_BYCALLER);
-    __fsetlocking(stdin, FSETLOCKING_BYCALLER);
 
     while (reader.getLine(cin)) {
         if (reader.mode() == 'x') {
