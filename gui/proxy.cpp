@@ -54,19 +54,19 @@ bool Proxy::acceptRow(int sourceRow, const QModelIndex& sourceParent) const
     }
     if (!m_functionFilter.isEmpty()) {
         const auto& function = source->index(sourceRow, Model::FunctionColumn, sourceParent).data().toString();
-        if (!function.contains(m_functionFilter)) {
+        if (!function.contains(m_functionFilter, Qt::CaseInsensitive)) {
             return false;
         }
     }
     if (!m_fileFilter.isEmpty()) {
         const auto& file = source->index(sourceRow, Model::FileColumn, sourceParent).data().toString();
-        if (!file.contains(m_fileFilter)) {
+        if (!file.contains(m_fileFilter, Qt::CaseInsensitive)) {
             return false;
         }
     }
     if (!m_moduleFilter.isEmpty()) {
         const auto& module = source->index(sourceRow, Model::ModuleColumn, sourceParent).data().toString();
-        if (!module.contains(m_moduleFilter)) {
+        if (!module.contains(m_moduleFilter, Qt::CaseInsensitive)) {
             return false;
         }
     }
