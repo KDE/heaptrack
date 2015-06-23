@@ -70,6 +70,7 @@ QString generateSummary(const ParserData& data)
     const double totalTimeS = 0.001 * data.totalTime;
     stream << "<qt>"
            << i18n("<strong>debuggee</strong>: <code>%1</code>", QString::fromStdString(data.debuggee)) << "<br/>"
+           // xgettext:no-c-format
            << i18n("<strong>total runtime</strong>: %1s", totalTimeS) << "<br/>"
            << i18n("<strong>bytes allocated in total</strong> (ignoring deallocations): %1 (%2/s)",
                    format.formatByteSize(data.totalAllocated, 2), format.formatByteSize(data.totalAllocated / totalTimeS)) << "<br/>"
