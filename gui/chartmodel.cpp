@@ -56,7 +56,6 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
     }
     Q_ASSERT(index.row() >= 0 && index.row() < rowCount(index.parent()));
     Q_ASSERT(index.column() >= 0 && index.column() < columnCount(index.parent()));
-    Q_ASSERT(m_data);
     Q_ASSERT(!index.parent().isValid());
 
     if ( role == KChart::LineAttributesRole ) {
