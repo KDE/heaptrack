@@ -38,7 +38,6 @@ target_link_libraries(heaptrack_gui
     KF5::ConfigWidgets
     KF5::I18n
     KChart
-    ${Boost_LIBRARIES}
     sharedprint)
 
 install(TARGETS heaptrack_gui ${INSTALL_TARGETS_DEFAULT_ARGS})

@@ -11,7 +11,7 @@ find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options)
 find_package(Threads REQUIRED)
 find_package(Qt5 5.2.0 NO_MODULE OPTIONAL_COMPONENTS Widgets)
 find_package(ECM 1.0.0 NO_MODULE)
-
+find_package(ZLIB REQUIRED)
 include(FeatureSummary)
 
 if(Qt5_FOUND AND ECM_FOUND)
@@ -67,6 +67,7 @@ include_directories(
     ${Boost_INCLUDE_DIRS}
     3rdparty/
     ${LIBUNWIND_INCLUDE_DIR}
+    ${ZLIB_INCLUDE_DIRS}
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -88,8 +89,9 @@ add_executable(heaptrack_interpret heaptrack_interpret.cpp)
 target_link_libraries(heaptrack_interpret backtrace)
 
 add_library(sharedprint STATIC accumulatedtracedata.cpp)
+target_link_libraries(sharedprint LINK_PUBLIC ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 add_executable(heaptrack_print heaptrack_print.cpp)
-target_link_libraries(heaptrack_print ${Boost_LIBRARIES} sharedprint)
+target_link_libraries(heaptrack_print LINK_PRIVATE sharedprint)
 
 set(BIN_INSTALL_DIR "bin")
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
