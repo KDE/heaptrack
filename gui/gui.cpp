@@ -61,5 +61,10 @@ int main(int argc, char** argv)
         window->show();
     }
 
+    if (parser.positionalArguments().isEmpty()) {
+        MainWindow* window = new MainWindow;
+        window->show();
+    }
+
     return app.exec();
 }
