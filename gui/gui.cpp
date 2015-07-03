@@ -28,6 +28,9 @@
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
+
+    KLocalizedString::setApplicationDomain("heaptrack");
+
     KAboutData aboutData(QStringLiteral("heaptrack_gui"), i18n("Heaptrack GUI"), QStringLiteral("0.1"),
                          i18n("A visualizer for heaptrack data files."), KAboutLicense::LGPL,
                          i18n("Copyright 2015, Milian Wolff <mail@milianw.de>"), QString(), QStringLiteral("mail@milianw.de"));
