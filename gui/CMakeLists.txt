@@ -1,6 +1,6 @@
 set(CMAKE_AUTOMOC 1)
 
-qt5_wrap_ui(UIFILES
+ki18n_wrap_ui(UIFILES
     mainwindow.ui
 )
 
