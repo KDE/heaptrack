@@ -33,6 +33,14 @@
  * @brief Experimental support for symbol overloading after runtime injection.
  */
 
+#if __WORDSIZE == 64
+#define ELF_R_SYM(i) ELF64_R_SYM(i)
+#elif __WORDSIZE == 32
+#define ELF_R_SYM(i) ELF32_R_SYM(i)
+#else
+#error unsupported word size
+#endif
+
 namespace {
 
 void overwrite_symbols() noexcept;
@@ -215,7 +223,7 @@ void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base, const bo
     // find symbols to overwrite
     const auto rela_end = reinterpret_cast<ElfW(Rela) *>(reinterpret_cast<char *>(jmprels.table) + jmprels.size);
     for (auto rela = jmprels.table; rela < rela_end; rela++) {
-        const auto index = ELF64_R_SYM(rela->r_info);
+        const auto index = ELF_R_SYM(rela->r_info);
         const char *symname = strings.table + symbols.table[index].st_name;
         auto addr = reinterpret_cast<void**>(rela->r_offset + base);
         for (const auto& hook : hooks::list) {
