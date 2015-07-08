@@ -39,7 +39,7 @@ struct ParserData final : public AccumulatedTraceData
         chartData.push_back({0, 0, 0, 0});
     }
 
-    void handleTimeStamp(size_t /*newStamp*/, size_t oldStamp)
+    void handleTimeStamp(uint64_t /*newStamp*/, uint64_t oldStamp)
     {
         maxLeakedSinceLastTimeStamp = max(maxLeakedSinceLastTimeStamp, leaked);
         chartData.push_back({oldStamp, maxLeakedSinceLastTimeStamp, totalAllocations, totalAllocated});
@@ -59,7 +59,7 @@ struct ParserData final : public AccumulatedTraceData
     string debuggee;
 
     ChartData chartData;
-    size_t maxLeakedSinceLastTimeStamp = 0;
+    uint64_t maxLeakedSinceLastTimeStamp = 0;
 };
 
 QString generateSummary(const ParserData& data)
