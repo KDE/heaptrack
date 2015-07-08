@@ -32,7 +32,7 @@
 template<typename Base>
 struct Index
 {
-    size_t index = 0;
+    uint64_t index = 0;
 
     explicit operator bool() const
     {
@@ -64,7 +64,7 @@ struct TraceIndex : public Index<TraceIndex> {};
 
 struct InstructionPointer
 {
-    uintptr_t instructionPointer = 0;
+    uint64_t instructionPointer = 0;
     ModuleIndex moduleIndex;
     FunctionIndex functionIndex;
     FileIndex fileIndex;
@@ -92,13 +92,13 @@ struct TraceNode
 struct AllocationData
 {
     // number of allocations
-    size_t allocations = 0;
+    uint64_t allocations = 0;
     // bytes allocated in total
-    size_t allocated = 0;
+    uint64_t allocated = 0;
     // amount of bytes leaked
-    size_t leaked = 0;
+    uint64_t leaked = 0;
     // largest amount of bytes allocated
-    size_t peak = 0;
+    uint64_t peak = 0;
 };
 
 struct Allocation : public AllocationData
@@ -124,7 +124,7 @@ struct MergedAllocation : public AllocationData
 struct AllocationInfo
 {
     TraceIndex traceIndex;
-    size_t size;
+    uint64_t size;
 };
 
 struct AccumulatedTraceData
@@ -132,7 +132,7 @@ struct AccumulatedTraceData
     AccumulatedTraceData();
     virtual ~AccumulatedTraceData() = default;
 
-    virtual void handleTimeStamp(size_t newStamp, size_t oldStamp) = 0;
+    virtual void handleTimeStamp(uint64_t newStamp, uint64_t oldStamp) = 0;
     virtual void handleAllocation() = 0;
     virtual void handleDebuggee(const char* command) = 0;
 
@@ -149,12 +149,12 @@ struct AccumulatedTraceData
     bool fromAttached = false;
 
     std::vector<Allocation> allocations;
-    std::map<size_t, size_t> sizeHistogram;
-    size_t totalAllocated = 0;
-    size_t totalAllocations = 0;
-    size_t peak = 0;
-    size_t leaked = 0;
-    size_t totalTime = 0;
+    std::map<uint64_t, uint64_t> sizeHistogram;
+    uint64_t totalAllocated = 0;
+    uint64_t totalAllocations = 0;
+    uint64_t peak = 0;
+    uint64_t leaked = 0;
+    uint64_t totalTime = 0;
 
     // our indices are sequentially increasing thus a new allocation can only ever
     // occur with an index larger than any other we encountered so far
@@ -171,7 +171,7 @@ struct AccumulatedTraceData
 
     // indices of functions that should stop the backtrace, e.g. main or static initialization
     std::vector<StringIndex> stopIndices;
-    std::unordered_map<uintptr_t, AllocationInfo> activeAllocations;
+    std::unordered_map<uint64_t, AllocationInfo> activeAllocations;
     std::vector<InstructionPointer> instructionPointers;
     std::vector<TraceNode> traces;
     std::vector<std::string> strings;

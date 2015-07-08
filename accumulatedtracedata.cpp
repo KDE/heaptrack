@@ -144,7 +144,7 @@ bool AccumulatedTraceData::read(istream& in)
     clear();
 
     LineReader reader;
-    size_t timeStamp = 0;
+    uint64_t timeStamp = 0;
 
     vector<StringIndex> opNewStrIndices;
     opNewStrIndices.reserve(16);
@@ -201,9 +201,9 @@ bool AccumulatedTraceData::read(istream& in)
                 opNewIpIndices.push_back(index);
             }
         } else if (reader.mode() == '+') {
-            size_t size = 0;
+            uint64_t size = 0;
             TraceIndex traceId;
-            uintptr_t ptr = 0;
+            uint64_t ptr = 0;
             if (!(reader >> size) || !(reader >> traceId) || !(reader >> ptr)) {
                 cerr << "failed to parse line: " << reader.line() << endl;
                 continue;
@@ -229,7 +229,7 @@ bool AccumulatedTraceData::read(istream& in)
                 ++sizeHistogram[size];
             }
         } else if (reader.mode() == '-') {
-            uintptr_t ptr = 0;
+            uint64_t ptr = 0;
             if (!(reader >> ptr)) {
                 cerr << "failed to parse line: " << reader.line() << endl;
                 continue;
@@ -259,7 +259,7 @@ bool AccumulatedTraceData::read(istream& in)
             // comment or empty line
             continue;
         } else if (reader.mode() == 'c') {
-            size_t newStamp = 0;
+            uint64_t newStamp = 0;
             if (!(reader >> newStamp)) {
                 cerr << "Failed to read time stamp: " << reader.line() << endl;
                 continue;
@@ -280,7 +280,7 @@ bool AccumulatedTraceData::read(istream& in)
     /// these are leaks, but we now have the same data in \c allocations as well
     activeAllocations.clear();
 
-    totalTime = max(timeStamp, size_t(1));
+    totalTime = max(timeStamp, uint64_t(1));
 
     handleTimeStamp(timeStamp, totalTime);
 

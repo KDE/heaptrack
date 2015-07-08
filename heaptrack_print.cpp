@@ -40,7 +40,7 @@ namespace {
 class formatBytes
 {
 public:
-    formatBytes(size_t bytes)
+    formatBytes(uint64_t bytes)
         : m_bytes(bytes)
     {
     }
@@ -48,7 +48,7 @@ public:
     friend ostream& operator<<(ostream& out, const formatBytes data);
 
 private:
-    size_t m_bytes;
+    uint64_t m_bytes;
 };
 
 ostream& operator<<(ostream& out, const formatBytes data)
@@ -408,7 +408,7 @@ struct Printer final : public AccumulatedTraceData
         }
     }
 
-    void handleTimeStamp(size_t /*newStamp*/, size_t oldStamp) override
+    void handleTimeStamp(uint64_t /*newStamp*/, uint64_t oldStamp) override
     {
         if (massifOut.is_open()) {
             writeMassifSnapshot(oldStamp, oldStamp == totalTime);
@@ -427,12 +427,12 @@ struct Printer final : public AccumulatedTraceData
 
     vector<MergedAllocation> mergedAllocations;
 
-    size_t massifSnapshotId = 0;
-    size_t lastMassifPeak = 0;
+    uint64_t massifSnapshotId = 0;
+    uint64_t lastMassifPeak = 0;
     vector<Allocation> massifAllocations;
     ofstream massifOut;
     double massifThreshold = 1;
-    size_t massifDetailedFreq = 1;
+    uint64_t massifDetailedFreq = 1;
 
     string filterBtFunction;
 };

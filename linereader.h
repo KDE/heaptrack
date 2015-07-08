@@ -93,7 +93,13 @@ public:
         return true;
     }
 
-    bool operator>>(std::size_t& hex)
+    bool operator>>(uint64_t& hex)
+    {
+        return readHex(hex);
+    }
+
+    // only for usage in heaptrack_interpret
+    bool operator>>(uint32_t& hex)
     {
         return readHex(hex);
     }
