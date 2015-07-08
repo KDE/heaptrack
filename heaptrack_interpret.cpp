@@ -165,7 +165,7 @@ struct AccumulatedTraceData
 
     ~AccumulatedTraceData()
     {
-        fprintf(stdout, "# strings: %lu\n# ips: %lu\n",
+        fprintf(stdout, "# strings: %zu\n# ips: %zu\n",
                 m_internedData.size(), m_encounteredIps.size());
     }
 
@@ -259,11 +259,11 @@ struct AccumulatedTraceData
         m_encounteredIps.insert(it, make_pair(instructionPointer, ipId));
 
         const auto ip = resolve(instructionPointer);
-        fprintf(stdout, "i %lx %lx", instructionPointer, ip.moduleIndex);
+        fprintf(stdout, "i %zx %zx", instructionPointer, ip.moduleIndex);
         if (ip.functionIndex || ip.fileIndex) {
-            fprintf(stdout, " %lx", ip.functionIndex);
+            fprintf(stdout, " %zx", ip.functionIndex);
             if (ip.fileIndex) {
-                fprintf(stdout, " %lx %x", ip.fileIndex, ip.line);
+                fprintf(stdout, " %zx %x", ip.fileIndex, ip.line);
             }
         }
         fputc('\n', stdout);
@@ -380,7 +380,7 @@ int main(int /*argc*/, char** /*argv*/)
             // ensure ip is encountered
             const auto ipId = data.addIp(instructionPointer);
             // trace point, map current output index to parent index
-            fprintf(stdout, "t %lx %lx\n", ipId, parentIndex);
+            fprintf(stdout, "t %zx %zx\n", ipId, parentIndex);
         } else {
             fputs(reader.line().c_str(), stdout);
             fputc('\n', stdout);

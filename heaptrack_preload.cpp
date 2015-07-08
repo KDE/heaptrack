@@ -95,7 +95,7 @@ void* dummy_calloc(size_t num, size_t size) noexcept
     size_t oldOffset = offset;
     offset += num * size;
     if (offset >= MAX_SIZE) {
-        fprintf(stderr, "failed to initialize, dummy calloc buf size exhausted: %lu requested, %lu available\n", offset, MAX_SIZE);
+        fprintf(stderr, "failed to initialize, dummy calloc buf size exhausted: %zu requested, %zu available\n", offset, MAX_SIZE);
         abort();
     }
     return buf + oldOffset;

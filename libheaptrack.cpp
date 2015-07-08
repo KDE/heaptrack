@@ -293,9 +293,9 @@ public:
 
         auto elapsed = chrono::duration_cast<chrono::milliseconds>(clock::now() - s_data->start);
 
-        debugLog<VeryVerboseOutput>("writeTimestamp(%lx)", elapsed.count());
+        debugLog<VeryVerboseOutput>("writeTimestamp(%" PRIx64 ")", elapsed.count());
 
-        if (fprintf(s_data->out, "c %lx\n", elapsed.count()) < 0) {
+        if (fprintf(s_data->out, "c %" PRIx64 "\n", elapsed.count()) < 0) {
             writeError();
             return;
         }
@@ -315,7 +315,7 @@ public:
         s_data->known.insert(ptr);
 #endif
 
-        if (fprintf(s_data->out, "+ %lx %lx %lx\n", size, index, reinterpret_cast<uintptr_t>(ptr)) < 0) {
+        if (fprintf(s_data->out, "+ %zx %zx %" PRIxPTR "\n", size, index, reinterpret_cast<uintptr_t>(ptr)) < 0) {
             writeError();
             return;
         }
@@ -333,7 +333,7 @@ public:
         s_data->known.erase(it);
 #endif
 
-        if (fprintf(s_data->out, "- %lx\n", reinterpret_cast<uintptr_t>(ptr)) < 0) {
+        if (fprintf(s_data->out, "- %" PRIxPTR "\n", reinterpret_cast<uintptr_t>(ptr)) < 0) {
             writeError();
             return;
         }
@@ -348,9 +348,9 @@ private:
             fileName = "x";
         }
 
-        debugLog<VerboseOutput>("dlopen_notify_callback: %s %lx", fileName, info->dlpi_addr);
+        debugLog<VerboseOutput>("dlopen_notify_callback: %s %zx", fileName, info->dlpi_addr);
 
-        if (fprintf(heaptrack->s_data->out, "m %s %lx", fileName, info->dlpi_addr) < 0) {
+        if (fprintf(heaptrack->s_data->out, "m %s %zx", fileName, info->dlpi_addr) < 0) {
             heaptrack->writeError();
             return 1;
         }
@@ -358,7 +358,7 @@ private:
         for (int i = 0; i < info->dlpi_phnum; i++) {
             const auto& phdr = info->dlpi_phdr[i];
             if (phdr.p_type == PT_LOAD) {
-                if (fprintf(heaptrack->s_data->out, " %lx %lx", phdr.p_vaddr, phdr.p_memsz) < 0) {
+                if (fprintf(heaptrack->s_data->out, " %zx %zx", phdr.p_vaddr, phdr.p_memsz) < 0) {
                     heaptrack->writeError();
                     return 1;
                 }
@@ -540,7 +540,7 @@ void heaptrack_malloc(void* ptr, size_t size)
     if (ptr && !RecursionGuard::isActive) {
         RecursionGuard guard;
 
-        debugLog<VeryVerboseOutput>("heaptrack_malloc(%p, %lu)", ptr, size);
+        debugLog<VeryVerboseOutput>("heaptrack_malloc(%p, %zu)", ptr, size);
 
         Trace trace;
         trace.fill(2 + HEAPTRACK_DEBUG_BUILD);
@@ -567,7 +567,7 @@ void heaptrack_realloc(void* ptr_in, size_t size, void* ptr_out)
     if (ptr_out && !RecursionGuard::isActive) {
         RecursionGuard guard;
 
-        debugLog<VeryVerboseOutput>("heaptrack_realloc(%p, %lu, %p)", ptr_in, size, ptr_out);
+        debugLog<VeryVerboseOutput>("heaptrack_realloc(%p, %zu, %p)", ptr_in, size, ptr_out);
 
         Trace trace;
         trace.fill(2 + HEAPTRACK_DEBUG_BUILD);
