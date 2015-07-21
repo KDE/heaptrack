@@ -155,7 +155,7 @@ function cleanup {
 
     echo "Heaptrack finished! Now run the following to investigate the data:"
     echo
-    if [[ "$(which heaptrack_gui)" != "" ]]; then
+    if [[ "$(which heaptrack_gui 2> /dev/null)" != "" ]]; then
         echo "  heaptrack_gui \"$output\""
     else
         echo "  heaptrack_print \"$output\" | less"
