@@ -10,3 +10,7 @@ add_executable(callgraph callgraph.cpp)
 add_library(testlib SHARED lib.cpp)
 add_executable(test_lib test_lib.cpp)
 target_link_libraries(test_lib testlib)
+
+add_executable(tst_trace tst_trace.cpp)
+target_link_libraries(tst_trace ${LIBUNWIND_LIBRARY})
+add_test(NAME tst_trace COMMAND tst_trace )

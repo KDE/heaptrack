@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.9)
 project(heaptrack)
+enable_testing()
 
 set(HEAPTRACK_VERSION_MAJOR 0)
 set(HEAPTRACK_VERSION_MINOR 1)

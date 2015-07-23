@@ -32,7 +32,9 @@ struct Trace
 {
     using ip_t = void*;
 
-    static const int MAX_SIZE = 64;
+    enum : int {
+        MAX_SIZE = 64
+    };
 
     const ip_t* begin() const
     {
