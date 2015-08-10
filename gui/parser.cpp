@@ -104,8 +104,7 @@ struct StringCache
     QString file(const InstructionPointer& ip) const
     {
         if (ip.fileIndex) {
-            auto file = stringify(ip.fileIndex);
-            return file + QLatin1Char(':') + QString::number(ip.line);
+            return stringify(ip.fileIndex);
         } else {
             return {};
         }
@@ -127,7 +126,7 @@ struct StringCache
 
     LocationData location(const InstructionPointer& ip) const
     {
-        return {func(ip), file(ip), module(ip)};
+        return {func(ip), file(ip), module(ip), ip.line};
     }
 
     vector<QString> m_strings;

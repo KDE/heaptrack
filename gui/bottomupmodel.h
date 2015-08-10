@@ -28,17 +28,22 @@ struct LocationData
     QString function;
     QString file;
     QString module;
+    int line;
     bool operator==(const LocationData& rhs) const
     {
         return function == rhs.function
             && file == rhs.file
-            && module == rhs.module;
+            && module == rhs.module
+            && line == rhs.line;
     }
     bool operator<(const LocationData& rhs) const
     {
         int i = function.compare(rhs.function);
         if (!i) {
             i = file.compare(rhs.file);
+        }
+        if (!i) {
+            i = line < rhs.line ? -1 : (line > rhs.line);
         }
         if (!i) {
             i = module.compare(rhs.module);
@@ -80,6 +85,7 @@ public:
         AllocatedColumn,
         FunctionColumn,
         FileColumn,
+        LineColumn,
         ModuleColumn,
         LocationColumn,
         NUM_COLUMNS

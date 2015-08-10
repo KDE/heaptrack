@@ -75,6 +75,7 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->results->setModel(bottomUpProxy);
     m_ui->results->hideColumn(BottomUpModel::FunctionColumn);
     m_ui->results->hideColumn(BottomUpModel::FileColumn);
+    m_ui->results->hideColumn(BottomUpModel::LineColumn);
     m_ui->results->hideColumn(BottomUpModel::ModuleColumn);
 
     connect(m_ui->filterFunction, &QLineEdit::textChanged,
