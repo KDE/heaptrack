@@ -440,7 +440,7 @@ struct Printer final : public AccumulatedTraceData
 
 int main(int argc, char** argv)
 {
-    po::options_description desc("Options");
+    po::options_description desc("Options", 120, 60);
     desc.add_options()
         ("file,f", po::value<string>(),
             "The heaptrack data file to print.")
