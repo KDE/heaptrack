@@ -164,7 +164,7 @@ struct Printer final : public AccumulatedTraceData
         printIp(findIp(ip), out, indent);
     }
 
-    void printIp(const InstructionPointer& ip, ostream& out, const size_t indent = 0) const
+    void printIp(const InstructionPointer& ip, ostream& out, const size_t indent = 0, bool flameGraph = false) const
     {
         printIndent(out, indent);
 
@@ -172,6 +172,17 @@ struct Printer final : public AccumulatedTraceData
             out << prettyFunction(stringify(ip.functionIndex));
         } else {
             out << "0x" << hex << ip.instructionPointer << dec;
+        }
+
+        if (flameGraph) {
+            // only print the file name but nothing else
+            if (ip.fileIndex) {
+                const auto& file = stringify(ip.fileIndex);
+                auto idx = file.find_last_of('/') + 1;
+                out << " (" << file.substr(idx) << ")";
+            }
+            out << ';';
+            return;
         }
 
         out << '\n';
@@ -214,6 +225,25 @@ struct Printer final : public AccumulatedTraceData
 
             node = findTrace(node.parentIndex);
         };
+    }
+
+    /**
+     * recursive top-down printer in the format
+     *
+     * func1;func2 (file);func2 (file);
+     */
+    void printFlamegraph(TraceNode node, ostream& out) const
+    {
+        if (!node.ipIndex) {
+            return;
+        }
+
+        const auto& ip = findIp(node.ipIndex);
+
+        if (!isStopIndex(ip.functionIndex)) {
+            printFlamegraph(findTrace(node.parentIndex), out);
+        }
+        printIp(ip, out, 0, true);
     }
 
     template<typename T, typename LabelPrinter, typename SubLabelPrinter>
@@ -458,6 +488,14 @@ int main(int argc, char** argv)
             "Print top overall allocators, ignoring memory frees.")
         ("print-histogram,H", po::value<string>()->default_value(string()),
             "Path to output file where an allocation size histogram will be written to.")
+        ("print-flamegraph,F", po::value<string>()->default_value(string()),
+            "Path to output file where a flame-graph compatible stack file will be written to.\n"
+            "To visualize the resulting file, use flamegraph.pl from https://github.com/brendangregg/FlameGraph:\n"
+            "  heaptrack_print heaptrack.someapp.PID.gz -F stacks.txt\n"
+            "  # optionally pass --reverse to flamegraph.pl\n"
+            "  flamegraph.pl --title \"heaptrack: allocations\" --colors mem \\\n"
+            "    --countname allocations < stacks.txt > heaptrack.someapp.PID.svg\n"
+            "  [firefox|chromium] heaptrack.someapp.PID.svg\n")
         ("print-massif,M", po::value<string>()->default_value(string()),
             "Path to output file where a massif compatible data file will be written to.")
         ("massif-threshold", po::value<double>()->default_value(1.),
@@ -514,6 +552,7 @@ int main(int argc, char** argv)
     data.filterBtFunction = vm["filter-bt-function"].as<string>();
     const string printHistogram = vm["print-histogram"].as<string>();
     data.printHistogram = !printHistogram.empty();
+    const string printFlamegraph = vm["print-flamegraph"].as<string>();
     const string printMassif = vm["print-massif"].as<string>();
     if (!printMassif.empty()) {
         data.massifOut.open(printMassif, ios_base::out);
@@ -605,6 +644,22 @@ int main(int argc, char** argv)
         } else {
             for (auto entry : data.sizeHistogram) {
                 histogram << entry.first << '\t' << entry.second << '\n';
+            }
+        }
+    }
+
+    if (!printFlamegraph.empty()) {
+        ofstream flamegraph(printFlamegraph, ios_base::out);
+        if (!flamegraph.is_open()) {
+            cerr << "Failed to open flamegraph output file \"" << printFlamegraph << "\"." << endl;
+        } else {
+            for (const auto& allocation : data.allocations) {
+                if (!allocation.traceIndex) {
+                    flamegraph << "??";
+                } else {
+                    data.printFlamegraph(data.findTrace(allocation.traceIndex), flamegraph);
+                }
+                flamegraph << ' ' << allocation.allocations << '\n';
             }
         }
     }
