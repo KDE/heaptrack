@@ -159,12 +159,6 @@
              </widget>
             </item>
            </layout>
-           <zorder>results</zorder>
-           <zorder>filterFile</zorder>
-           <zorder>filterFunction</zorder>
-           <zorder>filterModule</zorder>
-           <zorder>widget</zorder>
-           <zorder>results</zorder>
           </widget>
           <widget class="ChartWidget" name="leakedTab">
            <attribute name="title">
@@ -181,6 +175,11 @@
             <string>Allocated</string>
            </attribute>
           </widget>
+          <widget class="FlameGraph" name="flameGraphTab">
+           <attribute name="title">
+            <string>Flame Graph</string>
+           </attribute>
+          </widget>
          </widget>
         </item>
        </layout>
@@ -195,6 +194,12 @@
    <class>ChartWidget</class>
    <extends>QWidget</extends>
    <header>chartwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FlameGraph</class>
+   <extends>QWidget</extends>
+   <header>flamegraph.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

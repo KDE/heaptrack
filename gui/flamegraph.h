@@ -17,31 +17,45 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef FLAMEGRAPH_H
+#define FLAMEGRAPH_H
 
-#include <QObject>
+#include <QWidget>
+#include <QMap>
 
-#include "bottomupmodel.h"
-#include "chartmodel.h"
-#include "flamegraph.h"
+class QGraphicsScene;
+class QGraphicsView;
 
-class Parser : public QObject
+struct FlameGraphData
+{
+    struct Frame {
+        quint64 cost;
+        QMap<QByteArray, Frame> children;
+    };
+
+    using Stack = QMap<QByteArray, Frame>;
+
+    Stack stack;
+};
+
+Q_DECLARE_METATYPE(FlameGraphData);
+
+class FlameGraph : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Parser(QObject* parent = nullptr);
-    virtual ~Parser();
+    FlameGraph(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+    ~FlameGraph();
 
-public slots:
-    void parse(const QString& path);
+    void setData(const FlameGraphData& data);
 
-signals:
-    void summaryAvailable(const QString& summary);
-    void bottomUpDataAvailable(const BottomUpData& data);
-    void chartDataAvailable(const ChartData& data);
-    void flameGraphDataAvailable(const FlameGraphData& data);
-    void finished();
+protected:
+    virtual bool eventFilter(QObject* object, QEvent* event);
+
+private:
+    QGraphicsScene* m_scene;
+    QGraphicsView* m_view;
+    FlameGraphData m_data;
 };
 
-#endif // PARSER_H
+#endif // FLAMEGRAPH_H

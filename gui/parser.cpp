@@ -179,6 +179,27 @@ Parser::Parser(QObject* parent)
 
 Parser::~Parser() = default;
 
+static FlameGraphData::Stack fakeStack(int children, int recurse, int* id = 0, quint64* parentCost = 0)
+{
+    int stack_id = 1;
+    FlameGraphData::Stack data;
+    if (!id) {
+        id = &stack_id;
+    }
+    for (int i = 0; i < children; ++i) {
+        FlameGraphData::Frame frame;
+        frame.cost = (i + 1) * 2;
+        if (recurse) {
+            frame.children = fakeStack(children - 1, recurse - 1, id, &frame.cost);
+        }
+        if (parentCost) {
+            parentCost += frame.cost;
+        }
+        data[QByteArray::number((*id)++)] = frame;
+    }
+    return data;
+}
+
 void Parser::parse(const QString& path)
 {
     using namespace ThreadWeaver;
@@ -188,6 +209,8 @@ void Parser::parse(const QString& path)
         emit summaryAvailable(generateSummary(data));
         emit bottomUpDataAvailable(mergeAllocations(data));
         emit chartDataAvailable(data.chartData);
+        // TODO: implement this
+        emit flameGraphDataAvailable({fakeStack(4, 4)});
         emit finished();
     });
 }
