@@ -49,7 +49,7 @@
         <item>
          <widget class="QLabel" name="loadingLabel">
           <property name="text">
-           <string>Loading file %1, please wait...</string>
+           <string notr="true">Loading file, please wait...</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
