@@ -161,7 +161,7 @@ QVector<RowData> mergeAllocations(const AccumulatedTraceData& data)
                 it->leaked += allocation.leaked;
                 it->peak = max(it->peak, static_cast<quint64>(allocation.peak));
             } else {
-                it = rows->insert(it, {allocation.allocations, allocation.allocated, allocation.leaked, allocation.peak,
+                it = rows->insert(it, {allocation.allocations, allocation.peak, allocation.leaked, allocation.allocated,
                                         location, nullptr, {}});
             }
             traceIndex = trace.parentIndex;
