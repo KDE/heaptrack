@@ -24,6 +24,7 @@
 #include <KLocalizedString>
 
 #include <QTextStream>
+#include <QDebug>
 
 #include "../accumulatedtracedata.h"
 
