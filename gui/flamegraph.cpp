@@ -75,24 +75,31 @@ public:
 
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0)
     {
+        const int margin = 5;
+        const int width = rect().width() - 2 * margin;
+        if (width < 2) {
+            // don't try to paint tiny items
+            return;
+        }
+
         QGraphicsRectItem::paint(painter, option, widget);
 
         // TODO: text should always be displayed in a constant size and not zoomed
         // TODO: items should only be scaled horizontally, not vertically
         // TODO: items should "fit" into the view width
         static QFontMetrics m(QFont(QStringLiteral("monospace")));
-        const int margin = 5;
-        const int width = rect().width() - 2 * margin;
         if (width < m.averageCharWidth() * 6) {
+            // text is too wide for the current LOD, don't paint it
             return;
         }
+
         const int height = rect().height();
 
         const QPen oldPen = painter->pen();
         QPen pen = oldPen;
         pen.setColor(Qt::white);
         painter->setPen(pen);
-        painter->drawText(margin + rect().x(), rect().y(), width, height, Qt::AlignCenter | Qt::TextSingleLine, m.elidedText(m_label, Qt::ElideRight, width));
+        painter->drawText(margin + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine, m.elidedText(m_label, Qt::ElideRight, width));
         painter->setPen(oldPen);
     }
 
@@ -103,7 +110,8 @@ private:
 // TODO: what is the right value for maxWidth here?
 QVector<QGraphicsItem*> toGraphicsItems(const FlameGraphData::Stack& data,
                                         const qreal x_0 = 0, const qreal y_0 = 0,
-                                        const qreal maxWidth = 800., qreal totalCostForColor = 0)
+                                        const qreal maxWidth = 800., qreal totalCostForColor = 0,
+                                        qreal parentCost = 0)
 {
     QVector<QGraphicsItem*> ret;
     ret.reserve(data.size());
@@ -114,8 +122,8 @@ QVector<QGraphicsItem*> toGraphicsItems(const FlameGraphData::Stack& data,
     }
     if (!totalCostForColor) {
         totalCostForColor = totalCost;
+        parentCost = totalCost;
     }
-    qDebug() << "graphicsitem:" << totalCost << totalCostForColor;
 
     qreal x = x_0;
     const qreal h = 25;
@@ -125,10 +133,11 @@ QVector<QGraphicsItem*> toGraphicsItems(const FlameGraphData::Stack& data,
     const qreal y_margin = 2;
 
     for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
-        const qreal w = maxWidth * double(it.value().cost) / totalCostForColor;
+        const qreal w = maxWidth * double(it.value().cost) / parentCost;
         FrameGraphicsItem* item = new FrameGraphicsItem(QRectF(x, y, w, h), it.value().cost, it.key());
+        item->setVisible(w > 2.);
         item->setBrush(color(it.value().cost, totalCostForColor));
-        ret += toGraphicsItems(it.value().children, x, y - h - y_margin, w, totalCostForColor);
+        ret += toGraphicsItems(it.value().children, x, y - h - y_margin, w, totalCostForColor, it.value().cost);
         x += w + x_margin;
         ret << item;
     }
@@ -184,11 +193,6 @@ void FlameGraph::setData(const FlameGraphData& data)
     foreach(QGraphicsItem* item, toGraphicsItems(data.stack)) {
         m_scene->addItem(item);
     }
-
-    qDebug() << m_scene->itemsBoundingRect() << m_scene->sceneRect() << m_view->rect() << m_view->contentsRect();
-//     m_view->fitInView( m_scene->itemsBoundingRect(), Qt::KeepAspectRatio );
-    // TODO: what is the correct scale value here?! without it, the contents in the view are teeny tiny!
-//     m_view->scale(1, 1);
 
     qDebug() << "took me: " << t.elapsed();
 }

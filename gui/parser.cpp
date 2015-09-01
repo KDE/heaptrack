@@ -180,7 +180,7 @@ Parser::Parser(QObject* parent)
 
 Parser::~Parser() = default;
 
-static void buildFrameGraph(const QVector<RowData>& mergedAllocations, FlameGraphData::Stack* topStack, QSet<const RowData*>* coveredRows)
+static void buildFrameGraph(const QVector<RowData>& mergedAllocations, FlameGraphData::Stack* topStack)
 {
     foreach (const auto& row, mergedAllocations) {
         if (row.children.isEmpty()) {
@@ -189,16 +189,15 @@ static void buildFrameGraph(const QVector<RowData>& mergedAllocations, FlameGrap
             auto stack = topStack;
             while (node) {
                 auto& data = (*stack)[node->location.function];
-                if (!coveredRows->contains(node)) {
-                    data.cost += node->allocations;
-                    coveredRows->insert(node);
-                }
+                // always use the leaf node's cost and propagate that one up the chain
+                // otherwise we'd count the cost of some nodes multiple times
+                data.cost += row.allocations;
                 stack = &data.children;
                 node = node->parent;
             }
         } else {
             // recurse to find a leaf
-            buildFrameGraph(row.children, topStack, coveredRows);
+            buildFrameGraph(row.children, topStack);
         }
     }
 }
@@ -214,9 +213,7 @@ void Parser::parse(const QString& path)
         emit bottomUpDataAvailable(mergedAllocations);
         emit chartDataAvailable(data.chartData);
         FlameGraphData::Stack stack;
-        QSet<const RowData*> coveredRows;
-        buildFrameGraph(mergedAllocations, &stack, &coveredRows);
-        qDebug() << data.totalAllocations;
+        buildFrameGraph(mergedAllocations, &stack);
         emit flameGraphDataAvailable({stack});
         emit finished();
     });
