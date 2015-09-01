@@ -43,21 +43,6 @@ QColor color(quint64 cost, quint64 maxCost)
     return QColor::fromHsv(120 - ratio * 120, 255, 255, (-((ratio-1) * (ratio-1))) * 120 + 120);
 }
 
-/*
-// TODO: aggregate top-down instead of bottom-up to better resemble
-// other flame graphs with the culprits on top instead of on bottom
-void aggregateStack(TreeLeafItem* item, StackData* data)
-{
-    const QByteArray label = isBelowThreshold(item->label()) ? QByteArray() : functionInLabel(item->label());
-
-    Frame& frame = (*data)[label];
-    frame.cost = qMax(item->cost(), frame.cost);
-
-    foreach(TreeLeafItem* child, item->children()) {
-        aggregateStack(child, &frame.children);
-    }
-}*/
-
 class FrameGraphicsItem : public QGraphicsRectItem
 {
 public:
@@ -66,7 +51,7 @@ public:
     {
         static const QString emptyLabel = QStringLiteral("???");
 
-        m_label = i18nc("%1: memory cost, %2: function label",
+        m_label = i18nc("%1: number of allocations, %2: function label",
                         "%2: %1",
                         cost,
                         function.isEmpty() ? emptyLabel : function);
@@ -84,11 +69,15 @@ public:
 
         QGraphicsRectItem::paint(painter, option, widget);
 
+        const qreal lod = qMax(qreal(1.), option->levelOfDetailFromTransform(painter->worldTransform()));
+
         // TODO: text should always be displayed in a constant size and not zoomed
         // TODO: items should only be scaled horizontally, not vertically
         // TODO: items should "fit" into the view width
-        static QFontMetrics m(QFont(QStringLiteral("monospace")));
-        if (width < m.averageCharWidth() * 6) {
+        QFont font(QStringLiteral("monospace"));
+        font.setPointSizeF(10. / lod);
+        QFontMetrics metrics(font);
+        if (width < metrics.averageCharWidth() * 6) {
             // text is too wide for the current LOD, don't paint it
             return;
         }
@@ -96,11 +85,14 @@ public:
         const int height = rect().height();
 
         const QPen oldPen = painter->pen();
+        const QFont oldFont = painter->font();
         QPen pen = oldPen;
         pen.setColor(Qt::white);
         painter->setPen(pen);
-        painter->drawText(margin + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine, m.elidedText(m_label, Qt::ElideRight, width));
+        painter->setFont(font);
+        painter->drawText(margin + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine, metrics.elidedText(m_label, Qt::ElideRight, width));
         painter->setPen(oldPen);
+        painter->setFont(oldFont);
     }
 
 private:
