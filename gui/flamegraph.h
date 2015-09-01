@@ -29,11 +29,11 @@ class QGraphicsView;
 struct FlameGraphData
 {
     struct Frame {
-        quint64 cost;
-        QMap<QByteArray, Frame> children;
+        quint64 cost = 0;
+        using Stack = QMap<QString, Frame>;
+        Stack children;
     };
-
-    using Stack = QMap<QByteArray, Frame>;
+    using Stack = Frame::Stack;
 
     Stack stack;
 };

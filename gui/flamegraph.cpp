@@ -61,7 +61,7 @@ void aggregateStack(TreeLeafItem* item, StackData* data)
 class FrameGraphicsItem : public QGraphicsRectItem
 {
 public:
-    FrameGraphicsItem(const QRectF& rect, const quint64 cost, const QByteArray& function)
+    FrameGraphicsItem(const QRectF& rect, const quint64 cost, const QString& function)
         : QGraphicsRectItem(rect)
     {
         static const QString emptyLabel = QStringLiteral("???");
@@ -69,7 +69,7 @@ public:
         m_label = i18nc("%1: memory cost, %2: function label",
                         "%2: %1",
                         cost,
-                        function.isEmpty() ? emptyLabel : QString::fromUtf8(function));
+                        function.isEmpty() ? emptyLabel : function);
         setToolTip(m_label);
     }
 
@@ -186,9 +186,9 @@ void FlameGraph::setData(const FlameGraphData& data)
     }
 
     qDebug() << m_scene->itemsBoundingRect() << m_scene->sceneRect() << m_view->rect() << m_view->contentsRect();
-    m_view->fitInView( m_scene->itemsBoundingRect(), Qt::KeepAspectRatio );
+//     m_view->fitInView( m_scene->itemsBoundingRect(), Qt::KeepAspectRatio );
     // TODO: what is the correct scale value here?! without it, the contents in the view are teeny tiny!
-    m_view->scale(5, 5);
+//     m_view->scale(1, 1);
 
     qDebug() << "took me: " << t.elapsed();
 }

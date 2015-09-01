@@ -180,25 +180,27 @@ Parser::Parser(QObject* parent)
 
 Parser::~Parser() = default;
 
-static FlameGraphData::Stack fakeStack(int children, int recurse, int* id = 0, quint64* parentCost = 0)
+static void buildFrameGraph(const QVector<RowData>& mergedAllocations, FlameGraphData::Stack* topStack, QSet<const RowData*>* coveredRows)
 {
-    int stack_id = 1;
-    FlameGraphData::Stack data;
-    if (!id) {
-        id = &stack_id;
-    }
-    for (int i = 0; i < children; ++i) {
-        FlameGraphData::Frame frame;
-        frame.cost = (i + 1) * 2;
-        if (recurse) {
-            frame.children = fakeStack(children - 1, recurse - 1, id, &frame.cost);
+    foreach (const auto& row, mergedAllocations) {
+        if (row.children.isEmpty()) {
+            // leaf node found, bubble up the parent chain to build a top-down tree
+            auto node = &row;
+            auto stack = topStack;
+            while (node) {
+                auto& data = (*stack)[node->location.function];
+                if (!coveredRows->contains(node)) {
+                    data.cost += node->allocations;
+                    coveredRows->insert(node);
+                }
+                stack = &data.children;
+                node = node->parent;
+            }
+        } else {
+            // recurse to find a leaf
+            buildFrameGraph(row.children, topStack, coveredRows);
         }
-        if (parentCost) {
-            parentCost += frame.cost;
-        }
-        data[QByteArray::number((*id)++)] = frame;
     }
-    return data;
 }
 
 void Parser::parse(const QString& path)
@@ -208,10 +210,14 @@ void Parser::parse(const QString& path)
         ParserData data;
         data.read(path.toStdString());
         emit summaryAvailable(generateSummary(data));
-        emit bottomUpDataAvailable(mergeAllocations(data));
+        const auto mergedAllocations = mergeAllocations(data);
+        emit bottomUpDataAvailable(mergedAllocations);
         emit chartDataAvailable(data.chartData);
-        // TODO: implement this
-        emit flameGraphDataAvailable({fakeStack(4, 4)});
+        FlameGraphData::Stack stack;
+        QSet<const RowData*> coveredRows;
+        buildFrameGraph(mergedAllocations, &stack, &coveredRows);
+        qDebug() << data.totalAllocations;
+        emit flameGraphDataAvailable({stack});
         emit finished();
     });
 }
