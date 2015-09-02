@@ -85,14 +85,9 @@ public:
 
         const int height = rect().height();
 
-        const QPen oldPen = painter->pen();
         const QFont oldFont = painter->font();
-        QPen pen = oldPen;
-        pen.setColor(KColorScheme(QPalette::Active).foreground().color());
-        painter->setPen(pen);
         painter->setFont(font);
         painter->drawText(margin + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine, metrics.elidedText(m_label, Qt::ElideRight, width));
-        painter->setPen(oldPen);
         painter->setFont(oldFont);
     }
 
@@ -100,37 +95,28 @@ private:
     QString m_label;
 };
 
+const qreal h = 25.;
+const qreal x_margin = 0.;
+const qreal y_margin = 2.;
+
 // TODO: what is the right value for maxWidth here?
-QVector<QGraphicsItem*> toGraphicsItems(const FlameGraphData::Stack& data,
-                                        const qreal x_0 = 0, const qreal y_0 = 0,
-                                        const qreal maxWidth = 800., qreal totalCostForColor = 0,
-                                        qreal parentCost = 0)
+QVector<FrameGraphicsItem*> toGraphicsItems(const FlameGraphData::Stack& data,
+                                        qreal totalCostForColor, qreal parentCost,
+                                        const qreal x_0, const qreal y_0,
+                                        const qreal maxWidth)
 {
-    QVector<QGraphicsItem*> ret;
+    QVector<FrameGraphicsItem*> ret;
     ret.reserve(data.size());
 
-    double totalCost = 0;
-    foreach(const auto& frame, data) {
-        totalCost += frame.cost;
-    }
-    if (!totalCostForColor) {
-        totalCostForColor = totalCost;
-        parentCost = totalCost;
-    }
-
     qreal x = x_0;
-    const qreal h = 25;
     const qreal y = y_0;
-
-    const qreal x_margin = 0;
-    const qreal y_margin = 2;
 
     for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
         const qreal w = maxWidth * double(it.value().cost) / parentCost;
         FrameGraphicsItem* item = new FrameGraphicsItem(QRectF(x, y, w, h), it.value().cost, it.key());
         item->setVisible(w > 2.);
         item->setBrush(color(it.value().cost, totalCostForColor));
-        ret += toGraphicsItems(it.value().children, x, y - h - y_margin, w, totalCostForColor, it.value().cost);
+        ret += toGraphicsItems(it.value().children, totalCostForColor, it.value().cost, x, y - h - y_margin, w);
         x += w + x_margin;
         ret << item;
     }
@@ -183,7 +169,20 @@ void FlameGraph::setData(const FlameGraphData& data)
     qDebug() << "Evaluating flame graph";
     QElapsedTimer t; t.start();
 
-    foreach(QGraphicsItem* item, toGraphicsItems(data.stack)) {
+    double totalCost = 0;
+    foreach(const auto& frame, data.stack) {
+        totalCost += frame.cost;
+    }
+
+    const QPen pen(KColorScheme(QPalette::Active).foreground().color());
+
+    // TODO: get this out of the view somehow
+    const qreal totalWidth = 800;
+    FrameGraphicsItem* root = new FrameGraphicsItem(QRectF(0, 0, totalWidth, h), totalCost, i18n("total allocations"));
+    root->setPen(pen);
+    m_scene->addItem(root);
+    foreach(FrameGraphicsItem* item, toGraphicsItems(data.stack, totalCost, totalCost, 0, - h - y_margin, totalWidth)) {
+        item->setPen(pen);
         m_scene->addItem(item);
     }
 
