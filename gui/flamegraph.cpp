@@ -42,8 +42,6 @@ public:
     FrameGraphicsItem(const QRectF& rect, const quint64 cost, const QString& function, FrameGraphicsItem* parent = nullptr)
         : QGraphicsRectItem(rect, parent)
     {
-        setFlag(QGraphicsItem::ItemIgnoresTransformations);
-
         static const QString emptyLabel = QStringLiteral("???");
 
         m_label = i18nc("%1: number of allocations, %2: function label",
@@ -181,7 +179,15 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
         return QObject::eventFilter(object, event);
     }
 
-    if (event->type() == QEvent::MouseButtonRelease) {
+    if (event->type() == QEvent::Wheel) {
+        QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
+        if (wheelEvent->modifiers() == Qt::ControlModifier) {
+            // zoom view with Ctrl + mouse wheel
+            qreal scale = pow(1.1, double(wheelEvent->delta()) / (120.0 * 2.));
+            m_view->scale(scale, scale);
+            return true;
+        }
+    } else if (event->type() == QEvent::MouseButtonRelease) {
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
             auto item = dynamic_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos()));
