@@ -47,9 +47,11 @@ QColor color(quint64 cost, quint64 maxCost)
 class FrameGraphicsItem : public QGraphicsRectItem
 {
 public:
-    FrameGraphicsItem(const QRectF& rect, const quint64 cost, const QString& function)
-        : QGraphicsRectItem(rect)
+    FrameGraphicsItem(const QRectF& rect, const quint64 cost, const QString& function, FrameGraphicsItem* parent = nullptr)
+        : QGraphicsRectItem(rect, parent)
     {
+        setFlag(QGraphicsItem::ItemIgnoresTransformations);
+
         static const QString emptyLabel = QStringLiteral("???");
 
         m_label = i18nc("%1: number of allocations, %2: function label",
@@ -70,14 +72,11 @@ public:
 
         QGraphicsRectItem::paint(painter, option, widget);
 
-        const qreal lod = qMax(qreal(1.), option->levelOfDetailFromTransform(painter->worldTransform()));
-
         // TODO: text should always be displayed in a constant size and not zoomed
         // TODO: items should only be scaled horizontally, not vertically
         // TODO: items should "fit" into the view width
-        QFont font(QStringLiteral("monospace"));
-        font.setPointSizeF(10. / lod);
-        QFontMetrics metrics(font);
+        static const QFont font(QStringLiteral("monospace"), 10);
+        static const QFontMetrics metrics(font);
         if (width < metrics.averageCharWidth() * 6) {
             // text is too wide for the current LOD, don't paint it
             return;
@@ -100,28 +99,23 @@ const qreal x_margin = 0.;
 const qreal y_margin = 2.;
 
 // TODO: what is the right value for maxWidth here?
-QVector<FrameGraphicsItem*> toGraphicsItems(const FlameGraphData::Stack& data,
-                                        qreal totalCostForColor, qreal parentCost,
-                                        const qreal x_0, const qreal y_0,
-                                        const qreal maxWidth)
+void toGraphicsItems(const FlameGraphData::Stack& data, qreal totalCostForColor,
+                     qreal parentCost, FrameGraphicsItem *parent)
 {
-    QVector<FrameGraphicsItem*> ret;
-    ret.reserve(data.size());
-
-    qreal x = x_0;
-    const qreal y = y_0;
+    auto pos = parent->rect().topLeft();
+    qreal x = pos.x();
+    const qreal y = pos.y() - h - y_margin;
+    const qreal maxWidth = parent->rect().width();
 
     for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
         const qreal w = maxWidth * double(it.value().cost) / parentCost;
-        FrameGraphicsItem* item = new FrameGraphicsItem(QRectF(x, y, w, h), it.value().cost, it.key());
+        FrameGraphicsItem* item = new FrameGraphicsItem(QRectF(x, y, w, h), it.value().cost, it.key(), parent);
         item->setVisible(w > 2.);
+        item->setPen(parent->pen());
         item->setBrush(color(it.value().cost, totalCostForColor));
-        ret += toGraphicsItems(it.value().children, totalCostForColor, it.value().cost, x, y - h - y_margin, w);
+        toGraphicsItems(it.value().children, totalCostForColor, it.value().cost, item);
         x += w + x_margin;
-        ret << item;
     }
-
-    return ret;
 }
 
 }
@@ -148,15 +142,17 @@ FlameGraph::~FlameGraph()
 
 bool FlameGraph::eventFilter(QObject* object, QEvent* event)
 {
-    if (object == m_view->viewport() && event->type() == QEvent::Wheel) {
-        QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
-        if (wheelEvent->modifiers() == Qt::ControlModifier) {
-            // zoom view with Ctrl + mouse wheel
-            qreal scale = pow(1.1, double(wheelEvent->delta()) / (120.0 * 2.));
-            m_view->scale(scale, scale);
+    if (object != m_view->viewport()) {
+        return QObject::eventFilter(object, event);
+    }
+
+    if (event->type() == QEvent::MouseButtonRelease) {
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        if (mouseEvent->button() == Qt::LeftButton) {
+            auto item = m_view->itemAt(mouseEvent->pos());
+            qDebug() << item << (item ? item->toolTip() : QString());
             return true;
         }
-
     }
     return QObject::eventFilter(object, event);
 }
@@ -180,11 +176,8 @@ void FlameGraph::setData(const FlameGraphData& data)
     const qreal totalWidth = 800;
     FrameGraphicsItem* root = new FrameGraphicsItem(QRectF(0, 0, totalWidth, h), totalCost, i18n("total allocations"));
     root->setPen(pen);
+    toGraphicsItems(data.stack, totalCost, totalCost, root);
     m_scene->addItem(root);
-    foreach(FrameGraphicsItem* item, toGraphicsItems(data.stack, totalCost, totalCost, 0, - h - y_margin, totalWidth)) {
-        item->setPen(pen);
-        m_scene->addItem(item);
-    }
 
     qDebug() << "took me: " << t.elapsed();
 }
