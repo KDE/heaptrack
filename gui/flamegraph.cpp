@@ -34,6 +34,7 @@
 #include <QDebug>
 
 #include <KLocalizedString>
+#include <KColorScheme>
 
 namespace {
 
@@ -87,7 +88,7 @@ public:
         const QPen oldPen = painter->pen();
         const QFont oldFont = painter->font();
         QPen pen = oldPen;
-        pen.setColor(Qt::white);
+        pen.setColor(KColorScheme(QPalette::Active).foreground().color());
         painter->setPen(pen);
         painter->setFont(font);
         painter->drawText(margin + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine, metrics.elidedText(m_label, Qt::ElideRight, width));
