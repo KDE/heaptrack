@@ -25,6 +25,7 @@
 
 class QGraphicsScene;
 class QGraphicsView;
+class FrameGraphicsItem;
 
 struct FlameGraphData
 {
@@ -56,6 +57,7 @@ private:
     QGraphicsScene* m_scene;
     QGraphicsView* m_view;
     FlameGraphData m_data;
+    FrameGraphicsItem* m_rootItem;
 };
 
 #endif // FLAMEGRAPH_H

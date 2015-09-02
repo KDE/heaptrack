@@ -36,14 +36,6 @@
 #include <KLocalizedString>
 #include <KColorScheme>
 
-namespace {
-
-QColor color(quint64 cost, quint64 maxCost)
-{
-    const double ratio = double(cost) / maxCost;
-    return QColor::fromHsv(120 - ratio * 120, 255, 255, (-((ratio-1) * (ratio-1))) * 120 + 120);
-}
-
 class FrameGraphicsItem : public QGraphicsRectItem
 {
 public:
@@ -61,10 +53,31 @@ public:
         setToolTip(m_label);
     }
 
+    static const QFont font()
+    {
+        static const QFont font(QStringLiteral("monospace"), 10);
+        return font;
+    }
+
+    static const QFontMetrics fontMetrics()
+    {
+        static const QFontMetrics metrics(font());
+        return metrics;
+    }
+
+    static int margin()
+    {
+        return 5;
+    }
+
+    int preferredWidth() const
+    {
+        return fontMetrics().width(m_label) + 2 * margin();
+    }
+
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0)
     {
-        const int margin = 5;
-        const int width = rect().width() - 2 * margin;
+        const int width = rect().width() - 2 * margin();
         if (width < 2) {
             // don't try to paint tiny items
             return;
@@ -75,9 +88,7 @@ public:
         // TODO: text should always be displayed in a constant size and not zoomed
         // TODO: items should only be scaled horizontally, not vertically
         // TODO: items should "fit" into the view width
-        static const QFont font(QStringLiteral("monospace"), 10);
-        static const QFontMetrics metrics(font);
-        if (width < metrics.averageCharWidth() * 6) {
+        if (width < fontMetrics().averageCharWidth() * 6) {
             // text is too wide for the current LOD, don't paint it
             return;
         }
@@ -85,8 +96,9 @@ public:
         const int height = rect().height();
 
         const QFont oldFont = painter->font();
-        painter->setFont(font);
-        painter->drawText(margin + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine, metrics.elidedText(m_label, Qt::ElideRight, width));
+        painter->setFont(font());
+        painter->drawText(margin() + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
+                          fontMetrics().elidedText(m_label, Qt::ElideRight, width));
         painter->setFont(oldFont);
     }
 
@@ -94,9 +106,18 @@ private:
     QString m_label;
 };
 
+namespace {
+
+QColor color(quint64 cost, quint64 maxCost)
+{
+    const double ratio = double(cost) / maxCost;
+    return QColor::fromHsv(120 - ratio * 120, 255, 255, (-((ratio-1) * (ratio-1))) * 120 + 120);
+}
+
 const qreal h = 25.;
 const qreal x_margin = 0.;
 const qreal y_margin = 2.;
+const qreal minRootWidth = 800.;
 
 // TODO: what is the right value for maxWidth here?
 void toGraphicsItems(const FlameGraphData::Stack& data, qreal totalCostForColor,
@@ -118,12 +139,26 @@ void toGraphicsItems(const FlameGraphData::Stack& data, qreal totalCostForColor,
     }
 }
 
+void scaleItems(FrameGraphicsItem *item, qreal scaleFactor)
+{
+    auto rect = item->rect();
+    rect.moveLeft(rect.left() * scaleFactor);
+    rect.setWidth(rect.width() * scaleFactor);
+    item->setRect(rect);
+    foreach (auto child, item->childItems()) {
+        if (auto frameChild = dynamic_cast<FrameGraphicsItem*>(child)) {
+            scaleItems(frameChild, scaleFactor);
+        }
+    }
+}
+
 }
 
 FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     : QWidget(parent, flags)
     , m_scene(new QGraphicsScene(this))
     , m_view(new QGraphicsView(this))
+    , m_rootItem(nullptr)
 {
     qRegisterMetaType<FlameGraphData>();
 
@@ -149,8 +184,17 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
     if (event->type() == QEvent::MouseButtonRelease) {
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
-            auto item = m_view->itemAt(mouseEvent->pos());
-            qDebug() << item << (item ? item->toolTip() : QString());
+            auto item = dynamic_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos()));
+            if (item) {
+                const auto preferredWidth = item->preferredWidth();
+                auto scaleFactor = qreal(preferredWidth) / item->rect().width();
+                if (m_rootItem->rect().width() * scaleFactor < minRootWidth) {
+                    // don't shrink too much, keep the root item at a certain minimum size
+                    scaleFactor = minRootWidth / m_rootItem->rect().width();
+                }
+                scaleItems(m_rootItem, scaleFactor);
+                m_view->centerOn(item);
+            }
             return true;
         }
     }
@@ -172,12 +216,10 @@ void FlameGraph::setData(const FlameGraphData& data)
 
     const QPen pen(KColorScheme(QPalette::Active).foreground().color());
 
-    // TODO: get this out of the view somehow
-    const qreal totalWidth = 800;
-    FrameGraphicsItem* root = new FrameGraphicsItem(QRectF(0, 0, totalWidth, h), totalCost, i18n("total allocations"));
-    root->setPen(pen);
-    toGraphicsItems(data.stack, totalCost, totalCost, root);
-    m_scene->addItem(root);
+    m_rootItem = new FrameGraphicsItem(QRectF(0, 0, minRootWidth, h), totalCost, i18n("total allocations"));
+    m_rootItem->setPen(pen);
+    toGraphicsItems(data.stack, totalCost, totalCost, m_rootItem);
+    m_scene->addItem(m_rootItem);
 
     qDebug() << "took me: " << t.elapsed();
 }
