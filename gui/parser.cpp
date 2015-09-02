@@ -164,6 +164,9 @@ QVector<RowData> mergeAllocations(const AccumulatedTraceData& data)
                 it = rows->insert(it, {allocation.allocations, allocation.peak, allocation.leaked, allocation.allocated,
                                         location, nullptr, {}});
             }
+            if (data.isStopIndex(ip.functionIndex)) {
+                break;
+            }
             traceIndex = trace.parentIndex;
             rows = &it->children;
         }
