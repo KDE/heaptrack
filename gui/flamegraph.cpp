@@ -36,8 +36,9 @@
 #include <KLocalizedString>
 #include <KColorScheme>
 
-FrameGraphicsItem::FrameGraphicsItem(const QRectF& rect, const quint64 cost, const QString& function, FrameGraphicsItem* parent)
-    : QGraphicsRectItem(rect, parent)
+FrameGraphicsItem::FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent)
+    : QGraphicsRectItem(parent)
+    , m_cost(cost)
     , m_isHovered(false)
 {
     static const QString emptyLabel = QStringLiteral("???");
@@ -49,6 +50,11 @@ FrameGraphicsItem::FrameGraphicsItem(const QRectF& rect, const quint64 cost, con
     setToolTip(m_label);
     setFlag(QGraphicsItem::ItemIsSelectable);
     setAcceptHoverEvents(true);
+}
+
+quint64 FrameGraphicsItem::cost() const
+{
+    return m_cost;
 }
 
 QFont FrameGraphicsItem::font()
@@ -73,14 +79,8 @@ int FrameGraphicsItem::itemHeight()
     return fontMetrics().height() + 4;
 }
 
-int FrameGraphicsItem::preferredWidth() const
+void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* widget)
 {
-    return fontMetrics().width(m_label) + 2 * margin();
-}
-
-void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
-{
-
     if (isSelected() || m_isHovered) {
         auto selectedColor = brush().color();
         selectedColor.setAlpha(255);
@@ -128,19 +128,6 @@ void FrameGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 namespace {
 
-void scaleItems(FrameGraphicsItem *item, qreal scaleFactor)
-{
-    auto rect = item->rect();
-    rect.moveLeft(rect.left() * scaleFactor);
-    rect.setWidth(rect.width() * scaleFactor);
-    item->setRect(rect);
-    foreach (auto child, item->childItems()) {
-        if (auto frameChild = dynamic_cast<FrameGraphicsItem*>(child)) {
-            scaleItems(frameChild, scaleFactor);
-        }
-    }
-}
-
 struct Frame {
     quint64 cost = 0;
     using Stack = QMap<QString, Frame>;
@@ -153,7 +140,7 @@ QColor color()
     return QColor(0, 190 + 50 * qreal(rand()) / RAND_MAX, 210 * qreal(rand()) / RAND_MAX, 125);
 }
 
-void toGraphicsItems(const Stack& data, qreal parentCost, FrameGraphicsItem *parent)
+void layoutItems(FrameGraphicsItem *parent)
 {
     auto pos = parent->rect().topLeft();
     const qreal h = FrameGraphicsItem::itemHeight();
@@ -162,13 +149,23 @@ void toGraphicsItems(const Stack& data, qreal parentCost, FrameGraphicsItem *par
     const qreal maxWidth = parent->rect().width();
     qreal x = pos.x();
 
+    foreach (auto child, parent->childItems()) {
+        auto frameChild = static_cast<FrameGraphicsItem*>(child);
+        const qreal w = maxWidth * double(frameChild->cost()) / parent->cost();
+        frameChild->setVisible(w > 1);
+        frameChild->setRect(QRectF(x, y, w, h));
+        layoutItems(frameChild);
+        x += w;
+    }
+}
+
+void toGraphicsItems(const Stack& data, FrameGraphicsItem *parent)
+{
     for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
-        const qreal w = maxWidth * double(it.value().cost) / parentCost;
-        FrameGraphicsItem* item = new FrameGraphicsItem(QRectF(x, y, w, h), it.value().cost, it.key(), parent);
+        FrameGraphicsItem* item = new FrameGraphicsItem(it.value().cost, it.key(), parent);
         item->setPen(parent->pen());
         item->setBrush(color());
-        toGraphicsItems(it.value().children, it.value().cost, item);
-        x += w;
+        toGraphicsItems(it.value().children, item);
     }
 }
 
@@ -182,10 +179,10 @@ FrameGraphicsItem* buildGraphicsItems(const Stack& stack)
     KColorScheme scheme(QPalette::Active);
     const QPen pen(scheme.foreground().color());
 
-    auto rootItem = new FrameGraphicsItem(QRectF(0, 0, 1000, FrameGraphicsItem::itemHeight()), totalCost, i18n("total allocations"));
+    auto rootItem = new FrameGraphicsItem(totalCost, i18n("total allocations"));
     rootItem->setBrush(scheme.background());
     rootItem->setPen(pen);
-    toGraphicsItems(stack, totalCost, rootItem);
+    toGraphicsItems(stack, rootItem);
     return rootItem;
 }
 
@@ -225,9 +222,6 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
     m_view->setScene(m_scene);
     m_view->viewport()->installEventFilter(this);
-    // prevent duplicate resize, when a scrollbar is shown for the first time
-    m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     m_view->viewport()->setMouseTracking(true);
 
     layout()->addWidget(m_view);
@@ -242,14 +236,7 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
 {
     bool ret = QObject::eventFilter(object, event);
 
-    if (event->type() == QEvent::Wheel) {
-        QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
-        if (wheelEvent->modifiers() == Qt::ControlModifier) {
-            // zoom view with Ctrl + mouse wheel
-            qreal scale = pow(1.1, double(wheelEvent->delta()) / (120.0 * 2.));
-            m_view->scale(scale, scale);
-        }
-    } else if (event->type() == QEvent::MouseButtonRelease) {
+    if (event->type() == QEvent::MouseButtonRelease) {
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
             auto item = dynamic_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos()));
@@ -258,7 +245,7 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
             }
         }
     } else if (event->type() == QEvent::Resize || event->type() == QEvent::Show) {
-        zoomIntoRootItem();
+        zoomInto(m_rootItem);
     }
     return ret;
 }
@@ -267,10 +254,11 @@ void FlameGraph::setData(FrameGraphicsItem* rootItem)
 {
     m_scene->clear();
     m_rootItem = rootItem;
+    // layouting needs a root item with a given height, the rest will be overwritten later
+    rootItem->setRect(0, 0, 800, FrameGraphicsItem::itemHeight());
     m_scene->addItem(rootItem);
 
-    m_minRootWidth = 0;
-    zoomIntoRootItem();
+    zoomInto(m_rootItem);
 }
 
 FrameGraphicsItem * FlameGraph::parseData(const QVector<RowData>& data)
@@ -282,22 +270,25 @@ FrameGraphicsItem * FlameGraph::parseData(const QVector<RowData>& data)
 
 void FlameGraph::zoomInto(FrameGraphicsItem* item)
 {
-    const auto preferredWidth = item->preferredWidth();
-    auto scaleFactor = qreal(preferredWidth) / item->rect().width();
-    if (m_rootItem->rect().width() * scaleFactor < m_minRootWidth) {
-        // don't shrink too much, keep the root item at a certain minimum size
-        scaleFactor = m_minRootWidth / m_rootItem->rect().width();
-    }
-    scaleItems(m_rootItem, scaleFactor);
-    m_view->centerOn(item);
-}
-
-void FlameGraph::zoomIntoRootItem()
-{
-    const auto minRootWidth = m_view->viewport()->width() - 20;
-    if (!isVisible() || !m_rootItem || m_minRootWidth == minRootWidth)
+    if (!item) {
         return;
+    }
 
-    m_minRootWidth = minRootWidth;
-    zoomInto(m_rootItem);
+    const auto rootWidth = m_view->viewport()->width() - 40;
+    auto parent = item;
+    while (parent) {
+        auto rect = parent->rect();
+        rect.setLeft(0);
+        rect.setWidth(rootWidth);
+        parent->setRect(rect);
+        if (parent->parentItem()) {
+            foreach (auto sibling, parent->parentItem()->childItems()) {
+                sibling->setVisible(sibling == parent);
+            }
+        }
+        parent = static_cast<FrameGraphicsItem*>(parent->parentItem());
+    }
+
+    layoutItems(item);
+    m_view->centerOn(item);
 }

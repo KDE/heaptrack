@@ -30,14 +30,14 @@ class QGraphicsView;
 class FrameGraphicsItem : public QGraphicsRectItem
 {
 public:
-    FrameGraphicsItem(const QRectF& rect, const quint64 cost, const QString& function, FrameGraphicsItem* parent = nullptr);
+    FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent = nullptr);
+
+    quint64 cost() const;
 
     static QFont font();
     static QFontMetrics fontMetrics();
     static int margin();
     static int itemHeight();
-
-    int preferredWidth() const;
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
@@ -47,6 +47,7 @@ protected:
 
 private:
     QString m_label;
+    quint64 m_cost;
     bool m_isHovered;
 };
 
@@ -66,7 +67,6 @@ protected:
 
 private:
     void zoomInto(FrameGraphicsItem* item);
-    void zoomIntoRootItem();
 
     QGraphicsScene* m_scene;
     QGraphicsView* m_view;
