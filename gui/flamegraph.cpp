@@ -196,6 +196,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
 {
     setLayout(new QVBoxLayout);
 
+    m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
     m_view->setScene(m_scene);
     m_view->viewport()->installEventFilter(this);
     // prevent duplicate resize, when a scrollbar is shown for the first time
