@@ -46,6 +46,7 @@ FrameGraphicsItem::FrameGraphicsItem(const QRectF& rect, const quint64 cost, con
                     cost,
                     function.isEmpty() ? emptyLabel : function);
     setToolTip(m_label);
+    setFlag(QGraphicsItem::ItemIsSelectable);
 }
 
 QFont FrameGraphicsItem::font()
@@ -83,7 +84,20 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
         return;
     }
 
-    QGraphicsRectItem::paint(painter, option, widget);
+    if (isSelected()) {
+        auto selectedColor = brush().color();
+        selectedColor.setAlpha(255);
+        painter->fillRect(rect(), selectedColor);
+        const QPen oldPen = painter->pen();
+        auto pen = oldPen;
+        pen.setWidth(2);
+        painter->setPen(pen);
+        painter->drawRect(rect());
+        painter->setPen(oldPen);
+    } else {
+        painter->fillRect(rect(), brush());
+        painter->drawRect(rect());
+    }
 
     // TODO: text should always be displayed in a constant size and not zoomed
     // TODO: items should only be scaled horizontally, not vertically
@@ -160,9 +174,11 @@ FrameGraphicsItem* buildGraphicsItems(const Stack& stack)
         totalCost += frame.cost;
     }
 
-    const QPen pen(KColorScheme(QPalette::Active).foreground().color());
+    KColorScheme scheme(QPalette::Active);
+    const QPen pen(scheme.foreground().color());
 
     auto rootItem = new FrameGraphicsItem(QRectF(0, 0, 1000, FrameGraphicsItem::itemHeight()), totalCost, i18n("total allocations"));
+    rootItem->setBrush(scheme.background());
     rootItem->setPen(pen);
     toGraphicsItems(stack, totalCost, totalCost, rootItem);
     return rootItem;
@@ -218,9 +234,7 @@ FlameGraph::~FlameGraph()
 
 bool FlameGraph::eventFilter(QObject* object, QEvent* event)
 {
-    if (object != m_view->viewport()) {
-        return QObject::eventFilter(object, event);
-    }
+    bool ret = QObject::eventFilter(object, event);
 
     if (event->type() == QEvent::Wheel) {
         QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
@@ -228,7 +242,6 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
             // zoom view with Ctrl + mouse wheel
             qreal scale = pow(1.1, double(wheelEvent->delta()) / (120.0 * 2.));
             m_view->scale(scale, scale);
-            return true;
         }
     } else if (event->type() == QEvent::MouseButtonRelease) {
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
@@ -237,12 +250,11 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
             if (item) {
                 zoomInto(item);
             }
-            return true;
         }
     } else if (event->type() == QEvent::Resize || event->type() == QEvent::Show) {
         zoomIntoRootItem();
     }
-    return QObject::eventFilter(object, event);
+    return ret;
 }
 
 void FlameGraph::setData(FrameGraphicsItem* rootItem)
