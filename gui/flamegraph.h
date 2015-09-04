@@ -60,9 +60,13 @@ protected:
     bool eventFilter(QObject* object, QEvent* event) override;
 
 private:
+    void zoomInto(FrameGraphicsItem* item);
+    void zoomIntoRootItem();
+
     QGraphicsScene* m_scene;
     QGraphicsView* m_view;
     FrameGraphicsItem* m_rootItem;
+    int m_minRootWidth;
 };
 
 #endif // FLAMEGRAPH_H

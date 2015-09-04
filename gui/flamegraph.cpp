@@ -105,6 +105,7 @@ void scaleItems(FrameGraphicsItem *item, qreal scaleFactor)
     rect.moveLeft(rect.left() * scaleFactor);
     rect.setWidth(rect.width() * scaleFactor);
     item->setRect(rect);
+    item->setVisible(rect.width() > 2.);
     foreach (auto child, item->childItems()) {
         if (auto frameChild = dynamic_cast<FrameGraphicsItem*>(child)) {
             scaleItems(frameChild, scaleFactor);
@@ -127,7 +128,6 @@ QColor color(quint64 cost, quint64 maxCost)
 
 const qreal h = 25.;
 const qreal y_margin = 2.;
-const qreal minRootWidth = 800.;
 
 void toGraphicsItems(const Stack& data, qreal totalCostForColor,
                      qreal parentCost, FrameGraphicsItem *parent)
@@ -157,7 +157,7 @@ FrameGraphicsItem* buildGraphicsItems(const Stack& stack)
 
     const QPen pen(KColorScheme(QPalette::Active).foreground().color());
 
-    auto rootItem = new FrameGraphicsItem(QRectF(0, 0, minRootWidth, h), totalCost, i18n("total allocations"));
+    auto rootItem = new FrameGraphicsItem(QRectF(0, 0, 1000, h), totalCost, i18n("total allocations"));
     rootItem->setPen(pen);
     toGraphicsItems(stack, totalCost, totalCost, rootItem);
     return rootItem;
@@ -192,11 +192,15 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     , m_scene(new QGraphicsScene(this))
     , m_view(new QGraphicsView(this))
     , m_rootItem(nullptr)
+    , m_minRootWidth(0)
 {
     setLayout(new QVBoxLayout);
 
     m_view->setScene(m_scene);
     m_view->viewport()->installEventFilter(this);
+    // prevent duplicate resize, when a scrollbar is shown for the first time
+    m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
     layout()->addWidget(m_view);
 }
@@ -225,17 +229,12 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
         if (mouseEvent->button() == Qt::LeftButton) {
             auto item = dynamic_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos()));
             if (item) {
-                const auto preferredWidth = item->preferredWidth();
-                auto scaleFactor = qreal(preferredWidth) / item->rect().width();
-                if (m_rootItem->rect().width() * scaleFactor < minRootWidth) {
-                    // don't shrink too much, keep the root item at a certain minimum size
-                    scaleFactor = minRootWidth / m_rootItem->rect().width();
-                }
-                scaleItems(m_rootItem, scaleFactor);
-                m_view->centerOn(item);
+                zoomInto(item);
             }
             return true;
         }
+    } else if (event->type() == QEvent::Resize || event->type() == QEvent::Show) {
+        zoomIntoRootItem();
     }
     return QObject::eventFilter(object, event);
 }
@@ -245,6 +244,9 @@ void FlameGraph::setData(FrameGraphicsItem* rootItem)
     m_scene->clear();
     m_rootItem = rootItem;
     m_scene->addItem(rootItem);
+
+    m_minRootWidth = 0;
+    zoomIntoRootItem();
 }
 
 FrameGraphicsItem * FlameGraph::parseData(const QVector<RowData>& data)
@@ -252,4 +254,27 @@ FrameGraphicsItem * FlameGraph::parseData(const QVector<RowData>& data)
     Stack stack;
     buildFlameGraph(data, &stack);
     return buildGraphicsItems(stack);
+}
+
+void FlameGraph::zoomInto(FrameGraphicsItem* item)
+{
+    const auto preferredWidth = item->preferredWidth();
+    auto scaleFactor = qreal(preferredWidth) / item->rect().width();
+    if (m_rootItem->rect().width() * scaleFactor < m_minRootWidth) {
+        // don't shrink too much, keep the root item at a certain minimum size
+        scaleFactor = m_minRootWidth / m_rootItem->rect().width();
+    }
+    scaleItems(m_rootItem, scaleFactor);
+    m_view->centerOn(item);
+}
+
+void FlameGraph::zoomIntoRootItem()
+{
+    const auto minRootWidth = m_view->viewport()->width() - 20;
+    if (!isVisible() || !m_rootItem || m_minRootWidth == minRootWidth)
+        return;
+
+    qDebug() << minRootWidth << m_minRootWidth;
+    m_minRootWidth = minRootWidth;
+    zoomInto(m_rootItem);
 }
