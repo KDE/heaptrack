@@ -38,6 +38,7 @@
 
 FrameGraphicsItem::FrameGraphicsItem(const QRectF& rect, const quint64 cost, const QString& function, FrameGraphicsItem* parent)
     : QGraphicsRectItem(rect, parent)
+    , m_isHovered(false)
 {
     static const QString emptyLabel = QStringLiteral("???");
 
@@ -47,6 +48,7 @@ FrameGraphicsItem::FrameGraphicsItem(const QRectF& rect, const quint64 cost, con
                     function.isEmpty() ? emptyLabel : function);
     setToolTip(m_label);
     setFlag(QGraphicsItem::ItemIsSelectable);
+    setAcceptHoverEvents(true);
 }
 
 QFont FrameGraphicsItem::font()
@@ -84,10 +86,15 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
         return;
     }
 
-    if (isSelected()) {
+    if (isSelected() || m_isHovered) {
         auto selectedColor = brush().color();
         selectedColor.setAlpha(255);
         painter->fillRect(rect(), selectedColor);
+    } else {
+        painter->fillRect(rect(), brush());
+    }
+
+    if (isSelected()) {
         const QPen oldPen = painter->pen();
         auto pen = oldPen;
         pen.setWidth(2);
@@ -95,13 +102,9 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
         painter->drawRect(rect());
         painter->setPen(oldPen);
     } else {
-        painter->fillRect(rect(), brush());
         painter->drawRect(rect());
     }
 
-    // TODO: text should always be displayed in a constant size and not zoomed
-    // TODO: items should only be scaled horizontally, not vertically
-    // TODO: items should "fit" into the view width
     if (width < fontMetrics().averageCharWidth() * 6) {
         // text is too wide for the current LOD, don't paint it
         return;
@@ -114,6 +117,18 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     painter->drawText(margin() + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
                         fontMetrics().elidedText(m_label, Qt::ElideRight, width));
     painter->setFont(oldFont);
+}
+
+void FrameGraphicsItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    QGraphicsRectItem::hoverEnterEvent(event);
+    m_isHovered = true;
+}
+
+void FrameGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    QGraphicsRectItem::hoverLeaveEvent(event);
+    m_isHovered = false;
 }
 
 namespace {
@@ -144,7 +159,6 @@ QColor color(quint64 cost, quint64 maxCost)
     const double ratio = double(cost) / maxCost;
     return QColor::fromHsv(120 - ratio * 120, 255, 255, (-((ratio-1) * (ratio-1))) * 120 + 120);
 }
-
 
 void toGraphicsItems(const Stack& data, qreal totalCostForColor,
                      qreal parentCost, FrameGraphicsItem *parent)
@@ -223,6 +237,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     // prevent duplicate resize, when a scrollbar is shown for the first time
     m_view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     m_view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+    m_view->viewport()->setMouseTracking(true);
 
     layout()->addWidget(m_view);
 }

@@ -41,8 +41,13 @@ public:
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
+protected:
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+
 private:
     QString m_label;
+    bool m_isHovered;
 };
 
 class FlameGraph : public QWidget
