@@ -239,10 +239,7 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
     if (event->type() == QEvent::MouseButtonRelease) {
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
-            auto item = dynamic_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos()));
-            if (item) {
-                zoomInto(item);
-            }
+            zoomInto(static_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos())));
         }
     } else if (event->type() == QEvent::Resize || event->type() == QEvent::Show) {
         zoomInto(m_rootItem);
