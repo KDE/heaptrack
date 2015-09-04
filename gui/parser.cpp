@@ -27,6 +27,7 @@
 #include <QDebug>
 
 #include "../accumulatedtracedata.h"
+#include "flamegraph.h"
 
 #include <vector>
 
@@ -183,28 +184,6 @@ Parser::Parser(QObject* parent)
 
 Parser::~Parser() = default;
 
-static void buildFrameGraph(const QVector<RowData>& mergedAllocations, FlameGraphData::Stack* topStack)
-{
-    foreach (const auto& row, mergedAllocations) {
-        if (row.children.isEmpty()) {
-            // leaf node found, bubble up the parent chain to build a top-down tree
-            auto node = &row;
-            auto stack = topStack;
-            while (node) {
-                auto& data = (*stack)[node->location.function];
-                // always use the leaf node's cost and propagate that one up the chain
-                // otherwise we'd count the cost of some nodes multiple times
-                data.cost += row.allocations;
-                stack = &data.children;
-                node = node->parent;
-            }
-        } else {
-            // recurse to find a leaf
-            buildFrameGraph(row.children, topStack);
-        }
-    }
-}
-
 void Parser::parse(const QString& path)
 {
     using namespace ThreadWeaver;
@@ -215,9 +194,7 @@ void Parser::parse(const QString& path)
         const auto mergedAllocations = mergeAllocations(data);
         emit bottomUpDataAvailable(mergedAllocations);
         emit chartDataAvailable(data.chartData);
-        FlameGraphData::Stack stack;
-        buildFrameGraph(mergedAllocations, &stack);
-        emit flameGraphDataAvailable({stack});
+        emit flameGraphDataAvailable(FlameGraph::parseData(mergedAllocations));
         emit finished();
     });
 }

@@ -36,106 +36,68 @@
 #include <KLocalizedString>
 #include <KColorScheme>
 
-class FrameGraphicsItem : public QGraphicsRectItem
+FrameGraphicsItem::FrameGraphicsItem(const QRectF& rect, const quint64 cost, const QString& function, FrameGraphicsItem* parent)
+    : QGraphicsRectItem(rect, parent)
 {
-public:
-    FrameGraphicsItem(const QRectF& rect, const quint64 cost, const QString& function, FrameGraphicsItem* parent = nullptr)
-        : QGraphicsRectItem(rect, parent)
-    {
-        static const QString emptyLabel = QStringLiteral("???");
+    static const QString emptyLabel = QStringLiteral("???");
 
-        m_label = i18nc("%1: number of allocations, %2: function label",
-                        "%2: %1",
-                        cost,
-                        function.isEmpty() ? emptyLabel : function);
-        setToolTip(m_label);
+    m_label = i18nc("%1: number of allocations, %2: function label",
+                    "%2: %1",
+                    cost,
+                    function.isEmpty() ? emptyLabel : function);
+    setToolTip(m_label);
+}
+
+QFont FrameGraphicsItem::font()
+{
+    static const QFont font(QStringLiteral("monospace"), 10);
+    return font;
+}
+
+QFontMetrics FrameGraphicsItem::fontMetrics()
+{
+    static const QFontMetrics metrics(font());
+    return metrics;
+}
+
+int FrameGraphicsItem::margin()
+{
+    return 5;
+}
+
+int FrameGraphicsItem::preferredWidth() const
+{
+    return fontMetrics().width(m_label) + 2 * margin();
+}
+
+void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    const int width = rect().width() - 2 * margin();
+    if (width < 2) {
+        // don't try to paint tiny items
+        return;
     }
 
-    static const QFont font()
-    {
-        static const QFont font(QStringLiteral("monospace"), 10);
-        return font;
+    QGraphicsRectItem::paint(painter, option, widget);
+
+    // TODO: text should always be displayed in a constant size and not zoomed
+    // TODO: items should only be scaled horizontally, not vertically
+    // TODO: items should "fit" into the view width
+    if (width < fontMetrics().averageCharWidth() * 6) {
+        // text is too wide for the current LOD, don't paint it
+        return;
     }
 
-    static const QFontMetrics fontMetrics()
-    {
-        static const QFontMetrics metrics(font());
-        return metrics;
-    }
+    const int height = rect().height();
 
-    static int margin()
-    {
-        return 5;
-    }
-
-    int preferredWidth() const
-    {
-        return fontMetrics().width(m_label) + 2 * margin();
-    }
-
-    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = 0)
-    {
-        const int width = rect().width() - 2 * margin();
-        if (width < 2) {
-            // don't try to paint tiny items
-            return;
-        }
-
-        QGraphicsRectItem::paint(painter, option, widget);
-
-        // TODO: text should always be displayed in a constant size and not zoomed
-        // TODO: items should only be scaled horizontally, not vertically
-        // TODO: items should "fit" into the view width
-        if (width < fontMetrics().averageCharWidth() * 6) {
-            // text is too wide for the current LOD, don't paint it
-            return;
-        }
-
-        const int height = rect().height();
-
-        const QFont oldFont = painter->font();
-        painter->setFont(font());
-        painter->drawText(margin() + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
-                          fontMetrics().elidedText(m_label, Qt::ElideRight, width));
-        painter->setFont(oldFont);
-    }
-
-private:
-    QString m_label;
-};
+    const QFont oldFont = painter->font();
+    painter->setFont(font());
+    painter->drawText(margin() + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
+                        fontMetrics().elidedText(m_label, Qt::ElideRight, width));
+    painter->setFont(oldFont);
+}
 
 namespace {
-
-QColor color(quint64 cost, quint64 maxCost)
-{
-    const double ratio = double(cost) / maxCost;
-    return QColor::fromHsv(120 - ratio * 120, 255, 255, (-((ratio-1) * (ratio-1))) * 120 + 120);
-}
-
-const qreal h = 25.;
-const qreal x_margin = 0.;
-const qreal y_margin = 2.;
-const qreal minRootWidth = 800.;
-
-// TODO: what is the right value for maxWidth here?
-void toGraphicsItems(const FlameGraphData::Stack& data, qreal totalCostForColor,
-                     qreal parentCost, FrameGraphicsItem *parent)
-{
-    auto pos = parent->rect().topLeft();
-    qreal x = pos.x();
-    const qreal y = pos.y() - h - y_margin;
-    const qreal maxWidth = parent->rect().width();
-
-    for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
-        const qreal w = maxWidth * double(it.value().cost) / parentCost;
-        FrameGraphicsItem* item = new FrameGraphicsItem(QRectF(x, y, w, h), it.value().cost, it.key(), parent);
-        item->setVisible(w > 2.);
-        item->setPen(parent->pen());
-        item->setBrush(color(it.value().cost, totalCostForColor));
-        toGraphicsItems(it.value().children, totalCostForColor, it.value().cost, item);
-        x += w + x_margin;
-    }
-}
 
 void scaleItems(FrameGraphicsItem *item, qreal scaleFactor)
 {
@@ -150,6 +112,79 @@ void scaleItems(FrameGraphicsItem *item, qreal scaleFactor)
     }
 }
 
+struct Frame {
+    quint64 cost = 0;
+    using Stack = QMap<QString, Frame>;
+    Stack children;
+};
+using Stack = Frame::Stack;
+
+QColor color(quint64 cost, quint64 maxCost)
+{
+    const double ratio = double(cost) / maxCost;
+    return QColor::fromHsv(120 - ratio * 120, 255, 255, (-((ratio-1) * (ratio-1))) * 120 + 120);
+}
+
+const qreal h = 25.;
+const qreal y_margin = 2.;
+const qreal minRootWidth = 800.;
+
+void toGraphicsItems(const Stack& data, qreal totalCostForColor,
+                     qreal parentCost, FrameGraphicsItem *parent)
+{
+    auto pos = parent->rect().topLeft();
+    qreal x = pos.x();
+    const qreal y = pos.y() - h - y_margin;
+    const qreal maxWidth = parent->rect().width();
+
+    for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
+        const qreal w = maxWidth * double(it.value().cost) / parentCost;
+        FrameGraphicsItem* item = new FrameGraphicsItem(QRectF(x, y, w, h), it.value().cost, it.key(), parent);
+        item->setVisible(w > 2.);
+        item->setPen(parent->pen());
+        item->setBrush(color(it.value().cost, totalCostForColor));
+        toGraphicsItems(it.value().children, totalCostForColor, it.value().cost, item);
+        x += w;
+    }
+}
+
+FrameGraphicsItem* buildGraphicsItems(const Stack& stack)
+{
+    double totalCost = 0;
+    foreach(const auto& frame, stack) {
+        totalCost += frame.cost;
+    }
+
+    const QPen pen(KColorScheme(QPalette::Active).foreground().color());
+
+    auto rootItem = new FrameGraphicsItem(QRectF(0, 0, minRootWidth, h), totalCost, i18n("total allocations"));
+    rootItem->setPen(pen);
+    toGraphicsItems(stack, totalCost, totalCost, rootItem);
+    return rootItem;
+}
+
+static void buildFlameGraph(const QVector<RowData>& mergedAllocations, Stack* topStack)
+{
+    foreach (const auto& row, mergedAllocations) {
+        if (row.children.isEmpty()) {
+            // leaf node found, bubble up the parent chain to build a top-down tree
+            auto node = &row;
+            auto stack = topStack;
+            while (node) {
+                auto& data = (*stack)[node->location.function];
+                // always use the leaf node's cost and propagate that one up the chain
+                // otherwise we'd count the cost of some nodes multiple times
+                data.cost += row.allocations;
+                stack = &data.children;
+                node = node->parent;
+            }
+        } else {
+            // recurse to find a leaf
+            buildFlameGraph(row.children, topStack);
+        }
+    }
+}
+
 }
 
 FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
@@ -158,8 +193,6 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     , m_view(new QGraphicsView(this))
     , m_rootItem(nullptr)
 {
-    qRegisterMetaType<FlameGraphData>();
-
     setLayout(new QVBoxLayout);
 
     m_view->setScene(m_scene);
@@ -207,25 +240,16 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
     return QObject::eventFilter(object, event);
 }
 
-void FlameGraph::setData(const FlameGraphData& data)
+void FlameGraph::setData(FrameGraphicsItem* rootItem)
 {
-    m_data = data;
     m_scene->clear();
+    m_rootItem = rootItem;
+    m_scene->addItem(rootItem);
+}
 
-    qDebug() << "Evaluating flame graph";
-    QElapsedTimer t; t.start();
-
-    double totalCost = 0;
-    foreach(const auto& frame, data.stack) {
-        totalCost += frame.cost;
-    }
-
-    const QPen pen(KColorScheme(QPalette::Active).foreground().color());
-
-    m_rootItem = new FrameGraphicsItem(QRectF(0, 0, minRootWidth, h), totalCost, i18n("total allocations"));
-    m_rootItem->setPen(pen);
-    toGraphicsItems(data.stack, totalCost, totalCost, m_rootItem);
-    m_scene->addItem(m_rootItem);
-
-    qDebug() << "took me: " << t.elapsed();
+FrameGraphicsItem * FlameGraph::parseData(const QVector<RowData>& data)
+{
+    Stack stack;
+    buildFlameGraph(data, &stack);
+    return buildGraphicsItems(stack);
 }

@@ -21,42 +21,47 @@
 #define FLAMEGRAPH_H
 
 #include <QWidget>
-#include <QMap>
+#include <QGraphicsRectItem>
+#include "bottomupmodel.h"
 
 class QGraphicsScene;
 class QGraphicsView;
-class FrameGraphicsItem;
 
-struct FlameGraphData
+class FrameGraphicsItem : public QGraphicsRectItem
 {
-    struct Frame {
-        quint64 cost = 0;
-        using Stack = QMap<QString, Frame>;
-        Stack children;
-    };
-    using Stack = Frame::Stack;
+public:
+    FrameGraphicsItem(const QRectF& rect, const quint64 cost, const QString& function, FrameGraphicsItem* parent = nullptr);
 
-    Stack stack;
+    static QFont font();
+    static QFontMetrics fontMetrics();
+
+    static int margin();
+
+    int preferredWidth() const;
+
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+
+private:
+    QString m_label;
 };
-
-Q_DECLARE_METATYPE(FlameGraphData);
 
 class FlameGraph : public QWidget
 {
     Q_OBJECT
 public:
-    FlameGraph(QWidget* parent = 0, Qt::WindowFlags flags = 0);
+    FlameGraph(QWidget* parent = nullptr, Qt::WindowFlags flags = 0);
     ~FlameGraph();
 
-    void setData(const FlameGraphData& data);
+    void setData(FrameGraphicsItem* rootFrame);
+    // called from background thread
+    static FrameGraphicsItem* parseData(const QVector<RowData>& data);
 
 protected:
-    virtual bool eventFilter(QObject* object, QEvent* event);
+    bool eventFilter(QObject* object, QEvent* event) override;
 
 private:
     QGraphicsScene* m_scene;
     QGraphicsView* m_view;
-    FlameGraphData m_data;
     FrameGraphicsItem* m_rootItem;
 };
 
