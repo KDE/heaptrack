@@ -65,6 +65,11 @@ int FrameGraphicsItem::margin()
     return 5;
 }
 
+int FrameGraphicsItem::itemHeight()
+{
+    return fontMetrics().height() + 4;
+}
+
 int FrameGraphicsItem::preferredWidth() const
 {
     return fontMetrics().width(m_label) + 2 * margin();
@@ -126,16 +131,16 @@ QColor color(quint64 cost, quint64 maxCost)
     return QColor::fromHsv(120 - ratio * 120, 255, 255, (-((ratio-1) * (ratio-1))) * 120 + 120);
 }
 
-const qreal h = 25.;
-const qreal y_margin = 2.;
 
 void toGraphicsItems(const Stack& data, qreal totalCostForColor,
                      qreal parentCost, FrameGraphicsItem *parent)
 {
     auto pos = parent->rect().topLeft();
-    qreal x = pos.x();
+    const qreal h = FrameGraphicsItem::itemHeight();
+    const qreal y_margin = 2.;
     const qreal y = pos.y() - h - y_margin;
     const qreal maxWidth = parent->rect().width();
+    qreal x = pos.x();
 
     for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
         const qreal w = maxWidth * double(it.value().cost) / parentCost;
@@ -157,7 +162,7 @@ FrameGraphicsItem* buildGraphicsItems(const Stack& stack)
 
     const QPen pen(KColorScheme(QPalette::Active).foreground().color());
 
-    auto rootItem = new FrameGraphicsItem(QRectF(0, 0, 1000, h), totalCost, i18n("total allocations"));
+    auto rootItem = new FrameGraphicsItem(QRectF(0, 0, 1000, FrameGraphicsItem::itemHeight()), totalCost, i18n("total allocations"));
     rootItem->setPen(pen);
     toGraphicsItems(stack, totalCost, totalCost, rootItem);
     return rootItem;
@@ -275,7 +280,6 @@ void FlameGraph::zoomIntoRootItem()
     if (!isVisible() || !m_rootItem || m_minRootWidth == minRootWidth)
         return;
 
-    qDebug() << minRootWidth << m_minRootWidth;
     m_minRootWidth = minRootWidth;
     zoomInto(m_rootItem);
 }

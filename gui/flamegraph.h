@@ -34,8 +34,8 @@ public:
 
     static QFont font();
     static QFontMetrics fontMetrics();
-
     static int margin();
+    static int itemHeight();
 
     int preferredWidth() const;
 
