@@ -80,11 +80,6 @@ int FrameGraphicsItem::preferredWidth() const
 
 void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
-    const int width = rect().width() - 2 * margin();
-    if (width < 2) {
-        // don't try to paint tiny items
-        return;
-    }
 
     if (isSelected() || m_isHovered) {
         auto selectedColor = brush().color();
@@ -94,17 +89,17 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
         painter->fillRect(rect(), brush());
     }
 
+    const QPen oldPen = painter->pen();
+    auto pen = oldPen;
+    pen.setColor(brush().color());
     if (isSelected()) {
-        const QPen oldPen = painter->pen();
-        auto pen = oldPen;
         pen.setWidth(2);
-        painter->setPen(pen);
-        painter->drawRect(rect());
-        painter->setPen(oldPen);
-    } else {
-        painter->drawRect(rect());
     }
+    painter->setPen(pen);
+    painter->drawRect(rect());
+    painter->setPen(oldPen);
 
+    const int width = rect().width() - 2 * margin();
     if (width < fontMetrics().averageCharWidth() * 6) {
         // text is too wide for the current LOD, don't paint it
         return;
@@ -139,7 +134,6 @@ void scaleItems(FrameGraphicsItem *item, qreal scaleFactor)
     rect.moveLeft(rect.left() * scaleFactor);
     rect.setWidth(rect.width() * scaleFactor);
     item->setRect(rect);
-    item->setVisible(rect.width() > 2.);
     foreach (auto child, item->childItems()) {
         if (auto frameChild = dynamic_cast<FrameGraphicsItem*>(child)) {
             scaleItems(frameChild, scaleFactor);
@@ -154,14 +148,12 @@ struct Frame {
 };
 using Stack = Frame::Stack;
 
-QColor color(quint64 cost, quint64 maxCost)
+QColor color()
 {
-    const double ratio = double(cost) / maxCost;
-    return QColor::fromHsv(120 - ratio * 120, 255, 255, (-((ratio-1) * (ratio-1))) * 120 + 120);
+    return QColor(0, 190 + 50 * qreal(rand()) / RAND_MAX, 210 * qreal(rand()) / RAND_MAX, 125);
 }
 
-void toGraphicsItems(const Stack& data, qreal totalCostForColor,
-                     qreal parentCost, FrameGraphicsItem *parent)
+void toGraphicsItems(const Stack& data, qreal parentCost, FrameGraphicsItem *parent)
 {
     auto pos = parent->rect().topLeft();
     const qreal h = FrameGraphicsItem::itemHeight();
@@ -173,10 +165,9 @@ void toGraphicsItems(const Stack& data, qreal totalCostForColor,
     for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
         const qreal w = maxWidth * double(it.value().cost) / parentCost;
         FrameGraphicsItem* item = new FrameGraphicsItem(QRectF(x, y, w, h), it.value().cost, it.key(), parent);
-        item->setVisible(w > 2.);
         item->setPen(parent->pen());
-        item->setBrush(color(it.value().cost, totalCostForColor));
-        toGraphicsItems(it.value().children, totalCostForColor, it.value().cost, item);
+        item->setBrush(color());
+        toGraphicsItems(it.value().children, it.value().cost, item);
         x += w;
     }
 }
@@ -194,7 +185,7 @@ FrameGraphicsItem* buildGraphicsItems(const Stack& stack)
     auto rootItem = new FrameGraphicsItem(QRectF(0, 0, 1000, FrameGraphicsItem::itemHeight()), totalCost, i18n("total allocations"));
     rootItem->setBrush(scheme.background());
     rootItem->setPen(pen);
-    toGraphicsItems(stack, totalCost, totalCost, rootItem);
+    toGraphicsItems(stack, totalCost, rootItem);
     return rootItem;
 }
 
