@@ -26,11 +26,9 @@
 #include <QStyleOption>
 #include <QGraphicsView>
 #include <QGraphicsItem>
-#include <QGraphicsSimpleTextItem>
 #include <QWheelEvent>
 #include <QEvent>
-
-#include <QElapsedTimer>
+#include <QToolTip>
 #include <QDebug>
 
 #include <KLocalizedString>
@@ -39,15 +37,9 @@
 FrameGraphicsItem::FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent)
     : QGraphicsRectItem(parent)
     , m_cost(cost)
+    , m_function(function)
     , m_isHovered(false)
 {
-    static const QString emptyLabel = QStringLiteral("???");
-
-    m_label = i18nc("%1: number of allocations, %2: function label",
-                    "%2: %1",
-                    cost,
-                    function.isEmpty() ? emptyLabel : function);
-    setToolTip(m_label);
     setFlag(QGraphicsItem::ItemIsSelectable);
     setAcceptHoverEvents(true);
 }
@@ -87,19 +79,30 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     const int height = rect().height();
 
     painter->drawText(margin + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
-                      option->fontMetrics.elidedText(m_label, Qt::ElideRight, width));
+                      option->fontMetrics.elidedText(m_function, Qt::ElideRight, width));
 }
 
 void FrameGraphicsItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     QGraphicsRectItem::hoverEnterEvent(event);
     m_isHovered = true;
+    showToolTip();
+}
+
+void FrameGraphicsItem::showToolTip() const
+{
+    // we build the tooltip text on demand, which is much faster than doing that for potentially thousands of items when we load the data
+    QToolTip::showText(QCursor::pos(), i18nc("%1: number of allocations, %2: function label", "%1 allocations in %2 and below.", m_cost, m_function));
 }
 
 void FrameGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     QGraphicsRectItem::hoverLeaveEvent(event);
     m_isHovered = false;
+
+    if (auto parent = static_cast<FrameGraphicsItem*>(parentItem())) {
+        parent->showToolTip();
+    }
 }
 
 namespace {

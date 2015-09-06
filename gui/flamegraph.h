@@ -39,10 +39,11 @@ public:
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    void showToolTip() const;
 
 private:
-    QString m_label;
     quint64 m_cost;
+    QString m_function;
     bool m_isHovered;
 };
 
