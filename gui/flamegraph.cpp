@@ -57,29 +57,7 @@ quint64 FrameGraphicsItem::cost() const
     return m_cost;
 }
 
-QFont FrameGraphicsItem::font()
-{
-    static const QFont font(QStringLiteral("monospace"), 10);
-    return font;
-}
-
-QFontMetrics FrameGraphicsItem::fontMetrics()
-{
-    static const QFontMetrics metrics(font());
-    return metrics;
-}
-
-int FrameGraphicsItem::margin()
-{
-    return 5;
-}
-
-int FrameGraphicsItem::itemHeight()
-{
-    return fontMetrics().height() + 4;
-}
-
-void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* widget)
+void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* /*widget*/)
 {
     if (isSelected() || m_isHovered) {
         auto selectedColor = brush().color();
@@ -99,19 +77,17 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     painter->drawRect(rect());
     painter->setPen(oldPen);
 
-    const int width = rect().width() - 2 * margin();
-    if (width < fontMetrics().averageCharWidth() * 6) {
+    const int margin = 4;
+    const int width = rect().width() - 2 * margin;
+    if (width < option->fontMetrics.averageCharWidth() * 6) {
         // text is too wide for the current LOD, don't paint it
         return;
     }
 
     const int height = rect().height();
 
-    const QFont oldFont = painter->font();
-    painter->setFont(font());
-    painter->drawText(margin() + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
-                        fontMetrics().elidedText(m_label, Qt::ElideRight, width));
-    painter->setFont(oldFont);
+    painter->drawText(margin + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
+                      option->fontMetrics.elidedText(m_label, Qt::ElideRight, width));
 }
 
 void FrameGraphicsItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
@@ -135,18 +111,25 @@ struct Frame {
 };
 using Stack = Frame::Stack;
 
+/**
+ * Generate a color from the "mem" color space used in upstream FlameGraph.pl
+ */
 QColor color()
 {
     return QColor(0, 190 + 50 * qreal(rand()) / RAND_MAX, 210 * qreal(rand()) / RAND_MAX, 125);
 }
 
+/**
+ * Layout the flame graph and hide tiny items.
+ */
 void layoutItems(FrameGraphicsItem *parent)
 {
-    auto pos = parent->rect().topLeft();
-    const qreal h = FrameGraphicsItem::itemHeight();
+    const auto& parentRect = parent->rect();
+    const auto pos = parentRect.topLeft();
+    const qreal maxWidth = parentRect.width();
+    const qreal h = parentRect.height();
     const qreal y_margin = 2.;
     const qreal y = pos.y() - h - y_margin;
-    const qreal maxWidth = parent->rect().width();
     qreal x = pos.x();
 
     foreach (auto child, parent->childItems()) {
@@ -159,6 +142,9 @@ void layoutItems(FrameGraphicsItem *parent)
     }
 }
 
+/**
+ * Convert the top-down graph into a tree of FrameGraphicsItem.
+ */
 void toGraphicsItems(const Stack& data, FrameGraphicsItem *parent)
 {
     for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
@@ -169,24 +155,10 @@ void toGraphicsItems(const Stack& data, FrameGraphicsItem *parent)
     }
 }
 
-FrameGraphicsItem* buildGraphicsItems(const Stack& stack)
-{
-    double totalCost = 0;
-    foreach(const auto& frame, stack) {
-        totalCost += frame.cost;
-    }
-
-    KColorScheme scheme(QPalette::Active);
-    const QPen pen(scheme.foreground().color());
-
-    auto rootItem = new FrameGraphicsItem(totalCost, i18n("total allocations"));
-    rootItem->setBrush(scheme.background());
-    rootItem->setPen(pen);
-    toGraphicsItems(stack, rootItem);
-    return rootItem;
-}
-
-static void buildFlameGraph(const QVector<RowData>& mergedAllocations, Stack* topStack)
+/**
+ * Build a top-down graph from the bottom-up data in @p mergedAllocations
+ */
+void buildFlameGraph(const QVector<RowData>& mergedAllocations, Stack* topStack)
 {
     foreach (const auto& row, mergedAllocations) {
         if (row.children.isEmpty()) {
@@ -223,14 +195,12 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     m_view->setScene(m_scene);
     m_view->viewport()->installEventFilter(this);
     m_view->viewport()->setMouseTracking(true);
+    m_view->setFont(QFont(QStringLiteral("monospace")));
 
     layout()->addWidget(m_view);
 }
 
-FlameGraph::~FlameGraph()
-{
-
-}
+FlameGraph::~FlameGraph() = default;
 
 bool FlameGraph::eventFilter(QObject* object, QEvent* event)
 {
@@ -252,17 +222,30 @@ void FlameGraph::setData(FrameGraphicsItem* rootItem)
     m_scene->clear();
     m_rootItem = rootItem;
     // layouting needs a root item with a given height, the rest will be overwritten later
-    rootItem->setRect(0, 0, 800, FrameGraphicsItem::itemHeight());
+    rootItem->setRect(0, 0, 800, m_view->fontMetrics().height() + 4);
     m_scene->addItem(rootItem);
 
     zoomInto(m_rootItem);
 }
 
-FrameGraphicsItem * FlameGraph::parseData(const QVector<RowData>& data)
+FrameGraphicsItem* FlameGraph::parseData(const QVector<RowData>& data)
 {
     Stack stack;
     buildFlameGraph(data, &stack);
-    return buildGraphicsItems(stack);
+
+    double totalCost = 0;
+    foreach(const auto& frame, stack) {
+        totalCost += frame.cost;
+    }
+
+    KColorScheme scheme(QPalette::Active);
+    const QPen pen(scheme.foreground().color());
+
+    auto rootItem = new FrameGraphicsItem(totalCost, i18n("total allocations"));
+    rootItem->setBrush(scheme.background());
+    rootItem->setPen(pen);
+    toGraphicsItems(stack, rootItem);
+    return rootItem;
 }
 
 void FlameGraph::zoomInto(FrameGraphicsItem* item)
@@ -271,6 +254,8 @@ void FlameGraph::zoomInto(FrameGraphicsItem* item)
         return;
     }
 
+    // scale item and its parents to the maximum available width
+    // also hide all siblings of the parent items
     const auto rootWidth = m_view->viewport()->width() - 40;
     auto parent = item;
     while (parent) {
@@ -286,6 +271,9 @@ void FlameGraph::zoomInto(FrameGraphicsItem* item)
         parent = static_cast<FrameGraphicsItem*>(parent->parentItem());
     }
 
+    // then layout all items below the selected on
     layoutItems(item);
+
+    // and make sure it's visible
     m_view->centerOn(item);
 }

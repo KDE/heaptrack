@@ -34,11 +34,6 @@ public:
 
     quint64 cost() const;
 
-    static QFont font();
-    static QFontMetrics fontMetrics();
-    static int margin();
-    static int itemHeight();
-
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
 protected:
