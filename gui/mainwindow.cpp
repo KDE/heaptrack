@@ -27,8 +27,8 @@
 
 #include <QFileDialog>
 
-#include "bottomupmodel.h"
-#include "bottomupproxy.h"
+#include "treemodel.h"
+#include "treeproxy.h"
 #include "parser.h"
 #include "chartmodel.h"
 #include "chartproxy.h"
@@ -38,7 +38,8 @@ using namespace std;
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , m_ui(new Ui::MainWindow)
-    , m_bottomUpModel(new BottomUpModel(this))
+    , m_bottomUpModel(new TreeModel(this))
+    , m_topDownModel(new TreeModel(this))
     , m_chartModel(new ChartModel(this))
     , m_parser(new Parser(this))
 {
@@ -62,7 +63,9 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->allocatedTab->setModel(allocatedProxy);
 
     connect(m_parser, &Parser::bottomUpDataAvailable,
-            m_bottomUpModel, &BottomUpModel::resetData);
+            m_bottomUpModel, &TreeModel::resetData);
+    connect(m_parser, &Parser::topDownDataAvailable,
+            m_topDownModel, &TreeModel::resetData);
     connect(m_parser, &Parser::chartDataAvailable,
             m_chartModel, &ChartModel::resetData);
     connect(m_parser, &Parser::summaryAvailable,
@@ -72,20 +75,34 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_parser, &Parser::finished,
             this, [&] { m_ui->pages->setCurrentWidget(m_ui->resultsPage); });
 
-    auto bottomUpProxy = new BottomUpProxy(m_bottomUpModel);
+    auto bottomUpProxy = new TreeProxy(m_bottomUpModel);
     bottomUpProxy->setSourceModel(m_bottomUpModel);
-    m_ui->results->setModel(bottomUpProxy);
-    m_ui->results->hideColumn(BottomUpModel::FunctionColumn);
-    m_ui->results->hideColumn(BottomUpModel::FileColumn);
-    m_ui->results->hideColumn(BottomUpModel::LineColumn);
-    m_ui->results->hideColumn(BottomUpModel::ModuleColumn);
+    m_ui->bottomUpResults->setModel(bottomUpProxy);
+    m_ui->bottomUpResults->hideColumn(TreeModel::FunctionColumn);
+    m_ui->bottomUpResults->hideColumn(TreeModel::FileColumn);
+    m_ui->bottomUpResults->hideColumn(TreeModel::LineColumn);
+    m_ui->bottomUpResults->hideColumn(TreeModel::ModuleColumn);
 
-    connect(m_ui->filterFunction, &QLineEdit::textChanged,
-            bottomUpProxy, &BottomUpProxy::setFunctionFilter);
-    connect(m_ui->filterFile, &QLineEdit::textChanged,
-            bottomUpProxy, &BottomUpProxy::setFileFilter);
-    connect(m_ui->filterModule, &QLineEdit::textChanged,
-            bottomUpProxy, &BottomUpProxy::setModuleFilter);
+    connect(m_ui->bottomUpFilterFunction, &QLineEdit::textChanged,
+            bottomUpProxy, &TreeProxy::setFunctionFilter);
+    connect(m_ui->bottomUpFilterFile, &QLineEdit::textChanged,
+            bottomUpProxy, &TreeProxy::setFileFilter);
+    connect(m_ui->bottomUpFilterModule, &QLineEdit::textChanged,
+            bottomUpProxy, &TreeProxy::setModuleFilter);
+
+    auto topDownProxy = new TreeProxy(m_topDownModel);
+    topDownProxy->setSourceModel(m_topDownModel);
+    m_ui->topDownResults->setModel(topDownProxy);
+    m_ui->topDownResults->hideColumn(TreeModel::FunctionColumn);
+    m_ui->topDownResults->hideColumn(TreeModel::FileColumn);
+    m_ui->topDownResults->hideColumn(TreeModel::LineColumn);
+    m_ui->topDownResults->hideColumn(TreeModel::ModuleColumn);
+    connect(m_ui->topDownFilterFunction, &QLineEdit::textChanged,
+            bottomUpProxy, &TreeProxy::setFunctionFilter);
+    connect(m_ui->topDownFilterFile, &QLineEdit::textChanged,
+            bottomUpProxy, &TreeProxy::setFileFilter);
+    connect(m_ui->topDownFilterModule, &QLineEdit::textChanged,
+            bottomUpProxy, &TreeProxy::setModuleFilter);
 
     auto openFile = KStandardAction::open(this, SLOT(openFile()), this);
     m_ui->openFile->setDefaultAction(openFile);

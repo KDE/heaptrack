@@ -31,6 +31,14 @@ void laaa()
     bar();
 }
 
+void split()
+{
+    Foo f;
+    asdf();
+    bar();
+    laaa();
+}
+
 static Foo foo;
 
 int main()
@@ -71,6 +79,8 @@ int main()
         laaa();
     }
     laaa();
+
+    split();
 
     return 0;
 }

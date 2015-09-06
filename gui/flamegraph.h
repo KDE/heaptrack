@@ -22,7 +22,7 @@
 
 #include <QWidget>
 #include <QGraphicsRectItem>
-#include "bottomupmodel.h"
+#include "treemodel.h"
 
 class QGraphicsScene;
 class QGraphicsView;

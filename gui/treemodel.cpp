@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "bottomupmodel.h"
+#include "treemodel.h"
 
 #include <QDebug>
 #include <QTextStream>
@@ -27,14 +27,14 @@
 
 namespace {
 
-int indexOf(const RowData* row, const BottomUpData& siblings)
+int indexOf(const RowData* row, const TreeData& siblings)
 {
     Q_ASSERT(siblings.data() <= row);
     Q_ASSERT(siblings.data() + siblings.size() > row);
     return row - siblings.data();
 }
 
-const RowData* rowAt(const BottomUpData& rows, int row)
+const RowData* rowAt(const TreeData& rows, int row)
 {
     Q_ASSERT(rows.size() > row);
     return rows.data() + row;
@@ -42,17 +42,17 @@ const RowData* rowAt(const BottomUpData& rows, int row)
 
 }
 
-BottomUpModel::BottomUpModel(QObject* parent)
+TreeModel::TreeModel(QObject* parent)
     : QAbstractItemModel(parent)
 {
-    qRegisterMetaType<BottomUpData>();
+    qRegisterMetaType<TreeData>();
 }
 
-BottomUpModel::~BottomUpModel()
+TreeModel::~TreeModel()
 {
 }
 
-QVariant BottomUpModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (orientation != Qt::Horizontal || section < 0 || section >= NUM_COLUMNS) {
         return {};
@@ -112,7 +112,7 @@ QVariant BottomUpModel::headerData(int section, Qt::Orientation orientation, int
     return {};
 }
 
-QVariant BottomUpModel::data(const QModelIndex& index, int role) const
+QVariant TreeModel::data(const QModelIndex& index, int role) const
 {
     if (index.row() < 0 || index.column() < 0 || index.column() > NUM_COLUMNS) {
         return {};
@@ -181,7 +181,7 @@ QVariant BottomUpModel::data(const QModelIndex& index, int role) const
     return {};
 }
 
-QModelIndex BottomUpModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex TreeModel::index(int row, int column, const QModelIndex& parent) const
 {
     if (row < 0 || column  < 0 || column >= NUM_COLUMNS || row >= rowCount(parent)) {
         return QModelIndex();
@@ -189,7 +189,7 @@ QModelIndex BottomUpModel::index(int row, int column, const QModelIndex& parent)
     return createIndex(row, column, const_cast<void*>(reinterpret_cast<const void*>(toRow(parent))));
 }
 
-QModelIndex BottomUpModel::parent(const QModelIndex& child) const
+QModelIndex TreeModel::parent(const QModelIndex& child) const
 {
     if (!child.isValid()) {
         return {};
@@ -201,7 +201,7 @@ QModelIndex BottomUpModel::parent(const QModelIndex& child) const
     return createIndex(rowOf(parent), 0, const_cast<void*>(reinterpret_cast<const void*>(parent->parent)));
 }
 
-int BottomUpModel::rowCount(const QModelIndex& parent) const
+int TreeModel::rowCount(const QModelIndex& parent) const
 {
     if (!parent.isValid()) {
         return m_data.size();
@@ -213,19 +213,19 @@ int BottomUpModel::rowCount(const QModelIndex& parent) const
     return row->children.size();
 }
 
-int BottomUpModel::columnCount(const QModelIndex& /*parent*/) const
+int TreeModel::columnCount(const QModelIndex& /*parent*/) const
 {
     return NUM_COLUMNS;
 }
 
-void BottomUpModel::resetData(const BottomUpData& data)
+void TreeModel::resetData(const TreeData& data)
 {
     beginResetModel();
     m_data = data;
     endResetModel();
 }
 
-const RowData* BottomUpModel::toRow(const QModelIndex& index) const
+const RowData* TreeModel::toRow(const QModelIndex& index) const
 {
     if (!index.isValid()) {
         return nullptr;
@@ -237,13 +237,13 @@ const RowData* BottomUpModel::toRow(const QModelIndex& index) const
     }
 }
 
-const RowData* BottomUpModel::toParentRow(const QModelIndex& index) const
+const RowData* TreeModel::toParentRow(const QModelIndex& index) const
 {
     Q_ASSERT(index.isValid());
     return static_cast<const RowData*>(index.internalPointer());
 }
 
-int BottomUpModel::rowOf(const RowData* row) const
+int TreeModel::rowOf(const RowData* row) const
 {
     if (auto parent = row->parent) {
         return indexOf(row, parent->children);

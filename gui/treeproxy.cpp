@@ -17,55 +17,55 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "bottomupproxy.h"
+#include "treeproxy.h"
 
-#include "bottomupmodel.h"
+#include "treemodel.h"
 
-BottomUpProxy::BottomUpProxy(QObject* parent)
+TreeProxy::TreeProxy(QObject* parent)
     : KRecursiveFilterProxyModel(parent)
 {
 }
 
-BottomUpProxy::~BottomUpProxy() = default;
+TreeProxy::~TreeProxy() = default;
 
-void BottomUpProxy::setFunctionFilter(const QString& functionFilter)
+void TreeProxy::setFunctionFilter(const QString& functionFilter)
 {
     m_functionFilter = functionFilter;
     invalidate();
 }
 
-void BottomUpProxy::setFileFilter(const QString& fileFilter)
+void TreeProxy::setFileFilter(const QString& fileFilter)
 {
     m_fileFilter = fileFilter;
     invalidate();
 }
 
-void BottomUpProxy::setModuleFilter(const QString& moduleFilter)
+void TreeProxy::setModuleFilter(const QString& moduleFilter)
 {
     m_moduleFilter = moduleFilter;
     invalidate();
 }
 
-bool BottomUpProxy::acceptRow(int sourceRow, const QModelIndex& sourceParent) const
+bool TreeProxy::acceptRow(int sourceRow, const QModelIndex& sourceParent) const
 {
     auto source = sourceModel();
     if (!source) {
         return false;
     }
     if (!m_functionFilter.isEmpty()) {
-        const auto& function = source->index(sourceRow, BottomUpModel::FunctionColumn, sourceParent).data().toString();
+        const auto& function = source->index(sourceRow, TreeModel::FunctionColumn, sourceParent).data().toString();
         if (!function.contains(m_functionFilter, Qt::CaseInsensitive)) {
             return false;
         }
     }
     if (!m_fileFilter.isEmpty()) {
-        const auto& file = source->index(sourceRow, BottomUpModel::FileColumn, sourceParent).data().toString();
+        const auto& file = source->index(sourceRow, TreeModel::FileColumn, sourceParent).data().toString();
         if (!file.contains(m_fileFilter, Qt::CaseInsensitive)) {
             return false;
         }
     }
     if (!m_moduleFilter.isEmpty()) {
-        const auto& module = source->index(sourceRow, BottomUpModel::ModuleColumn, sourceParent).data().toString();
+        const auto& module = source->index(sourceRow, TreeModel::ModuleColumn, sourceParent).data().toString();
         if (!module.contains(m_moduleFilter, Qt::CaseInsensitive)) {
             return false;
         }

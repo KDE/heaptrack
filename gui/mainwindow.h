@@ -26,7 +26,7 @@ namespace Ui {
 class MainWindow;
 }
 
-class BottomUpModel;
+class TreeModel;
 class ChartModel;
 class Parser;
 
@@ -43,7 +43,8 @@ public slots:
 
 private:
     QScopedPointer<Ui::MainWindow> m_ui;
-    BottomUpModel* m_bottomUpModel;
+    TreeModel* m_bottomUpModel;
+    TreeModel* m_topDownModel;
     ChartModel* m_chartModel;
     Parser* m_parser;
 };

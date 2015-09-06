@@ -17,8 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef BOTTOMUPMODEL_H
-#define BOTTOMUPMODEL_H
+#ifndef TREEMODEL_H
+#define TREEMODEL_H
 
 #include <QAbstractItemModel>
 #include <QVector>
@@ -51,6 +51,7 @@ struct LocationData
         return i < 0;
     }
 };
+Q_DECLARE_TYPEINFO(LocationData, Q_MOVABLE_TYPE);
 
 struct RowData
 {
@@ -68,15 +69,15 @@ struct RowData
 };
 
 Q_DECLARE_TYPEINFO(RowData, Q_MOVABLE_TYPE);
-using BottomUpData = QVector<RowData>;
-Q_DECLARE_METATYPE(BottomUpData)
+using TreeData = QVector<RowData>;
+Q_DECLARE_METATYPE(TreeData)
 
-class BottomUpModel : public QAbstractItemModel
+class TreeModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:
-    BottomUpModel(QObject* parent);
-    virtual ~BottomUpModel();
+    TreeModel(QObject* parent);
+    virtual ~TreeModel();
 
     enum Columns {
         AllocationsColumn,
@@ -99,7 +100,7 @@ public:
     int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
 public slots:
-    void resetData(const BottomUpData& data);
+    void resetData(const TreeData& data);
 
 private:
     /// @return the row resembled by @p index
@@ -109,8 +110,8 @@ private:
     /// @return the row number of @p row in its parent
     int rowOf(const RowData* row) const;
 
-    BottomUpData m_data;
+    TreeData m_data;
 };
 
-#endif // BOTTOMUPMODEL_H
+#endif // TREEMODEL_H
 

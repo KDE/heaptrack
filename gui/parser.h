@@ -22,7 +22,7 @@
 
 #include <QObject>
 
-#include "bottomupmodel.h"
+#include "treemodel.h"
 #include "chartmodel.h"
 
 class FrameGraphicsItem;
@@ -39,7 +39,8 @@ public slots:
 
 signals:
     void summaryAvailable(const QString& summary);
-    void bottomUpDataAvailable(const BottomUpData& data);
+    void bottomUpDataAvailable(const TreeData& data);
+    void topDownDataAvailable(const TreeData& data);
     void chartDataAvailable(const ChartData& data);
     void flameGraphDataAvailable(FrameGraphicsItem* rootItem);
     void finished();

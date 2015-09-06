@@ -176,6 +176,56 @@ QVector<RowData> mergeAllocations(const AccumulatedTraceData& data)
     setParents(topRows, nullptr);
     return topRows;
 }
+
+RowData* findByLocation(const RowData& row, QVector<RowData>* data)
+{
+    for (int i = 0; i < data->size(); ++i) {
+        if (data->at(i).location == row.location) {
+            return data->data() + i;
+        }
+    }
+    return nullptr;
+}
+
+void buildTopDown(const QVector<RowData>& bottomUpData, QVector<RowData>* topDownData)
+{
+    foreach (const auto& row, bottomUpData) {
+        if (row.children.isEmpty()) {
+            // leaf node found, bubble up the parent chain to build a top-down tree
+            auto node = &row;
+            auto stack = topDownData;
+            while (node) {
+                auto data = findByLocation(*node, stack);
+                if (!data) {
+                    // create an empty top-down item for this bottom-up node
+                    *stack << RowData{0, 0, 0, 0, node->location, nullptr, {}};
+                    data = &stack->back();
+                }
+                // always use the leaf node's cost and propagate that one up the chain
+                // otherwise we'd count the cost of some nodes multiple times
+                data->allocations += row.allocations;
+                data->peak += row.peak;
+                data->leaked += row.leaked;
+                data->allocated += row.allocated;
+                stack = &data->children;
+                node = node->parent;
+            }
+        } else {
+            // recurse to find a leaf
+            buildTopDown(row.children, topDownData);
+        }
+    }
+}
+
+QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
+{
+    QVector<RowData> topRows;
+    buildTopDown(bottomUpData, &topRows);
+    // now set the parents, the data is constant from here on
+    setParents(topRows, nullptr);
+    return topRows;
+}
+
 }
 
 Parser::Parser(QObject* parent)
@@ -194,6 +244,8 @@ void Parser::parse(const QString& path)
         const auto mergedAllocations = mergeAllocations(data);
         emit bottomUpDataAvailable(mergedAllocations);
         emit chartDataAvailable(data.chartData);
+        const auto topDownData = toTopDownData(mergedAllocations);
+        emit topDownDataAvailable(topDownData);
         emit flameGraphDataAvailable(FlameGraph::parseData(mergedAllocations));
         emit finished();
     });

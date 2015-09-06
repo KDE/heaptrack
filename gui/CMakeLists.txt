@@ -14,8 +14,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 add_executable(heaptrack_gui
     gui.cpp
     mainwindow.cpp
-    bottomupmodel.cpp
-    bottomupproxy.cpp
+    treemodel.cpp
+    treeproxy.cpp
     chartwidget.cpp
     chartmodel.cpp
     chartproxy.cpp

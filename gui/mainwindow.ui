@@ -104,7 +104,7 @@
              <widget class="QWidget" name="widget" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout">
                <property name="spacing">
-                <number>0</number>
+                <number>6</number>
                </property>
                <property name="leftMargin">
                 <number>0</number>
@@ -119,21 +119,21 @@
                 <number>0</number>
                </property>
                <item>
-                <widget class="QLineEdit" name="filterFunction">
+                <widget class="QLineEdit" name="bottomUpFilterFunction">
                  <property name="placeholderText">
                   <string>filter by function...</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="filterFile">
+                <widget class="QLineEdit" name="bottomUpFilterFile">
                  <property name="placeholderText">
                   <string>filter by file...</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLineEdit" name="filterModule">
+                <widget class="QLineEdit" name="bottomUpFilterModule">
                  <property name="placeholderText">
                   <string>filter by module...</string>
                  </property>
@@ -143,7 +143,69 @@
              </widget>
             </item>
             <item>
-             <widget class="QTreeView" name="results">
+             <widget class="QTreeView" name="bottomUpResults">
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="rootIsDecorated">
+               <bool>true</bool>
+              </property>
+              <property name="uniformRowHeights">
+               <bool>true</bool>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="topDownTab">
+           <attribute name="title">
+            <string>Top-Down</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QWidget" name="widget_2" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLineEdit" name="topDownFilterFunction">
+                 <property name="placeholderText">
+                  <string>filter by function...</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="topDownFilterFile">
+                 <property name="placeholderText">
+                  <string>filter by file...</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="topDownFilterModule">
+                 <property name="placeholderText">
+                  <string>filter by module...</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTreeView" name="topDownResults">
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
