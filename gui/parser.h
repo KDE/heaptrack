@@ -25,6 +25,8 @@
 #include "bottomupmodel.h"
 #include "chartmodel.h"
 
+class FrameGraphicsItem;
+
 class Parser : public QObject
 {
     Q_OBJECT
@@ -39,6 +41,7 @@ signals:
     void summaryAvailable(const QString& summary);
     void bottomUpDataAvailable(const BottomUpData& data);
     void chartDataAvailable(const ChartData& data);
+    void flameGraphDataAvailable(FrameGraphicsItem* rootItem);
     void finished();
 };
 

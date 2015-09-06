@@ -21,6 +21,7 @@ add_executable(heaptrack_gui
     chartproxy.cpp
     modeltest.cpp
     parser.cpp
+    flamegraph.cpp
     ${UIFILES}
 )
 

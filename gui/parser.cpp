@@ -27,6 +27,7 @@
 #include <QDebug>
 
 #include "../accumulatedtracedata.h"
+#include "flamegraph.h"
 
 #include <vector>
 
@@ -164,6 +165,9 @@ QVector<RowData> mergeAllocations(const AccumulatedTraceData& data)
                 it = rows->insert(it, {allocation.allocations, allocation.peak, allocation.leaked, allocation.allocated,
                                         location, nullptr, {}});
             }
+            if (data.isStopIndex(ip.functionIndex)) {
+                break;
+            }
             traceIndex = trace.parentIndex;
             rows = &it->children;
         }
@@ -187,8 +191,10 @@ void Parser::parse(const QString& path)
         ParserData data;
         data.read(path.toStdString());
         emit summaryAvailable(generateSummary(data));
-        emit bottomUpDataAvailable(mergeAllocations(data));
+        const auto mergedAllocations = mergeAllocations(data);
+        emit bottomUpDataAvailable(mergedAllocations);
         emit chartDataAvailable(data.chartData);
+        emit flameGraphDataAvailable(FlameGraph::parseData(mergedAllocations));
         emit finished();
     });
 }
