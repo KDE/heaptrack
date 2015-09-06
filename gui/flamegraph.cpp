@@ -187,6 +187,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     , m_scene(new QGraphicsScene(this))
     , m_view(new QGraphicsView(this))
     , m_rootItem(nullptr)
+    , m_selectedItem(nullptr)
     , m_minRootWidth(0)
 {
     setLayout(new QVBoxLayout);
@@ -209,10 +210,10 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
     if (event->type() == QEvent::MouseButtonRelease) {
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
-            zoomInto(static_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos())));
+            selectItem(static_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos())));
         }
     } else if (event->type() == QEvent::Resize || event->type() == QEvent::Show) {
-        zoomInto(m_rootItem);
+        selectItem(m_selectedItem);
     }
     return ret;
 }
@@ -221,11 +222,14 @@ void FlameGraph::setData(FrameGraphicsItem* rootItem)
 {
     m_scene->clear();
     m_rootItem = rootItem;
+    m_selectedItem = rootItem;
     // layouting needs a root item with a given height, the rest will be overwritten later
     rootItem->setRect(0, 0, 800, m_view->fontMetrics().height() + 4);
     m_scene->addItem(rootItem);
 
-    zoomInto(m_rootItem);
+    if (isVisible()) {
+        selectItem(m_rootItem);
+    }
 }
 
 FrameGraphicsItem* FlameGraph::parseData(const QVector<RowData>& data)
@@ -248,7 +252,7 @@ FrameGraphicsItem* FlameGraph::parseData(const QVector<RowData>& data)
     return rootItem;
 }
 
-void FlameGraph::zoomInto(FrameGraphicsItem* item)
+void FlameGraph::selectItem(FrameGraphicsItem* item)
 {
     if (!item) {
         return;
@@ -276,4 +280,6 @@ void FlameGraph::zoomInto(FrameGraphicsItem* item)
 
     // and make sure it's visible
     m_view->centerOn(item);
+
+    m_selectedItem = item;
 }

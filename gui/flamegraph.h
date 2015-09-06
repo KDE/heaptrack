@@ -61,11 +61,12 @@ protected:
     bool eventFilter(QObject* object, QEvent* event) override;
 
 private:
-    void zoomInto(FrameGraphicsItem* item);
+    void selectItem(FrameGraphicsItem* item);
 
     QGraphicsScene* m_scene;
     QGraphicsView* m_view;
     FrameGraphicsItem* m_rootItem;
+    FrameGraphicsItem* m_selectedItem;
     int m_minRootWidth;
 };
 
