@@ -33,6 +33,8 @@ public:
     FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent = nullptr);
 
     quint64 cost() const;
+    void setCost(quint64 cost);
+    QString function() const;
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
@@ -56,7 +58,7 @@ public:
 
     void setData(FrameGraphicsItem* rootFrame);
     // called from background thread
-    static FrameGraphicsItem* parseData(const QVector<RowData>& data);
+    static FrameGraphicsItem* parseData(const QVector<RowData>& topDownData);
 
 protected:
     bool eventFilter(QObject* object, QEvent* event) override;

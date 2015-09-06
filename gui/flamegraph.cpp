@@ -49,6 +49,16 @@ quint64 FrameGraphicsItem::cost() const
     return m_cost;
 }
 
+void FrameGraphicsItem::setCost(quint64 cost)
+{
+    m_cost = cost;
+}
+
+QString FrameGraphicsItem::function() const
+{
+    return m_function;
+}
+
 void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* /*widget*/)
 {
     if (isSelected() || m_isHovered) {
@@ -107,13 +117,6 @@ void FrameGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 
 namespace {
 
-struct Frame {
-    quint64 cost = 0;
-    using Stack = QMap<QString, Frame>;
-    Stack children;
-};
-using Stack = Frame::Stack;
-
 /**
  * Generate a color from the "mem" color space used in upstream FlameGraph.pl
  */
@@ -145,41 +148,32 @@ void layoutItems(FrameGraphicsItem *parent)
     }
 }
 
-/**
- * Convert the top-down graph into a tree of FrameGraphicsItem.
- */
-void toGraphicsItems(const Stack& data, FrameGraphicsItem *parent)
+FrameGraphicsItem* findItemByFunction(const QList<QGraphicsItem*>& items, const QString& function)
 {
-    for (auto it = data.constBegin(); it != data.constEnd(); ++it) {
-        FrameGraphicsItem* item = new FrameGraphicsItem(it.value().cost, it.key(), parent);
-        item->setPen(parent->pen());
-        item->setBrush(color());
-        toGraphicsItems(it.value().children, item);
+    foreach (auto item_, items) {
+        auto item = static_cast<FrameGraphicsItem*>(item_);
+        if (item->function() == function) {
+            return item;
+        }
     }
+    return nullptr;
 }
 
 /**
- * Build a top-down graph from the bottom-up data in @p mergedAllocations
+ * Convert the top-down graph into a tree of FrameGraphicsItem.
  */
-void buildFlameGraph(const QVector<RowData>& mergedAllocations, Stack* topStack)
+void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent)
 {
-    foreach (const auto& row, mergedAllocations) {
-        if (row.children.isEmpty()) {
-            // leaf node found, bubble up the parent chain to build a top-down tree
-            auto node = &row;
-            auto stack = topStack;
-            while (node) {
-                auto& data = (*stack)[node->location.function];
-                // always use the leaf node's cost and propagate that one up the chain
-                // otherwise we'd count the cost of some nodes multiple times
-                data.cost += row.allocations;
-                stack = &data.children;
-                node = node->parent;
-            }
+    foreach (const auto& row, data) {
+        auto item = findItemByFunction(parent->childItems(), row.location.function);
+        if (!item) {
+            item = new FrameGraphicsItem(row.allocations, row.location.function, parent);
+            item->setPen(parent->pen());
+            item->setBrush(color());
         } else {
-            // recurse to find a leaf
-            buildFlameGraph(row.children, topStack);
+            item->setCost(item->cost() + row.allocations);
         }
+        toGraphicsItems(row.children, item);
     }
 }
 
@@ -235,23 +229,20 @@ void FlameGraph::setData(FrameGraphicsItem* rootItem)
     }
 }
 
-FrameGraphicsItem* FlameGraph::parseData(const QVector<RowData>& data)
+FrameGraphicsItem* FlameGraph::parseData(const QVector<RowData>& topDownData)
 {
-    Stack stack;
-    buildFlameGraph(data, &stack);
-
     double totalCost = 0;
-    foreach(const auto& frame, stack) {
-        totalCost += frame.cost;
+    foreach(const auto& frame, topDownData) {
+        totalCost += frame.allocations;
     }
 
     KColorScheme scheme(QPalette::Active);
     const QPen pen(scheme.foreground().color());
 
-    auto rootItem = new FrameGraphicsItem(totalCost, i18n("total allocations"));
+    auto rootItem = new FrameGraphicsItem(totalCost, i18n("%1 allocations in total", totalCost));
     rootItem->setBrush(scheme.background());
     rootItem->setPen(pen);
-    toGraphicsItems(stack, rootItem);
+    toGraphicsItems(topDownData, rootItem);
     return rootItem;
 }
 

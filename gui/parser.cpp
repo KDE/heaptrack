@@ -246,7 +246,7 @@ void Parser::parse(const QString& path)
         emit chartDataAvailable(data.chartData);
         const auto topDownData = toTopDownData(mergedAllocations);
         emit topDownDataAvailable(topDownData);
-        emit flameGraphDataAvailable(FlameGraph::parseData(mergedAllocations));
+        emit flameGraphDataAvailable(FlameGraph::parseData(topDownData));
         emit finished();
     });
 }
