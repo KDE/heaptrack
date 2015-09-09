@@ -18,6 +18,7 @@
  */
 
 #include "chartproxy.h"
+#include "chartmodel.h"
 
 ChartProxy::ChartProxy(const QString& label, int column, QObject* parent)
     : QSortFilterProxyModel(parent)
@@ -38,5 +39,6 @@ QVariant ChartProxy::headerData(int section, Qt::Orientation orientation, int ro
 
 bool ChartProxy::filterAcceptsColumn(int sourceColumn, const QModelIndex& /*sourceParent*/) const
 {
-    return sourceColumn == 0 || sourceColumn == m_column;
+    const auto column = sourceColumn % 4;
+    return column == ChartModel::TimeStampColumn || column == m_column;
 }

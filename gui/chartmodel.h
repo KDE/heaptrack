@@ -25,14 +25,21 @@
 
 struct ChartRow
 {
-    quint64 timeStamp;
-    quint64 leaked;
-    quint64 allocations;
-    quint64 allocated;
+    QString function;
+    quint64 cost;
 };
-
 Q_DECLARE_TYPEINFO(ChartRow, Q_MOVABLE_TYPE);
-using ChartData = QVector<ChartRow>;
+
+struct ChartRows
+{
+    quint64 timeStamp;
+    QVector<ChartRow> leaked;
+    QVector<ChartRow> allocations;
+    QVector<ChartRow> allocated;
+};
+Q_DECLARE_TYPEINFO(ChartRows, Q_MOVABLE_TYPE);
+
+using ChartData = QVector<ChartRows>;
 Q_DECLARE_METATYPE(ChartData)
 
 class ChartModel : public QAbstractTableModel
@@ -41,6 +48,14 @@ class ChartModel : public QAbstractTableModel
 public:
     explicit ChartModel(QObject* parent = nullptr);
     virtual ~ChartModel();
+
+    enum Columns {
+        TimeStampColumn,
+        LeakedColumn,
+        AllocationsColumn,
+        AllocatedColumn,
+        NUM_COLUMNS
+    };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;

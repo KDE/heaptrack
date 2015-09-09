@@ -50,15 +50,15 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->loadingProgress->setMinimum(0);
     m_ui->loadingProgress->setMaximum(0);
 
-    auto leakedProxy = new ChartProxy(i18n("Memory Leaked"), 1, this);
+    auto leakedProxy = new ChartProxy(i18n("Memory Leaked"), ChartModel::LeakedColumn, this);
     leakedProxy->setSourceModel(m_chartModel);
     m_ui->leakedTab->setModel(leakedProxy);
 
-    auto allocationsProxy = new ChartProxy(i18n("Memory Allocations"), 2, this);
+    auto allocationsProxy = new ChartProxy(i18n("Memory Allocations"), ChartModel::AllocationsColumn, this);
     allocationsProxy->setSourceModel(m_chartModel);
     m_ui->allocationsTab->setModel(allocationsProxy);
 
-    auto allocatedProxy = new ChartProxy(i18n("Memory Allocated"), 3, this);
+    auto allocatedProxy = new ChartProxy(i18n("Memory Allocated"), ChartModel::AllocatedColumn, this);
     allocatedProxy->setSourceModel(m_chartModel);
     m_ui->allocatedTab->setModel(allocatedProxy);
 

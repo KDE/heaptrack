@@ -38,13 +38,41 @@ struct ParserData final : public AccumulatedTraceData
 {
     ParserData()
     {
-        chartData.push_back({0, 0, 0, 0});
+        chartData.push_back({0, {{i18n("total"), 0}}, {{i18n("total"), 0}}, {{i18n("total"), 0}}});
     }
 
     void handleTimeStamp(uint64_t /*newStamp*/, uint64_t oldStamp)
     {
         maxLeakedSinceLastTimeStamp = max(maxLeakedSinceLastTimeStamp, leaked);
-        chartData.push_back({oldStamp, maxLeakedSinceLastTimeStamp, totalAllocations, totalAllocated});
+        ChartRows data;
+        data.timeStamp = oldStamp;
+        data.leaked.push_back({i18n("total"), maxLeakedSinceLastTimeStamp});
+        data.allocations.push_back({i18n("total"), totalAllocations});
+        data.allocated.push_back({i18n("total"), totalAllocated});
+
+        auto allocs = allocations;
+        sort(allocs.begin(), allocs.end(), [] (const Allocation& left, const Allocation& right) {
+            return left.leaked < right.leaked;
+        });
+        for (size_t i = 0; i < min(size_t(10), allocs.size()); ++i) {
+            QString function;
+            data.leaked.push_back({function, allocs[i].leaked});
+        }
+        sort(allocs.begin(), allocs.end(), [] (const Allocation& left, const Allocation& right) {
+            return left.allocations < right.allocations;
+        });
+        for (size_t i = 0; i < min(size_t(10), allocs.size()); ++i) {
+            QString function;
+            data.allocations.push_back({function, allocs[i].allocations});
+        }
+        sort(allocs.begin(), allocs.end(), [] (const Allocation& left, const Allocation& right) {
+            return left.allocated < right.allocated;
+        });
+        for (size_t i = 0; i < min(size_t(10), allocs.size()); ++i) {
+            QString function;
+            data.allocated.push_back({function, allocs[i].allocated});
+        }
+        chartData.push_back(data);
         maxLeakedSinceLastTimeStamp = 0;
     }
 

@@ -84,6 +84,7 @@ ChartWidget::ChartWidget(QWidget* parent)
     setLayout(layout);
 
     m_plotter->setAntiAliasing(true);
+    m_plotter->setType(KChart::Plotter::Stacked);
 
     KColorScheme scheme(QPalette::Active, KColorScheme::Window);
     QPen foreground(scheme.foreground().color());
