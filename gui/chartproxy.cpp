@@ -20,6 +20,8 @@
 #include "chartproxy.h"
 #include "chartmodel.h"
 
+#include <QDebug>
+
 ChartProxy::ChartProxy(const QString& label, int column, QObject* parent)
     : QSortFilterProxyModel(parent)
     , m_label(label)
@@ -35,6 +37,18 @@ QVariant ChartProxy::headerData(int section, Qt::Orientation orientation, int ro
         return m_label;
     }
     return QSortFilterProxyModel::headerData(section, orientation, role);
+}
+
+QVariant ChartProxy::data(const QModelIndex& proxyIndex, int role) const
+{
+    static_assert(ChartModel::TimeStampColumn == 0, "The code below assumes the time stamp column comes with value 0.");
+    if (role == Qt::ToolTipRole && proxyIndex.column() == 0) {
+        // KChart queries the tooltip for the timestamp column, which is not useful for us
+        // instead, we want to use the m_column, or in proxy column value that is 1
+        return QSortFilterProxyModel::data(index(proxyIndex.row(), 1, proxyIndex.parent()), role);
+    } else {
+        return QSortFilterProxyModel::data(proxyIndex, role);
+    }
 }
 
 bool ChartProxy::filterAcceptsColumn(int sourceColumn, const QModelIndex& /*sourceParent*/) const

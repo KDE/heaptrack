@@ -21,6 +21,7 @@
 
 #include <KChartGlobal>
 #include <KChartLineAttributes>
+#include <KLocalizedString>
 
 #include <QPen>
 #include <QBrush>
@@ -32,6 +33,23 @@ namespace {
 QColor colorForColumn(int column, int columnCount)
 {
     return QColor::fromHsv((1. - double(column + 1) / columnCount) * 255, 255, 255);
+}
+
+QVector<ChartRow> columnValue(const ChartRows& data, int column)
+{
+    if (column == ChartModel::LeakedColumn) {
+        return data.leaked;
+    } else if (column == ChartModel::AllocationsColumn) {
+        return data.allocations;
+    } else {
+        return data.allocated;
+    }
+}
+
+ChartRow indexValue(const ChartRows& data, int idx, int column)
+{
+    const auto& values = columnValue(data, column);
+    return idx < values.size() ? values[idx] : ChartRow();
 }
 }
 
@@ -90,23 +108,20 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
         return {};
     }
 
-    if ( role == Qt::ToolTipRole ) {
-        // TODO
-        return {};
-    }
-
     const auto& data = m_data.at(index.row());
+
     if (column == TimeStampColumn) {
         return data.timeStamp;
     }
 
-    if (column == LeakedColumn) {
-        return idx < data.leaked.size() ? data.leaked[idx].cost : 0;
-    } else if (column == AllocationsColumn) {
-        return idx < data.allocations.size() ? data.allocations[idx].cost : 0;
-    } else {
-        return idx < data.allocated.size() ? data.allocated[idx].cost : 0;
+    const auto& chartRow = indexValue(data, idx, column);
+
+    if ( role == Qt::ToolTipRole ) {
+        // TODO: use correct label for column, format cost and time properly in a human readable way
+        return i18n("%1: %2 at %3", chartRow.function, chartRow.cost, data.timeStamp);
     }
+
+    return chartRow.cost;
 }
 
 int ChartModel::columnCount(const QModelIndex& /*parent*/) const

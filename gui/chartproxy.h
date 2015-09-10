@@ -29,8 +29,10 @@ public:
     explicit ChartProxy(const QString& label, int column, QObject* parent = nullptr);
     virtual ~ChartProxy();
 
-protected:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+    QVariant data(const QModelIndex & proxyIndex, int role = Qt::DisplayRole) const override;
+
+protected:
     bool filterAcceptsColumn(int sourceColumn, const QModelIndex& sourceParent) const override;
 
 private:
