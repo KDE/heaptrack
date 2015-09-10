@@ -20,11 +20,12 @@
 #include "chartproxy.h"
 #include "chartmodel.h"
 
+#include <KLocalizedString>
+
 #include <QDebug>
 
-ChartProxy::ChartProxy(const QString& label, int column, QObject* parent)
+ChartProxy::ChartProxy(ChartModel::Columns column, QObject* parent)
     : QSortFilterProxyModel(parent)
-    , m_label(label)
     , m_column(column)
 {}
 
@@ -33,9 +34,6 @@ ChartProxy::~ChartProxy() = default;
 QVariant ChartProxy::headerData(int section, Qt::Orientation orientation, int role) const
 {
     Q_ASSERT(orientation != Qt::Horizontal || section < columnCount());
-    if (section == 0 && orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-        return m_label;
-    }
     return QSortFilterProxyModel::headerData(section, orientation, role);
 }
 

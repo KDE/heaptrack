@@ -21,13 +21,13 @@
 #define CHARTWIDGET_H
 
 #include <QWidget>
+#include "chartmodel.h"
 
 namespace KChart {
 class Chart;
 class Plotter;
 }
 
-class ChartModel;
 class QAbstractItemModel;
 
 class ChartWidget : public QWidget
@@ -37,7 +37,7 @@ public:
     explicit ChartWidget(QWidget* parent = nullptr);
     virtual ~ChartWidget();
 
-    void setModel(QAbstractItemModel* model);
+    void setModel(ChartModel* model, ChartModel::Columns costColumn);
 
 private:
     KChart::Chart* m_chart;

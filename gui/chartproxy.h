@@ -21,12 +21,13 @@
 #define CHARTPROXY_H
 
 #include <QSortFilterProxyModel>
+#include "chartmodel.h"
 
 class ChartProxy : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    explicit ChartProxy(const QString& label, int column, QObject* parent = nullptr);
+    explicit ChartProxy(ChartModel::Columns column, QObject* parent = nullptr);
     virtual ~ChartProxy();
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -36,8 +37,7 @@ protected:
     bool filterAcceptsColumn(int sourceColumn, const QModelIndex& sourceParent) const override;
 
 private:
-    QString m_label;
-    int m_column;
+    ChartModel::Columns m_column;
 };
 
 #endif //CHARTPROXY_H

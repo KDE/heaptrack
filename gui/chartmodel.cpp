@@ -71,6 +71,19 @@ QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int ro
         } else if (role == KChart::DatasetBrushRole) {
             return QVariant::fromValue(QBrush(colorForColumn(section, columnCount())));
         }
+
+        if (role == Qt::DisplayRole || Qt::ToolTipRole) {
+            switch (section) {
+            case ChartModel::AllocatedColumn:
+                return i18n("Memory Allocated");
+            case ChartModel::AllocationsColumn:
+                return i18n("Memory Allocations");
+            case ChartModel::LeakedColumn:
+                return i18n("Memory Leaked");
+            case ChartModel::TimeStampColumn:
+                return i18n("Elapsed Time");
+            }
+        }
     }
     return {};
 }

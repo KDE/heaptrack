@@ -36,7 +36,7 @@
 #include <KLocalizedString>
 #include <KColorScheme>
 
-#include "chartmodel.h"
+#include "chartproxy.h"
 
 using namespace KChart;
 
@@ -52,8 +52,7 @@ public:
     virtual const QString customizedLabel(const QString& label) const
     {
         // squeeze large numbers here
-        // TODO: when the unit is 'b' also use prettyCost() here
-        return QString::number(label.toDouble());
+        return QString::number(label.toDouble() / 1000, 'g', 2) + QLatin1Char('s');
     }
 };
 
@@ -86,26 +85,6 @@ ChartWidget::ChartWidget(QWidget* parent)
     m_plotter->setAntiAliasing(true);
     m_plotter->setType(KChart::Plotter::Stacked);
 
-    KColorScheme scheme(QPalette::Active, KColorScheme::Window);
-    QPen foreground(scheme.foreground().color());
-    auto bottomAxis = new TimeAxis(m_plotter);
-    auto axisTextAttributes = bottomAxis->textAttributes();
-    axisTextAttributes.setPen(foreground);
-    bottomAxis->setTextAttributes(axisTextAttributes);
-    auto axisTitleTextAttributes = bottomAxis->titleTextAttributes();
-    axisTitleTextAttributes.setPen(foreground);
-    bottomAxis->setTitleTextAttributes(axisTitleTextAttributes);
-    bottomAxis->setTitleText(i18n("time in ms"));
-    bottomAxis->setPosition(KChart::CartesianAxis::Bottom);
-    m_plotter->addAxis(bottomAxis);
-
-    auto* rightAxis = new SizeAxis(m_plotter);
-    rightAxis->setTextAttributes(axisTextAttributes);
-    rightAxis->setTitleTextAttributes(axisTitleTextAttributes);
-    rightAxis->setTitleText(i18n("memory heap size"));
-    rightAxis->setPosition(CartesianAxis::Right);
-    m_plotter->addAxis(rightAxis);
-
     auto* coordinatePlane = dynamic_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
     Q_ASSERT(coordinatePlane);
     coordinatePlane->addDiagram(m_plotter);
@@ -113,9 +92,42 @@ ChartWidget::ChartWidget(QWidget* parent)
 
 ChartWidget::~ChartWidget() = default;
 
-void ChartWidget::setModel(QAbstractItemModel* model)
+void ChartWidget::setModel(ChartModel* model, ChartModel::Columns costColumn)
 {
-    m_plotter->setModel(model);
+    if (m_plotter->model()) {
+        delete m_plotter->model();
+    }
+
+    Q_ASSERT(costColumn != ChartModel::TimeStampColumn);
+    auto proxy = new ChartProxy(costColumn, this);
+    proxy->setSourceModel(model);
+
+    foreach (auto axis, m_plotter->axes()) {
+        m_plotter->takeAxis(axis);
+        delete axis;
+    }
+
+    KColorScheme scheme(QPalette::Active, KColorScheme::Window);
+    const QPen foreground(scheme.foreground().color());
+    auto bottomAxis = new TimeAxis(m_plotter);
+    auto axisTextAttributes = bottomAxis->textAttributes();
+    axisTextAttributes.setPen(foreground);
+    bottomAxis->setTextAttributes(axisTextAttributes);
+    auto axisTitleTextAttributes = bottomAxis->titleTextAttributes();
+    axisTitleTextAttributes.setPen(foreground);
+    bottomAxis->setTitleTextAttributes(axisTitleTextAttributes);
+    bottomAxis->setTitleText(model->headerData(ChartModel::TimeStampColumn).toString());
+    bottomAxis->setPosition(KChart::CartesianAxis::Bottom);
+    m_plotter->addAxis(bottomAxis);
+
+    CartesianAxis* rightAxis = costColumn == ChartModel::AllocationsColumn ? new CartesianAxis(m_plotter) : new SizeAxis(m_plotter);
+    rightAxis->setTextAttributes(axisTextAttributes);
+    rightAxis->setTitleTextAttributes(axisTitleTextAttributes);
+    rightAxis->setTitleText(model->headerData(costColumn).toString());
+    rightAxis->setPosition(CartesianAxis::Right);
+    m_plotter->addAxis(rightAxis);
+
+    m_plotter->setModel(proxy);
 }
 
 #include "chartwidget.moc"
