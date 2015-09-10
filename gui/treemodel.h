@@ -67,8 +67,8 @@ struct RowData
         return location < rhs;
     }
 };
-
 Q_DECLARE_TYPEINFO(RowData, Q_MOVABLE_TYPE);
+
 using TreeData = QVector<RowData>;
 Q_DECLARE_METATYPE(TreeData)
 
