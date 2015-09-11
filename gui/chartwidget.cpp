@@ -99,7 +99,7 @@ void ChartWidget::setModel(ChartModel* model, ChartModel::Columns costColumn)
     }
 
     Q_ASSERT(costColumn != ChartModel::TimeStampColumn);
-    auto proxy = new ChartProxy(costColumn, this);
+    auto proxy = new ChartProxy(costColumn, false, this);
     proxy->setSourceModel(model);
 
     foreach (auto axis, m_plotter->axes()) {

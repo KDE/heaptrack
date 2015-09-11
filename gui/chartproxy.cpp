@@ -24,10 +24,12 @@
 
 #include <QDebug>
 
-ChartProxy::ChartProxy(ChartModel::Columns column, QObject* parent)
+ChartProxy::ChartProxy(ChartModel::Columns column, bool showTotal, QObject* parent)
     : QSortFilterProxyModel(parent)
     , m_column(column)
-{}
+    , m_showTotal(showTotal)
+{
+}
 
 ChartProxy::~ChartProxy() = default;
 
@@ -40,10 +42,10 @@ QVariant ChartProxy::headerData(int section, Qt::Orientation orientation, int ro
 QVariant ChartProxy::data(const QModelIndex& proxyIndex, int role) const
 {
     static_assert(ChartModel::TimeStampColumn == 0, "The code below assumes the time stamp column comes with value 0.");
-    if (role == Qt::ToolTipRole && proxyIndex.column() == 0) {
+    if (role == Qt::ToolTipRole) {
         // KChart queries the tooltip for the timestamp column, which is not useful for us
         // instead, we want to use the m_column, or in proxy column value that is 1
-        return QSortFilterProxyModel::data(index(proxyIndex.row(), 1, proxyIndex.parent()), role);
+        return QSortFilterProxyModel::data(index(proxyIndex.row(), proxyIndex.column() + 1, proxyIndex.parent()), role);
     } else {
         return QSortFilterProxyModel::data(proxyIndex, role);
     }
@@ -51,6 +53,10 @@ QVariant ChartProxy::data(const QModelIndex& proxyIndex, int role) const
 
 bool ChartProxy::filterAcceptsColumn(int sourceColumn, const QModelIndex& /*sourceParent*/) const
 {
-    const auto column = sourceColumn % 4;
+    if (m_showTotal && sourceColumn >= ChartModel::NUM_COLUMNS)
+        return false;
+    else if (!m_showTotal && sourceColumn < ChartModel::NUM_COLUMNS)
+        return false;
+    const auto column = sourceColumn % ChartModel::NUM_COLUMNS;
     return column == ChartModel::TimeStampColumn || column == m_column;
 }

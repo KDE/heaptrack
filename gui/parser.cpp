@@ -34,91 +34,12 @@
 using namespace std;
 
 namespace {
-struct ParserData final : public AccumulatedTraceData
-{
-    ParserData()
-    {
-        chartData.push_back({0, {{i18n("total"), 0}}, {{i18n("total"), 0}}, {{i18n("total"), 0}}});
-    }
 
-    void handleTimeStamp(uint64_t /*newStamp*/, uint64_t oldStamp)
-    {
-        maxLeakedSinceLastTimeStamp = max(maxLeakedSinceLastTimeStamp, leaked);
-        ChartRows data;
-        data.timeStamp = oldStamp;
-        data.leaked.push_back({i18n("total"), maxLeakedSinceLastTimeStamp});
-        data.allocations.push_back({i18n("total"), totalAllocations});
-        data.allocated.push_back({i18n("total"), totalAllocated});
-
-        auto allocs = allocations;
-        sort(allocs.begin(), allocs.end(), [] (const Allocation& left, const Allocation& right) {
-            return left.leaked < right.leaked;
-        });
-        for (size_t i = 0; i < min(size_t(10), allocs.size()); ++i) {
-            QString function;
-            data.leaked.push_back({function, allocs[i].leaked});
-        }
-        sort(allocs.begin(), allocs.end(), [] (const Allocation& left, const Allocation& right) {
-            return left.allocations < right.allocations;
-        });
-        for (size_t i = 0; i < min(size_t(10), allocs.size()); ++i) {
-            QString function;
-            data.allocations.push_back({function, allocs[i].allocations});
-        }
-        sort(allocs.begin(), allocs.end(), [] (const Allocation& left, const Allocation& right) {
-            return left.allocated < right.allocated;
-        });
-        for (size_t i = 0; i < min(size_t(10), allocs.size()); ++i) {
-            QString function;
-            data.allocated.push_back({function, allocs[i].allocated});
-        }
-        chartData.push_back(data);
-        maxLeakedSinceLastTimeStamp = 0;
-    }
-
-    void handleAllocation()
-    {
-        maxLeakedSinceLastTimeStamp = max(maxLeakedSinceLastTimeStamp, leaked);
-    }
-
-    void handleDebuggee(const char* command)
-    {
-        debuggee = command;
-    }
-
-    string debuggee;
-
-    ChartData chartData;
-    uint64_t maxLeakedSinceLastTimeStamp = 0;
-};
-
-QString generateSummary(const ParserData& data)
-{
-    QString ret;
-    KFormat format;
-    QTextStream stream(&ret);
-    const double totalTimeS = 0.001 * data.totalTime;
-    stream << "<qt>"
-           << i18n("<strong>debuggee</strong>: <code>%1</code>", QString::fromStdString(data.debuggee)) << "<br/>"
-           // xgettext:no-c-format
-           << i18n("<strong>total runtime</strong>: %1s", totalTimeS) << "<br/>"
-           << i18n("<strong>bytes allocated in total</strong> (ignoring deallocations): %1 (%2/s)",
-                   format.formatByteSize(data.totalAllocated, 2), format.formatByteSize(data.totalAllocated / totalTimeS)) << "<br/>"
-           << i18n("<strong>calls to allocation functions</strong>: %1 (%2/s)",
-                   data.totalAllocations, quint64(data.totalAllocations / totalTimeS)) << "<br/>"
-           << i18n("<strong>peak heap memory consumption</strong>: %1", format.formatByteSize(data.peak)) << "<br/>"
-           << i18n("<strong>total memory leaked</strong>: %1", format.formatByteSize(data.leaked)) << "<br/>";
-    stream << "</qt>";
-    return ret;
-}
-
+// TODO: use QString directly
 struct StringCache
 {
-    StringCache(const AccumulatedTraceData& data)
+    StringCache()
     {
-        m_strings.resize(data.strings.size());
-        transform(data.strings.begin(), data.strings.end(),
-                  m_strings.begin(), [] (const string& str) { return QString::fromStdString(str); });
     }
 
     QString func(const InstructionPointer& ip) const
@@ -159,8 +80,99 @@ struct StringCache
         return {func(ip), file(ip), module(ip), ip.line};
     }
 
+    void update(const vector<string>& strings)
+    {
+        transform(strings.begin() + m_strings.size(), strings.end(),
+                  back_inserter(m_strings), [] (const string& str) { return QString::fromStdString(str); });
+    }
+
     vector<QString> m_strings;
 };
+
+struct ParserData final : public AccumulatedTraceData
+{
+    ParserData()
+    {
+        chartData.push_back({0, {{i18n("total"), 0}}, {{i18n("total"), 0}}, {{i18n("total"), 0}}});
+    }
+
+    void handleTimeStamp(uint64_t /*newStamp*/, uint64_t oldStamp)
+    {
+        stringCache.update(strings);
+        maxLeakedSinceLastTimeStamp = max(maxLeakedSinceLastTimeStamp, leaked);
+        ChartRows data;
+        data.timeStamp = oldStamp;
+        data.leaked.push_back({i18n("total"), maxLeakedSinceLastTimeStamp});
+        data.allocations.push_back({i18n("total"), totalAllocations});
+        data.allocated.push_back({i18n("total"), totalAllocated});
+
+        // TODO: deduplicate code
+        auto allocs = allocations;
+        sort(allocs.begin(), allocs.end(), [] (const Allocation& left, const Allocation& right) {
+            return left.leaked < right.leaked;
+        });
+        for (size_t i = 0; i < min(size_t(10), allocs.size()); ++i) {
+            const auto& alloc = allocs[i];
+            auto function = stringCache.func(findIp(findTrace(alloc.traceIndex).ipIndex));
+            data.leaked.push_back({function, alloc.leaked});
+        }
+        sort(allocs.begin(), allocs.end(), [] (const Allocation& left, const Allocation& right) {
+            return left.allocations < right.allocations;
+        });
+        for (size_t i = 0; i < min(size_t(10), allocs.size()); ++i) {
+            const auto& alloc = allocs[i];
+            auto function = stringCache.func(findIp(findTrace(alloc.traceIndex).ipIndex));
+            data.allocations.push_back({function, alloc.allocations});
+        }
+        sort(allocs.begin(), allocs.end(), [] (const Allocation& left, const Allocation& right) {
+            return left.allocated < right.allocated;
+        });
+        for (size_t i = 0; i < min(size_t(10), allocs.size()); ++i) {
+            const auto& alloc = allocs[i];
+            auto function = stringCache.func(findIp(findTrace(alloc.traceIndex).ipIndex));
+            data.allocated.push_back({function, alloc.allocated});
+        }
+        chartData.push_back(data);
+        maxLeakedSinceLastTimeStamp = 0;
+    }
+
+    void handleAllocation()
+    {
+        maxLeakedSinceLastTimeStamp = max(maxLeakedSinceLastTimeStamp, leaked);
+    }
+
+    void handleDebuggee(const char* command)
+    {
+        debuggee = command;
+    }
+
+    string debuggee;
+
+    ChartData chartData;
+    uint64_t maxLeakedSinceLastTimeStamp = 0;
+
+    StringCache stringCache;
+};
+
+QString generateSummary(const ParserData& data)
+{
+    QString ret;
+    KFormat format;
+    QTextStream stream(&ret);
+    const double totalTimeS = 0.001 * data.totalTime;
+    stream << "<qt>"
+           << i18n("<strong>debuggee</strong>: <code>%1</code>", QString::fromStdString(data.debuggee)) << "<br/>"
+           // xgettext:no-c-format
+           << i18n("<strong>total runtime</strong>: %1s", totalTimeS) << "<br/>"
+           << i18n("<strong>bytes allocated in total</strong> (ignoring deallocations): %1 (%2/s)",
+                   format.formatByteSize(data.totalAllocated, 2), format.formatByteSize(data.totalAllocated / totalTimeS)) << "<br/>"
+           << i18n("<strong>calls to allocation functions</strong>: %1 (%2/s)",
+                   data.totalAllocations, quint64(data.totalAllocations / totalTimeS)) << "<br/>"
+           << i18n("<strong>peak heap memory consumption</strong>: %1", format.formatByteSize(data.peak)) << "<br/>"
+           << i18n("<strong>total memory leaked</strong>: %1", format.formatByteSize(data.leaked)) << "<br/>";
+    stream << "</qt>";
+    return ret;
+}
 
 void setParents(QVector<RowData>& children, const RowData* parent)
 {
@@ -170,10 +182,9 @@ void setParents(QVector<RowData>& children, const RowData* parent)
     }
 }
 
-QVector<RowData> mergeAllocations(const AccumulatedTraceData& data)
+QVector<RowData> mergeAllocations(const ParserData& data)
 {
     QVector<RowData> topRows;
-    StringCache strings(data);
     // merge allocations, leave parent pointers invalid (their location may change)
     for (const auto& allocation : data.allocations) {
         auto traceIndex = allocation.traceIndex;
@@ -182,7 +193,7 @@ QVector<RowData> mergeAllocations(const AccumulatedTraceData& data)
             const auto& trace = data.findTrace(traceIndex);
             const auto& ip = data.findIp(trace.ipIndex);
             // TODO: only store the IpIndex and use that
-            auto location = strings.location(ip);
+            auto location = data.stringCache.location(ip);
             auto it = lower_bound(rows->begin(), rows->end(), location);
             if (it != rows->end() && it->location == location) {
                 it->allocated += allocation.allocated;
