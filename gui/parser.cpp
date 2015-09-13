@@ -89,6 +89,18 @@ struct StringCache
     vector<QString> m_strings;
 };
 
+struct ChartMergeData
+{
+    QString function;
+    quint64 leaked;
+    quint64 allocations;
+    quint64 allocated;
+    bool operator<(const QString& rhs) const
+    {
+        return function < rhs;
+    }
+};
+
 struct ParserData final : public AccumulatedTraceData
 {
     ParserData()
@@ -106,31 +118,46 @@ struct ParserData final : public AccumulatedTraceData
         data.allocations.push_back({i18n("total"), totalAllocations});
         data.allocated.push_back({i18n("total"), totalAllocated});
 
+        vector<ChartMergeData> mergedData;
+        for (const auto& allocation : allocations) {
+            const auto function = stringCache.func(findIp(findTrace(allocation.traceIndex).ipIndex));
+            auto it = lower_bound(mergedData.begin(), mergedData.end(), function);
+            if (it != mergedData.end() && it->function == function) {
+                it->allocated += allocation.allocated;
+                it->allocations += allocation.allocations;
+                it->leaked += allocation.leaked;
+            } else {
+                it = mergedData.insert(it, {function, allocation.leaked, allocation.allocations, allocation.allocated});
+            }
+        }
+
         // TODO: deduplicate code
-        auto allocs = allocations;
-        sort(allocs.begin(), allocs.end(), [] (const Allocation& left, const Allocation& right) {
-            return left.leaked < right.leaked;
+        sort(mergedData.begin(), mergedData.end(), [] (const ChartMergeData& left, const ChartMergeData& right) {
+            return left.leaked > right.leaked;
         });
-        for (size_t i = 0; i < min(size_t(10), allocs.size()); ++i) {
-            const auto& alloc = allocs[i];
-            auto function = stringCache.func(findIp(findTrace(alloc.traceIndex).ipIndex));
-            data.leaked.push_back({function, alloc.leaked});
+        for (size_t i = 0; i < min(size_t(10), mergedData.size()); ++i) {
+            const auto& alloc = mergedData[i];
+            if (!alloc.leaked)
+                break;
+            data.leaked.push_back({alloc.function, alloc.leaked});
         }
-        sort(allocs.begin(), allocs.end(), [] (const Allocation& left, const Allocation& right) {
-            return left.allocations < right.allocations;
+        sort(mergedData.begin(), mergedData.end(), [] (const ChartMergeData& left, const ChartMergeData& right) {
+            return left.allocations > right.allocations;
         });
-        for (size_t i = 0; i < min(size_t(10), allocs.size()); ++i) {
-            const auto& alloc = allocs[i];
-            auto function = stringCache.func(findIp(findTrace(alloc.traceIndex).ipIndex));
-            data.allocations.push_back({function, alloc.allocations});
+        for (size_t i = 0; i < min(size_t(10), mergedData.size()); ++i) {
+            const auto& alloc = mergedData[i];
+            if (!alloc.allocations)
+                break;
+            data.allocations.push_back({alloc.function, alloc.allocations});
         }
-        sort(allocs.begin(), allocs.end(), [] (const Allocation& left, const Allocation& right) {
-            return left.allocated < right.allocated;
+        sort(mergedData.begin(), mergedData.end(), [] (const ChartMergeData& left, const ChartMergeData& right) {
+            return left.allocated > right.allocated;
         });
-        for (size_t i = 0; i < min(size_t(10), allocs.size()); ++i) {
-            const auto& alloc = allocs[i];
-            auto function = stringCache.func(findIp(findTrace(alloc.traceIndex).ipIndex));
-            data.allocated.push_back({function, alloc.allocated});
+        for (size_t i = 0; i < min(size_t(10), mergedData.size()); ++i) {
+            const auto& alloc = mergedData[i];
+            if (!alloc.allocated)
+                break;
+            data.allocated.push_back({alloc.function, alloc.allocated});
         }
         chartData.push_back(data);
         maxLeakedSinceLastTimeStamp = 0;
@@ -148,6 +175,7 @@ struct ParserData final : public AccumulatedTraceData
 
     string debuggee;
 
+    // FIXME: keep order of entries constant, add zero elements where required
     ChartData chartData;
     uint64_t maxLeakedSinceLastTimeStamp = 0;
 
