@@ -23,24 +23,24 @@
 #include <QAbstractTableModel>
 #include <QVector>
 
-struct ChartRow
-{
-    QString function;
-    quint64 cost;
-};
-Q_DECLARE_TYPEINFO(ChartRow, Q_MOVABLE_TYPE);
-
 struct ChartRows
 {
-    quint64 timeStamp;
-    QVector<ChartRow> leaked;
-    QVector<ChartRow> allocations;
-    QVector<ChartRow> allocated;
+    quint64 timeStamp = 0;
+    QHash<int, quint64> leaked;
+    QHash<int, quint64> allocations;
+    QHash<int, quint64> allocated;
 };
 Q_DECLARE_TYPEINFO(ChartRows, Q_MOVABLE_TYPE);
 
-using ChartData = QVector<ChartRows>;
+struct ChartData
+{
+    QVector<ChartRows> rows;
+    QHash<int, QString> leakedLabels;
+    QHash<int, QString> allocationsLabels;
+    QHash<int, QString> allocatedLabels;
+};
 Q_DECLARE_METATYPE(ChartData)
+Q_DECLARE_TYPEINFO(ChartData, Q_MOVABLE_TYPE);
 
 class ChartModel : public QAbstractTableModel
 {

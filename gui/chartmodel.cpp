@@ -35,21 +35,26 @@ QColor colorForColumn(int column, int columnCount)
     return QColor::fromHsv((1. - double(column + 1) / columnCount) * 255, 255, 255);
 }
 
-QVector<ChartRow> columnValue(const ChartRows& data, int column)
+quint64 indexValue(const ChartRows& data, int column, int index)
 {
     if (column == ChartModel::LeakedColumn) {
-        return data.leaked;
+        return data.leaked.value(index);
     } else if (column == ChartModel::AllocationsColumn) {
-        return data.allocations;
+        return data.allocations.value(index);
     } else {
-        return data.allocated;
+        return data.allocated.value(index);
     }
 }
 
-ChartRow indexValue(const ChartRows& data, int idx, int column)
+QString indexLabel(const ChartData& data, int column, int index)
 {
-    const auto& values = columnValue(data, column);
-    return idx < values.size() ? values[idx] : ChartRow();
+    if (column == ChartModel::LeakedColumn) {
+        return data.leakedLabels.value(index);
+    } else if (column == ChartModel::AllocationsColumn) {
+        return data.allocationsLabels.value(index);
+    } else {
+        return data.allocatedLabels.value(index);
+    }
 }
 }
 
@@ -108,8 +113,6 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
         return QVariant::fromValue(attributes);
     }
 
-    const auto idx = index.column() / 4;
-    const auto column = index.column() % 4;
 
     if ( role == KChart::DatasetPenRole ) {
         return QVariant::fromValue(QPen(colorForColumn(index.column(), columnCount())));
@@ -121,25 +124,28 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
         return {};
     }
 
-    const auto& data = m_data.at(index.row());
+    const auto& data = m_data.rows.at(index.row());
+    const auto column = index.column() % NUM_COLUMNS;
+    const auto idx = index.column() / NUM_COLUMNS;
 
     if (column == TimeStampColumn) {
         return data.timeStamp;
     }
 
-    const auto& chartRow = indexValue(data, idx, column);
+    const auto cost = indexValue(data, column, idx);
 
     if ( role == Qt::ToolTipRole ) {
         // TODO: use correct label for column, format cost and time properly in a human readable way
-        return i18n("%1: %2 at %3", chartRow.function, chartRow.cost, data.timeStamp);
+        return i18n("%1: %2 at %3", indexLabel(m_data, column, idx), cost, data.timeStamp);
     }
 
-    return chartRow.cost;
+    return cost;
 }
 
 int ChartModel::columnCount(const QModelIndex& /*parent*/) const
 {
-    return m_data.isEmpty() ? 0 : NUM_COLUMNS * m_data.last().allocated.size();
+    // the three cost columns + timestamp
+    return m_data.allocatedLabels.size() + m_data.allocationsLabels.size() + m_data.leakedLabels.size() + 1;
 }
 
 int ChartModel::rowCount(const QModelIndex& parent) const
@@ -147,7 +153,7 @@ int ChartModel::rowCount(const QModelIndex& parent) const
     if (parent.isValid()) {
         return 0;
     } else {
-        return m_data.size();
+        return m_data.rows.size();
     }
 }
 

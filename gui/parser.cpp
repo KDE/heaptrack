@@ -105,7 +105,11 @@ struct ParserData final : public AccumulatedTraceData
 {
     ParserData()
     {
-        chartData.push_back({0, {{i18n("total"), 0}}, {{i18n("total"), 0}}, {{i18n("total"), 0}}});
+        chartData.rows.push_back({});
+        // index 0 indicates the total row
+        chartLeakedLabelIds.insert(i18n("total"), 0);
+        chartAllocatedLabelIds.insert(i18n("total"), 0);
+        chartAllocationsLabelIds.insert(i18n("total"), 0);
     }
 
     void handleTimeStamp(uint64_t /*newStamp*/, uint64_t oldStamp)
@@ -114,10 +118,12 @@ struct ParserData final : public AccumulatedTraceData
         maxLeakedSinceLastTimeStamp = max(maxLeakedSinceLastTimeStamp, leaked);
         ChartRows data;
         data.timeStamp = oldStamp;
-        data.leaked.push_back({i18n("total"), maxLeakedSinceLastTimeStamp});
-        data.allocations.push_back({i18n("total"), totalAllocations});
-        data.allocated.push_back({i18n("total"), totalAllocated});
+        // total data
+        data.leaked.insert(0, maxLeakedSinceLastTimeStamp);
+        data.allocations.insert(0, totalAllocations);
+        data.allocated.insert(0, totalAllocated);
 
+        // merge data for top 10 functions in this timestamp
         vector<ChartMergeData> mergedData;
         for (const auto& allocation : allocations) {
             const auto function = stringCache.func(findIp(findTrace(allocation.traceIndex).ipIndex));
@@ -137,29 +143,44 @@ struct ParserData final : public AccumulatedTraceData
         });
         for (size_t i = 0; i < min(size_t(10), mergedData.size()); ++i) {
             const auto& alloc = mergedData[i];
-            if (!alloc.leaked)
+            if (!alloc.leaked) {
                 break;
-            data.leaked.push_back({alloc.function, alloc.leaked});
+            }
+            auto& id = chartLeakedLabelIds[alloc.function];
+            if (!id) {
+                id = chartLeakedLabelIds.size() - 1;
+            }
+            data.leaked.insert(id, alloc.leaked);
         }
         sort(mergedData.begin(), mergedData.end(), [] (const ChartMergeData& left, const ChartMergeData& right) {
             return left.allocations > right.allocations;
         });
         for (size_t i = 0; i < min(size_t(10), mergedData.size()); ++i) {
             const auto& alloc = mergedData[i];
-            if (!alloc.allocations)
+            if (!alloc.allocations) {
                 break;
-            data.allocations.push_back({alloc.function, alloc.allocations});
+            }
+            auto& id = chartAllocationsLabelIds[alloc.function];
+            if (!id) {
+                id = chartAllocationsLabelIds.size() - 1;
+            }
+            data.allocations.insert(id, alloc.allocations);
         }
         sort(mergedData.begin(), mergedData.end(), [] (const ChartMergeData& left, const ChartMergeData& right) {
             return left.allocated > right.allocated;
         });
         for (size_t i = 0; i < min(size_t(10), mergedData.size()); ++i) {
             const auto& alloc = mergedData[i];
-            if (!alloc.allocated)
+            if (!alloc.allocated) {
                 break;
-            data.allocated.push_back({alloc.function, alloc.allocated});
+            }
+            auto& id = chartAllocatedLabelIds[alloc.function];
+            if (!id) {
+                id = chartAllocatedLabelIds.size() - 1;
+            }
+            data.allocated.insert(id, alloc.allocated);
         }
-        chartData.push_back(data);
+        chartData.rows.push_back(data);
         maxLeakedSinceLastTimeStamp = 0;
     }
 
@@ -175,8 +196,10 @@ struct ParserData final : public AccumulatedTraceData
 
     string debuggee;
 
-    // FIXME: keep order of entries constant, add zero elements where required
     ChartData chartData;
+    QHash<QString, int> chartLeakedLabelIds;
+    QHash<QString, int> chartAllocationsLabelIds;
+    QHash<QString, int> chartAllocatedLabelIds;
     uint64_t maxLeakedSinceLastTimeStamp = 0;
 
     StringCache stringCache;
@@ -307,6 +330,19 @@ void Parser::parse(const QString& path)
     stream() << make_job([=]() {
         ParserData data;
         data.read(path.toStdString());
+        // TODO: deduplicate
+        data.chartData.leakedLabels.reserve(data.chartLeakedLabelIds.size());
+        for (auto it = data.chartLeakedLabelIds.constBegin(); it != data.chartLeakedLabelIds.constEnd(); ++it) {
+            data.chartData.leakedLabels.insert(it.value(), it.key());
+        }
+        data.chartData.allocatedLabels.reserve(data.chartAllocatedLabelIds.size());
+        for (auto it = data.chartAllocatedLabelIds.constBegin(); it != data.chartAllocatedLabelIds.constEnd(); ++it) {
+            data.chartData.allocatedLabels.insert(it.value(), it.key());
+        }
+        data.chartData.allocationsLabels.reserve(data.chartAllocationsLabelIds.size());
+        for (auto it = data.chartAllocationsLabelIds.constBegin(); it != data.chartAllocationsLabelIds.constEnd(); ++it) {
+            data.chartData.allocationsLabels.insert(it.value(), it.key());
+        }
         emit summaryAvailable(generateSummary(data));
         const auto mergedAllocations = mergeAllocations(data);
         emit bottomUpDataAvailable(mergedAllocations);
