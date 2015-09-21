@@ -22,6 +22,7 @@
 #include <KChartGlobal>
 #include <KChartLineAttributes>
 #include <KLocalizedString>
+#include <KFormat>
 
 #include <QPen>
 #include <QBrush>
@@ -135,8 +136,13 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
     const auto cost = indexValue(data, column, idx);
 
     if ( role == Qt::ToolTipRole ) {
-        // TODO: use correct label for column, format cost and time properly in a human readable way
-        return i18n("%1: %2 at %3", indexLabel(m_data, column, idx), cost, data.timeStamp);
+        const QString time = QString::number(double(data.timeStamp) / 1000, 'g', 3) + QLatin1Char('s');
+        if (column == AllocationsColumn) {
+            return i18n("%1: %2 at %3", indexLabel(m_data, column, idx), cost, time);
+        } else {
+            KFormat format;
+            return i18n("%1: %2 at %3", indexLabel(m_data, column, idx), format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
+        }
     }
 
     return cost;
