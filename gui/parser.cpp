@@ -137,49 +137,25 @@ struct ParserData final : public AccumulatedTraceData
             }
         }
 
-        // TODO: deduplicate code
-        sort(mergedData.begin(), mergedData.end(), [] (const ChartMergeData& left, const ChartMergeData& right) {
-            return left.leaked > right.leaked;
-        });
-        for (size_t i = 0; i < min(size_t(10), mergedData.size()); ++i) {
-            const auto& alloc = mergedData[i];
-            if (!alloc.leaked) {
-                break;
+        auto addChartData = [&] (quint64 ChartMergeData::* member, QHash<QString, int>* ids, QHash<int, quint64>* cost) {
+            sort(mergedData.begin(), mergedData.end(), [=] (const ChartMergeData& left, const ChartMergeData& right) {
+                return left.*member > right.*member;
+            });
+            for (size_t i = 0; i < min(size_t(10), mergedData.size()); ++i) {
+                const auto& alloc = mergedData[i];
+                if (!(alloc.*member)) {
+                    break;
+                }
+                auto& id = (*ids)[alloc.function];
+                if (!id) {
+                    id = ids->size() - 1;
+                }
+                cost->insert(id, alloc.leaked);
             }
-            auto& id = chartLeakedLabelIds[alloc.function];
-            if (!id) {
-                id = chartLeakedLabelIds.size() - 1;
-            }
-            data.leaked.insert(id, alloc.leaked);
-        }
-        sort(mergedData.begin(), mergedData.end(), [] (const ChartMergeData& left, const ChartMergeData& right) {
-            return left.allocations > right.allocations;
-        });
-        for (size_t i = 0; i < min(size_t(10), mergedData.size()); ++i) {
-            const auto& alloc = mergedData[i];
-            if (!alloc.allocations) {
-                break;
-            }
-            auto& id = chartAllocationsLabelIds[alloc.function];
-            if (!id) {
-                id = chartAllocationsLabelIds.size() - 1;
-            }
-            data.allocations.insert(id, alloc.allocations);
-        }
-        sort(mergedData.begin(), mergedData.end(), [] (const ChartMergeData& left, const ChartMergeData& right) {
-            return left.allocated > right.allocated;
-        });
-        for (size_t i = 0; i < min(size_t(10), mergedData.size()); ++i) {
-            const auto& alloc = mergedData[i];
-            if (!alloc.allocated) {
-                break;
-            }
-            auto& id = chartAllocatedLabelIds[alloc.function];
-            if (!id) {
-                id = chartAllocatedLabelIds.size() - 1;
-            }
-            data.allocated.insert(id, alloc.allocated);
-        }
+        };
+        addChartData(&ChartMergeData::leaked, &chartLeakedLabelIds, &data.leaked);
+        addChartData(&ChartMergeData::allocated, &chartAllocatedLabelIds, &data.allocated);
+        addChartData(&ChartMergeData::allocations, &chartAllocationsLabelIds, &data.allocations);
         chartData.rows.push_back(data);
         maxLeakedSinceLastTimeStamp = 0;
     }
@@ -316,6 +292,14 @@ QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
     return topRows;
 }
 
+void convertLabels(const QHash<QString, int>& input, QHash<int, QString>* output)
+{
+    output->reserve(input.size());
+    for (auto it = input.constBegin(); it != input.constEnd(); ++it) {
+        output->insert(it.value(), it.key());
+    }
+}
+
 }
 
 Parser::Parser(QObject* parent)
@@ -330,19 +314,9 @@ void Parser::parse(const QString& path)
     stream() << make_job([=]() {
         ParserData data;
         data.read(path.toStdString());
-        // TODO: deduplicate
-        data.chartData.leakedLabels.reserve(data.chartLeakedLabelIds.size());
-        for (auto it = data.chartLeakedLabelIds.constBegin(); it != data.chartLeakedLabelIds.constEnd(); ++it) {
-            data.chartData.leakedLabels.insert(it.value(), it.key());
-        }
-        data.chartData.allocatedLabels.reserve(data.chartAllocatedLabelIds.size());
-        for (auto it = data.chartAllocatedLabelIds.constBegin(); it != data.chartAllocatedLabelIds.constEnd(); ++it) {
-            data.chartData.allocatedLabels.insert(it.value(), it.key());
-        }
-        data.chartData.allocationsLabels.reserve(data.chartAllocationsLabelIds.size());
-        for (auto it = data.chartAllocationsLabelIds.constBegin(); it != data.chartAllocationsLabelIds.constEnd(); ++it) {
-            data.chartData.allocationsLabels.insert(it.value(), it.key());
-        }
+        convertLabels(data.chartLeakedLabelIds, &data.chartData.leakedLabels);
+        convertLabels(data.chartAllocatedLabelIds, &data.chartData.allocatedLabels);
+        convertLabels(data.chartAllocationsLabelIds, &data.chartData.allocationsLabels);
         emit summaryAvailable(generateSummary(data));
         const auto mergedAllocations = mergeAllocations(data);
         emit bottomUpDataAvailable(mergedAllocations);
