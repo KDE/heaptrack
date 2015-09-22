@@ -45,11 +45,11 @@ class TimeAxis : public CartesianAxis
 {
     Q_OBJECT
 public:
-    explicit TimeAxis(AbstractCartesianDiagram* diagram = 0)
+    explicit TimeAxis(AbstractCartesianDiagram* diagram = nullptr)
         : CartesianAxis(diagram)
     {}
 
-    virtual const QString customizedLabel(const QString& label) const
+    const QString customizedLabel(const QString& label) const override
     {
         // squeeze large numbers here
         return QString::number(label.toDouble() / 1000, 'g', 2) + QLatin1Char('s');
@@ -60,11 +60,11 @@ class SizeAxis : public CartesianAxis
 {
     Q_OBJECT
 public:
-    explicit SizeAxis(AbstractCartesianDiagram* diagram = 0)
+    explicit SizeAxis(AbstractCartesianDiagram* diagram = nullptr)
         : CartesianAxis(diagram)
     {}
 
-    virtual const QString customizedLabel(const QString& label) const
+    const QString customizedLabel(const QString& label) const override
     {
         // TODO: change distance between labels to 1024 and simply use prettyCost() here
         KFormat format(QLocale::system());
@@ -75,7 +75,7 @@ public:
 
 ChartWidget::ChartWidget(QWidget* parent)
     : QWidget(parent)
-    , m_chart(new KChart::Chart(this))
+    , m_chart(new Chart(this))
     , m_plotter(new Plotter(this))
 {
     auto layout = new QVBoxLayout(this);
@@ -83,7 +83,7 @@ ChartWidget::ChartWidget(QWidget* parent)
     setLayout(layout);
 
     m_plotter->setAntiAliasing(true);
-    m_plotter->setType(KChart::Plotter::Stacked);
+    m_plotter->setType(Plotter::Stacked);
 
     auto* coordinatePlane = dynamic_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
     Q_ASSERT(coordinatePlane);
@@ -117,7 +117,7 @@ void ChartWidget::setModel(ChartModel* model, ChartModel::Columns costColumn)
     axisTitleTextAttributes.setPen(foreground);
     bottomAxis->setTitleTextAttributes(axisTitleTextAttributes);
     bottomAxis->setTitleText(model->headerData(ChartModel::TimeStampColumn).toString());
-    bottomAxis->setPosition(KChart::CartesianAxis::Bottom);
+    bottomAxis->setPosition(CartesianAxis::Bottom);
     m_plotter->addAxis(bottomAxis);
 
     CartesianAxis* rightAxis = costColumn == ChartModel::AllocationsColumn ? new CartesianAxis(m_plotter) : new SizeAxis(m_plotter);
