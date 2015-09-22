@@ -24,21 +24,15 @@
 
 #include <QDebug>
 
-ChartProxy::ChartProxy(ChartModel::Columns column, bool showTotal, QObject* parent)
+ChartProxy::ChartProxy(bool showTotal, QObject* parent)
     : QSortFilterProxyModel(parent)
-    , m_column(column)
     , m_showTotal(showTotal)
 {
 }
 
 ChartProxy::~ChartProxy() = default;
 
-QVariant ChartProxy::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    Q_ASSERT(orientation != Qt::Horizontal || section < columnCount());
-    return QSortFilterProxyModel::headerData(section, orientation, role);
-}
-
+/*
 QVariant ChartProxy::data(const QModelIndex& proxyIndex, int role) const
 {
     static_assert(ChartModel::TimeStampColumn == 0, "The code below assumes the time stamp column comes with value 0.");
@@ -49,14 +43,13 @@ QVariant ChartProxy::data(const QModelIndex& proxyIndex, int role) const
     } else {
         return QSortFilterProxyModel::data(proxyIndex, role);
     }
-}
+}*/
 
 bool ChartProxy::filterAcceptsColumn(int sourceColumn, const QModelIndex& /*sourceParent*/) const
 {
-    if (m_showTotal && sourceColumn >= ChartModel::NUM_COLUMNS)
+    if (m_showTotal && sourceColumn >= 2)
         return false;
-    else if (!m_showTotal && sourceColumn < ChartModel::NUM_COLUMNS)
+    else if (!m_showTotal && sourceColumn < 2)
         return false;
-    const auto column = sourceColumn % ChartModel::NUM_COLUMNS;
-    return column == ChartModel::TimeStampColumn || column == m_column;
+    return true;
 }

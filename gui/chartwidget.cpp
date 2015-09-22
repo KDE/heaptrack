@@ -36,6 +36,7 @@
 #include <KLocalizedString>
 #include <KColorScheme>
 
+#include "chartmodel.h"
 #include "chartproxy.h"
 
 using namespace KChart;
@@ -76,58 +77,65 @@ public:
 ChartWidget::ChartWidget(QWidget* parent)
     : QWidget(parent)
     , m_chart(new Chart(this))
-    , m_plotter(new Plotter(this))
 {
     auto layout = new QVBoxLayout(this);
     layout->addWidget(m_chart);
     setLayout(layout);
-
-    m_plotter->setAntiAliasing(true);
-    m_plotter->setType(Plotter::Stacked);
-
-    auto* coordinatePlane = dynamic_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
-    Q_ASSERT(coordinatePlane);
-    coordinatePlane->addDiagram(m_plotter);
 }
 
 ChartWidget::~ChartWidget() = default;
 
-void ChartWidget::setModel(ChartModel* model, ChartModel::Columns costColumn)
+void ChartWidget::setModel(ChartModel* model)
 {
-    if (m_plotter->model()) {
-        delete m_plotter->model();
+    auto* coordinatePlane = dynamic_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
+    Q_ASSERT(coordinatePlane);
+    foreach (auto diagram, coordinatePlane->diagrams()) {
+        coordinatePlane->takeDiagram(diagram);
+        delete diagram;
     }
 
-    Q_ASSERT(costColumn != ChartModel::TimeStampColumn);
-    auto proxy = new ChartProxy(costColumn, false, this);
-    proxy->setSourceModel(model);
+    {
+        auto totalPlotter = new Plotter(this);
+        totalPlotter->setAntiAliasing(true);
+        auto totalProxy = new ChartProxy(true, this);
+        totalProxy->setSourceModel(model);
+        totalPlotter->setModel(totalProxy);
+        totalPlotter->setType(Plotter::Stacked);
 
-    foreach (auto axis, m_plotter->axes()) {
-        m_plotter->takeAxis(axis);
-        delete axis;
+        KColorScheme scheme(QPalette::Active, KColorScheme::Window);
+        const QPen foreground(scheme.foreground().color());
+        auto bottomAxis = new TimeAxis(totalPlotter);
+        auto axisTextAttributes = bottomAxis->textAttributes();
+        axisTextAttributes.setPen(foreground);
+        bottomAxis->setTextAttributes(axisTextAttributes);
+        auto axisTitleTextAttributes = bottomAxis->titleTextAttributes();
+        axisTitleTextAttributes.setPen(foreground);
+        bottomAxis->setTitleTextAttributes(axisTitleTextAttributes);
+        bottomAxis->setTitleText(model->headerData(0).toString());
+        bottomAxis->setPosition(CartesianAxis::Bottom);
+        totalPlotter->addAxis(bottomAxis);
+
+        CartesianAxis* rightAxis = model->type() == ChartModel::Allocations ? new CartesianAxis(totalPlotter) : new SizeAxis(totalPlotter);
+        rightAxis->setTextAttributes(axisTextAttributes);
+        rightAxis->setTitleTextAttributes(axisTitleTextAttributes);
+        rightAxis->setTitleText(model->headerData(1).toString());
+        rightAxis->setPosition(CartesianAxis::Right);
+        totalPlotter->addAxis(rightAxis);
+
+        coordinatePlane->addDiagram(totalPlotter);
     }
 
-    KColorScheme scheme(QPalette::Active, KColorScheme::Window);
-    const QPen foreground(scheme.foreground().color());
-    auto bottomAxis = new TimeAxis(m_plotter);
-    auto axisTextAttributes = bottomAxis->textAttributes();
-    axisTextAttributes.setPen(foreground);
-    bottomAxis->setTextAttributes(axisTextAttributes);
-    auto axisTitleTextAttributes = bottomAxis->titleTextAttributes();
-    axisTitleTextAttributes.setPen(foreground);
-    bottomAxis->setTitleTextAttributes(axisTitleTextAttributes);
-    bottomAxis->setTitleText(model->headerData(ChartModel::TimeStampColumn).toString());
-    bottomAxis->setPosition(CartesianAxis::Bottom);
-    m_plotter->addAxis(bottomAxis);
+    {
+        auto plotter = new Plotter(this);
+        plotter->setAntiAliasing(true);
+        plotter->setType(Plotter::Stacked);
 
-    CartesianAxis* rightAxis = costColumn == ChartModel::AllocationsColumn ? new CartesianAxis(m_plotter) : new SizeAxis(m_plotter);
-    rightAxis->setTextAttributes(axisTextAttributes);
-    rightAxis->setTitleTextAttributes(axisTitleTextAttributes);
-    rightAxis->setTitleText(model->headerData(costColumn).toString());
-    rightAxis->setPosition(CartesianAxis::Right);
-    m_plotter->addAxis(rightAxis);
+        auto proxy = new ChartProxy(false, this);
+        proxy->setSourceModel(model);
+        plotter->setModel(proxy);
+        coordinatePlane->addDiagram(plotter);
+    }
 
-    m_plotter->setModel(proxy);
 }
 
 #include "chartwidget.moc"

@@ -280,7 +280,7 @@ bool AccumulatedTraceData::read(istream& in)
     /// these are leaks, but we now have the same data in \c allocations as well
     activeAllocations.clear();
 
-    totalTime = max(timeStamp, uint64_t(1));
+    totalTime = timeStamp + 1;
 
     handleTimeStamp(timeStamp, totalTime);
 

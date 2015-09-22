@@ -27,17 +27,15 @@ class ChartProxy : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    explicit ChartProxy(ChartModel::Columns column, bool showTotal, QObject* parent = nullptr);
+    explicit ChartProxy(bool showTotal, QObject* parent = nullptr);
     virtual ~ChartProxy();
 
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-    QVariant data(const QModelIndex & proxyIndex, int role = Qt::DisplayRole) const override;
+//     QVariant data(const QModelIndex & proxyIndex, int role = Qt::DisplayRole) const override;
 
 protected:
     bool filterAcceptsColumn(int sourceColumn, const QModelIndex& sourceParent) const override;
 
 private:
-    ChartModel::Columns m_column;
     bool m_showTotal;
 };
 

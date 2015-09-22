@@ -26,18 +26,14 @@
 struct ChartRows
 {
     quint64 timeStamp = 0;
-    QHash<int, quint64> leaked;
-    QHash<int, quint64> allocations;
-    QHash<int, quint64> allocated;
+    QHash<int, quint64> cost;
 };
 Q_DECLARE_TYPEINFO(ChartRows, Q_MOVABLE_TYPE);
 
 struct ChartData
 {
     QVector<ChartRows> rows;
-    QHash<int, QString> leakedLabels;
-    QHash<int, QString> allocationsLabels;
-    QHash<int, QString> allocatedLabels;
+    QHash<int, QString> labels;
 };
 Q_DECLARE_METATYPE(ChartData)
 Q_DECLARE_TYPEINFO(ChartData, Q_MOVABLE_TYPE);
@@ -46,16 +42,15 @@ class ChartModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    explicit ChartModel(QObject* parent = nullptr);
+    enum Type {
+        Leaked,
+        Allocations,
+        Allocated,
+    };
+    explicit ChartModel(Type type, QObject* parent = nullptr);
     virtual ~ChartModel();
 
-    enum Columns {
-        TimeStampColumn,
-        LeakedColumn,
-        AllocationsColumn,
-        AllocatedColumn,
-        NUM_COLUMNS
-    };
+    Type type() const;
 
     QVariant headerData(int section, Qt::Orientation orientation = Qt::Horizontal, int role = Qt::DisplayRole) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
@@ -67,6 +62,7 @@ public slots:
 
 private:
     ChartData m_data;
+    Type m_type;
 };
 
 #endif // CHARTMODEL_H

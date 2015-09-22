@@ -438,10 +438,10 @@ struct Printer final : public AccumulatedTraceData
         }
     }
 
-    void handleTimeStamp(uint64_t /*newStamp*/, uint64_t oldStamp) override
+    void handleTimeStamp(uint64_t /*oldStamp*/, uint64_t newStamp) override
     {
         if (massifOut.is_open()) {
-            writeMassifSnapshot(oldStamp, oldStamp == totalTime);
+            writeMassifSnapshot(newStamp, newStamp == totalTime);
         }
     }
 

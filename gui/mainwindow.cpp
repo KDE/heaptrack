@@ -40,7 +40,6 @@ MainWindow::MainWindow(QWidget* parent)
     , m_ui(new Ui::MainWindow)
     , m_bottomUpModel(new TreeModel(this))
     , m_topDownModel(new TreeModel(this))
-    , m_chartModel(new ChartModel(this))
     , m_parser(new Parser(this))
 {
     m_ui->setupUi(this);
@@ -50,16 +49,23 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->loadingProgress->setMinimum(0);
     m_ui->loadingProgress->setMaximum(0);
 
-    m_ui->leakedTab->setModel(m_chartModel, ChartModel::LeakedColumn);
-    m_ui->allocationsTab->setModel(m_chartModel, ChartModel::AllocationsColumn);
-    m_ui->allocatedTab->setModel(m_chartModel, ChartModel::AllocatedColumn);
+    auto leakedModel = new ChartModel(ChartModel::Leaked, this);
+    m_ui->leakedTab->setModel(leakedModel);
+    auto allocationsModel = new ChartModel(ChartModel::Allocations, this);
+    m_ui->allocationsTab->setModel(allocationsModel);
+    auto allocatedModel = new ChartModel(ChartModel::Allocated, this);
+    m_ui->allocatedTab->setModel(allocatedModel);
 
     connect(m_parser, &Parser::bottomUpDataAvailable,
             m_bottomUpModel, &TreeModel::resetData);
     connect(m_parser, &Parser::topDownDataAvailable,
             m_topDownModel, &TreeModel::resetData);
-    connect(m_parser, &Parser::chartDataAvailable,
-            m_chartModel, &ChartModel::resetData);
+    connect(m_parser, &Parser::leakedChartDataAvailable,
+            leakedModel, &ChartModel::resetData);
+    connect(m_parser, &Parser::allocatedChartDataAvailable,
+            allocatedModel, &ChartModel::resetData);
+    connect(m_parser, &Parser::allocationsChartDataAvailable,
+            allocationsModel, &ChartModel::resetData);
     connect(m_parser, &Parser::summaryAvailable,
             m_ui->summary, &QLabel::setText);
     connect(m_parser, &Parser::flameGraphDataAvailable,

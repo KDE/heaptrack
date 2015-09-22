@@ -41,7 +41,9 @@ signals:
     void summaryAvailable(const QString& summary);
     void bottomUpDataAvailable(const TreeData& data);
     void topDownDataAvailable(const TreeData& data);
-    void chartDataAvailable(const ChartData& data);
+    void leakedChartDataAvailable(const ChartData& data);
+    void allocationsChartDataAvailable(const ChartData& data);
+    void allocatedChartDataAvailable(const ChartData& data);
     void flameGraphDataAvailable(FrameGraphicsItem* rootItem);
     void finished();
 };

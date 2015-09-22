@@ -105,23 +105,26 @@ struct ParserData final : public AccumulatedTraceData
 {
     ParserData()
     {
-        chartData.rows.push_back({});
+        // start off with null data at the origin
+        leakedChartData.data.rows.push_back({});
+        allocatedChartData.data.rows.push_back({});
+        allocationsChartData.data.rows.push_back({});
         // index 0 indicates the total row
-        chartLeakedLabelIds.insert(i18n("total"), 0);
-        chartAllocatedLabelIds.insert(i18n("total"), 0);
-        chartAllocationsLabelIds.insert(i18n("total"), 0);
+        leakedChartData.labelIds.insert(i18n("total"), 0);
+        allocatedChartData.labelIds.insert(i18n("total"), 0);
+        allocationsChartData.labelIds.insert(i18n("total"), 0);
     }
 
-    void handleTimeStamp(uint64_t /*newStamp*/, uint64_t oldStamp)
+    void handleTimeStamp(uint64_t /*oldStamp*/, uint64_t newStamp)
     {
         stringCache.update(strings);
         maxLeakedSinceLastTimeStamp = max(maxLeakedSinceLastTimeStamp, leaked);
-        ChartRows data;
-        data.timeStamp = oldStamp;
-        // total data
-        data.leaked.insert(0, maxLeakedSinceLastTimeStamp);
-        data.allocations.insert(0, totalAllocations);
-        data.allocated.insert(0, totalAllocated);
+        ChartRows leakedData;
+        leakedData.timeStamp = newStamp;
+        leakedData.cost.insert(0, maxLeakedSinceLastTimeStamp);
+        ChartRows allocationsData;
+        allocationsData.timeStamp = newStamp;
+        allocationsData.cost.insert(0, totalAllocations);
 
         // merge data for top 10 functions in this timestamp
         vector<ChartMergeData> mergedData;
@@ -137,7 +140,10 @@ struct ParserData final : public AccumulatedTraceData
             }
         }
 
-        auto addChartData = [&] (quint64 ChartMergeData::* member, QHash<QString, int>* ids, QHash<int, quint64>* cost) {
+        auto addChartData = [&] (quint64 ChartMergeData::* member, ChartDataWithLabels* data, quint64 totalCost) {
+            ChartRows row;
+            row.timeStamp = newStamp;
+            row.cost.insert(0, totalCost);
             sort(mergedData.begin(), mergedData.end(), [=] (const ChartMergeData& left, const ChartMergeData& right) {
                 return left.*member > right.*member;
             });
@@ -146,17 +152,25 @@ struct ParserData final : public AccumulatedTraceData
                 if (!(alloc.*member)) {
                     break;
                 }
-                auto& id = (*ids)[alloc.function];
+                auto& id = data->labelIds[alloc.function];
                 if (!id) {
-                    id = ids->size() - 1;
+                    id = data->labelIds.size() - 1;
                 }
-                cost->insert(id, alloc.leaked);
+                row.cost.insert(id, alloc.*member);
+            }
+            data->data.rows.append(row);
+
+            if (newStamp == totalTime) {
+                // finalize and convert labels
+                data->data.labels.reserve(data->labelIds.size());
+                for (auto it = data->labelIds.constBegin(); it != data->labelIds.constEnd(); ++it) {
+                    data->data.labels.insert(it.value(), it.key());
+                }
             }
         };
-        addChartData(&ChartMergeData::leaked, &chartLeakedLabelIds, &data.leaked);
-        addChartData(&ChartMergeData::allocated, &chartAllocatedLabelIds, &data.allocated);
-        addChartData(&ChartMergeData::allocations, &chartAllocationsLabelIds, &data.allocations);
-        chartData.rows.push_back(data);
+        addChartData(&ChartMergeData::leaked, &leakedChartData, maxLeakedSinceLastTimeStamp);
+        addChartData(&ChartMergeData::allocated, &allocatedChartData, totalAllocated);
+        addChartData(&ChartMergeData::allocations, &allocationsChartData, totalAllocations);
         maxLeakedSinceLastTimeStamp = 0;
     }
 
@@ -172,10 +186,14 @@ struct ParserData final : public AccumulatedTraceData
 
     string debuggee;
 
-    ChartData chartData;
-    QHash<QString, int> chartLeakedLabelIds;
-    QHash<QString, int> chartAllocationsLabelIds;
-    QHash<QString, int> chartAllocatedLabelIds;
+    struct ChartDataWithLabels
+    {
+        ChartData data;
+        QHash<QString, int> labelIds;
+    };
+    ChartDataWithLabels leakedChartData;
+    ChartDataWithLabels allocationsChartData;
+    ChartDataWithLabels allocatedChartData;
     uint64_t maxLeakedSinceLastTimeStamp = 0;
 
     StringCache stringCache;
@@ -292,14 +310,6 @@ QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
     return topRows;
 }
 
-void convertLabels(const QHash<QString, int>& input, QHash<int, QString>* output)
-{
-    output->reserve(input.size());
-    for (auto it = input.constBegin(); it != input.constEnd(); ++it) {
-        output->insert(it.value(), it.key());
-    }
-}
-
 }
 
 Parser::Parser(QObject* parent)
@@ -314,13 +324,12 @@ void Parser::parse(const QString& path)
     stream() << make_job([=]() {
         ParserData data;
         data.read(path.toStdString());
-        convertLabels(data.chartLeakedLabelIds, &data.chartData.leakedLabels);
-        convertLabels(data.chartAllocatedLabelIds, &data.chartData.allocatedLabels);
-        convertLabels(data.chartAllocationsLabelIds, &data.chartData.allocationsLabels);
         emit summaryAvailable(generateSummary(data));
         const auto mergedAllocations = mergeAllocations(data);
         emit bottomUpDataAvailable(mergedAllocations);
-        emit chartDataAvailable(data.chartData);
+        emit leakedChartDataAvailable(data.leakedChartData.data);
+        emit allocationsChartDataAvailable(data.allocationsChartData.data);
+        emit allocatedChartDataAvailable(data.allocatedChartData.data);
         const auto topDownData = toTopDownData(mergedAllocations);
         emit topDownDataAvailable(topDownData);
         emit flameGraphDataAvailable(FlameGraph::parseData(topDownData));

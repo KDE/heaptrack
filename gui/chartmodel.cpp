@@ -33,40 +33,24 @@
 namespace {
 QColor colorForColumn(int column, int columnCount)
 {
-    return QColor::fromHsv((1. - double(column + 1) / columnCount) * 255, 255, 255);
-}
-
-quint64 indexValue(const ChartRows& data, int column, int index)
-{
-    if (column == ChartModel::LeakedColumn) {
-        return data.leaked.value(index);
-    } else if (column == ChartModel::AllocationsColumn) {
-        return data.allocations.value(index);
-    } else {
-        return data.allocated.value(index);
-    }
-}
-
-QString indexLabel(const ChartData& data, int column, int index)
-{
-    if (column == ChartModel::LeakedColumn) {
-        return data.leakedLabels.value(index);
-    } else if (column == ChartModel::AllocationsColumn) {
-        return data.allocationsLabels.value(index);
-    } else {
-        return data.allocatedLabels.value(index);
-    }
+    return QColor::fromHsv((double(column + 1) / columnCount) * 255, 255, 255);
 }
 }
 
-ChartModel::ChartModel(QObject* parent)
+ChartModel::ChartModel(Type type, QObject* parent)
     : QAbstractTableModel(parent)
+    , m_type(type)
 {
     qRegisterMetaType<ChartData>();
     new ModelTest(this);
 }
 
 ChartModel::~ChartModel() = default;
+
+ChartModel::Type ChartModel::type() const
+{
+    return m_type;
+}
 
 QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
@@ -79,15 +63,16 @@ QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int ro
         }
 
         if (role == Qt::DisplayRole || Qt::ToolTipRole) {
-            switch (section) {
-            case ChartModel::AllocatedColumn:
-                return i18n("Memory Allocated");
-            case ChartModel::AllocationsColumn:
-                return i18n("Memory Allocations");
-            case ChartModel::LeakedColumn:
-                return i18n("Memory Leaked");
-            case ChartModel::TimeStampColumn:
+            if (section == 0) {
                 return i18n("Elapsed Time");
+            }
+            switch (m_type) {
+            case Allocated:
+                return i18n("Memory Allocated");
+            case Allocations:
+                return i18n("Memory Allocations");
+            case Leaked:
+                return i18n("Memory Leaked");
             }
         }
     }
@@ -126,22 +111,22 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
     }
 
     const auto& data = m_data.rows.at(index.row());
-    const auto column = index.column() % NUM_COLUMNS;
-    const auto idx = index.column() / NUM_COLUMNS;
 
-    if (column == TimeStampColumn) {
+    int column = index.column();
+    if (role != Qt::ToolTipRole && column % 2 == 0) {
         return data.timeStamp;
     }
+    column = column / 2;
 
-    const auto cost = indexValue(data, column, idx);
-
-    if ( role == Qt::ToolTipRole ) {
+    const auto cost = data.cost.value(column);
+    if (role == Qt::ToolTipRole) {
         const QString time = QString::number(double(data.timeStamp) / 1000, 'g', 3) + QLatin1Char('s');
-        if (column == AllocationsColumn) {
-            return i18n("%1: %2 at %3", indexLabel(m_data, column, idx), cost, time);
+        const auto label = m_data.labels.value(column);
+        if (m_type == Allocations) {
+            return i18n("%1: %2 at %3", label, cost, time);
         } else {
             KFormat format;
-            return i18n("%1: %2 at %3", indexLabel(m_data, column, idx), format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
+            return i18n("%1: %2 at %3", label, format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
         }
     }
 
@@ -150,8 +135,7 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
 
 int ChartModel::columnCount(const QModelIndex& /*parent*/) const
 {
-    // the three cost columns + timestamp
-    return m_data.allocatedLabels.size() + m_data.allocationsLabels.size() + m_data.leakedLabels.size() + 1;
+    return m_data.labels.size() * 2;
 }
 
 int ChartModel::rowCount(const QModelIndex& parent) const

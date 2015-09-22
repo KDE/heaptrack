@@ -45,7 +45,6 @@ private:
     QScopedPointer<Ui::MainWindow> m_ui;
     TreeModel* m_bottomUpModel;
     TreeModel* m_topDownModel;
-    ChartModel* m_chartModel;
     Parser* m_parser;
 };
 
