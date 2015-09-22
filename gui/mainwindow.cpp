@@ -49,8 +49,8 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->loadingProgress->setMinimum(0);
     m_ui->loadingProgress->setMaximum(0);
 
-    auto leakedModel = new ChartModel(ChartModel::Leaked, this);
-    m_ui->leakedTab->setModel(leakedModel);
+    auto consumedModel = new ChartModel(ChartModel::Consumed, this);
+    m_ui->consumedTab->setModel(consumedModel);
     auto allocationsModel = new ChartModel(ChartModel::Allocations, this);
     m_ui->allocationsTab->setModel(allocationsModel);
     auto allocatedModel = new ChartModel(ChartModel::Allocated, this);
@@ -60,8 +60,8 @@ MainWindow::MainWindow(QWidget* parent)
             m_bottomUpModel, &TreeModel::resetData);
     connect(m_parser, &Parser::topDownDataAvailable,
             m_topDownModel, &TreeModel::resetData);
-    connect(m_parser, &Parser::leakedChartDataAvailable,
-            leakedModel, &ChartModel::resetData);
+    connect(m_parser, &Parser::consumedChartDataAvailable,
+            consumedModel, &ChartModel::resetData);
     connect(m_parser, &Parser::allocatedChartDataAvailable,
             allocatedModel, &ChartModel::resetData);
     connect(m_parser, &Parser::allocationsChartDataAvailable,

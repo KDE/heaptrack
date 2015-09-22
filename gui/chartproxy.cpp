@@ -20,10 +20,6 @@
 #include "chartproxy.h"
 #include "chartmodel.h"
 
-#include <KLocalizedString>
-
-#include <QDebug>
-
 ChartProxy::ChartProxy(bool showTotal, QObject* parent)
     : QSortFilterProxyModel(parent)
     , m_showTotal(showTotal)
@@ -31,19 +27,6 @@ ChartProxy::ChartProxy(bool showTotal, QObject* parent)
 }
 
 ChartProxy::~ChartProxy() = default;
-
-/*
-QVariant ChartProxy::data(const QModelIndex& proxyIndex, int role) const
-{
-    static_assert(ChartModel::TimeStampColumn == 0, "The code below assumes the time stamp column comes with value 0.");
-    if (role == Qt::ToolTipRole) {
-        // KChart queries the tooltip for the timestamp column, which is not useful for us
-        // instead, we want to use the m_column, or in proxy column value that is 1
-        return QSortFilterProxyModel::data(index(proxyIndex.row(), proxyIndex.column() + 1, proxyIndex.parent()), role);
-    } else {
-        return QSortFilterProxyModel::data(proxyIndex, role);
-    }
-}*/
 
 bool ChartProxy::filterAcceptsColumn(int sourceColumn, const QModelIndex& /*sourceParent*/) const
 {

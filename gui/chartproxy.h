@@ -30,8 +30,6 @@ public:
     explicit ChartProxy(bool showTotal, QObject* parent = nullptr);
     virtual ~ChartProxy();
 
-//     QVariant data(const QModelIndex & proxyIndex, int role = Qt::DisplayRole) const override;
-
 protected:
     bool filterAcceptsColumn(int sourceColumn, const QModelIndex& sourceParent) const override;
 

@@ -71,8 +71,8 @@ QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int ro
                 return i18n("Memory Allocated");
             case Allocations:
                 return i18n("Memory Allocations");
-            case Leaked:
-                return i18n("Memory Leaked");
+            case Consumed:
+                return i18n("Memory Consumed");
             }
         }
     }
@@ -91,11 +91,11 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
     if ( role == KChart::LineAttributesRole ) {
         KChart::LineAttributes attributes;
         attributes.setDisplayArea(true);
-//         if (index == m_selection) {
-//             attributes.setTransparency(255);
-//         } else {
+        if (index.column() > 1) {
+            attributes.setTransparency(127);
+        } else {
             attributes.setTransparency(50);
-//         }
+        }
         return QVariant::fromValue(attributes);
     }
 

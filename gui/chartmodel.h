@@ -43,7 +43,7 @@ class ChartModel : public QAbstractTableModel
     Q_OBJECT
 public:
     enum Type {
-        Leaked,
+        Consumed,
         Allocations,
         Allocated,
     };

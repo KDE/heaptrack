@@ -222,9 +222,9 @@
             </item>
            </layout>
           </widget>
-          <widget class="ChartWidget" name="leakedTab">
+          <widget class="ChartWidget" name="consumedTab">
            <attribute name="title">
-            <string>Leaked</string>
+            <string>Consumed</string>
            </attribute>
           </widget>
           <widget class="ChartWidget" name="allocationsTab">
