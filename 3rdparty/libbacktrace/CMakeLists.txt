@@ -127,6 +127,7 @@ check_symbol_exists (mmap sys/mman.h HAVE_MMAP)
 # This has a tremendous impact on the performance when analyzing the DWARF
 # symbols of a large binary, such as clang++ or webkit.
 set (ALLOC_FILE alloc.c)
+set (BACKTRACE_USES_MALLOC 1)
 
 if (HAVE_MMAP)
     set (VIEW_FILE mmapio.c)
@@ -134,12 +135,6 @@ if (HAVE_MMAP)
     check_symbol_exists (MAP_ANON sys/mman.h HAVE_MMAP_ANON)
 else ()
     set (VIEW_FILE read.c)
-endif ()
-
-if (ALLOC_FILE STREQUAL "alloc.c")
-    set (BACKTRACE_USES_MALLOC 1)
-else ()
-    set (BACKTRACE_USES_MALLOC 0)
 endif ()
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
