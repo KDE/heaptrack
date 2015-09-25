@@ -121,18 +121,19 @@ endif ()
 
 check_symbol_exists (mmap sys/mman.h HAVE_MMAP)
 
+# NOTE: For the use-case of heaptrack, we want to use malloc for allocating
+# the tiny fragments required for reading a backtrace as we are doing this
+# in a separate process, outside of a potential signal handler
+# This has a tremendous impact on the performance when analyzing the DWARF
+# symbols of a large binary, such as clang++ or webkit.
+set (ALLOC_FILE alloc.c)
+
 if (HAVE_MMAP)
     set (VIEW_FILE mmapio.c)
     check_symbol_exists (MAP_ANONYMOUS sys/mman.h HAVE_MMAP_ANONYMOUS)
     check_symbol_exists (MAP_ANON sys/mman.h HAVE_MMAP_ANON)
-    if (HAVE_MMAP_ANONYMOUS AND HAVE_MMAP_ANON)
-    set (ALLOC_FILE mmap.c)
-    else ()
-    set (ALLOC_FILE alloc.c)
-    endif ()
 else ()
     set (VIEW_FILE read.c)
-    set (ALLOC_FILE alloc.c)
 endif ()
 
 if (ALLOC_FILE STREQUAL "alloc.c")
