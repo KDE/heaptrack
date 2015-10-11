@@ -174,7 +174,7 @@ struct ParserData final : public AccumulatedTraceData
             return;
         }
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, leaked);
-        const uint64_t MAX_CHART_DATAPOINTS = 200; // TODO: make this configurable via the GUI
+        const uint64_t MAX_CHART_DATAPOINTS = 500; // TODO: make this configurable via the GUI
         const uint64_t diffBetweenTimeStamps = totalTime / MAX_CHART_DATAPOINTS;
         if (newStamp != totalTime && newStamp - lastTimeStamp < diffBetweenTimeStamps) {
             return;
