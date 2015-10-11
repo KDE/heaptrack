@@ -55,6 +55,12 @@ struct Index
     }
 };
 
+template<typename Base>
+uint qHash(const Index<Base> index, uint seed = 0) noexcept
+{
+    return qHash(index.index, seed);
+}
+
 struct StringIndex : public Index<StringIndex> {};
 struct ModuleIndex : public StringIndex {};
 struct FunctionIndex : public StringIndex {};
@@ -136,7 +142,6 @@ struct AccumulatedTraceData
     virtual void handleAllocation() = 0;
     virtual void handleDebuggee(const char* command) = 0;
 
-    void clear();
     const std::string& stringify(const StringIndex stringId) const;
 
     std::string prettyFunction(const std::string& function) const;
@@ -175,6 +180,7 @@ struct AccumulatedTraceData
     std::vector<InstructionPointer> instructionPointers;
     std::vector<TraceNode> traces;
     std::vector<std::string> strings;
+    std::vector<IpIndex> opNewIpIndices;
 };
 
 #endif // ACCUMULATEDTRACEDATA_H

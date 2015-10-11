@@ -57,16 +57,7 @@ AccumulatedTraceData::AccumulatedTraceData()
     allocations.reserve(16384);
     activeAllocations.reserve(65536);
     stopIndices.reserve(4);
-}
-
-void AccumulatedTraceData::clear()
-{
-    stopIndices.clear();
-    instructionPointers.clear();
-    traces.clear();
-    strings.clear();
-    allocations.clear();
-    activeAllocations.clear();
+    opNewIpIndices.reserve(16);
 }
 
 const string& AccumulatedTraceData::stringify(const StringIndex stringId) const
@@ -141,15 +132,11 @@ bool AccumulatedTraceData::read(const string& inputFile)
 
 bool AccumulatedTraceData::read(istream& in)
 {
-    clear();
-
     LineReader reader;
     uint64_t timeStamp = 0;
 
     vector<StringIndex> opNewStrIndices;
     opNewStrIndices.reserve(16);
-    vector<IpIndex> opNewIpIndices;
-    opNewIpIndices.reserve(16);
     vector<string> opNewStrings = {
         "operator new(unsigned long)",
         "operator new[](unsigned long)"
@@ -161,8 +148,20 @@ bool AccumulatedTraceData::read(istream& in)
         "__static_initialization_and_destruction_0"
     };
 
+    const bool reparsing = totalTime != 0;
+    m_maxAllocationTraceIndex.index = 0;
+    totalAllocated = 0;
+    totalAllocations = 0;
+    peak = 0;
+    leaked = 0;
+    allocations.clear();
+    sizeHistogram.clear();
+
     while (reader.getLine(in)) {
         if (reader.mode() == 's') {
+            if (reparsing) {
+                continue;
+            }
             strings.push_back(reader.line().substr(2));
             StringIndex index;
             index.index = strings.size();
@@ -179,6 +178,9 @@ bool AccumulatedTraceData::read(istream& in)
                 }
             }
         } else if (reader.mode() == 't') {
+            if (reparsing) {
+                continue;
+            }
             TraceNode node;
             reader >> node.ipIndex;
             reader >> node.parentIndex;
@@ -188,6 +190,9 @@ bool AccumulatedTraceData::read(istream& in)
             }
             traces.push_back(node);
         } else if (reader.mode() == 'i') {
+            if (reparsing) {
+                continue;
+            }
             InstructionPointer ip;
             reader >> ip.instructionPointer;
             reader >> ip.moduleIndex;
@@ -280,7 +285,9 @@ bool AccumulatedTraceData::read(istream& in)
     /// these are leaks, but we now have the same data in \c allocations as well
     activeAllocations.clear();
 
-    totalTime = timeStamp + 1;
+    if (!reparsing) {
+        totalTime = timeStamp + 1;
+    }
 
     handleTimeStamp(timeStamp, totalTime);
 

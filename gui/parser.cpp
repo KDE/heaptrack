@@ -97,88 +97,125 @@ struct StringCache
 
 struct ChartMergeData
 {
-    QString function;
+    IpIndex ip;
     quint64 consumed;
     quint64 allocations;
     quint64 allocated;
-    bool operator<(const QString& rhs) const
+    bool operator<(const IpIndex rhs) const
     {
-        return function < rhs;
+        return ip < rhs;
     }
 };
-static_assert(std::is_nothrow_move_assignable<ChartMergeData>::value, "ChartMergeData must be nothrow move assignable for performance reasons");
 
 struct ParserData final : public AccumulatedTraceData
 {
     ParserData()
+    {
+    }
+
+    void updateStringCache()
+    {
+        stringCache.update(strings);
+    }
+
+    void prepareBuildCharts()
     {
         // start off with null data at the origin
         consumedChartData.data.rows.push_back({});
         allocatedChartData.data.rows.push_back({});
         allocationsChartData.data.rows.push_back({});
         // index 0 indicates the total row
-        consumedChartData.labelIds.insert(i18n("total"), 0);
-        allocatedChartData.labelIds.insert(i18n("total"), 0);
-        allocationsChartData.labelIds.insert(i18n("total"), 0);
+        consumedChartData.data.labels[0] = i18n("total");
+        allocatedChartData.data.labels[0] = i18n("total");
+        allocationsChartData.data.labels[0] = i18n("total");
+
+        buildCharts = true;
+        maxConsumedSinceLastTimeStamp = 0;
+        vector<ChartMergeData> merged;
+        merged.reserve(instructionPointers.size());
+        // merge the allocation cost by instruction pointer
+        // TODO: aggregate by function instead?
+        // TODO: traverse the merged call stack up until the first fork
+        for (const auto& alloc : allocations) {
+            const auto ip = findTrace(alloc.traceIndex).ipIndex;
+            auto it = lower_bound(merged.begin(), merged.end(), ip);
+            if (it == merged.end() || it->ip != ip) {
+                it = merged.insert(it, {ip, 0, 0, 0});
+            }
+            it->consumed += alloc.peak; // we want to track the top peaks in the chart
+            it->allocated += alloc.allocated;
+            it->allocations += alloc.allocations;
+        }
+        // find the top hot spots for the individual data members and remember their IP and store the label
+        auto findTopChartEntries = [&] (quint64 ChartMergeData::* member, ChartDataWithLabels* data) {
+            sort(merged.begin(), merged.end(), [=] (const ChartMergeData& left, const ChartMergeData& right) {
+                return left.*member > right.*member;
+            });
+            const size_t MAX_CHART_FUNCTIONS = 20;
+            for (size_t i = 0; i < min(size_t(MAX_CHART_FUNCTIONS), merged.size()); ++i) {
+                const auto& alloc = merged[i];
+                if (!(alloc.*member)) {
+                    break;
+                }
+                const auto ip = alloc.ip;
+                data->labelIds[ip] = i + 1;
+                const auto function = stringCache.func(findIp(ip));
+                data->data.labels[i + 1] = function;
+            }
+        };
+        findTopChartEntries(&ChartMergeData::consumed, &consumedChartData);
+        findTopChartEntries(&ChartMergeData::allocated, &allocatedChartData);
+        findTopChartEntries(&ChartMergeData::allocations, &allocationsChartData);
     }
 
     void handleTimeStamp(uint64_t /*oldStamp*/, uint64_t newStamp)
     {
+        if (!buildCharts) {
+            return;
+        }
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, leaked);
-        // TODO: make this configurable via the GUI
-        const uint64_t diffBetweenTimeStamps = 1000; //  1000ms = 1s
+        const uint64_t MAX_CHART_DATAPOINTS = 200; // TODO: make this configurable via the GUI
+        const uint64_t diffBetweenTimeStamps = totalTime / MAX_CHART_DATAPOINTS;
         if (newStamp != totalTime && newStamp - lastTimeStamp < diffBetweenTimeStamps) {
             return;
         }
-        lastTimeStamp = newStamp;
-        stringCache.update(strings);
-
-        // merge data for top 10 functions in this timestamp
-        vector<ChartMergeData> mergedData;
-        for (const auto& allocation : allocations) {
-            const auto function = stringCache.func(findIp(findTrace(allocation.traceIndex).ipIndex));
-            auto it = lower_bound(mergedData.begin(), mergedData.end(), function);
-            if (it != mergedData.end() && it->function == function) {
-                it->allocated += allocation.allocated;
-                it->allocations += allocation.allocations;
-                it->consumed += allocation.leaked;
-            } else {
-                it = mergedData.insert(it, {function, allocation.leaked, allocation.allocations, allocation.allocated});
-            }
-        }
-
-        auto addChartData = [&] (quint64 ChartMergeData::* member, ChartDataWithLabels* data, quint64 totalCost) {
-            ChartRows row;
-            row.timeStamp = newStamp;
-            row.cost.insert(0, totalCost);
-            sort(mergedData.begin(), mergedData.end(), [=] (const ChartMergeData& left, const ChartMergeData& right) {
-                return left.*member > right.*member;
-            });
-            for (size_t i = 0; i < min(size_t(10), mergedData.size()); ++i) {
-                const auto& alloc = mergedData[i];
-                if (!(alloc.*member)) {
-                    break;
-                }
-                auto& id = data->labelIds[alloc.function];
-                if (!id) {
-                    id = data->labelIds.size() - 1;
-                }
-                row.cost.insert(id, alloc.*member);
-            }
-            data->data.rows.append(row);
-
-            if (newStamp == totalTime) {
-                // finalize and convert labels
-                data->data.labels.reserve(data->labelIds.size());
-                for (auto it = data->labelIds.constBegin(); it != data->labelIds.constEnd(); ++it) {
-                    data->data.labels.insert(it.value(), it.key());
-                }
-            }
-        };
-        addChartData(&ChartMergeData::consumed, &consumedChartData, maxConsumedSinceLastTimeStamp);
-        addChartData(&ChartMergeData::allocated, &allocatedChartData, totalAllocated);
-        addChartData(&ChartMergeData::allocations, &allocationsChartData, totalAllocations);
+        const auto nowConsumed = maxConsumedSinceLastTimeStamp;
         maxConsumedSinceLastTimeStamp = 0;
+        lastTimeStamp = newStamp;
+
+        // create the rows
+        auto createRow = [] (uint64_t timeStamp, uint64_t totalCost) {
+            ChartRows row;
+            row.timeStamp = timeStamp;
+            row.cost.insert(0, totalCost);
+            return row;
+        };
+        auto consumed = createRow(newStamp, nowConsumed);
+        auto allocated = createRow(newStamp, totalAllocated);
+        auto allocs = createRow(newStamp, totalAllocations);
+
+        // if the cost is non-zero and the ip corresponds to a hotspot function selected in the labels,
+        // we add the cost to the rows column
+        auto addDataToRow = [] (uint64_t cost, IpIndex ip, ChartDataWithLabels* labels, ChartRows* rows) {
+            if (!cost) {
+                return;
+            }
+            const auto id = labels->labelIds.value(ip, -1);
+            if (id == -1) {
+                return;
+            }
+            rows->cost[id] += cost;
+        };
+        for (const auto& alloc : allocations) {
+            const auto ip = findTrace(alloc.traceIndex).ipIndex;
+            addDataToRow(alloc.leaked, ip, &consumedChartData, &consumed);
+            addDataToRow(alloc.allocated, ip, &allocatedChartData, &allocated);
+            addDataToRow(alloc.allocations, ip, &allocationsChartData, &allocs);
+        }
+        // add the rows for this time stamp
+        consumedChartData.data.rows << consumed;
+        allocatedChartData.data.rows << allocated;
+        allocationsChartData.data.rows << allocs;
     }
 
     void handleAllocation()
@@ -196,7 +233,7 @@ struct ParserData final : public AccumulatedTraceData
     struct ChartDataWithLabels
     {
         ChartData data;
-        QHash<QString, int> labelIds;
+        QHash<IpIndex, int> labelIds;
     };
     ChartDataWithLabels consumedChartData;
     ChartDataWithLabels allocationsChartData;
@@ -205,6 +242,8 @@ struct ParserData final : public AccumulatedTraceData
     uint64_t lastTimeStamp = 0;
 
     StringCache stringCache;
+
+    bool buildCharts = false;
 };
 
 QString generateSummary(const ParserData& data)
@@ -330,17 +369,27 @@ void Parser::parse(const QString& path)
 {
     using namespace ThreadWeaver;
     stream() << make_job([=]() {
+        const auto stdPath = path.toStdString();
         ParserData data;
-        data.read(path.toStdString());
+        data.read(stdPath);
+        data.updateStringCache();
+
         emit summaryAvailable(generateSummary(data));
         const auto mergedAllocations = mergeAllocations(data);
         emit bottomUpDataAvailable(mergedAllocations);
+        // TODO: fork off into two threads here, one for creating top-down + flamegraph
+        //       one to do the chart stuff
+        const auto topDownData = toTopDownData(mergedAllocations);
+        emit topDownDataAvailable(topDownData);
+        // TODO: do this on-demand when the flame graph is shown for the first time
+        emit flameGraphDataAvailable(FlameGraph::parseData(topDownData));
+
+        data.prepareBuildCharts();
+        data.read(stdPath);
         emit consumedChartDataAvailable(data.consumedChartData.data);
         emit allocationsChartDataAvailable(data.allocationsChartData.data);
         emit allocatedChartDataAvailable(data.allocatedChartData.data);
-        const auto topDownData = toTopDownData(mergedAllocations);
-        emit topDownDataAvailable(topDownData);
-        emit flameGraphDataAvailable(FlameGraph::parseData(topDownData));
+
         emit finished();
     });
 }
