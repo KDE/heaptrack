@@ -28,8 +28,6 @@
 #include <QBrush>
 #include <QDebug>
 
-#include "modeltest.h"
-
 namespace {
 QColor colorForColumn(int column, int columnCount)
 {
@@ -42,7 +40,6 @@ ChartModel::ChartModel(Type type, QObject* parent)
     , m_type(type)
 {
     qRegisterMetaType<ChartData>();
-    new ModelTest(this);
 }
 
 ChartModel::~ChartModel() = default;
