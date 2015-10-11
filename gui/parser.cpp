@@ -124,8 +124,14 @@ struct ParserData final : public AccumulatedTraceData
 
     void handleTimeStamp(uint64_t /*oldStamp*/, uint64_t newStamp)
     {
-        stringCache.update(strings);
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, leaked);
+        // TODO: make this configurable via the GUI
+        const uint64_t diffBetweenTimeStamps = 1000; //  1000ms = 1s
+        if (newStamp != totalTime && newStamp - lastTimeStamp < diffBetweenTimeStamps) {
+            return;
+        }
+        lastTimeStamp = newStamp;
+        stringCache.update(strings);
 
         // merge data for top 10 functions in this timestamp
         vector<ChartMergeData> mergedData;
@@ -196,6 +202,7 @@ struct ParserData final : public AccumulatedTraceData
     ChartDataWithLabels allocationsChartData;
     ChartDataWithLabels allocatedChartData;
     uint64_t maxConsumedSinceLastTimeStamp = 0;
+    uint64_t lastTimeStamp = 0;
 
     StringCache stringCache;
 };
