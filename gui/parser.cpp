@@ -106,6 +106,7 @@ struct ChartMergeData
         return function < rhs;
     }
 };
+static_assert(std::is_nothrow_move_assignable<ChartMergeData>::value, "ChartMergeData must be nothrow move assignable for performance reasons");
 
 struct ParserData final : public AccumulatedTraceData
 {
