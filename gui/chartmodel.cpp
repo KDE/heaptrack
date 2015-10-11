@@ -51,7 +51,7 @@ ChartModel::Type ChartModel::type() const
 
 QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    Q_ASSERT(orientation != Qt::Horizontal || section < columnCount());
+    Q_ASSERT(orientation == Qt::Horizontal || section < columnCount());
     if (orientation == Qt::Horizontal) {
         if (role == KChart::DatasetPenRole) {
             return QVariant::fromValue(QPen(colorForColumn(section, columnCount())));
