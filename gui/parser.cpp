@@ -40,6 +40,7 @@ struct StringCache
 {
     StringCache()
     {
+        m_ipAddresses.reserve(16384);
     }
 
     QString func(const InstructionPointer& ip) const
@@ -48,7 +49,11 @@ struct StringCache
             // TODO: support removal of template arguments
             return stringify(ip.functionIndex);
         } else {
-            return static_cast<QString>(QLatin1String("0x") + QString::number(ip.instructionPointer, 16));
+            auto& ipAddr = m_ipAddresses[ip.instructionPointer];
+            if (ipAddr.isEmpty()) {
+                ipAddr = QLatin1String("0x") + QString::number(ip.instructionPointer, 16);
+            }
+            return ipAddr;
         }
     }
 
@@ -87,6 +92,7 @@ struct StringCache
     }
 
     vector<QString> m_strings;
+    mutable QHash<uint64_t, QString> m_ipAddresses;
 };
 
 struct ChartMergeData
