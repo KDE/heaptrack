@@ -30,6 +30,7 @@
 #include "flamegraph.h"
 
 #include <vector>
+#include <memory>
 
 using namespace std;
 
@@ -374,28 +375,40 @@ Parser::~Parser() = default;
 void Parser::parse(const QString& path)
 {
     using namespace ThreadWeaver;
-    stream() << make_job([=]() {
+    stream() << make_job([this, path]() {
         const auto stdPath = path.toStdString();
-        ParserData data;
-        data.read(stdPath);
-        data.updateStringCache();
+        auto data = make_shared<ParserData>();
+        data->read(stdPath);
+        data->updateStringCache();
 
-        emit summaryAvailable(generateSummary(data));
-        const auto mergedAllocations = mergeAllocations(data);
-        emit bottomUpDataAvailable(mergedAllocations);
-        // TODO: fork off into two threads here, one for creating top-down + flamegraph
-        //       one to do the chart stuff
-        const auto topDownData = toTopDownData(mergedAllocations);
-        emit topDownDataAvailable(topDownData);
-        // TODO: do this on-demand when the flame graph is shown for the first time
-        emit flameGraphDataAvailable(FlameGraph::parseData(topDownData));
+        emit summaryAvailable(generateSummary(*data));
 
-        data.prepareBuildCharts();
-        data.read(stdPath);
-        emit consumedChartDataAvailable(data.consumedChartData);
-        emit allocationsChartDataAvailable(data.allocationsChartData);
-        emit allocatedChartDataAvailable(data.allocatedChartData);
+        // merge allocations before modifying the data again
+        const auto mergedAllocations = mergeAllocations(*data);
+        // now data can be modified again for the chart data evaluation
 
-        emit finished();
+        auto parallel = new Collection;
+        *parallel << make_job([this, mergedAllocations]() {
+            emit bottomUpDataAvailable(mergedAllocations);
+            const auto topDownData = toTopDownData(mergedAllocations);
+            emit topDownDataAvailable(topDownData);
+            // TODO: do this on-demand when the flame graph is shown for the first time
+            emit flameGraphDataAvailable(FlameGraph::parseData(topDownData));
+        }) << make_job([this, data, stdPath]() {
+            // this mutates data, and thus anything running in parallel must
+            // not access data
+            data->prepareBuildCharts();
+            data->read(stdPath);
+            emit consumedChartDataAvailable(data->consumedChartData);
+            emit allocationsChartDataAvailable(data->allocationsChartData);
+            emit allocatedChartDataAvailable(data->allocatedChartData);
+        });
+
+        auto sequential = new Sequence;
+        *sequential << parallel << make_job([this]() {
+            emit finished();
+        });
+
+        stream() << sequential;
     });
 }
