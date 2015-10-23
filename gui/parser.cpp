@@ -108,6 +108,8 @@ struct ChartMergeData
     }
 };
 
+const uint64_t MAX_CHART_DATAPOINTS = 500; // TODO: make this configurable via the GUI
+
 struct ParserData final : public AccumulatedTraceData
 {
     ParserData()
@@ -121,6 +123,9 @@ struct ParserData final : public AccumulatedTraceData
 
     void prepareBuildCharts()
     {
+        consumedChartData.rows.reserve(MAX_CHART_DATAPOINTS);
+        allocatedChartData.rows.reserve(MAX_CHART_DATAPOINTS);
+        allocationsChartData.rows.reserve(MAX_CHART_DATAPOINTS);
         // start off with null data at the origin
         consumedChartData.rows.push_back({});
         allocatedChartData.rows.push_back({});
@@ -174,7 +179,6 @@ struct ParserData final : public AccumulatedTraceData
             return;
         }
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, leaked);
-        const uint64_t MAX_CHART_DATAPOINTS = 500; // TODO: make this configurable via the GUI
         const uint64_t diffBetweenTimeStamps = totalTime / MAX_CHART_DATAPOINTS;
         if (newStamp != totalTime && newStamp - lastTimeStamp < diffBetweenTimeStamps) {
             return;
