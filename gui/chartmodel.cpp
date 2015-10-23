@@ -114,8 +114,9 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
         return data.timeStamp;
     }
     column = column / 2;
+    Q_ASSERT(column < ChartRows::MAX_NUM_COST);
 
-    const auto cost = data.cost.value(column);
+    const auto cost = data.cost[column];
     if (role == Qt::ToolTipRole) {
         const QString time = QString::number(double(data.timeStamp) / 1000, 'g', 3) + QLatin1Char('s');
         const auto label = m_data.labels.value(column);

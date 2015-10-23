@@ -151,8 +151,7 @@ struct ParserData final : public AccumulatedTraceData
             sort(merged.begin(), merged.end(), [=] (const ChartMergeData& left, const ChartMergeData& right) {
                 return left.*member > right.*member;
             });
-            const size_t MAX_CHART_FUNCTIONS = 20;
-            for (size_t i = 0; i < min(size_t(MAX_CHART_FUNCTIONS), merged.size()); ++i) {
+            for (size_t i = 0; i < min(size_t(ChartRows::MAX_NUM_COST), merged.size()); ++i) {
                 const auto& alloc = merged[i];
                 if (!(alloc.*member)) {
                     break;
@@ -187,7 +186,7 @@ struct ParserData final : public AccumulatedTraceData
         auto createRow = [] (uint64_t timeStamp, uint64_t totalCost) {
             ChartRows row;
             row.timeStamp = timeStamp;
-            row.cost.insert(0, totalCost);
+            row.cost[0] = totalCost;
             return row;
         };
         auto consumed = createRow(newStamp, nowConsumed);

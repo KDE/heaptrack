@@ -22,11 +22,19 @@
 
 #include <QAbstractTableModel>
 #include <QVector>
+#include <array>
 
 struct ChartRows
 {
+    ChartRows()
+    {
+        cost.fill(0);
+    }
+    enum {
+        MAX_NUM_COST = 20
+    };
     quint64 timeStamp = 0;
-    QHash<int, quint64> cost;
+    std::array<quint64, MAX_NUM_COST> cost;
 };
 Q_DECLARE_TYPEINFO(ChartRows, Q_MOVABLE_TYPE);
 
