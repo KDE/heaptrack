@@ -121,13 +121,13 @@ struct ParserData final : public AccumulatedTraceData
     void prepareBuildCharts()
     {
         // start off with null data at the origin
-        consumedChartData.data.rows.push_back({});
-        allocatedChartData.data.rows.push_back({});
-        allocationsChartData.data.rows.push_back({});
+        consumedChartData.rows.push_back({});
+        allocatedChartData.rows.push_back({});
+        allocationsChartData.rows.push_back({});
         // index 0 indicates the total row
-        consumedChartData.data.labels[0] = i18n("total");
-        allocatedChartData.data.labels[0] = i18n("total");
-        allocationsChartData.data.labels[0] = i18n("total");
+        consumedChartData.labels[0] = i18n("total");
+        allocatedChartData.labels[0] = i18n("total");
+        allocationsChartData.labels[0] = i18n("total");
 
         buildCharts = true;
         maxConsumedSinceLastTimeStamp = 0;
@@ -147,7 +147,7 @@ struct ParserData final : public AccumulatedTraceData
             it->allocations += alloc.allocations;
         }
         // find the top hot spots for the individual data members and remember their IP and store the label
-        auto findTopChartEntries = [&] (quint64 ChartMergeData::* member, ChartDataWithLabels* data) {
+        auto findTopChartEntries = [&] (quint64 ChartMergeData::* member, int LabelIds::* label, ChartData* data) {
             sort(merged.begin(), merged.end(), [=] (const ChartMergeData& left, const ChartMergeData& right) {
                 return left.*member > right.*member;
             });
@@ -157,14 +157,14 @@ struct ParserData final : public AccumulatedTraceData
                     break;
                 }
                 const auto ip = alloc.ip;
-                data->labelIds[ip] = i + 1;
+                (labelIds[ip].*label) = i + 1;
                 const auto function = stringCache.func(findIp(ip));
-                data->data.labels[i + 1] = function;
+                data->labels[i + 1] = function;
             }
         };
-        findTopChartEntries(&ChartMergeData::consumed, &consumedChartData);
-        findTopChartEntries(&ChartMergeData::allocated, &allocatedChartData);
-        findTopChartEntries(&ChartMergeData::allocations, &allocationsChartData);
+        findTopChartEntries(&ChartMergeData::consumed, &LabelIds::consumed, &consumedChartData);
+        findTopChartEntries(&ChartMergeData::allocated, &LabelIds::allocated, &allocatedChartData);
+        findTopChartEntries(&ChartMergeData::allocations, &LabelIds::allocations, &allocationsChartData);
     }
 
     void handleTimeStamp(uint64_t /*oldStamp*/, uint64_t newStamp)
@@ -195,26 +195,27 @@ struct ParserData final : public AccumulatedTraceData
 
         // if the cost is non-zero and the ip corresponds to a hotspot function selected in the labels,
         // we add the cost to the rows column
-        auto addDataToRow = [] (uint64_t cost, IpIndex ip, ChartDataWithLabels* labels, ChartRows* rows) {
-            if (!cost) {
+        auto addDataToRow = [] (uint64_t cost, int labelId, ChartRows* rows) {
+            if (!cost || labelId == -1) {
                 return;
             }
-            const auto id = labels->labelIds.value(ip, -1);
-            if (id == -1) {
-                return;
-            }
-            rows->cost[id] += cost;
+            rows->cost[labelId] += cost;
         };
         for (const auto& alloc : allocations) {
             const auto ip = findTrace(alloc.traceIndex).ipIndex;
-            addDataToRow(alloc.leaked, ip, &consumedChartData, &consumed);
-            addDataToRow(alloc.allocated, ip, &allocatedChartData, &allocated);
-            addDataToRow(alloc.allocations, ip, &allocationsChartData, &allocs);
+            auto it = labelIds.constFind(ip);
+            if (it == labelIds.constEnd()) {
+                continue;
+            }
+            const auto& labelIds = *it;
+            addDataToRow(alloc.leaked, labelIds.consumed, &consumed);
+            addDataToRow(alloc.allocated, labelIds.allocated, &allocated);
+            addDataToRow(alloc.allocations, labelIds.allocations, &allocs);
         }
         // add the rows for this time stamp
-        consumedChartData.data.rows << consumed;
-        allocatedChartData.data.rows << allocated;
-        allocationsChartData.data.rows << allocs;
+        consumedChartData.rows << consumed;
+        allocatedChartData.rows << allocated;
+        allocationsChartData.rows << allocs;
     }
 
     void handleAllocation()
@@ -229,14 +230,20 @@ struct ParserData final : public AccumulatedTraceData
 
     string debuggee;
 
-    struct ChartDataWithLabels
+    ChartData consumedChartData;
+    ChartData allocationsChartData;
+    ChartData allocatedChartData;
+    // here we store the indices into ChartRows::cost for those IpIndices that
+    // are within the top hotspots. This way, we can do one hash lookup in the
+    // handleTimeStamp function instead of three when we'd store this data
+    // in a per-ChartData hash.
+    struct LabelIds
     {
-        ChartData data;
-        QHash<IpIndex, int> labelIds;
+        int consumed = -1;
+        int allocations = -1;
+        int allocated = -1;
     };
-    ChartDataWithLabels consumedChartData;
-    ChartDataWithLabels allocationsChartData;
-    ChartDataWithLabels allocatedChartData;
+    QHash<IpIndex, LabelIds> labelIds;
     uint64_t maxConsumedSinceLastTimeStamp = 0;
     uint64_t lastTimeStamp = 0;
 
@@ -385,9 +392,9 @@ void Parser::parse(const QString& path)
 
         data.prepareBuildCharts();
         data.read(stdPath);
-        emit consumedChartDataAvailable(data.consumedChartData.data);
-        emit allocationsChartDataAvailable(data.allocationsChartData.data);
-        emit allocatedChartDataAvailable(data.allocatedChartData.data);
+        emit consumedChartDataAvailable(data.consumedChartData);
+        emit allocationsChartDataAvailable(data.allocationsChartData);
+        emit allocatedChartDataAvailable(data.allocatedChartData);
 
         emit finished();
     });
