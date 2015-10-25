@@ -274,7 +274,7 @@ struct AccumulatedTraceData
      * Prevent the same file from being initialized multiple times.
      * This drastically cuts the memory consumption down
      */
-    backtrace_state* findBacktraceState(const string& fileName, uintptr_t addressStart, bool isExe)
+    backtrace_state* findBacktraceState(const string& fileName, uintptr_t addressStart)
     {
         if (boost::algorithm::starts_with(fileName, "linux-vdso.so")) {
             // prevent warning, since this will always fail
@@ -306,7 +306,7 @@ struct AccumulatedTraceData
                 int foundSym = 0;
                 int foundDwarf = 0;
                 auto ret = elf_add(state, descriptor, addressStart, errorHandler, &data,
-                                   &state->fileline_fn, &foundSym, &foundDwarf, isExe);
+                                   &state->fileline_fn, &foundSym, &foundDwarf, false);
                 if (ret && foundSym) {
                     state->syminfo_fn = &elf_syminfo;
                 }
@@ -351,8 +351,7 @@ int main(int /*argc*/, char** /*argv*/)
             if (fileName == "-") {
                 data.clearModules();
             } else {
-                const bool isExe = (fileName == "x");
-                if (isExe) {
+                if (fileName == "x") {
                     fileName = exe;
                 }
                 const auto moduleIndex = data.intern(fileName);
@@ -361,7 +360,7 @@ int main(int /*argc*/, char** /*argv*/)
                     cerr << "failed to parse line: " << reader.line() << endl;
                     return 1;
                 }
-                auto state = data.findBacktraceState(fileName, addressStart, isExe);
+                auto state = data.findBacktraceState(fileName, addressStart);
                 uintptr_t vAddr = 0;
                 uintptr_t memSize = 0;
                 while ((reader >> vAddr) && (reader >> memSize)) {
