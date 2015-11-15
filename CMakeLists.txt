@@ -2,6 +2,11 @@ cmake_minimum_required(VERSION 2.8.9)
 project(heaptrack)
 enable_testing()
 
+if(NOT CMAKE_BUILD_TYPE)
+  message(STATUS "Setting build type to 'RelWithDebInfo' as none was specified.")
+  set(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build." FORCE)
+endif()
+
 set(HEAPTRACK_VERSION_MAJOR 0)
 set(HEAPTRACK_VERSION_MINOR 1)
 set(HEAPTRACK_VERSION_PATCH 0)
