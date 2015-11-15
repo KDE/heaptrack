@@ -13,11 +13,14 @@ set(HEAPTRACK_VERSION_PATCH 0)
 set(HEAPTRACK_LIB_VERSION 1.0.0)
 set(HEAPTRACK_LIB_SOVERSION 1)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
 find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options)
 find_package(Threads REQUIRED)
 find_package(Qt5 5.2.0 NO_MODULE OPTIONAL_COMPONENTS Widgets)
 find_package(ECM 1.0.0 NO_MODULE)
 find_package(ZLIB REQUIRED)
+find_package(Sqlite REQUIRED)
 include(FeatureSummary)
 
 if(Qt5_FOUND AND ECM_FOUND)
@@ -94,6 +97,9 @@ set_target_properties(heaptrack_inject PROPERTIES VERSION ${HEAPTRACK_LIB_VERSIO
 
 add_executable(heaptrack_interpret heaptrack_interpret.cpp)
 target_link_libraries(heaptrack_interpret backtrace)
+
+add_executable(heaptrack_convert heaptrack_convert.cpp)
+target_link_libraries(heaptrack_convert ${SQLITE_LIBRARIES})
 
 add_library(sharedprint STATIC accumulatedtracedata.cpp)
 target_link_libraries(sharedprint LINK_PUBLIC ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
