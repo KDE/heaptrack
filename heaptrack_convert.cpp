@@ -76,9 +76,9 @@ sqlite::Database initSql(const string& file)
     sqlite::execute(db, R"(
         CREATE TABLE Timestamps (
             id UNSIGNED INTEGER PRIMARY KEY ASC,
-            time UNSIGNED INTEGER
+            time UNSIGNED INTEGER,
             allocationId UNSIGNED INTEGER,
-            deallocationId UNSIGNED INTEGER,
+            deallocationId UNSIGNED INTEGER
         )
     )");
     sqlite::execute(db, R"(
