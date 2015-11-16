@@ -127,6 +127,18 @@ public:
         }
     }
 
+    template<typename T>
+    void bindAll(int i, T v)
+    {
+        bind(i, v);
+    }
+
+    template<typename T, typename... Args>
+    void bindAll(int i, T first, Args... args) {
+        bindAll(i, first);
+        bindAll(i + 1, args...);
+    }
+
 private:
     Database m_db;
     sqlite3_stmt* m_statement = nullptr;
@@ -154,18 +166,6 @@ public:
     }
 
 private:
-    template<typename T>
-    void bindAll(int i, T v)
-    {
-        bind(i, v);
-    }
-
-    template<typename T, typename... Args>
-    void bindAll(int i, T first, Args... args) {
-        bindAll(i, first);
-        bindAll(i + 1, args...);
-    }
-
     uint64_t m_id = 0;
 };
 

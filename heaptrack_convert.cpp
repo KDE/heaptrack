@@ -23,6 +23,7 @@
 #include <iostream>
 #include <cstdio>
 #include <stdio_ext.h>
+#include <unordered_map>
 
 using namespace std;
 
@@ -41,13 +42,13 @@ sqlite::Database initSql(const string& file)
             id UNSIGNED INTEGER PRIMARY KEY ASC,
             instructionPointer UNSIGNED INTEGER,
             parent UNSIGNED INTEGER
-        )
+        ) WITHOUT ROWID
     )");
     sqlite::execute(db, R"(
         CREATE TABLE Strings (
             id UNSIGNED INTEGER PRIMARY KEY ASC,
             string TEXT
-        )
+        ) WITHOUT ROWID
     )");
     sqlite::execute(db, R"(
         CREATE TABLE InstructionPointers (
@@ -57,36 +58,28 @@ sqlite::Database initSql(const string& file)
             function UNSIGNED INTEGER,
             file UNSIGNED INTEGER,
             line UNSIGNED INTEGER
-        )
+        ) WITHOUT ROWID
     )");
     sqlite::execute(db, R"(
         CREATE TABLE Allocations (
             id UNSIGNED INTEGER PRIMARY KEY ASC,
-            size UNSIGNED INTEGER,
-            trace UNSIGNED INTEGER,
-            pointer UNSIGNED INTEGER
-        )
-    )");
-    sqlite::execute(db, R"(
-        CREATE TABLE Deallocations (
-            id UNSIGNED INTEGER PRIMARY KEY ASC,
-            pointer UNSIGNED INTEGER
-        )
+            size INTEGER,
+            trace UNSIGNED INTEGER
+        ) WITHOUT ROWID
     )");
     sqlite::execute(db, R"(
         CREATE TABLE Timestamps (
             id UNSIGNED INTEGER PRIMARY KEY ASC,
             time UNSIGNED INTEGER,
-            allocationId UNSIGNED INTEGER,
-            deallocationId UNSIGNED INTEGER
-        )
+            allocations UNSIGNED INTEGER
+        ) WITHOUT ROWID
     )");
     sqlite::execute(db, R"(
         CREATE TABLE Metadata (
             id UNSIGNED INTEGER PRIMARY KEY ASC,
             string TEXT,
             value TEXT
-        )
+        ) WITHOUT ROWID
     )");
 
     // improve performance of bulk writes
@@ -98,6 +91,8 @@ sqlite::Database initSql(const string& file)
 
 void convertToSql(istream& in, sqlite::Database db)
 {
+    unordered_map<uint64_t, uint64_t> ptrToAllocationId;
+    ptrToAllocationId.reserve(1000000);
     LineReader reader;
 
     sqlite::execute(db, R"(
@@ -116,16 +111,17 @@ void convertToSql(istream& in, sqlite::Database db)
         INSERT INTO InstructionPointers VALUES (?1, ?2, ?3, ?4, ?5, ?6)
     )");
 
-    sqlite::InsertQuery allocations(db, R"(
-        INSERT INTO Allocations VALUES (?1, ?2, ?3, ?4)
+    uint64_t allocationEntries = 0;
+    sqlite::Query allocations(db, R"(
+        INSERT INTO Allocations VALUES (?1, ?2, ?3)
     )");
-
-    sqlite::InsertQuery deallocations(db, R"(
-        INSERT INTO Deallocations VALUES (?1, ?2)
+    sqlite::Query deallocations(db, R"(
+        INSERT INTO Allocations (id, size, trace)
+        SELECT ?1, -b.size, b.trace FROM Allocations AS b WHERE b.id = ?2
     )");
 
     sqlite::InsertQuery timestamps(db, R"(
-        INSERT INTO Timestamps VALUES (?1, ?2, ?3, ?4)
+        INSERT INTO Timestamps VALUES (?1, ?2, ?3)
     )");
 
     sqlite::InsertQuery metadata(db, R"(
@@ -160,18 +156,32 @@ void convertToSql(istream& in, sqlite::Database db)
             reader >> size;
             reader >> traceId;
             reader >> ptr;
-            allocations.insert(size, traceId, ptr);
+            allocations.bindAll(1, allocationEntries, size, traceId);
+            allocations.execute();
+            allocations.reset();
+            ptrToAllocationId[ptr] = allocationEntries;
+            ++allocationEntries;
         } else if (reader.mode() == '-') {
             uint64_t ptr = 0;
             reader >> ptr;
-            deallocations.insert(ptr);
+            auto it = ptrToAllocationId.find(ptr);
+            if (it != ptrToAllocationId.end()) {
+                auto allocationId = it->second;
+                ptrToAllocationId.erase(it);
+                deallocations.bindAll(1, allocationEntries, allocationId);
+                deallocations.execute();
+                deallocations.reset();
+                ++allocationEntries;
+            } else {
+                cerr << "unknown ptr passed to free: " << reader.line() << '\n';
+            }
         } else if (reader.mode() == '#') {
             // comment or empty line
             continue;
         } else if (reader.mode() == 'c') {
             uint64_t timestamp = 0;
             reader >> timestamp;
-            timestamps.insert(timestamp, allocations.rowsInserted(), deallocations.rowsInserted());
+            timestamps.insert(timestamp, allocationEntries);
         } else if (reader.mode() == 'X') {
             const auto debuggee = reader.line().c_str() + 2;
             metadata.insert("debuggee", debuggee);
@@ -185,6 +195,12 @@ void convertToSql(istream& in, sqlite::Database db)
     sqlite::execute(db, R"(
         END TRANSACTION
     )");
+
+    cout << "finalizing...\n";
+    sqlite::execute(db, R"(
+        VACUUM
+    )");
+    cout << "done\n";
 }
 
 }
