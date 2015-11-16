@@ -124,6 +124,7 @@ configure_file(heaptrack.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/heaptrack @ONLY)
 install(TARGETS heaptrack_print RUNTIME DESTINATION ${BIN_INSTALL_DIR})
 install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/heaptrack DESTINATION ${BIN_INSTALL_DIR})
 install(TARGETS heaptrack_interpret RUNTIME DESTINATION ${LIBEXEC_INSTALL_DIR})
+install(TARGETS heaptrack_convert RUNTIME DESTINATION ${LIBEXEC_INSTALL_DIR})
 install(TARGETS heaptrack_inject LIBRARY DESTINATION ${LIB_INSTALL_DIR}/heaptrack/)
 install(TARGETS heaptrack_preload LIBRARY DESTINATION ${LIB_INSTALL_DIR}/heaptrack/)
 
