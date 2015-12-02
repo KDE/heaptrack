@@ -263,7 +263,7 @@ struct Printer final : public AccumulatedTraceData
             return l.*member > r.*member;
         };
         sort(mergedAllocations.begin(), mergedAllocations.end(), sortOrder);
-        for (size_t i = 0; i < min(size_t(10), mergedAllocations.size()); ++i) {
+        for (size_t i = 0; i < min(peakLimit, mergedAllocations.size()); ++i) {
             auto& allocation = mergedAllocations[i];
             if (!(allocation.*member)) {
                 break;
@@ -300,7 +300,7 @@ struct Printer final : public AccumulatedTraceData
             [member] (const Allocation& l, const Allocation &r) {
                 return l.*member > r.*member;
             });
-        for (size_t i = 0; i < min(size_t(10), allocations.size()); ++i) {
+        for (size_t i = 0; i < min(peakLimit, allocations.size()); ++i) {
             const auto& allocation = allocations[i];
             if (!(allocation.*member)) {
                 break;
@@ -465,6 +465,7 @@ struct Printer final : public AccumulatedTraceData
     uint64_t massifDetailedFreq = 1;
 
     string filterBtFunction;
+    size_t peakLimit;
 };
 }
 
@@ -484,6 +485,8 @@ int main(int argc, char** argv)
             "Print backtraces to top allocators, sorted by number of calls to allocation functions.")
         ("print-leaks,l", po::value<bool>()->default_value(false)->implicit_value(true),
             "Print backtraces to leaked memory allocations.")
+        ("peak-limit,n", po::value<size_t>()->default_value(10)->implicit_value(10),
+            "Limit the number of reported peaks.")
         ("print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
             "Print top overall allocators, ignoring memory frees.")
         ("print-histogram,H", po::value<string>()->default_value(string()),
@@ -563,6 +566,7 @@ int main(int argc, char** argv)
         data.massifThreshold = vm["massif-threshold"].as<double>();
         data.massifDetailedFreq = vm["massif-detailed-freq"].as<size_t>();
     }
+    data.peakLimit = vm["peak-limit"].as<size_t>();
     const bool printLeaks = vm["print-leaks"].as<bool>();
     const bool printOverallAlloc = vm["print-overall-allocated"].as<bool>();
     const bool printPeaks = vm["print-peaks"].as<bool>();
