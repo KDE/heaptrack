@@ -68,8 +68,8 @@ MainWindow::MainWindow(QWidget* parent)
             allocationsModel, &ChartModel::resetData);
     connect(m_parser, &Parser::summaryAvailable,
             m_ui->summary, &QLabel::setText);
-    connect(m_parser, &Parser::flameGraphDataAvailable,
-            m_ui->flameGraphTab, &FlameGraph::setData);
+    connect(m_parser, &Parser::topDownDataAvailable,
+            m_ui->flameGraphTab, &FlameGraph::setTopDownData);
     connect(m_parser, &Parser::finished,
             this, [&] { m_ui->pages->setCurrentWidget(m_ui->resultsPage); });
 

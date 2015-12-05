@@ -25,7 +25,7 @@
 #include <QGraphicsScene>
 #include <QStyleOption>
 #include <QGraphicsView>
-#include <QGraphicsItem>
+#include <QGraphicsRectItem>
 #include <QWheelEvent>
 #include <QEvent>
 #include <QToolTip>
@@ -33,6 +33,28 @@
 
 #include <KLocalizedString>
 #include <KColorScheme>
+
+class FrameGraphicsItem : public QGraphicsRectItem
+{
+public:
+    FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent = nullptr);
+
+    quint64 cost() const;
+    void setCost(quint64 cost);
+    QString function() const;
+
+    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
+
+protected:
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
+    void showToolTip() const;
+
+private:
+    quint64 m_cost;
+    QString m_function;
+    bool m_isHovered;
+};
 
 FrameGraphicsItem::FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent)
     : QGraphicsRectItem(parent)
@@ -185,6 +207,23 @@ void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent)
     }
 }
 
+FrameGraphicsItem* parseData(const QVector<RowData>& topDownData)
+{
+    double totalCost = 0;
+    foreach(const auto& frame, topDownData) {
+        totalCost += frame.allocations;
+    }
+
+    KColorScheme scheme(QPalette::Active);
+    const QPen pen(scheme.foreground().color());
+
+    auto rootItem = new FrameGraphicsItem(totalCost, i18n("%1 allocations in total", totalCost));
+    rootItem->setBrush(scheme.background());
+    rootItem->setPen(pen);
+    toGraphicsItems(topDownData, rootItem);
+    return rootItem;
+}
+
 }
 
 FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
@@ -223,11 +262,35 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
     return ret;
 }
 
+void FlameGraph::showEvent(QShowEvent* event)
+{
+    setData(parseData(m_topDownData));
+    QWidget::showEvent(event);
+}
+
+void FlameGraph::hideEvent(QHideEvent* event)
+{
+    setData(nullptr);
+    QWidget::hideEvent(event);
+}
+
+void FlameGraph::setTopDownData(const TreeData& topDownData)
+{
+    m_topDownData = topDownData;
+    if (isVisible()) {
+        setData(parseData(topDownData));
+    }
+}
+
 void FlameGraph::setData(FrameGraphicsItem* rootItem)
 {
     m_scene->clear();
     m_rootItem = rootItem;
     m_selectedItem = rootItem;
+    if (!rootItem) {
+        return;
+    }
+
     // layouting needs a root item with a given height, the rest will be overwritten later
     rootItem->setRect(0, 0, 800, m_view->fontMetrics().height() + 4);
     m_scene->addItem(rootItem);
@@ -235,23 +298,6 @@ void FlameGraph::setData(FrameGraphicsItem* rootItem)
     if (isVisible()) {
         selectItem(m_rootItem);
     }
-}
-
-FrameGraphicsItem* FlameGraph::parseData(const QVector<RowData>& topDownData)
-{
-    double totalCost = 0;
-    foreach(const auto& frame, topDownData) {
-        totalCost += frame.allocations;
-    }
-
-    KColorScheme scheme(QPalette::Active);
-    const QPen pen(scheme.foreground().color());
-
-    auto rootItem = new FrameGraphicsItem(totalCost, i18n("%1 allocations in total", totalCost));
-    rootItem->setBrush(scheme.background());
-    rootItem->setPen(pen);
-    toGraphicsItems(topDownData, rootItem);
-    return rootItem;
 }
 
 void FlameGraph::selectItem(FrameGraphicsItem* item)

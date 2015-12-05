@@ -21,33 +21,12 @@
 #define FLAMEGRAPH_H
 
 #include <QWidget>
-#include <QGraphicsRectItem>
 #include "treemodel.h"
 
 class QGraphicsScene;
 class QGraphicsView;
 
-class FrameGraphicsItem : public QGraphicsRectItem
-{
-public:
-    FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent = nullptr);
-
-    quint64 cost() const;
-    void setCost(quint64 cost);
-    QString function() const;
-
-    void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
-
-protected:
-    void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
-    void showToolTip() const;
-
-private:
-    quint64 m_cost;
-    QString m_function;
-    bool m_isHovered;
-};
+class FrameGraphicsItem;
 
 class FlameGraph : public QWidget
 {
@@ -56,15 +35,18 @@ public:
     FlameGraph(QWidget* parent = nullptr, Qt::WindowFlags flags = 0);
     ~FlameGraph();
 
-    void setData(FrameGraphicsItem* rootFrame);
-    // called from background thread
-    static FrameGraphicsItem* parseData(const QVector<RowData>& topDownData);
+    void setTopDownData(const TreeData& topDownData);
 
 protected:
     bool eventFilter(QObject* object, QEvent* event) override;
+    void showEvent(QShowEvent* event) override;
+    void hideEvent(QHideEvent* event) override;
 
 private:
+    void setData(FrameGraphicsItem* rootItem);
     void selectItem(FrameGraphicsItem* item);
+
+    TreeData m_topDownData;
 
     QGraphicsScene* m_scene;
     QGraphicsView* m_view;

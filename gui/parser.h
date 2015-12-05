@@ -25,8 +25,6 @@
 #include "treemodel.h"
 #include "chartmodel.h"
 
-class FrameGraphicsItem;
-
 class Parser : public QObject
 {
     Q_OBJECT
@@ -44,7 +42,6 @@ signals:
     void consumedChartDataAvailable(const ChartData& data);
     void allocationsChartDataAvailable(const ChartData& data);
     void allocatedChartDataAvailable(const ChartData& data);
-    void flameGraphDataAvailable(FrameGraphicsItem* rootItem);
     void finished();
 };
 

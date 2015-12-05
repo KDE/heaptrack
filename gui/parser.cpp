@@ -27,7 +27,6 @@
 #include <QDebug>
 
 #include "../accumulatedtracedata.h"
-#include "flamegraph.h"
 
 #include <vector>
 #include <memory>
@@ -396,8 +395,6 @@ void Parser::parse(const QString& path)
             emit bottomUpDataAvailable(mergedAllocations);
             const auto topDownData = toTopDownData(mergedAllocations);
             emit topDownDataAvailable(topDownData);
-            // TODO: do this on-demand when the flame graph is shown for the first time
-            emit flameGraphDataAvailable(FlameGraph::parseData(topDownData));
         }) << make_job([this, data, stdPath]() {
             // this mutates data, and thus anything running in parallel must
             // not access data
