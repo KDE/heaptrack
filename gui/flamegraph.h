@@ -41,9 +41,11 @@ public:
 protected:
     bool eventFilter(QObject* object, QEvent* event) override;
 
+private slots:
+    void setData(FrameGraphicsItem* rootItem);
+
 private:
     void showData();
-    void setData(FrameGraphicsItem* rootItem);
     void selectItem(FrameGraphicsItem* item);
 
     TreeData m_topDownData;

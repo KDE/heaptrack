@@ -32,6 +32,7 @@
 #include <QDebug>
 #include <QAction>
 
+#include <ThreadWeaver/ThreadWeaver>
 #include <KLocalizedString>
 #include <KColorScheme>
 
@@ -56,6 +57,8 @@ private:
     QString m_function;
     bool m_isHovered;
 };
+
+Q_DECLARE_METATYPE(FrameGraphicsItem*);
 
 FrameGraphicsItem::FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent)
     : QGraphicsRectItem(parent)
@@ -235,6 +238,8 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     , m_selectedItem(nullptr)
     , m_minRootWidth(0)
 {
+    qRegisterMetaType<FrameGraphicsItem*>();
+
     setLayout(new QVBoxLayout);
 
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -294,7 +299,14 @@ void FlameGraph::setBottomUpData(const TreeData& bottomUpData)
 void FlameGraph::showData()
 {
     setData(nullptr);
-    setData(parseData(m_showBottomUpData ? m_bottomUpData : m_topDownData));
+
+    using namespace ThreadWeaver;
+    auto data = m_showBottomUpData ? m_bottomUpData : m_topDownData;
+    stream() << make_job([data, this]() {
+        auto parsedData = parseData(data);
+        QMetaObject::invokeMethod(this, "setData", Qt::QueuedConnection,
+                                  Q_ARG(FrameGraphicsItem*, parsedData));
+    });
 }
 
 void FlameGraph::setData(FrameGraphicsItem* rootItem)
@@ -303,6 +315,8 @@ void FlameGraph::setData(FrameGraphicsItem* rootItem)
     m_rootItem = rootItem;
     m_selectedItem = rootItem;
     if (!rootItem) {
+        auto text = m_scene->addText(i18n("generating flame graph..."));
+        m_view->centerOn(text);
         return;
     }
 
