@@ -30,6 +30,7 @@
 #include <QEvent>
 #include <QToolTip>
 #include <QDebug>
+#include <QAction>
 
 #include <KLocalizedString>
 #include <KColorScheme>
@@ -241,6 +242,14 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     m_view->viewport()->installEventFilter(this);
     m_view->viewport()->setMouseTracking(true);
     m_view->setFont(QFont(QStringLiteral("monospace")));
+    m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
+    auto bottomUpViewAction = new QAction(i18n("Bottom-Down View"), this);
+    bottomUpViewAction->setCheckable(true);
+    connect(bottomUpViewAction, &QAction::toggled, this, [this, bottomUpViewAction] {
+        m_showBottomUpData = bottomUpViewAction->isChecked();
+        showData();
+    });
+    m_view->addAction(bottomUpViewAction);
 
     layout()->addWidget(m_view);
 }
@@ -257,29 +266,35 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
             selectItem(static_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos())));
         }
     } else if (event->type() == QEvent::Resize || event->type() == QEvent::Show) {
-        selectItem(m_selectedItem);
+        if (!m_rootItem) {
+            showData();
+        } else {
+            selectItem(m_selectedItem);
+        }
+    } else if (event->type() == QEvent::Hide) {
+        setData(nullptr);
     }
     return ret;
-}
-
-void FlameGraph::showEvent(QShowEvent* event)
-{
-    setData(parseData(m_topDownData));
-    QWidget::showEvent(event);
-}
-
-void FlameGraph::hideEvent(QHideEvent* event)
-{
-    setData(nullptr);
-    QWidget::hideEvent(event);
 }
 
 void FlameGraph::setTopDownData(const TreeData& topDownData)
 {
     m_topDownData = topDownData;
+
     if (isVisible()) {
-        setData(parseData(topDownData));
+        showData();
     }
+}
+
+void FlameGraph::setBottomUpData(const TreeData& bottomUpData)
+{
+    m_bottomUpData = bottomUpData;
+}
+
+void FlameGraph::showData()
+{
+    setData(nullptr);
+    setData(parseData(m_showBottomUpData ? m_bottomUpData : m_topDownData));
 }
 
 void FlameGraph::setData(FrameGraphicsItem* rootItem)

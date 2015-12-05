@@ -70,6 +70,8 @@ MainWindow::MainWindow(QWidget* parent)
             m_ui->summary, &QLabel::setText);
     connect(m_parser, &Parser::topDownDataAvailable,
             m_ui->flameGraphTab, &FlameGraph::setTopDownData);
+    connect(m_parser, &Parser::bottomUpDataAvailable,
+            m_ui->flameGraphTab, &FlameGraph::setBottomUpData);
     connect(m_parser, &Parser::finished,
             this, [&] { m_ui->pages->setCurrentWidget(m_ui->resultsPage); });
 

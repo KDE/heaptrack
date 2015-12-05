@@ -36,23 +36,25 @@ public:
     ~FlameGraph();
 
     void setTopDownData(const TreeData& topDownData);
+    void setBottomUpData(const TreeData& bottomUpData);
 
 protected:
     bool eventFilter(QObject* object, QEvent* event) override;
-    void showEvent(QShowEvent* event) override;
-    void hideEvent(QHideEvent* event) override;
 
 private:
+    void showData();
     void setData(FrameGraphicsItem* rootItem);
     void selectItem(FrameGraphicsItem* item);
 
     TreeData m_topDownData;
+    TreeData m_bottomUpData;
 
     QGraphicsScene* m_scene;
     QGraphicsView* m_view;
     FrameGraphicsItem* m_rootItem;
     FrameGraphicsItem* m_selectedItem;
     int m_minRootWidth;
+    bool m_showBottomUpData = false;
 };
 
 #endif // FLAMEGRAPH_H
