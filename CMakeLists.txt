@@ -100,6 +100,8 @@ target_link_libraries(heaptrack_interpret backtrace)
 
 add_executable(heaptrack_convert heaptrack_convert.cpp)
 target_link_libraries(heaptrack_convert ${SQLITE_LIBRARIES})
+add_executable(heaptrack_convert2 heaptrack_convert2.cpp)
+target_link_libraries(heaptrack_convert2 ${SQLITE_LIBRARIES})
 
 add_library(sharedprint STATIC accumulatedtracedata.cpp)
 target_link_libraries(sharedprint LINK_PUBLIC ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})

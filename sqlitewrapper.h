@@ -98,6 +98,11 @@ public:
         return sqlite3_step(m_statement) != SQLITE_DONE;
     }
 
+    uint64_t value(int where) const
+    {
+        return static_cast<uint64_t>(sqlite3_column_int64(m_statement, where));
+    }
+
     void bind(int where, const char* text, int length = -1, bool staticData = true)
     {
         if (length == -1) {
