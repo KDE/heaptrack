@@ -129,21 +129,21 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         case LeakedColumn:
             return row->leaked;
         case FunctionColumn:
-            return row->location.function;
+            return row->location->function;
         case ModuleColumn:
-            return row->location.module;
+            return row->location->module;
         case FileColumn:
-            return row->location.file;
+            return row->location->file;
         case LineColumn:
-            return row->location.line;
+            return row->location->line;
         case LocationColumn:
-            if (row->location.file.isEmpty()) {
-                return i18n("%1 in ?? (%2)", row->location.function,
-                            row->location.module);
+            if (row->location->file.isEmpty()) {
+                return i18n("%1 in ?? (%2)", row->location->function,
+                            row->location->module);
             } else {
-                return i18n("%1 in %2:%3 (%4)", row->location.function,
-                            row->location.file, row->location.line,
-                            row->location.module);
+                return i18n("%1 in %2:%3 (%4)", row->location->function,
+                            row->location->file, row->location->line,
+                            row->location->module);
             }
         case NUM_COLUMNS:
             break;
@@ -153,7 +153,7 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         QTextStream stream(&tooltip);
         stream << "<qt><pre>";
         stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                        row->location.function, row->location.file, row->location.line, row->location.module);
+                        row->location->function, row->location->file, row->location->line, row->location->module);
         stream << '\n';
         KFormat format;
         stream << i18n("allocated %1 over %2 calls, peak at %3, leaked %4",
@@ -167,7 +167,7 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             while (child->children.count() == 1 && max-- > 0) {
                 stream << "\n";
                 stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                                child->location.function, child->location.file, child->location.line, child->location.module);
+                                child->location->function, child->location->file, child->location->line, child->location->module);
                 child = child->children.data();
             }
             if (child->children.count() > 1) {

@@ -199,9 +199,9 @@ FrameGraphicsItem* findItemByFunction(const QList<QGraphicsItem*>& items, const 
 void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent)
 {
     foreach (const auto& row, data) {
-        auto item = findItemByFunction(parent->childItems(), row.location.function);
+        auto item = findItemByFunction(parent->childItems(), row.location->function);
         if (!item) {
-            item = new FrameGraphicsItem(row.allocations, row.location.function, parent);
+            item = new FrameGraphicsItem(row.allocations, row.location->function, parent);
             item->setPen(parent->pen());
             item->setBrush(brush());
         } else {

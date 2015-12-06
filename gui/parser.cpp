@@ -29,7 +29,6 @@
 #include "../accumulatedtracedata.h"
 
 #include <vector>
-#include <memory>
 
 using namespace std;
 
@@ -80,9 +79,17 @@ struct StringCache
         }
     }
 
-    LocationData location(const InstructionPointer& ip) const
+    shared_ptr<LocationData> location(const InstructionPointer& ip) const
     {
-        return {func(ip), file(ip), module(ip), ip.line};
+        LocationData data = {func(ip), file(ip), module(ip), ip.line};
+        auto it = lower_bound(m_locations.begin(), m_locations.end(), data);
+        if (it != m_locations.end() && **it == data) {
+            return *it;
+        } else {
+            auto interned = make_shared<LocationData>(data);
+            m_locations.insert(it, interned);
+            return interned;
+        }
     }
 
     void update(const vector<string>& strings)
@@ -93,6 +100,7 @@ struct StringCache
 
     vector<QString> m_strings;
     mutable QHash<uint64_t, QString> m_ipAddresses;
+    mutable vector<shared_ptr<LocationData>> m_locations;
 };
 
 struct ChartMergeData
@@ -294,7 +302,6 @@ QVector<RowData> mergeAllocations(const ParserData& data)
         while (traceIndex) {
             const auto& trace = data.findTrace(traceIndex);
             const auto& ip = data.findIp(trace.ipIndex);
-            // TODO: only store the IpIndex and use that
             auto location = data.stringCache.location(ip);
             auto it = lower_bound(rows->begin(), rows->end(), location);
             if (it != rows->end() && it->location == location) {

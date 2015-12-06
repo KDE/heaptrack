@@ -23,12 +23,17 @@
 #include <QAbstractItemModel>
 #include <QVector>
 
+#include <boost/functional/hash.hpp>
+
+#include <memory>
+
 struct LocationData
 {
     QString function;
     QString file;
     QString module;
     int line;
+
     bool operator==(const LocationData& rhs) const
     {
         return function == rhs.function
@@ -36,6 +41,7 @@ struct LocationData
             && module == rhs.module
             && line == rhs.line;
     }
+
     bool operator<(const LocationData& rhs) const
     {
         int i = function.compare(rhs.function);
@@ -53,18 +59,23 @@ struct LocationData
 };
 Q_DECLARE_TYPEINFO(LocationData, Q_MOVABLE_TYPE);
 
+inline bool operator<(const std::shared_ptr<LocationData>& lhs, const LocationData& rhs)
+{
+    return *lhs < rhs;
+}
+
 struct RowData
 {
     quint64 allocations;
     quint64 peak;
     quint64 leaked;
     quint64 allocated;
-    LocationData location;
+    std::shared_ptr<LocationData> location;
     const RowData* parent;
     QVector<RowData> children;
-    bool operator<(const LocationData& rhs) const
+    bool operator<(const std::shared_ptr<LocationData>& rhs) const
     {
-        return location < rhs;
+        return *location < *rhs;
     }
 };
 Q_DECLARE_TYPEINFO(RowData, Q_MOVABLE_TYPE);
