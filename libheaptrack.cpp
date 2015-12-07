@@ -307,7 +307,7 @@ public:
             return;
         }
         updateModuleCache();
-        const size_t index = s_data->traceTree.index(trace, s_data->out);
+        const auto index = s_data->traceTree.index(trace, s_data->out);
 
 #ifdef DEBUG_MALLOC_PTRS
         auto it = s_data->known.find(ptr);
@@ -315,7 +315,7 @@ public:
         s_data->known.insert(ptr);
 #endif
 
-        if (fprintf(s_data->out, "+ %zx %zx %" PRIxPTR "\n", size, index, reinterpret_cast<uintptr_t>(ptr)) < 0) {
+        if (fprintf(s_data->out, "+ %zx %x %" PRIxPTR "\n", size, index, reinterpret_cast<uintptr_t>(ptr)) < 0) {
             writeError();
             return;
         }

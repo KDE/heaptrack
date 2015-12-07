@@ -32,7 +32,7 @@
 template<typename Base>
 struct Index
 {
-    uint64_t index = 0;
+    uint32_t index = 0;
 
     explicit operator bool() const
     {

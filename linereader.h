@@ -98,7 +98,6 @@ public:
         return readHex(hex);
     }
 
-    // only for usage in heaptrack_interpret
     bool operator>>(uint32_t& hex)
     {
         return readHex(hex);

@@ -36,7 +36,7 @@ struct TraceEdge
     // index associated to the backtrace up to this instruction pointer
     // the evaluation process can then reverse-map the index to the parent ip
     // to rebuild the backtrace from the bottom-up
-    std::size_t index;
+    uint32_t index;
     // Unsorted list of children, assumed to be small
     std::vector<TraceEdge> children;
 };
@@ -61,9 +61,9 @@ public:
      *
      * Unknown instruction pointers will be printed to @p out.
      */
-    std::size_t index(const Trace& trace, FILE* out)
+    uint32_t index(const Trace& trace, FILE* out)
     {
-        size_t index = 0;
+        uint32_t index = 0;
         TraceEdge* parent = &m_root;
         for (int i = trace.size() - 1; i >= 0; --i) {
             const auto ip = trace[i];
@@ -76,7 +76,7 @@ public:
             if (it == parent->children.end() || it->instructionPointer != ip) {
                 index = m_index++;
                 it = parent->children.insert(it, {ip, index, {}});
-                fprintf(out, "t %" PRIxPTR " %zx\n", reinterpret_cast<uintptr_t>(ip), parent->index);
+                fprintf(out, "t %" PRIxPTR " %x\n", reinterpret_cast<uintptr_t>(ip), parent->index);
             }
             index = it->index;
             parent = &(*it);
@@ -86,7 +86,7 @@ public:
 
 private:
     TraceEdge m_root = {0, 0, {}};
-    std::size_t m_index = 1;
+    uint32_t m_index = 1;
 };
 
 #endif // TRACETREE_H
