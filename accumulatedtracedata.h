@@ -125,9 +125,25 @@ struct MergedAllocation : public AllocationData
 };
 
 /**
- * Information for a single call to an allocation function
+ * Information for a single call to an allocation function for small allocations.
+ *
+ * The split between small and big allocations is done to save memory. Most of
+ * the time apps will only do small allocations, and tons of them. With this
+ * split we can reduce the memory footprint of the active allocation tracker
+ * below by a factor of 2. This is especially notable for apps that do tons
+ * of small allocations and don't free them. A notable example for such an
+ * application is heaptrack_print/heaptrack_gui itself!
  */
-struct AllocationInfo
+struct SmallAllocationInfo
+{
+    TraceIndex traceIndex;
+    uint32_t size;
+};
+
+/**
+ * Information for a single call to an allocation function for big allocations.
+ */
+struct BigAllocationInfo
 {
     TraceIndex traceIndex;
     uint64_t size;
@@ -174,9 +190,12 @@ struct AccumulatedTraceData
 
     bool isStopIndex(const StringIndex index) const;
 
+    BigAllocationInfo takeActiveAllocation(uint64_t ptr);
+
     // indices of functions that should stop the backtrace, e.g. main or static initialization
     std::vector<StringIndex> stopIndices;
-    std::unordered_map<uint64_t, AllocationInfo> activeAllocations;
+    std::unordered_map<uint32_t, SmallAllocationInfo> activeSmallAllocations;
+    std::unordered_map<uint64_t, BigAllocationInfo> activeBigAllocations;
     std::vector<InstructionPointer> instructionPointers;
     std::vector<TraceNode> traces;
     std::vector<std::string> strings;

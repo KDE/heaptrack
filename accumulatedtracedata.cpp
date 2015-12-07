@@ -55,7 +55,7 @@ AccumulatedTraceData::AccumulatedTraceData()
     traces.reserve(65536);
     strings.reserve(4096);
     allocations.reserve(16384);
-    activeAllocations.reserve(65536);
+    activeSmallAllocations.reserve(65536);
     stopIndices.reserve(4);
     opNewIpIndices.reserve(16);
 }
@@ -214,7 +214,13 @@ bool AccumulatedTraceData::read(istream& in)
                 continue;
             }
 
-            activeAllocations[ptr] = {traceId, size};
+            if (size <= std::numeric_limits<uint32_t>::max()) {
+                // save memory by storing this allocation in the list of small allocations
+                activeSmallAllocations[ptr] = {traceId, static_cast<uint32_t>(size)};
+            } else {
+                // these rare allocations consume more memory to track, but that's fine
+                activeBigAllocations[ptr] = {traceId, size};
+            }
 
             auto& allocation = findAllocation(traceId);
             allocation.leaked += size;
@@ -239,15 +245,11 @@ bool AccumulatedTraceData::read(istream& in)
                 cerr << "failed to parse line: " << reader.line() << endl;
                 continue;
             }
-            auto ip = activeAllocations.find(ptr);
-            if (ip == activeAllocations.end()) {
-                if (!fromAttached) {
-                    cerr << "unknown pointer in line: " << reader.line() << endl;
-                }
+            const auto info = takeActiveAllocation(ptr);
+            if (!info.traceIndex) {
+                // happens when we attached to a running application
                 continue;
             }
-            const auto info = ip->second;
-            activeAllocations.erase(ip);
 
             auto& allocation = findAllocation(info.traceIndex);
             if (!allocation.allocations || allocation.leaked < info.size) {
@@ -283,7 +285,8 @@ bool AccumulatedTraceData::read(istream& in)
     }
 
     /// these are leaks, but we now have the same data in \c allocations as well
-    activeAllocations.clear();
+    activeSmallAllocations.clear();
+    activeBigAllocations.clear();
 
     if (!reparsing) {
         totalTime = timeStamp + 1;
@@ -339,4 +342,23 @@ TraceNode AccumulatedTraceData::findTrace(const TraceIndex traceIndex) const
 bool AccumulatedTraceData::isStopIndex(const StringIndex index) const
 {
     return find(stopIndices.begin(), stopIndices.end(), index) != stopIndices.end();
+}
+
+BigAllocationInfo AccumulatedTraceData::takeActiveAllocation(uint64_t ptr)
+{
+    auto small = activeSmallAllocations.find(ptr);
+    if (small != activeSmallAllocations.end()) {
+        auto ret = small->second;
+        activeSmallAllocations.erase(small);
+        return {ret.traceIndex, ret.size};
+    }
+    // rare
+    auto big = activeBigAllocations.find(ptr);
+    if (big != activeBigAllocations.end()) {
+        auto ret = big->second;
+        activeBigAllocations.erase(big);
+        return ret;
+    }
+    // happens esp. when we runtime-attached
+    return {};
 }
