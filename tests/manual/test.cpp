@@ -48,7 +48,7 @@ int main()
     delete f;
 
     char* c = new char[1000];
-    printf("new char[]: %p\n", c);
+    printf("new char[]: %p\n", (void*)c);
     delete[] c;
 
     void* buf = malloc(100);
