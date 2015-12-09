@@ -194,7 +194,7 @@ struct AccumulatedTraceData
 
     // indices of functions that should stop the backtrace, e.g. main or static initialization
     std::vector<StringIndex> stopIndices;
-    std::unordered_map<uint32_t, SmallAllocationInfo> activeSmallAllocations;
+    std::unordered_map<uint64_t, SmallAllocationInfo> activeSmallAllocations;
     std::unordered_map<uint64_t, BigAllocationInfo> activeBigAllocations;
     std::vector<InstructionPointer> instructionPointers;
     std::vector<TraceNode> traces;
