@@ -152,10 +152,12 @@ bool AccumulatedTraceData::read(istream& in)
     m_maxAllocationTraceIndex.index = 0;
     totalAllocated = 0;
     totalAllocations = 0;
+    totalTemporary = 0;
     peak = 0;
     leaked = 0;
     allocations.clear();
     sizeHistogram.clear();
+    uint64_t lastAllocationPtr = 0;
 
     while (reader.getLine(in)) {
         if (reader.mode() == 's') {
@@ -235,6 +237,7 @@ bool AccumulatedTraceData::read(istream& in)
             if (leaked > peak) {
                 peak = leaked;
             }
+            lastAllocationPtr = ptr;
             handleAllocation();
             if (printHistogram) {
                 ++sizeHistogram[size];
@@ -262,6 +265,11 @@ bool AccumulatedTraceData::read(istream& in)
                 allocation.leaked -= info.size;
             }
             leaked -= info.size;
+            if (lastAllocationPtr == ptr) {
+                ++allocation.temporary;
+                ++totalTemporary;
+            }
+            lastAllocationPtr = 0;
         } else if (reader.mode() == '#') {
             // comment or empty line
             continue;

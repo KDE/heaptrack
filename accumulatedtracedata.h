@@ -105,6 +105,8 @@ struct AllocationData
     uint64_t leaked = 0;
     // largest amount of bytes allocated
     uint64_t peak = 0;
+    // number of temporary allocations
+    uint64_t temporary = 0;
 };
 
 struct Allocation : public AllocationData
@@ -173,6 +175,7 @@ struct AccumulatedTraceData
     std::map<uint64_t, uint64_t> sizeHistogram;
     uint64_t totalAllocated = 0;
     uint64_t totalAllocations = 0;
+    uint64_t totalTemporary = 0;
     uint64_t peak = 0;
     uint64_t leaked = 0;
     uint64_t totalTime = 0;

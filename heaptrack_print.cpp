@@ -126,6 +126,7 @@ struct Printer final : public AccumulatedTraceData
                 merged.allocations += allocation.allocations;
                 merged.leaked += allocation.leaked;
                 merged.peak += allocation.peak;
+                merged.temporary += allocation.temporary;
             }
         }
         return ret;
@@ -482,6 +483,8 @@ int main(int argc, char** argv)
             "Print backtraces to top allocators, sorted by peak consumption.")
         ("print-allocators,a", po::value<bool>()->default_value(true)->implicit_value(true),
             "Print backtraces to top allocators, sorted by number of calls to allocation functions.")
+        ("print-temporary,T", po::value<bool>()->default_value(true)->implicit_value(true),
+            "Print backtraces to top allocators, sorted by number of temporary allocations.")
         ("print-leaks,l", po::value<bool>()->default_value(false)->implicit_value(true),
             "Print backtraces to leaked memory allocations.")
         ("print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
@@ -567,6 +570,7 @@ int main(int argc, char** argv)
     const bool printOverallAlloc = vm["print-overall-allocated"].as<bool>();
     const bool printPeaks = vm["print-peaks"].as<bool>();
     const bool printAllocs = vm["print-allocators"].as<bool>();
+    const bool printTemporary = vm["print-temporary"].as<bool>();
 
     cout << "reading file \"" << inputFile << "\" - please wait, this might take some time..." << endl;
     if (!data.read(inputFile)) {
@@ -628,12 +632,27 @@ int main(int argc, char** argv)
         cout << endl;
     }
 
+    if (printTemporary) {
+        // sort by amount of temporary allocations
+        cout << "MOST TEMPORARY ALLOCATIONS\n";
+        data.printAllocations(&AllocationData::temporary, [] (const AllocationData& data) {
+            cout << data.temporary << " temporary allocations of " << data.allocations << " allocations in total ("
+                 << setprecision(2) << (float(data.temporary)  * 100.f / data.allocations) << "%) from\n";
+        }, [] (const AllocationData& data) {
+            cout << data.temporary << " temporary allocations of " << data.allocations << " allocations in total ("
+                 << setprecision(2) << (float(data.temporary)  * 100.f / data.allocations) << "%) from:\n";
+        });
+        cout << endl;
+    }
+
     const double totalTimeS = 0.001 * data.totalTime;
     cout << "total runtime: " << fixed << totalTimeS << "s.\n"
          << "bytes allocated in total (ignoring deallocations): " << formatBytes(data.totalAllocated)
             << " (" << formatBytes(data.totalAllocated / totalTimeS) << "/s)" << '\n'
          << "calls to allocation functions: " << data.totalAllocations
             << " (" << size_t(data.totalAllocations / totalTimeS) << "/s)\n"
+         << "temporary memory allocations: " << data.totalTemporary
+            << " (" << size_t(data.totalTemporary / totalTimeS) << "/s)\n"
          << "peak heap memory consumption: " << formatBytes(data.peak) << '\n'
          << "total memory leaked: " << formatBytes(data.leaked) << '\n';
 
