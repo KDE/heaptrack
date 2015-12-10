@@ -42,6 +42,7 @@ signals:
     void consumedChartDataAvailable(const ChartData& data);
     void allocationsChartDataAvailable(const ChartData& data);
     void allocatedChartDataAvailable(const ChartData& data);
+    void temporaryChartDataAvailable(const ChartData& data);
     void finished();
 };
 

@@ -232,6 +232,11 @@
             <string>Allocations</string>
            </attribute>
           </widget>
+          <widget class="ChartWidget" name="temporaryTab">
+           <attribute name="title">
+            <string>Temporary Allocations</string>
+           </attribute>
+          </widget>
           <widget class="ChartWidget" name="allocatedTab">
            <attribute name="title">
             <string>Allocated</string>

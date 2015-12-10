@@ -109,6 +109,7 @@ struct ChartMergeData
     quint64 consumed;
     quint64 allocations;
     quint64 allocated;
+    quint64 temporary;
     bool operator<(const IpIndex rhs) const
     {
         return ip < rhs;
@@ -133,14 +134,17 @@ struct ParserData final : public AccumulatedTraceData
         consumedChartData.rows.reserve(MAX_CHART_DATAPOINTS);
         allocatedChartData.rows.reserve(MAX_CHART_DATAPOINTS);
         allocationsChartData.rows.reserve(MAX_CHART_DATAPOINTS);
+        temporaryChartData.rows.reserve(MAX_CHART_DATAPOINTS);
         // start off with null data at the origin
         consumedChartData.rows.push_back({});
         allocatedChartData.rows.push_back({});
         allocationsChartData.rows.push_back({});
+        temporaryChartData.rows.push_back({});
         // index 0 indicates the total row
         consumedChartData.labels[0] = i18n("total");
         allocatedChartData.labels[0] = i18n("total");
         allocationsChartData.labels[0] = i18n("total");
+        temporaryChartData.labels[0] = i18n("total");
 
         buildCharts = true;
         maxConsumedSinceLastTimeStamp = 0;
@@ -153,11 +157,12 @@ struct ParserData final : public AccumulatedTraceData
             const auto ip = findTrace(alloc.traceIndex).ipIndex;
             auto it = lower_bound(merged.begin(), merged.end(), ip);
             if (it == merged.end() || it->ip != ip) {
-                it = merged.insert(it, {ip, 0, 0, 0});
+                it = merged.insert(it, {ip, 0, 0, 0, 0});
             }
             it->consumed += alloc.peak; // we want to track the top peaks in the chart
             it->allocated += alloc.allocated;
             it->allocations += alloc.allocations;
+            it->temporary += alloc.temporary;
         }
         // find the top hot spots for the individual data members and remember their IP and store the label
         auto findTopChartEntries = [&] (quint64 ChartMergeData::* member, int LabelIds::* label, ChartData* data) {
@@ -178,6 +183,7 @@ struct ParserData final : public AccumulatedTraceData
         findTopChartEntries(&ChartMergeData::consumed, &LabelIds::consumed, &consumedChartData);
         findTopChartEntries(&ChartMergeData::allocated, &LabelIds::allocated, &allocatedChartData);
         findTopChartEntries(&ChartMergeData::allocations, &LabelIds::allocations, &allocationsChartData);
+        findTopChartEntries(&ChartMergeData::temporary, &LabelIds::temporary, &temporaryChartData);
     }
 
     void handleTimeStamp(uint64_t /*oldStamp*/, uint64_t newStamp)
@@ -204,6 +210,7 @@ struct ParserData final : public AccumulatedTraceData
         auto consumed = createRow(newStamp, nowConsumed);
         auto allocated = createRow(newStamp, totalAllocated);
         auto allocs = createRow(newStamp, totalAllocations);
+        auto temporary = createRow(newStamp, totalTemporary);
 
         // if the cost is non-zero and the ip corresponds to a hotspot function selected in the labels,
         // we add the cost to the rows column
@@ -223,11 +230,13 @@ struct ParserData final : public AccumulatedTraceData
             addDataToRow(alloc.leaked, labelIds.consumed, &consumed);
             addDataToRow(alloc.allocated, labelIds.allocated, &allocated);
             addDataToRow(alloc.allocations, labelIds.allocations, &allocs);
+            addDataToRow(alloc.temporary, labelIds.temporary, &temporary);
         }
         // add the rows for this time stamp
         consumedChartData.rows << consumed;
         allocatedChartData.rows << allocated;
         allocationsChartData.rows << allocs;
+        temporaryChartData.rows << temporary;
     }
 
     void handleAllocation()
@@ -245,6 +254,7 @@ struct ParserData final : public AccumulatedTraceData
     ChartData consumedChartData;
     ChartData allocationsChartData;
     ChartData allocatedChartData;
+    ChartData temporaryChartData;
     // here we store the indices into ChartRows::cost for those IpIndices that
     // are within the top hotspots. This way, we can do one hash lookup in the
     // handleTimeStamp function instead of three when we'd store this data
@@ -254,6 +264,7 @@ struct ParserData final : public AccumulatedTraceData
         int consumed = -1;
         int allocations = -1;
         int allocated = -1;
+        int temporary = -1;
     };
     QHash<IpIndex, LabelIds> labelIds;
     uint64_t maxConsumedSinceLastTimeStamp = 0;
@@ -278,6 +289,9 @@ QString generateSummary(const ParserData& data)
                    format.formatByteSize(data.totalAllocated, 2), format.formatByteSize(data.totalAllocated / totalTimeS)) << "<br/>"
            << i18n("<strong>calls to allocation functions</strong>: %1 (%2/s)",
                    data.totalAllocations, quint64(data.totalAllocations / totalTimeS)) << "<br/>"
+           << i18n("<strong>temporary allocations</strong>: %1 (%2%, %3/s)",
+                   data.totalTemporary, round(float(data.totalTemporary) * 100.f * 100.f / data.totalAllocations) / 100.f,
+                   quint64(data.totalTemporary / totalTimeS)) << "<br/>"
            << i18n("<strong>peak heap memory consumption</strong>: %1", format.formatByteSize(data.peak)) << "<br/>"
            << i18n("<strong>total memory leaked</strong>: %1", format.formatByteSize(data.leaked)) << "<br/>";
     stream << "</qt>";
@@ -307,10 +321,11 @@ QVector<RowData> mergeAllocations(const ParserData& data)
             if (it != rows->end() && it->location == location) {
                 it->allocated += allocation.allocated;
                 it->allocations += allocation.allocations;
+                it->temporary += allocation.temporary;
                 it->leaked += allocation.leaked;
                 it->peak += allocation.peak;
             } else {
-                it = rows->insert(it, {allocation.allocations, allocation.peak, allocation.leaked, allocation.allocated,
+                it = rows->insert(it, {allocation.allocations, allocation.peak, allocation.leaked, allocation.allocated, allocation.temporary,
                                         location, nullptr, {}});
             }
             if (data.isStopIndex(ip.functionIndex)) {
@@ -346,7 +361,7 @@ void buildTopDown(const QVector<RowData>& bottomUpData, QVector<RowData>* topDow
                 auto data = findByLocation(*node, stack);
                 if (!data) {
                     // create an empty top-down item for this bottom-up node
-                    *stack << RowData{0, 0, 0, 0, node->location, nullptr, {}};
+                    *stack << RowData{0, 0, 0, 0, 0, node->location, nullptr, {}};
                     data = &stack->back();
                 }
                 // always use the leaf node's cost and propagate that one up the chain
@@ -355,6 +370,7 @@ void buildTopDown(const QVector<RowData>& bottomUpData, QVector<RowData>* topDow
                 data->peak += row.peak;
                 data->leaked += row.leaked;
                 data->allocated += row.allocated;
+                data->temporary += row.temporary;
                 stack = &data->children;
                 node = node->parent;
             }
@@ -410,6 +426,7 @@ void Parser::parse(const QString& path)
             emit consumedChartDataAvailable(data->consumedChartData);
             emit allocationsChartDataAvailable(data->allocationsChartData);
             emit allocatedChartDataAvailable(data->allocatedChartData);
+            emit temporaryChartDataAvailable(data->temporaryChartData);
         });
 
         auto sequential = new Sequence;

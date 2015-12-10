@@ -70,6 +70,8 @@ QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int ro
                 return i18n("Memory Allocations");
             case Consumed:
                 return i18n("Memory Consumed");
+            case Temporary:
+                return i18n("Temporary Allocations");
             }
         }
     }
@@ -120,7 +122,7 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
     if (role == Qt::ToolTipRole) {
         const QString time = QString::number(double(data.timeStamp) / 1000, 'g', 3) + QLatin1Char('s');
         const auto label = m_data.labels.value(column);
-        if (m_type == Allocations) {
+        if (m_type == Allocations || m_type == Temporary) {
             return i18n("%1: %2 at %3", label, cost, time);
         } else {
             KFormat format;

@@ -55,6 +55,8 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->allocationsTab->setModel(allocationsModel);
     auto allocatedModel = new ChartModel(ChartModel::Allocated, this);
     m_ui->allocatedTab->setModel(allocatedModel);
+    auto temporaryModel = new ChartModel(ChartModel::Temporary, this);
+    m_ui->temporaryTab->setModel(temporaryModel);
 
     connect(m_parser, &Parser::bottomUpDataAvailable,
             m_bottomUpModel, &TreeModel::resetData);
@@ -66,6 +68,8 @@ MainWindow::MainWindow(QWidget* parent)
             allocatedModel, &ChartModel::resetData);
     connect(m_parser, &Parser::allocationsChartDataAvailable,
             allocationsModel, &ChartModel::resetData);
+    connect(m_parser, &Parser::temporaryChartDataAvailable,
+            temporaryModel, &ChartModel::resetData);
     connect(m_parser, &Parser::summaryAvailable,
             m_ui->summary, &QLabel::setText);
     connect(m_parser, &Parser::topDownDataAvailable,

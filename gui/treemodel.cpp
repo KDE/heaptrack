@@ -25,6 +25,8 @@
 #include <KFormat>
 #include <KLocalizedString>
 
+#include <cmath>
+
 namespace {
 
 int indexOf(const RowData* row, const TreeData& siblings)
@@ -69,6 +71,8 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
                 return i18n("Module");
             case AllocationsColumn:
                 return i18n("Allocations [-]");
+            case TemporaryColumn:
+                return i18n("Temporary Allocations [-]");
             case PeakColumn:
                 return i18n("Peak [B]");
             case LeakedColumn:
@@ -95,6 +99,8 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
                 return i18n("<qt>The module, i.e. executable or shared library, from which an allocation function was called.</qt>");
             case AllocationsColumn:
                 return i18n("<qt>The number of times an allocation function was called from this location.</qt>");
+            case TemporaryColumn:
+                return i18n("<qt>The number of temporary allocations. These allocations are directly followed by a free without any other allocations in-between.</qt>");
             case PeakColumn:
                 return i18n("<qt>The maximum heap memory in bytes consumed from allocations originating at this location. "
                             "This takes deallocations into account.</qt>");
@@ -124,6 +130,8 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             return row->allocated;
         case AllocationsColumn:
             return row->allocations;
+        case TemporaryColumn:
+            return row->temporary;
         case PeakColumn:
             return row->peak;
         case LeakedColumn:
@@ -156,8 +164,9 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
                         row->location->function, row->location->file, row->location->line, row->location->module);
         stream << '\n';
         KFormat format;
-        stream << i18n("allocated %1 over %2 calls, peak at %3, leaked %4",
-                       format.formatByteSize(row->allocated), row->allocations,
+        stream << i18n("allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, leaked %6",
+                       format.formatByteSize(row->allocated), row->allocations, row->temporary,
+                       round(float(row->temporary) * 100.f * 100.f / row->allocations) / 100.f,
                        format.formatByteSize(row->peak), format.formatByteSize(row->leaked));
         stream << '\n';
         if (!row->children.isEmpty()) {

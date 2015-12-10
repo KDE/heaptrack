@@ -70,6 +70,7 @@ struct RowData
     quint64 peak;
     quint64 leaked;
     quint64 allocated;
+    quint64 temporary;
     std::shared_ptr<LocationData> location;
     const RowData* parent;
     QVector<RowData> children;
@@ -92,6 +93,7 @@ public:
 
     enum Columns {
         AllocationsColumn,
+        TemporaryColumn,
         PeakColumn,
         LeakedColumn,
         AllocatedColumn,
