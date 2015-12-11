@@ -175,6 +175,7 @@ struct AccumulatedTraceData
             // sort by addresses, required for binary search below
             sort(m_modules.begin(), m_modules.end());
 
+#ifndef NDEBUG
             for (size_t i = 0; i < m_modules.size(); ++i) {
                 const auto& m1 = m_modules[i];
                 for (size_t j = i + 1; j < m_modules.size(); ++j) {
@@ -194,6 +195,7 @@ struct AccumulatedTraceData
                     }
                 }
             }
+#endif
 
             m_modulesDirty = false;
         }
