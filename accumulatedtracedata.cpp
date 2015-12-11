@@ -287,6 +287,8 @@ bool AccumulatedTraceData::read(istream& in)
             leaked = 0;
             peak = 0;
             fromAttached = true;
+        } else if (reader.mode() == 'v') {
+            // the version, we ignore it for now
         } else {
             cerr << "failed to parse line: " << reader.line() << endl;
         }

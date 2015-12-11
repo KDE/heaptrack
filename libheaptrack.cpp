@@ -110,6 +110,11 @@ struct RecursionGuard
 
 thread_local bool RecursionGuard::isActive = false;
 
+void writeVersion(FILE* out)
+{
+    fprintf(out, "v %x\n", HEAPTRACK_VERSION);
+}
+
 void writeExe(FILE* out)
 {
     const int BUF_SIZE = 1023;
@@ -243,6 +248,7 @@ public:
             return;
         }
 
+        writeVersion(out);
         writeExe(out);
         writeCommandLine(out);
 
