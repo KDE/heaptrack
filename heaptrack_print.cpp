@@ -274,21 +274,20 @@ struct Printer final : public AccumulatedTraceData
 
             sort(allocation.traces.begin(), allocation.traces.end(), sortOrder);
             size_t handled = 0;
-            const size_t subTracesToPrint = 5;
-            for (size_t j = 0; j < min(subTracesToPrint, allocation.traces.size()); ++j) {
+            for (size_t j = 0; j < min(subPeakLimit, allocation.traces.size()); ++j) {
                 const auto& trace = allocation.traces[j];
                 sublabel(trace);
                 handled += trace.*member;
                 printBacktrace(trace.traceIndex, cout, 2, true);
             }
-            if (allocation.traces.size() > subTracesToPrint) {
+            if (allocation.traces.size() > subPeakLimit) {
                 cout << "  and ";
                 if (member == &AllocationData::allocations) {
                     cout << (allocation.*member - handled);
                 } else {
                     cout << formatBytes(allocation.*member - handled);
                 }
-                cout << " from " << (allocation.traces.size() - subTracesToPrint) << " other places\n";
+                cout << " from " << (allocation.traces.size() - subPeakLimit) << " other places\n";
             }
             cout << '\n';
         }
@@ -467,6 +466,7 @@ struct Printer final : public AccumulatedTraceData
 
     string filterBtFunction;
     size_t peakLimit = 10;
+    size_t subPeakLimit = 5;
 };
 }
 
@@ -492,6 +492,8 @@ int main(int argc, char** argv)
             "Print top overall allocators, ignoring memory frees.")
          ("peak-limit,n", po::value<size_t>()->default_value(10)->implicit_value(10),
             "Limit the number of reported peaks.")
+         ("sub-peak-limit,s", po::value<size_t>()->default_value(5)->implicit_value(5),
+            "Limit the number of reported backtraces of merged peak locations.")
         ("print-histogram,H", po::value<string>()->default_value(string()),
             "Path to output file where an allocation size histogram will be written to.")
         ("print-flamegraph,F", po::value<string>()->default_value(string()),
@@ -557,6 +559,7 @@ int main(int argc, char** argv)
     data.mergeBacktraces = vm["merge-backtraces"].as<bool>();
     data.filterBtFunction = vm["filter-bt-function"].as<string>();
     data.peakLimit = vm["peak-limit"].as<size_t>();
+    data.subPeakLimit = vm["sub-peak-limit"].as<size_t>();
     const string printHistogram = vm["print-histogram"].as<string>();
     data.printHistogram = !printHistogram.empty();
     const string printFlamegraph = vm["print-flamegraph"].as<string>();
