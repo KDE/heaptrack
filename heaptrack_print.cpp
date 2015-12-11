@@ -264,7 +264,7 @@ struct Printer final : public AccumulatedTraceData
             return l.*member > r.*member;
         };
         sort(mergedAllocations.begin(), mergedAllocations.end(), sortOrder);
-        for (size_t i = 0; i < min(size_t(10), mergedAllocations.size()); ++i) {
+        for (size_t i = 0; i < min(peakLimit, mergedAllocations.size()); ++i) {
             auto& allocation = mergedAllocations[i];
             if (!(allocation.*member)) {
                 break;
@@ -301,7 +301,7 @@ struct Printer final : public AccumulatedTraceData
             [member] (const Allocation& l, const Allocation &r) {
                 return l.*member > r.*member;
             });
-        for (size_t i = 0; i < min(size_t(10), allocations.size()); ++i) {
+        for (size_t i = 0; i < min(peakLimit, allocations.size()); ++i) {
             const auto& allocation = allocations[i];
             if (!(allocation.*member)) {
                 break;
@@ -466,6 +466,7 @@ struct Printer final : public AccumulatedTraceData
     uint64_t massifDetailedFreq = 1;
 
     string filterBtFunction;
+    size_t peakLimit = 10;
 };
 }
 
@@ -489,6 +490,8 @@ int main(int argc, char** argv)
             "Print backtraces to leaked memory allocations.")
         ("print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
             "Print top overall allocators, ignoring memory frees.")
+         ("peak-limit,n", po::value<size_t>()->default_value(10)->implicit_value(10),
+            "Limit the number of reported peaks.")
         ("print-histogram,H", po::value<string>()->default_value(string()),
             "Path to output file where an allocation size histogram will be written to.")
         ("print-flamegraph,F", po::value<string>()->default_value(string()),
@@ -553,6 +556,7 @@ int main(int argc, char** argv)
     data.shortenTemplates = vm["shorten-templates"].as<bool>();
     data.mergeBacktraces = vm["merge-backtraces"].as<bool>();
     data.filterBtFunction = vm["filter-bt-function"].as<string>();
+    data.peakLimit = vm["peak-limit"].as<size_t>();
     const string printHistogram = vm["print-histogram"].as<string>();
     data.printHistogram = !printHistogram.empty();
     const string printFlamegraph = vm["print-flamegraph"].as<string>();
