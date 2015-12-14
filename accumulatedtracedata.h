@@ -26,47 +26,11 @@
 
 #include <fstream>
 #include <unordered_map>
+#include <unordered_set>
 #include <map>
+#include <boost/functional/hash.hpp>
 
-// sadly, C++ doesn't yet have opaque typedefs
-template<typename Base>
-struct Index
-{
-    uint32_t index = 0;
-
-    explicit operator bool() const
-    {
-        return index;
-    }
-
-    bool operator<(Index o) const
-    {
-        return index < o.index;
-    }
-
-    bool operator!=(Index o) const
-    {
-        return index != o.index;
-    }
-
-    bool operator==(Index o) const
-    {
-        return index == o.index;
-    }
-};
-
-template<typename Base>
-uint qHash(const Index<Base> index, uint seed = 0) noexcept
-{
-    return qHash(index.index, seed);
-}
-
-struct StringIndex : public Index<StringIndex> {};
-struct ModuleIndex : public StringIndex {};
-struct FunctionIndex : public StringIndex {};
-struct FileIndex : public StringIndex {};
-struct IpIndex : public Index<IpIndex> {};
-struct TraceIndex : public Index<TraceIndex> {};
+#include "indices.h"
 
 struct InstructionPointer
 {
@@ -138,8 +102,8 @@ struct MergedAllocation : public AllocationData
  */
 struct SmallAllocationInfo
 {
-    TraceIndex traceIndex;
     uint32_t size;
+    TraceIndex traceIndex;
 };
 
 /**
@@ -147,8 +111,12 @@ struct SmallAllocationInfo
  */
 struct BigAllocationInfo
 {
-    TraceIndex traceIndex;
     uint64_t size;
+    TraceIndex traceIndex;
+    bool operator==(const BigAllocationInfo& rhs) const
+    {
+        return rhs.traceIndex == traceIndex && rhs.size == size;
+    }
 };
 
 struct AccumulatedTraceData
@@ -197,12 +165,16 @@ struct AccumulatedTraceData
 
     // indices of functions that should stop the backtrace, e.g. main or static initialization
     std::vector<StringIndex> stopIndices;
-    std::unordered_map<uint64_t, SmallAllocationInfo> activeSmallAllocations;
-    std::unordered_map<uint64_t, BigAllocationInfo> activeBigAllocations;
     std::vector<InstructionPointer> instructionPointers;
     std::vector<TraceNode> traces;
     std::vector<std::string> strings;
     std::vector<IpIndex> opNewIpIndices;
+
+    std::vector<BigAllocationInfo> allocationInfos;
+
+    // backwards compatibility
+    std::unordered_map<uint64_t, SmallAllocationInfo> activeSmallAllocations;
+    std::unordered_map<uint64_t, BigAllocationInfo> activeBigAllocations;
 };
 
 #endif // ACCUMULATEDTRACEDATA_H

@@ -158,6 +158,7 @@ bool AccumulatedTraceData::read(istream& in)
     allocations.clear();
     sizeHistogram.clear();
     uint64_t lastAllocationPtr = 0;
+    uint fileVersion = 0;
 
     while (reader.getLine(in)) {
         if (reader.mode() == 's') {
@@ -208,50 +209,77 @@ bool AccumulatedTraceData::read(istream& in)
                 opNewIpIndices.push_back(index);
             }
         } else if (reader.mode() == '+') {
-            uint64_t size = 0;
-            TraceIndex traceId;
-            uint64_t ptr = 0;
-            if (!(reader >> size) || !(reader >> traceId) || !(reader >> ptr)) {
-                cerr << "failed to parse line: " << reader.line() << endl;
-                continue;
-            }
-
-            if (size <= std::numeric_limits<uint32_t>::max()) {
-                // save memory by storing this allocation in the list of small allocations
-                activeSmallAllocations[ptr] = {traceId, static_cast<uint32_t>(size)};
+            BigAllocationInfo info;
+            if (fileVersion >= 0x010000) {
+                uint32_t allocationInfoIndex = 0;
+                if (!(reader >> allocationInfoIndex)) {
+                    cerr << "failed to parse line: " << reader.line() << endl;
+                    continue;
+                }
+                info = allocationInfos[allocationInfoIndex];
             } else {
-                // these rare allocations consume more memory to track, but that's fine
-                activeBigAllocations[ptr] = {traceId, size};
+                uint64_t ptr = 0;
+                if (!(reader >> info.size) || !(reader >> info.traceIndex) || !(reader >> ptr)) {
+                    cerr << "failed to parse line: " << reader.line() << endl;
+                    continue;
+                }
+
+                if (info.size <= std::numeric_limits<uint32_t>::max()) {
+                    // save memory by storing this allocation in the list of small allocations
+                    activeSmallAllocations[ptr] = {static_cast<uint32_t>(info.size), info.traceIndex};
+                } else {
+                    // these rare allocations consume more memory to track, but that's fine
+                    activeBigAllocations[ptr] = info;
+                }
+                lastAllocationPtr = ptr;
             }
 
-            auto& allocation = findAllocation(traceId);
-            allocation.leaked += size;
-            allocation.allocated += size;
+            auto& allocation = findAllocation(info.traceIndex);
+            allocation.leaked += info.size;
+            allocation.allocated += info.size;
             ++allocation.allocations;
             if (allocation.leaked > allocation.peak) {
                 allocation.peak = allocation.leaked;
             }
-            totalAllocated += size;
+
+            totalAllocated += info.size;
             ++totalAllocations;
-            leaked += size;
+            leaked += info.size;
             if (leaked > peak) {
                 peak = leaked;
             }
-            lastAllocationPtr = ptr;
-            handleAllocation();
+
             if (printHistogram) {
-                ++sizeHistogram[size];
+                ++sizeHistogram[info.size];
             }
+
+            handleAllocation();
         } else if (reader.mode() == '-') {
-            uint64_t ptr = 0;
-            if (!(reader >> ptr)) {
-                cerr << "failed to parse line: " << reader.line() << endl;
-                continue;
-            }
-            const auto info = takeActiveAllocation(ptr);
-            if (!info.traceIndex) {
-                // happens when we attached to a running application
-                continue;
+            BigAllocationInfo info;
+            bool temporary = false;
+            if (fileVersion >= 0x010000) {
+                uint32_t allocationInfoIndex = 0;
+                if (!(reader >> allocationInfoIndex)) {
+                    cerr << "failed to parse line: " << reader.line() << endl;
+                    continue;
+                }
+                info = allocationInfos[allocationInfoIndex];
+                // optional, and thus may fail.
+                // but that's OK since we default to false anyways
+                reader >> temporary;
+            } else {
+                uint64_t ptr = 0;
+                if (!(reader >> ptr)) {
+                    cerr << "failed to parse line: " << reader.line() << endl;
+                    continue;
+                }
+                info = takeActiveAllocation(ptr);
+                if (!info.traceIndex) {
+                    // happens when we attached to a running application
+                    continue;
+                }
+                temporary = lastAllocationPtr == ptr;
+                lastAllocationPtr = 0;
             }
 
             auto& allocation = findAllocation(info.traceIndex);
@@ -265,11 +293,17 @@ bool AccumulatedTraceData::read(istream& in)
                 allocation.leaked -= info.size;
             }
             leaked -= info.size;
-            if (lastAllocationPtr == ptr) {
+            if (temporary) {
                 ++allocation.temporary;
                 ++totalTemporary;
             }
-            lastAllocationPtr = 0;
+        } else if (reader.mode() == 'a') {
+            BigAllocationInfo info;
+            if (!(reader >> info.size) || !(reader >> info.traceIndex)) {
+                cerr << "failed to parse line: " << reader.line() << endl;
+                continue;
+            }
+            allocationInfos.push_back(info);
         } else if (reader.mode() == '#') {
             // comment or empty line
             continue;
@@ -288,7 +322,7 @@ bool AccumulatedTraceData::read(istream& in)
             peak = 0;
             fromAttached = true;
         } else if (reader.mode() == 'v') {
-            // the version, we ignore it for now
+            reader >> fileVersion;
         } else {
             cerr << "failed to parse line: " << reader.line() << endl;
         }
@@ -354,13 +388,15 @@ bool AccumulatedTraceData::isStopIndex(const StringIndex index) const
     return find(stopIndices.begin(), stopIndices.end(), index) != stopIndices.end();
 }
 
+// only used for backwards compatibility with older data files
+// newer files do this in heaptrack_interpret already with some more magic
 BigAllocationInfo AccumulatedTraceData::takeActiveAllocation(uint64_t ptr)
 {
     auto small = activeSmallAllocations.find(ptr);
     if (small != activeSmallAllocations.end()) {
         auto ret = small->second;
         activeSmallAllocations.erase(small);
-        return {ret.traceIndex, ret.size};
+        return {ret.size, ret.traceIndex};
     }
     // rare
     auto big = activeBigAllocations.find(ptr);

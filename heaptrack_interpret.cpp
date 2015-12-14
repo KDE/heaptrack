@@ -26,6 +26,7 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <tuple>
 #include <algorithm>
@@ -34,10 +35,12 @@
 #include <cxxabi.h>
 
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/functional/hash.hpp>
 
 #include "libbacktrace/backtrace.h"
 #include "libbacktrace/internal.h"
 #include "linereader.h"
+#include "pointermap.h"
 
 using namespace std;
 
@@ -124,25 +127,6 @@ struct Module
     uintptr_t addressEnd;
     size_t moduleIndex;
     backtrace_state* backtraceState;
-};
-
-struct Allocation
-{
-    // backtrace entry point
-    size_t ipIndex;
-    // number of allocations
-    size_t allocations;
-    // amount of bytes leaked
-    size_t leaked;
-};
-
-/**
- * Information for a single call to an allocation function
- */
-struct AllocationInfo
-{
-    size_t ipIndex;
-    size_t size;
 };
 
 struct ResolvedIP
@@ -329,6 +313,36 @@ private:
     unordered_map<uintptr_t, size_t> m_encounteredIps;
 };
 
+/**
+ * Information for a single call to an allocation function for big allocations.
+ */
+struct AllocationInfo
+{
+    uint64_t size;
+    TraceIndex traceIndex;
+    AllocationIndex allocationInfoIndex;
+    bool operator==(const AllocationInfo& rhs) const
+    {
+        return rhs.traceIndex == traceIndex
+            && rhs.size == size;
+            // allocationInfoIndex not compared to allow to look it up
+    }
+};
+
+}
+
+namespace std {
+template<>
+struct hash<AllocationInfo> {
+    size_t operator()(const AllocationInfo &info) const
+    {
+        size_t seed = 0;
+        boost::hash_combine(seed, info.size);
+        boost::hash_combine(seed, info.traceIndex.index);
+        // allocationInfoIndex not hashed to allow to look it up
+        return seed;
+    }
+};
 }
 
 int main(int /*argc*/, char** /*argv*/)
@@ -343,6 +357,11 @@ int main(int /*argc*/, char** /*argv*/)
     LineReader reader;
 
     string exe;
+
+    unordered_set<AllocationInfo> allocationInfos;
+    PointerMap ptrToIndex;
+    uint64_t lastPtr = 0;
+    allocationInfos.reserve(625000);
 
     while (reader.getLine(cin)) {
         if (reader.mode() == 'x') {
@@ -382,6 +401,45 @@ int main(int /*argc*/, char** /*argv*/)
             const auto ipId = data.addIp(instructionPointer);
             // trace point, map current output index to parent index
             fprintf(stdout, "t %zx %zx\n", ipId, parentIndex);
+        } else if (reader.mode() == '+') {
+            uint64_t size = 0;
+            TraceIndex traceId;
+            uint64_t ptr = 0;
+            if (!(reader >> size) || !(reader >> traceId.index) || !(reader >> ptr)) {
+                cerr << "failed to parse line: " << reader.line() << endl;
+                continue;
+            }
+            AllocationIndex index;
+            index.index = allocationInfos.size();
+            AllocationInfo info = {size, traceId, index};
+            auto it = allocationInfos.find(info);
+            if (it != allocationInfos.end()) {
+                info = *it;
+            } else {
+                allocationInfos.insert(it, info);
+                fprintf(stdout, "a %zx %x\n", info.size, info.traceIndex.index);
+            }
+            ptrToIndex.addPointer(ptr, info.allocationInfoIndex);
+            lastPtr = ptr;
+            fprintf(stdout, "+ %x\n", info.allocationInfoIndex.index);
+        } else if (reader.mode() == '-') {
+            uint64_t ptr = 0;
+            if (!(reader >> ptr)) {
+                cerr << "failed to parse line: " << reader.line() << endl;
+                continue;
+            }
+            bool temporary = lastPtr == ptr;
+            lastPtr = 0;
+            auto allocation = ptrToIndex.takePointer(ptr);
+            if (!allocation.second) {
+                continue;
+            }
+            fprintf(stdout, "- %x", allocation.first.index);
+            if (temporary) {
+                fputs(" 1\n", stdout);
+            } else {
+                fputc('\n', stdout);
+            }
         } else {
             fputs(reader.line().c_str(), stdout);
             fputc('\n', stdout);
