@@ -29,6 +29,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 
 #include "linereader.h"
+#include "config.h"
 
 using namespace std;
 
@@ -323,6 +324,11 @@ bool AccumulatedTraceData::read(istream& in)
             fromAttached = true;
         } else if (reader.mode() == 'v') {
             reader >> fileVersion;
+            if (fileVersion > HEAPTRACK_VERSION) {
+                cerr << "The data file was written by a newer heaptrack of version " << hex << fileVersion
+                     << " and is thus not compatible with this build of heaptrack version " << hex << HEAPTRACK_VERSION << '.' << endl;
+                return false;
+            }
         } else {
             cerr << "failed to parse line: " << reader.line() << endl;
         }
