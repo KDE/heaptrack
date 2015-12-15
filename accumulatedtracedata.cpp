@@ -30,6 +30,7 @@
 
 #include "linereader.h"
 #include "config.h"
+#include "pointermap.h"
 
 using namespace std;
 
@@ -56,7 +57,6 @@ AccumulatedTraceData::AccumulatedTraceData()
     traces.reserve(65536);
     strings.reserve(4096);
     allocations.reserve(16384);
-    activeSmallAllocations.reserve(65536);
     stopIndices.reserve(4);
     opNewIpIndices.reserve(16);
 }
@@ -157,8 +157,13 @@ bool AccumulatedTraceData::read(istream& in)
     peak = 0;
     leaked = 0;
     allocations.clear();
-    uint64_t lastAllocationPtr = 0;
     uint fileVersion = 0;
+
+    // required for backwards compatibility
+    // newer versions handle this in heaptrack_interpret already
+    AllocationInfoSet allocationInfoSet;
+    PointerMap pointers;
+    uint64_t lastAllocationPtr = 0;
 
     while (reader.getLine(in)) {
         if (reader.mode() == 's') {
@@ -209,7 +214,7 @@ bool AccumulatedTraceData::read(istream& in)
                 opNewIpIndices.push_back(index);
             }
         } else if (reader.mode() == '+') {
-            BigAllocationInfo info;
+            AllocationInfo info;
             AllocationIndex allocationIndex;
             if (fileVersion >= 0x010000) {
                 if (!(reader >> allocationIndex.index)) {
@@ -217,21 +222,16 @@ bool AccumulatedTraceData::read(istream& in)
                     continue;
                 }
                 info = allocationInfos[allocationIndex.index];
-            } else {
-                // TODO: allocationInfoIndex
+            } else { // backwards compatibility
                 uint64_t ptr = 0;
                 if (!(reader >> info.size) || !(reader >> info.traceIndex) || !(reader >> ptr)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     continue;
                 }
-
-                if (info.size <= std::numeric_limits<uint32_t>::max()) {
-                    // save memory by storing this allocation in the list of small allocations
-                    activeSmallAllocations[ptr] = {static_cast<uint32_t>(info.size), info.traceIndex};
-                } else {
-                    // these rare allocations consume more memory to track, but that's fine
-                    activeBigAllocations[ptr] = info;
+                if (allocationInfoSet.add(info.size, info.traceIndex, &allocationIndex)) {
+                    allocationInfos.push_back(info);
                 }
+                pointers.addPointer(ptr, allocationIndex);
                 lastAllocationPtr = ptr;
             }
 
@@ -252,33 +252,33 @@ bool AccumulatedTraceData::read(istream& in)
 
             handleAllocation(info, allocationIndex);
         } else if (reader.mode() == '-') {
-            BigAllocationInfo info;
+            AllocationIndex allocationInfoIndex;
             bool temporary = false;
             if (fileVersion >= 0x010000) {
-                uint32_t allocationInfoIndex = 0;
-                if (!(reader >> allocationInfoIndex)) {
+                if (!(reader >> allocationInfoIndex.index)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     continue;
                 }
-                info = allocationInfos[allocationInfoIndex];
                 // optional, and thus may fail.
                 // but that's OK since we default to false anyways
                 reader >> temporary;
-            } else {
+            } else { // backwards compatibility
                 uint64_t ptr = 0;
                 if (!(reader >> ptr)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     continue;
                 }
-                info = takeActiveAllocation(ptr);
-                if (!info.traceIndex) {
+                auto taken = pointers.takePointer(ptr);
+                if (!taken.second) {
                     // happens when we attached to a running application
                     continue;
                 }
+                allocationInfoIndex = taken.first;
                 temporary = lastAllocationPtr == ptr;
                 lastAllocationPtr = 0;
             }
 
+            const auto& info = allocationInfos[allocationInfoIndex.index];
             auto& allocation = findAllocation(info.traceIndex);
             if (!allocation.allocations || allocation.leaked < info.size) {
                 if (!fromAttached) {
@@ -295,7 +295,7 @@ bool AccumulatedTraceData::read(istream& in)
                 ++totalTemporary;
             }
         } else if (reader.mode() == 'a') {
-            BigAllocationInfo info;
+            AllocationInfo info;
             if (!(reader >> info.size) || !(reader >> info.traceIndex)) {
                 cerr << "failed to parse line: " << reader.line() << endl;
                 continue;
@@ -329,10 +329,6 @@ bool AccumulatedTraceData::read(istream& in)
             cerr << "failed to parse line: " << reader.line() << endl;
         }
     }
-
-    /// these are leaks, but we now have the same data in \c allocations as well
-    activeSmallAllocations.clear();
-    activeBigAllocations.clear();
 
     if (!reparsing) {
         totalTime = timeStamp + 1;
@@ -388,25 +384,4 @@ TraceNode AccumulatedTraceData::findTrace(const TraceIndex traceIndex) const
 bool AccumulatedTraceData::isStopIndex(const StringIndex index) const
 {
     return find(stopIndices.begin(), stopIndices.end(), index) != stopIndices.end();
-}
-
-// only used for backwards compatibility with older data files
-// newer files do this in heaptrack_interpret already with some more magic
-BigAllocationInfo AccumulatedTraceData::takeActiveAllocation(uint64_t ptr)
-{
-    auto small = activeSmallAllocations.find(ptr);
-    if (small != activeSmallAllocations.end()) {
-        auto ret = small->second;
-        activeSmallAllocations.erase(small);
-        return {ret.size, ret.traceIndex};
-    }
-    // rare
-    auto big = activeBigAllocations.find(ptr);
-    if (big != activeBigAllocations.end()) {
-        auto ret = big->second;
-        activeBigAllocations.erase(big);
-        return ret;
-    }
-    // happens esp. when we runtime-attached
-    return {};
 }

@@ -240,7 +240,7 @@ struct ParserData final : public AccumulatedTraceData
         temporaryChartData.rows << temporary;
     }
 
-    void handleAllocation(const BigAllocationInfo& info, const AllocationIndex index)
+    void handleAllocation(const AllocationInfo& info, const AllocationIndex index)
     {
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, leaked);
 
@@ -260,7 +260,7 @@ struct ParserData final : public AccumulatedTraceData
 
     struct CountedAllocationInfo
     {
-        BigAllocationInfo info;
+        AllocationInfo info;
         uint64_t allocations;
         bool operator<(const CountedAllocationInfo& rhs) const
         {

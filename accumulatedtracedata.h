@@ -90,30 +90,15 @@ struct MergedAllocation : public AllocationData
     IpIndex ipIndex;
 };
 
-/**
- * Information for a single call to an allocation function for small allocations.
- *
- * The split between small and big allocations is done to save memory. Most of
- * the time apps will only do small allocations, and tons of them. With this
- * split we can reduce the memory footprint of the active allocation tracker
- * below by a factor of 2. This is especially notable for apps that do tons
- * of small allocations and don't free them. A notable example for such an
- * application is heaptrack_print/heaptrack_gui itself!
- */
-struct SmallAllocationInfo
-{
-    uint32_t size;
-    TraceIndex traceIndex;
-};
 
 /**
- * Information for a single call to an allocation function for big allocations.
+ * Information for a single call to an allocation function.
  */
-struct BigAllocationInfo
+struct AllocationInfo
 {
     uint64_t size;
     TraceIndex traceIndex;
-    bool operator==(const BigAllocationInfo& rhs) const
+    bool operator==(const AllocationInfo& rhs) const
     {
         return rhs.traceIndex == traceIndex && rhs.size == size;
     }
@@ -125,7 +110,7 @@ struct AccumulatedTraceData
     virtual ~AccumulatedTraceData() = default;
 
     virtual void handleTimeStamp(uint64_t oldStamp, uint64_t newStamp) = 0;
-    virtual void handleAllocation(const BigAllocationInfo& info, const AllocationIndex index) = 0;
+    virtual void handleAllocation(const AllocationInfo& info, const AllocationIndex index) = 0;
     virtual void handleDebuggee(const char* command) = 0;
 
     const std::string& stringify(const StringIndex stringId) const;
@@ -159,8 +144,6 @@ struct AccumulatedTraceData
 
     bool isStopIndex(const StringIndex index) const;
 
-    BigAllocationInfo takeActiveAllocation(uint64_t ptr);
-
     // indices of functions that should stop the backtrace, e.g. main or static initialization
     std::vector<StringIndex> stopIndices;
     std::vector<InstructionPointer> instructionPointers;
@@ -168,11 +151,7 @@ struct AccumulatedTraceData
     std::vector<std::string> strings;
     std::vector<IpIndex> opNewIpIndices;
 
-    std::vector<BigAllocationInfo> allocationInfos;
-
-    // backwards compatibility
-    std::unordered_map<uint64_t, SmallAllocationInfo> activeSmallAllocations;
-    std::unordered_map<uint64_t, BigAllocationInfo> activeBigAllocations;
+    std::vector<AllocationInfo> allocationInfos;
 };
 
 #endif // ACCUMULATEDTRACEDATA_H

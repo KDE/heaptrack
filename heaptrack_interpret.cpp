@@ -26,7 +26,6 @@
 #include <iostream>
 #include <sstream>
 #include <unordered_map>
-#include <unordered_set>
 #include <vector>
 #include <tuple>
 #include <algorithm>
@@ -35,7 +34,6 @@
 #include <cxxabi.h>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/functional/hash.hpp>
 
 #include "libbacktrace/backtrace.h"
 #include "libbacktrace/internal.h"
@@ -313,36 +311,6 @@ private:
     unordered_map<uintptr_t, size_t> m_encounteredIps;
 };
 
-/**
- * Information for a single call to an allocation function for big allocations.
- */
-struct AllocationInfo
-{
-    uint64_t size;
-    TraceIndex traceIndex;
-    AllocationIndex allocationInfoIndex;
-    bool operator==(const AllocationInfo& rhs) const
-    {
-        return rhs.traceIndex == traceIndex
-            && rhs.size == size;
-            // allocationInfoIndex not compared to allow to look it up
-    }
-};
-
-}
-
-namespace std {
-template<>
-struct hash<AllocationInfo> {
-    size_t operator()(const AllocationInfo &info) const
-    {
-        size_t seed = 0;
-        boost::hash_combine(seed, info.size);
-        boost::hash_combine(seed, info.traceIndex.index);
-        // allocationInfoIndex not hashed to allow to look it up
-        return seed;
-    }
-};
 }
 
 int main(int /*argc*/, char** /*argv*/)
@@ -358,10 +326,9 @@ int main(int /*argc*/, char** /*argv*/)
 
     string exe;
 
-    unordered_set<AllocationInfo> allocationInfos;
     PointerMap ptrToIndex;
     uint64_t lastPtr = 0;
-    allocationInfos.reserve(625000);
+    AllocationInfoSet allocationInfos;
 
     while (reader.getLine(cin)) {
         if (reader.mode() == 'x') {
@@ -410,18 +377,12 @@ int main(int /*argc*/, char** /*argv*/)
                 continue;
             }
             AllocationIndex index;
-            index.index = allocationInfos.size();
-            AllocationInfo info = {size, traceId, index};
-            auto it = allocationInfos.find(info);
-            if (it != allocationInfos.end()) {
-                info = *it;
-            } else {
-                allocationInfos.insert(it, info);
-                fprintf(stdout, "a %zx %x\n", info.size, info.traceIndex.index);
+            if (allocationInfos.add(size, traceId, &index)) {
+                fprintf(stdout, "a %zx %x\n", size, traceId.index);
             }
-            ptrToIndex.addPointer(ptr, info.allocationInfoIndex);
+            ptrToIndex.addPointer(ptr, index);
             lastPtr = ptr;
-            fprintf(stdout, "+ %x\n", info.allocationInfoIndex.index);
+            fprintf(stdout, "+ %x\n", index.index);
         } else if (reader.mode() == '-') {
             uint64_t ptr = 0;
             if (!(reader >> ptr)) {

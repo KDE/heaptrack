@@ -22,12 +22,68 @@
 
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <map>
 #include <limits>
 #include <iostream>
 #include <algorithm>
 
+#include <boost/functional/hash.hpp>
+
 #include "indices.h"
+
+/**
+ * Information for a single call to an allocation function for big allocations.
+ */
+struct IndexedAllocationInfo
+{
+    uint64_t size;
+    TraceIndex traceIndex;
+    AllocationIndex allocationIndex;
+    bool operator==(const IndexedAllocationInfo& rhs) const
+    {
+        return rhs.traceIndex == traceIndex
+            && rhs.size == size;
+            // allocationInfoIndex not compared to allow to look it up
+    }
+};
+
+namespace std {
+template<>
+struct hash<IndexedAllocationInfo> {
+    size_t operator()(const IndexedAllocationInfo &info) const
+    {
+        size_t seed = 0;
+        boost::hash_combine(seed, info.size);
+        boost::hash_combine(seed, info.traceIndex.index);
+        // allocationInfoIndex not hashed to allow to look it up
+        return seed;
+    }
+};
+}
+
+struct AllocationInfoSet
+{
+    AllocationInfoSet()
+    {
+        set.reserve(625000);
+    }
+
+    bool add(uint64_t size, TraceIndex traceIndex, AllocationIndex* allocationIndex)
+    {
+        allocationIndex->index = set.size();
+        IndexedAllocationInfo info = {size, traceIndex, *allocationIndex};
+        auto it = set.find(info);
+        if (it != set.end()) {
+            *allocationIndex = it->allocationIndex;
+            return false;
+        } else {
+            set.insert(it, info);
+            return true;
+        }
+    }
+    std::unordered_set<IndexedAllocationInfo> set;
+};
 
 /**
  * A low-memory-overhead map of 64bit pointer addresses to 32bit allocation indices.
