@@ -32,6 +32,7 @@
 #include "parser.h"
 #include "chartmodel.h"
 #include "chartproxy.h"
+#include "histogrammodel.h"
 
 using namespace std;
 
@@ -57,6 +58,8 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->allocatedTab->setModel(allocatedModel);
     auto temporaryModel = new ChartModel(ChartModel::Temporary, this);
     m_ui->temporaryTab->setModel(temporaryModel);
+    auto sizeHistogramModel = new HistogramModel(this);
+    m_ui->sizesTab->setModel(sizeHistogramModel);
 
     connect(m_parser, &Parser::bottomUpDataAvailable,
             m_bottomUpModel, &TreeModel::resetData);
@@ -70,6 +73,8 @@ MainWindow::MainWindow(QWidget* parent)
             allocationsModel, &ChartModel::resetData);
     connect(m_parser, &Parser::temporaryChartDataAvailable,
             temporaryModel, &ChartModel::resetData);
+    connect(m_parser, &Parser::sizeHistogramDataAvailable,
+            sizeHistogramModel, &HistogramModel::resetData);
     connect(m_parser, &Parser::summaryAvailable,
             m_ui->summary, &QLabel::setText);
     connect(m_parser, &Parser::topDownDataAvailable,

@@ -125,7 +125,7 @@ struct AccumulatedTraceData
     virtual ~AccumulatedTraceData() = default;
 
     virtual void handleTimeStamp(uint64_t oldStamp, uint64_t newStamp) = 0;
-    virtual void handleAllocation() = 0;
+    virtual void handleAllocation(const BigAllocationInfo& info, const AllocationIndex index) = 0;
     virtual void handleDebuggee(const char* command) = 0;
 
     const std::string& stringify(const StringIndex stringId) const;
@@ -136,11 +136,9 @@ struct AccumulatedTraceData
     bool read(std::istream& in);
 
     bool shortenTemplates = false;
-    bool printHistogram = false;
     bool fromAttached = false;
 
     std::vector<Allocation> allocations;
-    std::map<uint64_t, uint64_t> sizeHistogram;
     uint64_t totalAllocated = 0;
     uint64_t totalAllocations = 0;
     uint64_t totalTemporary = 0;

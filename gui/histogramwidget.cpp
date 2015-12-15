@@ -17,12 +17,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "chartwidget.h"
+#include "histogramwidget.h"
 
 #include <QVBoxLayout>
+#include <QSortFilterProxyModel>
 
 #include <KChartChart>
-#include <KChartPlotter>
+#include <KChartBarDiagram>
 
 #include <KChartGridAttributes>
 #include <KChartHeaderFooter>
@@ -32,31 +33,15 @@
 #include <KChartBackgroundAttributes>
 #include <KChartFrameAttributes.h>
 
-#include <KFormat>
 #include <KLocalizedString>
 #include <KColorScheme>
+#include <KFormat>
 
-#include "chartmodel.h"
-#include "chartproxy.h"
+#include "histogrammodel.h"
 
 using namespace KChart;
 
 namespace {
-class TimeAxis : public CartesianAxis
-{
-    Q_OBJECT
-public:
-    explicit TimeAxis(AbstractCartesianDiagram* diagram = nullptr)
-        : CartesianAxis(diagram)
-    {}
-
-    const QString customizedLabel(const QString& label) const override
-    {
-        // squeeze large numbers here
-        return QString::number(label.toDouble() / 1000, 'g', 2) + QLatin1Char('s');
-    }
-};
-
 class SizeAxis : public CartesianAxis
 {
     Q_OBJECT
@@ -71,70 +56,98 @@ public:
         return format.formatByteSize(label.toDouble(), 1, KFormat::MetricBinaryDialect);
     }
 };
+
+class HistogramProxy : public QSortFilterProxyModel
+{
+    Q_OBJECT
+public:
+    explicit HistogramProxy(bool showTotal, QObject* parent = nullptr)
+        : QSortFilterProxyModel(parent)
+        , m_showTotal(showTotal)
+    {
+    }
+    virtual ~HistogramProxy() = default;
+
+protected:
+    bool filterAcceptsColumn(int sourceColumn, const QModelIndex& /*sourceParent*/) const override
+    {
+        if (m_showTotal) {
+            return sourceColumn == 0;
+        } else {
+            return sourceColumn != 0;
+        }
+    }
+
+private:
+    bool m_showTotal;
+};
+
 }
 
-ChartWidget::ChartWidget(QWidget* parent)
+HistogramWidget::HistogramWidget(QWidget* parent)
     : QWidget(parent)
-    , m_chart(new Chart(this))
+    , m_chart(new KChart::Chart(this))
+    , m_total(new BarDiagram(this))
+    , m_detailed(new BarDiagram(this))
 {
     auto layout = new QVBoxLayout(this);
     layout->addWidget(m_chart);
     setLayout(layout);
-}
 
-ChartWidget::~ChartWidget() = default;
-
-void ChartWidget::setModel(ChartModel* model)
-{
     auto* coordinatePlane = dynamic_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
     Q_ASSERT(coordinatePlane);
-    foreach (auto diagram, coordinatePlane->diagrams()) {
-        coordinatePlane->takeDiagram(diagram);
-        delete diagram;
-    }
 
     {
-        auto totalPlotter = new Plotter(this);
-        totalPlotter->setAntiAliasing(true);
-        auto totalProxy = new ChartProxy(true, this);
-        totalProxy->setSourceModel(model);
-        totalPlotter->setModel(totalProxy);
-        totalPlotter->setType(Plotter::Stacked);
+        m_total->setAntiAliasing(true);
 
         KColorScheme scheme(QPalette::Active, KColorScheme::Window);
-        const QPen foreground(scheme.foreground().color());
-        auto bottomAxis = new TimeAxis(totalPlotter);
+        QPen foreground(scheme.foreground().color());
+        auto bottomAxis = new CartesianAxis(m_total);
         auto axisTextAttributes = bottomAxis->textAttributes();
         axisTextAttributes.setPen(foreground);
         bottomAxis->setTextAttributes(axisTextAttributes);
         auto axisTitleTextAttributes = bottomAxis->titleTextAttributes();
         axisTitleTextAttributes.setPen(foreground);
         bottomAxis->setTitleTextAttributes(axisTitleTextAttributes);
-        bottomAxis->setTitleText(model->headerData(0).toString());
-        bottomAxis->setPosition(CartesianAxis::Bottom);
-        totalPlotter->addAxis(bottomAxis);
+        bottomAxis->setPosition(KChart::CartesianAxis::Bottom);
+        bottomAxis->setTitleText(i18n("Requested Allocation Size"));
+        m_total->addAxis(bottomAxis);
 
-        CartesianAxis* rightAxis = model->type() == ChartModel::Allocations ? new CartesianAxis(totalPlotter) : new SizeAxis(totalPlotter);
+        auto* rightAxis = new CartesianAxis(m_total);
         rightAxis->setTextAttributes(axisTextAttributes);
         rightAxis->setTitleTextAttributes(axisTitleTextAttributes);
-        rightAxis->setTitleText(model->headerData(1).toString());
+        rightAxis->setTitleText(i18n("Number of Allocations"));
         rightAxis->setPosition(CartesianAxis::Right);
-        totalPlotter->addAxis(rightAxis);
+        m_total->addAxis(rightAxis);
 
-        coordinatePlane->addDiagram(totalPlotter);
+        coordinatePlane->addDiagram(m_total);
+
+        m_total->setType(BarDiagram::Normal);
     }
 
     {
-        auto plotter = new Plotter(this);
-        plotter->setAntiAliasing(true);
-        plotter->setType(Plotter::Stacked);
+        m_detailed->setAntiAliasing(true);
 
-        auto proxy = new ChartProxy(false, this);
-        proxy->setSourceModel(model);
-        plotter->setModel(proxy);
-        coordinatePlane->addDiagram(plotter);
+        coordinatePlane->addDiagram(m_detailed);
+
+        m_detailed->setType(BarDiagram::Stacked);
     }
-
 }
 
-#include "chartwidget.moc"
+HistogramWidget::~HistogramWidget() = default;
+
+void HistogramWidget::setModel(QAbstractItemModel* model)
+{
+    {
+        auto proxy = new HistogramProxy(true, this);
+        proxy->setSourceModel(model);
+        m_total->setModel(proxy);
+    }
+    {
+        auto proxy = new HistogramProxy(false, this);
+        proxy->setSourceModel(model);
+        m_detailed->setModel(proxy);
+    }
+}
+
+#include "histogramwidget.moc"

@@ -29,6 +29,7 @@
 #include "../accumulatedtracedata.h"
 
 #include <vector>
+#include <tuple>
 
 using namespace std;
 
@@ -239,9 +240,15 @@ struct ParserData final : public AccumulatedTraceData
         temporaryChartData.rows << temporary;
     }
 
-    void handleAllocation()
+    void handleAllocation(const BigAllocationInfo& info, const AllocationIndex index)
     {
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, leaked);
+
+        if (index.index == allocationInfoCounter.size()) {
+            allocationInfoCounter.push_back({info, 1});
+        } else {
+            ++allocationInfoCounter[index.index].allocations;
+        }
     }
 
     void handleDebuggee(const char* command)
@@ -250,6 +257,17 @@ struct ParserData final : public AccumulatedTraceData
     }
 
     string debuggee;
+
+    struct CountedAllocationInfo
+    {
+        BigAllocationInfo info;
+        uint64_t allocations;
+        bool operator<(const CountedAllocationInfo& rhs) const
+        {
+            return make_tuple(info.size, allocations) < make_tuple(rhs.info.size, rhs.allocations);
+        }
+    };
+    vector<CountedAllocationInfo> allocationInfoCounter;
 
     ChartData consumedChartData;
     ChartData allocationsChartData;
@@ -390,6 +408,78 @@ QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
     return topRows;
 }
 
+struct MergedHistogramColumnData
+{
+    std::shared_ptr<LocationData> location;
+    uint64_t allocations;
+    bool operator<(const std::shared_ptr<LocationData>& rhs) const
+    {
+        return location < rhs;
+    }
+};
+
+HistogramData buildSizeHistogram(ParserData& data)
+{
+    HistogramData ret;
+    if (data.allocationInfoCounter.empty()) {
+        return ret;
+    }
+    sort(data.allocationInfoCounter.begin(), data.allocationInfoCounter.end());
+    const auto totalLabel = i18n("total");
+    HistogramRow row;
+    const pair<uint64_t, QString> buckets[] = {
+        {8, i18n("0B to 8B")},
+        {16, i18n("9B to 16B")},
+        {32, i18n("17B to 32B")},
+        {64, i18n("33B to 64B")},
+        {128, i18n("65B to 128B")},
+        {256, i18n("129B to 256B")},
+        {512, i18n("257B to 512B")},
+        {1024, i18n("512B to 1KB")},
+        {numeric_limits<uint64_t>::max(), i18n("more than 1KB")}
+    };
+    uint bucketIndex = 0;
+    row.size = buckets[bucketIndex].first;
+    row.sizeLabel = buckets[bucketIndex].second;
+    vector<MergedHistogramColumnData> columnData;
+    columnData.reserve(128);
+    auto insertColumns = [&] () {
+        sort(columnData.begin(), columnData.end(), [] (const MergedHistogramColumnData& lhs, const MergedHistogramColumnData& rhs) {
+            return lhs.allocations > rhs.allocations;
+        });
+        // -1 to account for total row
+        for (size_t i = 0; i < size_t(HistogramRow::NUM_COLUMNS - 1); ++i) {
+            const auto& column = columnData[i];
+            row.columns[i + 1] = {column.allocations, column.location};
+        }
+    };
+    for (const auto& info : data.allocationInfoCounter) {
+        if (info.info.size > row.size) {
+            insertColumns();
+            columnData.clear();
+            ret << row;
+            ++bucketIndex;
+            row.size = buckets[bucketIndex].first;
+            row.sizeLabel = buckets[bucketIndex].second;
+            row.columns[0] = {info.allocations, {}};
+        } else {
+            row.columns[0].allocations += info.allocations;
+        }
+        const auto ipIndex = data.findTrace(info.info.traceIndex).ipIndex;
+        const auto ip = data.findIp(ipIndex);
+        const auto location = data.stringCache.location(ip);
+        auto it = lower_bound(columnData.begin(), columnData.end(), location);
+        if (it == columnData.end() || it->location != location) {
+            columnData.insert(it, {location, info.allocations});
+        } else {
+            it->allocations += info.allocations;
+        }
+    }
+    insertColumns();
+    ret << row;
+    return ret;
+}
+
 }
 
 Parser::Parser(QObject* parent)
@@ -411,11 +501,14 @@ void Parser::parse(const QString& path)
 
         // merge allocations before modifying the data again
         const auto mergedAllocations = mergeAllocations(*data);
+        // also calculate the size histogram
+        const auto sizeHistogram = buildSizeHistogram(*data);
         // now data can be modified again for the chart data evaluation
 
         auto parallel = new Collection;
-        *parallel << make_job([this, mergedAllocations]() {
+        *parallel << make_job([this, mergedAllocations, sizeHistogram]() {
             emit bottomUpDataAvailable(mergedAllocations);
+            emit sizeHistogramDataAvailable(sizeHistogram);
             const auto topDownData = toTopDownData(mergedAllocations);
             emit topDownDataAvailable(topDownData);
         }) << make_job([this, data, stdPath]() {

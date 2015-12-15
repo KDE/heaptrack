@@ -19,6 +19,8 @@ add_executable(heaptrack_gui
     chartwidget.cpp
     chartmodel.cpp
     chartproxy.cpp
+    histogramwidget.cpp
+    histogrammodel.cpp
     modeltest.cpp
     parser.cpp
     flamegraph.cpp

@@ -430,8 +430,12 @@ struct Printer final : public AccumulatedTraceData
         }
     }
 
-    void handleAllocation() override
+    void handleAllocation(const BigAllocationInfo& info, const AllocationIndex /*index*/) override
     {
+        if (printHistogram) {
+            ++sizeHistogram[info.size];
+        }
+
         if (leaked > lastMassifPeak && massifOut.is_open()) {
             massifAllocations = allocations;
             lastMassifPeak = leaked;
@@ -453,9 +457,12 @@ struct Printer final : public AccumulatedTraceData
         }
     }
 
+    bool printHistogram = false;
     bool mergeBacktraces = true;
 
     vector<MergedAllocation> mergedAllocations;
+
+    std::map<uint64_t, uint64_t> sizeHistogram;
 
     uint64_t massifSnapshotId = 0;
     uint64_t lastMassifPeak = 0;

@@ -242,6 +242,11 @@
             <string>Allocated</string>
            </attribute>
           </widget>
+          <widget class="HistogramWidget" name="sizesTab">
+           <attribute name="title">
+            <string>Sizes</string>
+           </attribute>
+          </widget>
           <widget class="FlameGraph" name="flameGraphTab">
            <attribute name="title">
             <string>Flame Graph</string>
@@ -267,6 +272,12 @@
    <class>FlameGraph</class>
    <extends>QWidget</extends>
    <header>flamegraph.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>HistogramWidget</class>
+   <extends>QWidget</extends>
+   <header>histogramwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

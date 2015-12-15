@@ -157,7 +157,6 @@ bool AccumulatedTraceData::read(istream& in)
     peak = 0;
     leaked = 0;
     allocations.clear();
-    sizeHistogram.clear();
     uint64_t lastAllocationPtr = 0;
     uint fileVersion = 0;
 
@@ -211,14 +210,15 @@ bool AccumulatedTraceData::read(istream& in)
             }
         } else if (reader.mode() == '+') {
             BigAllocationInfo info;
+            AllocationIndex allocationIndex;
             if (fileVersion >= 0x010000) {
-                uint32_t allocationInfoIndex = 0;
-                if (!(reader >> allocationInfoIndex)) {
+                if (!(reader >> allocationIndex.index)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     continue;
                 }
-                info = allocationInfos[allocationInfoIndex];
+                info = allocationInfos[allocationIndex.index];
             } else {
+                // TODO: allocationInfoIndex
                 uint64_t ptr = 0;
                 if (!(reader >> info.size) || !(reader >> info.traceIndex) || !(reader >> ptr)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
@@ -250,11 +250,7 @@ bool AccumulatedTraceData::read(istream& in)
                 peak = leaked;
             }
 
-            if (printHistogram) {
-                ++sizeHistogram[info.size];
-            }
-
-            handleAllocation();
+            handleAllocation(info, allocationIndex);
         } else if (reader.mode() == '-') {
             BigAllocationInfo info;
             bool temporary = false;

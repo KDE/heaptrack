@@ -17,35 +17,32 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef PARSER_H
-#define PARSER_H
+#ifndef HISTOGRAMWIDGET_H
+#define HISTOGRAMWIDGET_H
 
-#include <QObject>
+#include <QWidget>
 
-#include "treemodel.h"
-#include "chartmodel.h"
-#include "histogrammodel.h"
+namespace KChart {
+class Chart;
+class BarDiagram;
+}
 
-class Parser : public QObject
+class QAbstractItemModel;
+
+class HistogramWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Parser(QObject* parent = nullptr);
-    virtual ~Parser();
+    explicit HistogramWidget(QWidget* parent = nullptr);
+    virtual ~HistogramWidget();
 
-public slots:
-    void parse(const QString& path);
+    void setModel(QAbstractItemModel* model);
 
-signals:
-    void summaryAvailable(const QString& summary);
-    void bottomUpDataAvailable(const TreeData& data);
-    void topDownDataAvailable(const TreeData& data);
-    void consumedChartDataAvailable(const ChartData& data);
-    void allocationsChartDataAvailable(const ChartData& data);
-    void allocatedChartDataAvailable(const ChartData& data);
-    void temporaryChartDataAvailable(const ChartData& data);
-    void sizeHistogramDataAvailable(const HistogramData& data);
-    void finished();
+private:
+    KChart::Chart* m_chart;
+    KChart::BarDiagram* m_total;
+    KChart::BarDiagram* m_detailed;
 };
 
-#endif // PARSER_H
+#endif // HISTOGRAMWIDGET_H
+
