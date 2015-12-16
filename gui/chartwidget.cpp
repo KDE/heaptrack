@@ -114,7 +114,8 @@ void ChartWidget::setModel(ChartModel* model)
         bottomAxis->setPosition(CartesianAxis::Bottom);
         totalPlotter->addAxis(bottomAxis);
 
-        CartesianAxis* rightAxis = model->type() == ChartModel::Allocations ? new CartesianAxis(totalPlotter) : new SizeAxis(totalPlotter);
+        CartesianAxis* rightAxis = model->type() == ChartModel::Allocations || model->type() == ChartModel::Temporary
+                                    ? new CartesianAxis(totalPlotter) : new SizeAxis(totalPlotter);
         rightAxis->setTextAttributes(axisTextAttributes);
         rightAxis->setTitleTextAttributes(axisTitleTextAttributes);
         rightAxis->setTitleText(model->headerData(1).toString());
