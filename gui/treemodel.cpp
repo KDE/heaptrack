@@ -70,15 +70,15 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
             case ModuleColumn:
                 return i18n("Module");
             case AllocationsColumn:
-                return i18n("Allocations [-]");
+                return i18n("Allocations");
             case TemporaryColumn:
-                return i18n("Temporary Allocations [-]");
+                return i18n("Temporary");
             case PeakColumn:
-                return i18n("Peak [B]");
+                return i18n("Peak");
             case LeakedColumn:
-                return i18n("Leaked [B]");
+                return i18n("Leaked");
             case AllocatedColumn:
-                return i18n("Allocated [B]");
+                return i18n("Allocated");
             case LocationColumn:
                 return i18n("Location");
             case NUM_COLUMNS:
@@ -124,18 +124,31 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         return {};
     }
     const auto row = toRow(index);
-    if (role == Qt::DisplayRole) {
+    if (role == Qt::DisplayRole || role == SortRole) {
+        KFormat format;
         switch (static_cast<Columns>(index.column())) {
         case AllocatedColumn:
-            return row->allocated;
+            if (role == SortRole) {
+                return row->allocated;
+            } else {
+                return format.formatByteSize(row->allocated);
+            }
         case AllocationsColumn:
             return row->allocations;
         case TemporaryColumn:
             return row->temporary;
         case PeakColumn:
-            return row->peak;
+            if (role == SortRole) {
+                return row->peak;
+            } else {
+                return format.formatByteSize(row->peak);
+            }
         case LeakedColumn:
-            return row->leaked;
+            if (role == SortRole) {
+                return row->leaked;
+            } else {
+                return format.formatByteSize(row->leaked);
+            }
         case FunctionColumn:
             return row->location->function;
         case ModuleColumn:

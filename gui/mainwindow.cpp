@@ -86,6 +86,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     auto bottomUpProxy = new TreeProxy(m_bottomUpModel);
     bottomUpProxy->setSourceModel(m_bottomUpModel);
+    bottomUpProxy->setSortRole(TreeModel::SortRole);
     m_ui->bottomUpResults->setModel(bottomUpProxy);
     m_ui->bottomUpResults->hideColumn(TreeModel::FunctionColumn);
     m_ui->bottomUpResults->hideColumn(TreeModel::FileColumn);
@@ -101,6 +102,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     auto topDownProxy = new TreeProxy(m_topDownModel);
     topDownProxy->setSourceModel(m_topDownModel);
+    topDownProxy->setSortRole(TreeModel::SortRole);
     m_ui->topDownResults->setModel(topDownProxy);
     m_ui->topDownResults->hideColumn(TreeModel::FunctionColumn);
     m_ui->topDownResults->hideColumn(TreeModel::FileColumn);
