@@ -295,6 +295,9 @@ bool AccumulatedTraceData::read(istream& in)
                 ++totalTemporary;
             }
         } else if (reader.mode() == 'a') {
+            if (reparsing) {
+                continue;
+            }
             AllocationInfo info;
             if (!(reader >> info.size) || !(reader >> info.traceIndex)) {
                 cerr << "failed to parse line: " << reader.line() << endl;
