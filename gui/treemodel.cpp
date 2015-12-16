@@ -59,6 +59,14 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
     if (orientation != Qt::Horizontal || section < 0 || section >= NUM_COLUMNS) {
         return {};
     }
+    if (role == Qt::InitialSortOrderRole) {
+        if (section == AllocatedColumn || section == AllocationsColumn
+            || section == PeakColumn || section == LeakedColumn
+            || section == TemporaryColumn)
+        {
+            return Qt::DescendingOrder;
+        }
+    }
     if (role == Qt::DisplayRole) {
         switch (static_cast<Columns>(section)) {
             case FileColumn:
