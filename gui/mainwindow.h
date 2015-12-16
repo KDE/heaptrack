@@ -43,8 +43,6 @@ public slots:
 
 private:
     QScopedPointer<Ui::MainWindow> m_ui;
-    TreeModel* m_bottomUpModel;
-    TreeModel* m_topDownModel;
     Parser* m_parser;
 };
 

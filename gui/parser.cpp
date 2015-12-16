@@ -503,16 +503,17 @@ void Parser::parse(const QString& path)
         emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again
         const auto mergedAllocations = mergeAllocations(*data);
-        emit progressMessageAvailable(i18n("building size histogram..."));
+        emit bottomUpDataAvailable(mergedAllocations);
+
         // also calculate the size histogram
+        emit progressMessageAvailable(i18n("building size histogram..."));
         const auto sizeHistogram = buildSizeHistogram(*data);
+        emit sizeHistogramDataAvailable(sizeHistogram);
         // now data can be modified again for the chart data evaluation
 
         emit progressMessageAvailable(i18n("building charts..."));
         auto parallel = new Collection;
         *parallel << make_job([this, mergedAllocations, sizeHistogram]() {
-            emit bottomUpDataAvailable(mergedAllocations);
-            emit sizeHistogramDataAvailable(sizeHistogram);
             const auto topDownData = toTopDownData(mergedAllocations);
             emit topDownDataAvailable(topDownData);
         }) << make_job([this, data, stdPath]() {
