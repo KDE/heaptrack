@@ -77,6 +77,8 @@ MainWindow::MainWindow(QWidget* parent)
             sizeHistogramModel, &HistogramModel::resetData);
     connect(m_parser, &Parser::summaryAvailable,
             m_ui->summary, &QLabel::setText);
+    connect(m_parser, &Parser::progressMessageAvailable,
+            m_ui->progressLabel, &QLabel::setText);
     connect(m_parser, &Parser::topDownDataAvailable,
             m_ui->flameGraphTab, &FlameGraph::setTopDownData);
     connect(m_parser, &Parser::bottomUpDataAvailable,

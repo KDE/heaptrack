@@ -494,17 +494,21 @@ void Parser::parse(const QString& path)
     stream() << make_job([this, path]() {
         const auto stdPath = path.toStdString();
         auto data = make_shared<ParserData>();
+        emit progressMessageAvailable(i18n("parsing data..."));
         data->read(stdPath);
         data->updateStringCache();
 
         emit summaryAvailable(generateSummary(*data));
 
+        emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again
         const auto mergedAllocations = mergeAllocations(*data);
+        emit progressMessageAvailable(i18n("building size histogram..."));
         // also calculate the size histogram
         const auto sizeHistogram = buildSizeHistogram(*data);
         // now data can be modified again for the chart data evaluation
 
+        emit progressMessageAvailable(i18n("building charts..."));
         auto parallel = new Collection;
         *parallel << make_job([this, mergedAllocations, sizeHistogram]() {
             emit bottomUpDataAvailable(mergedAllocations);

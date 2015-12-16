@@ -37,6 +37,7 @@ public slots:
     void parse(const QString& path);
 
 signals:
+    void progressMessageAvailable(const QString& progress);
     void summaryAvailable(const QString& summary);
     void bottomUpDataAvailable(const TreeData& data);
     void topDownDataAvailable(const TreeData& data);
