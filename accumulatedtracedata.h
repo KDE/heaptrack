@@ -42,14 +42,14 @@ struct InstructionPointer
 
     bool compareWithoutAddress(const InstructionPointer &other) const
     {
-        return std::make_tuple(moduleIndex, functionIndex, fileIndex, line)
-             < std::make_tuple(other.moduleIndex, other.functionIndex, other.fileIndex, other.line);
+        return std::tie(moduleIndex, functionIndex, fileIndex, line)
+             < std::tie(other.moduleIndex, other.functionIndex, other.fileIndex, other.line);
     }
 
     bool equalWithoutAddress(const InstructionPointer &other) const
     {
-        return std::make_tuple(moduleIndex, functionIndex, fileIndex, line)
-            == std::make_tuple(other.moduleIndex, other.functionIndex, other.fileIndex, other.line);
+        return std::tie(moduleIndex, functionIndex, fileIndex, line)
+            == std::tie(other.moduleIndex, other.functionIndex, other.fileIndex, other.line);
     }
 };
 

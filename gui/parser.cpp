@@ -264,7 +264,8 @@ struct ParserData final : public AccumulatedTraceData
         uint64_t allocations;
         bool operator<(const CountedAllocationInfo& rhs) const
         {
-            return make_tuple(info.size, allocations) < make_tuple(rhs.info.size, rhs.allocations);
+            return tie(info.size, allocations)
+                 < tie(rhs.info.size, rhs.allocations);
         }
     };
     vector<CountedAllocationInfo> allocationInfoCounter;

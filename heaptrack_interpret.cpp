@@ -111,14 +111,14 @@ struct Module
 
     bool operator<(const Module& module) const
     {
-        return make_tuple(addressStart, addressEnd, moduleIndex)
-             < make_tuple(module.addressStart, module.addressEnd, module.moduleIndex);
+        return tie(addressStart, addressEnd, moduleIndex)
+             < tie(module.addressStart, module.addressEnd, module.moduleIndex);
     }
 
     bool operator!=(const Module& module) const
     {
-        return make_tuple(addressStart, addressEnd, moduleIndex)
-            != make_tuple(module.addressStart, module.addressEnd, module.moduleIndex);
+        return tie(addressStart, addressEnd, moduleIndex)
+            != tie(module.addressStart, module.addressEnd, module.moduleIndex);
     }
 
     uintptr_t addressStart;
