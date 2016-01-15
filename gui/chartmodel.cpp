@@ -121,13 +121,23 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
     const auto cost = data.cost[column];
     if (role == Qt::ToolTipRole) {
         const QString time = QString::number(double(data.timeStamp) / 1000, 'g', 3) + QLatin1Char('s');
-        const auto label = m_data.labels.value(column);
-        if (m_type == Allocations || m_type == Temporary) {
-            return i18n("%1: %2 at %3", label, cost, time);
-        } else {
-            KFormat format;
-            return i18n("%1: %2 at %3", label, format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
+        const auto label = m_data.labels.value(column).toHtmlEscaped();
+        KFormat format;
+        switch (m_type) {
+            case Allocations:
+                return i18n("<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>",
+                            label, cost, time);
+            case Temporary:
+                return i18n("<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</p></qt>",
+                            label, cost, time);
+            case Consumed:
+                return i18n("<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>",
+                            label, format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
+            case Allocated:
+                return i18n("<qt>%2 allocated after %3 from:<p style='margin-left:10px'>%1</p></qt>",
+                            label, format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
         }
+        return {};
     }
 
     return cost;
