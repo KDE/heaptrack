@@ -160,6 +160,9 @@
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
+              <property name="indentation">
+               <number>10</number>
+              </property>
               <property name="rootIsDecorated">
                <bool>true</bool>
               </property>
@@ -221,6 +224,9 @@
              <widget class="QTreeView" name="topDownResults">
               <property name="alternatingRowColors">
                <bool>true</bool>
+              </property>
+              <property name="indentation">
+               <number>10</number>
               </property>
               <property name="rootIsDecorated">
                <bool>true</bool>
