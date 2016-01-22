@@ -42,6 +42,12 @@ const RowData* rowAt(const TreeData& rows, int row)
     return rows.data() + row;
 }
 
+/// @return the parent row containing @p index
+const RowData* toParentRow(const QModelIndex& index)
+{
+    return static_cast<const RowData*>(index.internalPointer());
+}
+
 }
 
 TreeModel::TreeModel(QObject* parent)
@@ -133,13 +139,12 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
     }
     const auto row = toRow(index);
     if (role == Qt::DisplayRole || role == SortRole) {
-        KFormat format;
         switch (static_cast<Columns>(index.column())) {
         case AllocatedColumn:
             if (role == SortRole) {
                 return row->allocated;
             } else {
-                return format.formatByteSize(row->allocated);
+                return m_format.formatByteSize(row->allocated);
             }
         case AllocationsColumn:
             return row->allocations;
@@ -149,13 +154,13 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             if (role == SortRole) {
                 return row->peak;
             } else {
-                return format.formatByteSize(row->peak);
+                return m_format.formatByteSize(row->peak);
             }
         case LeakedColumn:
             if (role == SortRole) {
                 return row->leaked;
             } else {
-                return format.formatByteSize(row->leaked);
+                return m_format.formatByteSize(row->leaked);
             }
         case FunctionColumn:
             return row->location->function;
@@ -265,12 +270,6 @@ const RowData* TreeModel::toRow(const QModelIndex& index) const
     } else {
         return rowAt(m_data, index.row());
     }
-}
-
-const RowData* TreeModel::toParentRow(const QModelIndex& index) const
-{
-    Q_ASSERT(index.isValid());
-    return static_cast<const RowData*>(index.internalPointer());
 }
 
 int TreeModel::rowOf(const RowData* row) const

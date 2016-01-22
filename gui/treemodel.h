@@ -23,6 +23,8 @@
 #include <QAbstractItemModel>
 #include <QVector>
 
+#include <KFormat>
+
 #include <boost/functional/hash.hpp>
 
 #include <memory>
@@ -122,12 +124,12 @@ public slots:
 private:
     /// @return the row resembled by @p index
     const RowData* toRow(const QModelIndex& index) const;
-    /// @return the parent row containing @p index
-    const RowData* toParentRow(const QModelIndex& index) const;
     /// @return the row number of @p row in its parent
     int rowOf(const RowData* row) const;
 
     TreeData m_data;
+    // TODO: update via global event filter when the locale changes (changeEvent)
+    KFormat m_format;
 };
 
 #endif // TREEMODEL_H
