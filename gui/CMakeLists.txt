@@ -6,7 +6,7 @@ ki18n_wrap_ui(UIFILES
 
 include(KDEInstallDirs)
 include(KDECMakeSettings)
-include(KDECompilerSettings)
+include(KDECompilerSettings NO_POLICY_SCOPE)
 include(ECMAddTests)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
