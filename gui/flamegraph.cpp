@@ -176,9 +176,11 @@ void layoutItems(FrameGraphicsItem *parent)
         auto frameChild = static_cast<FrameGraphicsItem*>(child);
         const qreal w = maxWidth * double(frameChild->cost()) / parent->cost();
         frameChild->setVisible(w > 1);
-        frameChild->setRect(QRectF(x, y, w, h));
-        layoutItems(frameChild);
-        x += w;
+        if (frameChild->isVisible()) {
+            frameChild->setRect(QRectF(x, y, w, h));
+            layoutItems(frameChild);
+            x += w;
+        }
     }
 }
 
