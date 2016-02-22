@@ -330,6 +330,10 @@ int main(int /*argc*/, char** /*argv*/)
     uint64_t lastPtr = 0;
     AllocationInfoSet allocationInfos;
 
+    uint64_t allocations = 0;
+    uint64_t leakedAllocations = 0;
+    uint64_t temporaryAllocations = 0;
+
     while (reader.getLine(cin)) {
         if (reader.mode() == 'x') {
             reader >> exe;
@@ -369,6 +373,8 @@ int main(int /*argc*/, char** /*argv*/)
             // trace point, map current output index to parent index
             fprintf(stdout, "t %zx %zx\n", ipId, parentIndex);
         } else if (reader.mode() == '+') {
+            ++allocations;
+            ++leakedAllocations;
             uint64_t size = 0;
             TraceIndex traceId;
             uint64_t ptr = 0;
@@ -376,6 +382,7 @@ int main(int /*argc*/, char** /*argv*/)
                 cerr << "failed to parse line: " << reader.line() << endl;
                 continue;
             }
+
             AllocationIndex index;
             if (allocationInfos.add(size, traceId, &index)) {
                 fprintf(stdout, "a %zx %x\n", size, traceId.index);
@@ -384,6 +391,7 @@ int main(int /*argc*/, char** /*argv*/)
             lastPtr = ptr;
             fprintf(stdout, "+ %x\n", index.index);
         } else if (reader.mode() == '-') {
+            --leakedAllocations;
             uint64_t ptr = 0;
             if (!(reader >> ptr)) {
                 cerr << "failed to parse line: " << reader.line() << endl;
@@ -397,6 +405,7 @@ int main(int /*argc*/, char** /*argv*/)
             }
             fprintf(stdout, "- %x", allocation.first.index);
             if (temporary) {
+                ++temporaryAllocations;
                 fputs(" 1\n", stdout);
             } else {
                 fputc('\n', stdout);
@@ -406,6 +415,12 @@ int main(int /*argc*/, char** /*argv*/)
             fputc('\n', stdout);
         }
     }
+
+    fprintf(stderr, "heaptrack stats:\n"
+           "\tallocations:          \t%lu\n"
+           "\tleaked allocations:   \t%lu\n"
+           "\ttemporary allocations:\t%lu\n",
+           allocations, leakedAllocations, temporaryAllocations);
 
     return 0;
 }
