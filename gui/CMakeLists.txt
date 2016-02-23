@@ -24,6 +24,7 @@ add_executable(heaptrack_gui
     modeltest.cpp
     parser.cpp
     flamegraph.cpp
+    stacksmodel.cpp
     ${UIFILES}
 )
 

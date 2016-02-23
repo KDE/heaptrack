@@ -17,35 +17,32 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef STACKSMODEL_H
+#define STACKSMODEL_H
 
-#include <QMainWindow>
-#include <KSharedConfig>
+#include <QAbstractListModel>
 
-namespace Ui {
-class MainWindow;
-}
-
-class TreeModel;
-class ChartModel;
-class Parser;
-
-class MainWindow : public QMainWindow
+class StacksModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    MainWindow(QWidget* parent = nullptr);
-    virtual ~MainWindow();
+    explicit StacksModel(QObject* parent = nullptr);
+    ~StacksModel();
 
-public slots:
-    void loadFile(const QString& path);
-    void openFile();
+    void setStackIndex(int index);
+    void fillFromIndex(const QModelIndex& leaf);
+    void clear();
+
+    int rowCount(const QModelIndex& parent) const override;
+    QVariant data(const QModelIndex& index, int role) const override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+
+signals:
+    void stacksFound(int stacks);
 
 private:
-    QScopedPointer<Ui::MainWindow> m_ui;
-    Parser* m_parser;
-    KSharedConfig::Ptr m_config;
+    QVector<QVector<QModelIndex>> m_data;
+    int m_stackIndex = 0;
 };
 
-#endif // MAINWINDOW_H
+#endif // STACKSMODEL_H

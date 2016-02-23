@@ -58,15 +58,19 @@ int main(int argc, char** argv)
     parser.process(app);
     aboutData.processCommandLine(&parser);
 
-    foreach (const QString &file, parser.positionalArguments()) {
-        MainWindow* window = new MainWindow;
-        window->loadFile(file);
+    auto createWindow = [] () -> MainWindow* {
+        auto window = new MainWindow;
+        window->setAttribute(Qt::WA_DeleteOnClose);
         window->show();
+        return window;
+    };
+
+    foreach (const QString &file, parser.positionalArguments()) {
+        createWindow()->loadFile(file);
     }
 
     if (parser.positionalArguments().isEmpty()) {
-        MainWindow* window = new MainWindow;
-        window->show();
+        createWindow();
     }
 
     return app.exec();
