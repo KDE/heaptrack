@@ -192,7 +192,7 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
     } else if (role == Qt::ToolTipRole) {
         QString tooltip;
         QTextStream stream(&tooltip);
-        stream << "<qt><pre>";
+        stream << "<qt><pre style='font-family:monospace;'>";
         stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
                         row->location->function, row->location->file, row->location->line, row->location->module);
         stream << '\n';
