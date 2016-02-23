@@ -496,7 +496,11 @@ void Parser::parse(const QString& path)
         const auto stdPath = path.toStdString();
         auto data = make_shared<ParserData>();
         emit progressMessageAvailable(i18n("parsing data..."));
-        data->read(stdPath);
+        if (!data->read(stdPath)) {
+            emit failedToOpen(path);
+            return;
+        }
+
         data->updateStringCache();
 
         emit summaryAvailable(generateSummary(*data));

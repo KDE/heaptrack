@@ -14,7 +14,17 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout_6">
+    <item>
+     <widget class="KMessageWidget" name="messages">
+      <property name="messageType">
+       <enum>KMessageWidget::Information</enum>
+      </property>
+      <property name="icon">
+       <iconset theme="dialog-error"/>
+      </property>
+     </widget>
+    </item>
     <item>
      <widget class="QStackedWidget" name="pages">
       <widget class="QWidget" name="openPage">
@@ -331,6 +341,11 @@
   </widget>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>KMessageWidget</class>
+   <extends>QFrame</extends>
+   <header>kmessagewidget.h</header>
+  </customwidget>
   <customwidget>
    <class>ChartWidget</class>
    <extends>QWidget</extends>

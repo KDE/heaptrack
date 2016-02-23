@@ -137,11 +137,20 @@ MainWindow::MainWindow(QWidget* parent)
             m_ui->summary, &QLabel::setText);
     connect(m_parser, &Parser::progressMessageAvailable,
             m_ui->progressLabel, &QLabel::setText);
-    connect(m_parser, &Parser::finished,
-            this, [=] {
+    auto removeProgress = [this] {
         statusBar()->removeWidget(m_ui->progressLabel);
         statusBar()->removeWidget(m_ui->loadingProgress);
+    };
+    connect(m_parser, &Parser::finished,
+            this, removeProgress);
+    connect(m_parser, &Parser::failedToOpen,
+            this, [this, removeProgress] (const QString& failedFile) {
+        removeProgress();
+        m_ui->pages->setCurrentWidget(m_ui->openPage);
+        m_ui->messages->setText(i18n("Failed to parse file %1.", failedFile));
+        m_ui->messages->show();
     });
+    m_ui->messages->hide();
 
     auto bottomUpProxy = new TreeProxy(bottomUpModel);
     bottomUpProxy->setSourceModel(bottomUpModel);

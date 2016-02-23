@@ -47,6 +47,7 @@ signals:
     void temporaryChartDataAvailable(const ChartData& data);
     void sizeHistogramDataAvailable(const HistogramData& data);
     void finished();
+    void failedToOpen(const QString& path);
 };
 
 #endif // PARSER_H
