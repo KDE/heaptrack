@@ -203,9 +203,11 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
                        format.formatByteSize(row->peak), format.formatByteSize(row->leaked));
         stream << '\n';
         if (!row->children.isEmpty()) {
-            stream << '\n' << i18n("backtrace:") << '\n';
             auto child = row;
             int max = 5;
+            if (child->children.count() == 1) {
+                stream << '\n' << i18n("backtrace:") << '\n';
+            }
             while (child->children.count() == 1 && max-- > 0) {
                 stream << "\n";
                 stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
