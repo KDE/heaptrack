@@ -48,6 +48,12 @@ const RowData* toParentRow(const QModelIndex& index)
     return static_cast<const RowData*>(index.internalPointer());
 }
 
+QString basename(const QString& path)
+{
+    int idx = path.lastIndexOf(QLatin1Char('/'));
+    return path.mid(idx + 1);
+}
+
 }
 
 TreeModel::TreeModel(QObject* parent)
@@ -172,12 +178,13 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             return row->location->line;
         case LocationColumn:
             if (row->location->file.isEmpty()) {
-                return i18n("%1 in ?? (%2)", row->location->function,
-                            row->location->module);
+                return i18n("%1 in ?? (%2)",
+                            basename(row->location->function),
+                            basename(row->location->module));
             } else {
                 return i18n("%1 in %2:%3 (%4)", row->location->function,
-                            row->location->file, row->location->line,
-                            row->location->module);
+                            basename(row->location->file), row->location->line,
+                            basename(row->location->module));
             }
         case NUM_COLUMNS:
             break;
