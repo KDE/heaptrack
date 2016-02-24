@@ -300,6 +300,7 @@ QString generateSummary(const ParserData& data)
     KFormat format;
     QTextStream stream(&ret);
     const double totalTimeS = 0.001 * data.totalTime;
+    const double peakTimeS = 0.001 * data.peakTime;
     stream << "<qt><dl>"
            << i18n("<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>", QString::fromStdString(data.debuggee))
            // xgettext:no-c-format
@@ -311,7 +312,7 @@ QString generateSummary(const ParserData& data)
            << i18n("<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>",
                    data.totalTemporary, round(float(data.totalTemporary) * 100.f * 100.f / data.totalAllocations) / 100.f,
                    quint64(data.totalTemporary / totalTimeS))
-           << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1</dd>", format.formatByteSize(data.peak))
+           << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2s</dd>", format.formatByteSize(data.peak), peakTimeS)
            << i18n("<dt><b>total memory leaked</b>:</dt><dd>%1</dd>", format.formatByteSize(data.leaked));
     stream << "</dl></qt>";
     return ret;

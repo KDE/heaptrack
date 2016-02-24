@@ -130,6 +130,7 @@ struct AccumulatedTraceData
     uint64_t peak = 0;
     uint64_t leaked = 0;
     uint64_t totalTime = 0;
+    uint64_t peakTime = 0;
 
     // our indices are sequentially increasing thus a new allocation can only ever
     // occur with an index larger than any other we encountered so far

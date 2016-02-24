@@ -155,6 +155,7 @@ bool AccumulatedTraceData::read(istream& in)
     totalAllocations = 0;
     totalTemporary = 0;
     peak = 0;
+    peakTime = 0;
     leaked = 0;
     allocations.clear();
     uint fileVersion = 0;
@@ -248,6 +249,7 @@ bool AccumulatedTraceData::read(istream& in)
             leaked += info.size;
             if (leaked > peak) {
                 peak = leaked;
+                peakTime = timeStamp;
             }
 
             handleAllocation(info, allocationIndex);
