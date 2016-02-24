@@ -63,7 +63,6 @@ void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type)
     view->setUniformRowHeights(true);
     view->sortByColumn(0);
     view->header()->setStretchLastSection(true);
-    view->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 }
 }
 
