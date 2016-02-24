@@ -20,10 +20,8 @@
 #include "parser.h"
 
 #include <ThreadWeaver/ThreadWeaver>
-#include <KFormat>
 #include <KLocalizedString>
 
-#include <QTextStream>
 #include <QDebug>
 
 #include "../accumulatedtracedata.h"
@@ -294,30 +292,6 @@ struct ParserData final : public AccumulatedTraceData
     bool buildCharts = false;
 };
 
-QString generateSummary(const ParserData& data)
-{
-    QString ret;
-    KFormat format;
-    QTextStream stream(&ret);
-    const double totalTimeS = 0.001 * data.totalTime;
-    const double peakTimeS = 0.001 * data.peakTime;
-    stream << "<qt><dl>"
-           << i18n("<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>", QString::fromStdString(data.debuggee))
-           // xgettext:no-c-format
-           << i18n("<dt><b>total runtime</b>:</dt><dd>%1s</dd>", totalTimeS)
-           << i18n("<dt><b>bytes allocated in total</b> (ignoring deallocations):</dt><dd>%1 (%2/s)</dd>",
-                   format.formatByteSize(data.totalAllocated, 2), format.formatByteSize(data.totalAllocated / totalTimeS))
-           << i18n("<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>",
-                   data.totalAllocations, quint64(data.totalAllocations / totalTimeS))
-           << i18n("<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>",
-                   data.totalTemporary, round(float(data.totalTemporary) * 100.f * 100.f / data.totalAllocations) / 100.f,
-                   quint64(data.totalTemporary / totalTimeS))
-           << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2s</dd>", format.formatByteSize(data.peak), peakTimeS)
-           << i18n("<dt><b>total memory leaked</b>:</dt><dd>%1</dd>", format.formatByteSize(data.leaked));
-    stream << "</dl></qt>";
-    return ret;
-}
-
 void setParents(QVector<RowData>& children, const RowData* parent)
 {
     for (auto& row: children) {
@@ -486,7 +460,9 @@ HistogramData buildSizeHistogram(ParserData& data)
 
 Parser::Parser(QObject* parent)
     : QObject(parent)
-{}
+{
+    qRegisterMetaType<SummaryData>();
+}
 
 Parser::~Parser() = default;
 
@@ -504,7 +480,16 @@ void Parser::parse(const QString& path)
 
         data->updateStringCache();
 
-        emit summaryAvailable(generateSummary(*data));
+        emit summaryAvailable({
+            QString::fromStdString(data->debuggee),
+            data->totalTime,
+            data->peakTime,
+            data->peak,
+            data->leaked,
+            data->totalAllocations,
+            data->totalTemporary,
+            data->totalAllocated
+        });
 
         emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again

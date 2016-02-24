@@ -26,6 +26,19 @@
 #include "chartmodel.h"
 #include "histogrammodel.h"
 
+struct SummaryData
+{
+    QString debuggee;
+    uint64_t totalTime;
+    uint64_t peakTime;
+    uint64_t peak;
+    uint64_t leaked;
+    uint64_t allocations;
+    uint64_t temporary;
+    uint64_t allocated;
+};
+Q_DECLARE_METATYPE(SummaryData);
+
 class Parser : public QObject
 {
     Q_OBJECT
@@ -38,7 +51,7 @@ public slots:
 
 signals:
     void progressMessageAvailable(const QString& progress);
-    void summaryAvailable(const QString& summary);
+    void summaryAvailable(const SummaryData& summary);
     void bottomUpDataAvailable(const TreeData& data);
     void topDownDataAvailable(const TreeData& data);
     void consumedChartDataAvailable(const ChartData& data);

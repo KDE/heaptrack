@@ -147,7 +147,45 @@ MainWindow::MainWindow(QWidget* parent)
                 m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->sizesTab), true);
             });
     connect(m_parser, &Parser::summaryAvailable,
-            m_ui->summary, &QLabel::setText);
+            this, [this] (const SummaryData& data) {
+                KFormat format;
+                QString textLeft;
+                QString textCenter;
+                QString textRight;
+                const double totalTimeS = 0.001 * data.totalTime;
+                const double peakTimeS = 0.001 * data.peakTime;
+                {
+                    QTextStream stream(&textLeft);
+                    stream << "<qt><dl>"
+                           << i18n("<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>", data.debuggee)
+                           // xgettext:no-c-format
+                           << i18n("<dt><b>total runtime</b>:</dt><dd>%1s</dd>", totalTimeS)
+                           << "</dl></qt>";
+                }
+                {
+                    QTextStream stream(&textCenter);
+                    stream << "<qt><dl>"
+                           << i18n("<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>",
+                                   data.allocations, quint64(data.allocations / totalTimeS))
+                           << i18n("<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>",
+                                   data.temporary, round(float(data.temporary) * 100.f * 100.f / data.allocations) / 100.f,
+                                   quint64(data.temporary / totalTimeS))
+                           << "</dl></qt>";
+                }
+                {
+                    QTextStream stream(&textRight);
+                    stream << "<qt><dl>"
+                           << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2s</dd>", format.formatByteSize(data.peak), peakTimeS)
+                           << i18n("<dt><b>total memory leaked</b>:</dt><dd>%1</dd>", format.formatByteSize(data.leaked))
+                           << i18n("<dt><b>bytes allocated in total</b> (ignoring deallocations):</dt><dd>%1 (%2/s)</dd>",
+                                   format.formatByteSize(data.allocated, 2), format.formatByteSize(data.allocated / totalTimeS))
+                           << "</dl></qt>";
+                }
+
+                m_ui->summaryLeft->setText(textLeft);
+                m_ui->summaryCenter->setText(textCenter);
+                m_ui->summaryRight->setText(textRight);
+            });
     connect(m_parser, &Parser::progressMessageAvailable,
             m_ui->progressLabel, &QLabel::setText);
     auto removeProgress = [this] {

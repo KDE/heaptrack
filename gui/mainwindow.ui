@@ -21,7 +21,8 @@
        <enum>KMessageWidget::Information</enum>
       </property>
       <property name="icon">
-       <iconset theme="dialog-error"/>
+       <iconset theme="dialog-error">
+        <normaloff>.</normaloff>.</iconset>
       </property>
      </widget>
     </item>
@@ -114,21 +115,48 @@
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
-             <widget class="QLabel" name="summary">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string notr="true">summary goes here</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
+             <widget class="QWidget" name="widget_10" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <item>
+                <widget class="QLabel" name="summaryLeft">
+                 <property name="text">
+                  <string notr="true">summary</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="summaryCenter">
+                 <property name="text">
+                  <string notr="true">summary</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="summaryRight">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="text">
+                  <string notr="true">summary goes here</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="line">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
               </property>
              </widget>
             </item>
@@ -302,12 +330,6 @@
                 </widget>
                </item>
               </layout>
-              <zorder>summary</zorder>
-              <zorder>widget_5</zorder>
-              <zorder>widget_6</zorder>
-              <zorder>widget_7</zorder>
-              <zorder>widget_8</zorder>
-              <zorder>widget_9</zorder>
              </widget>
             </item>
            </layout>
