@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Milian Wolff <mail@milianw.de>
+ * Copyright 2016 Milian Wolff <mail@milianw.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Library General Public License as
@@ -17,37 +17,33 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef TOPPROXY_H
+#define TOPPROXY_H
 
-#include <QMainWindow>
-#include <KSharedConfig>
+#include <QSortFilterProxyModel>
 
-namespace Ui {
-class MainWindow;
-}
+#include "treemodel.h"
 
-class TreeModel;
-class ChartModel;
-class Parser;
-
-class MainWindow : public QMainWindow
+class TopProxy : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    MainWindow(QWidget* parent = nullptr);
-    virtual ~MainWindow();
+    enum Type {
+        Peak,
+        Leaked,
+        Allocations,
+        Allocated,
+        Temporary
+    };
 
-public slots:
-    void loadFile(const QString& path);
-    void openFile();
+    explicit TopProxy(Type type, QObject* parent = nullptr);
+    ~TopProxy() override;
+
+    bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
+    bool filterAcceptsColumn(int source_column, const QModelIndex& source_parent) const override;
 
 private:
-    void setupStacks();
-
-    QScopedPointer<Ui::MainWindow> m_ui;
-    Parser* m_parser;
-    KSharedConfig::Ptr m_config;
+    Type m_type;
 };
 
-#endif // MAINWINDOW_H
+#endif // TOPPROXY_H

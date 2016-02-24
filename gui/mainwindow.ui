@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1128</width>
+    <width>1280</width>
     <height>896</height>
    </rect>
   </property>
@@ -104,20 +104,214 @@
       <widget class="QWidget" name="resultsPage">
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QLabel" name="summary">
-          <property name="text">
-           <string notr="true">summary goes here</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>7</number>
+           <number>0</number>
           </property>
+          <widget class="QWidget" name="summaryTab">
+           <attribute name="title">
+            <string>Summary</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <item>
+             <widget class="QLabel" name="summary">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string notr="true">summary goes here</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="widget_4" native="true">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <item>
+                <widget class="QWidget" name="widget_5" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_8">
+                  <item>
+                   <widget class="QLabel" name="topPeakLabel">
+                    <property name="font">
+                     <font>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="toolTip">
+                     <string>List of functions that allocated the most memory at a given time.</string>
+                    </property>
+                    <property name="text">
+                     <string>Highest Memory Peaks</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QTreeView" name="topPeak">
+                    <property name="toolTip">
+                     <string>List of functions that allocated the most memory at a given time.</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_6" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_9">
+                  <item>
+                   <widget class="QLabel" name="topLeakedLabel">
+                    <property name="font">
+                     <font>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="toolTip">
+                     <string>List of functions that leak the most memory.</string>
+                    </property>
+                    <property name="text">
+                     <string>Largest Memory Leaks</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QTreeView" name="topLeaked">
+                    <property name="toolTip">
+                     <string>List of functions that leak the most memory.</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_7" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_10">
+                  <item>
+                   <widget class="QLabel" name="topAllocationsLabel">
+                    <property name="font">
+                     <font>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="toolTip">
+                     <string>List of functions that allocate memory most often.</string>
+                    </property>
+                    <property name="text">
+                     <string>Most Memory Allocations</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QTreeView" name="topAllocations">
+                    <property name="toolTip">
+                     <string>List of functions that allocate memory most often.</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_8" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_11">
+                  <item>
+                   <widget class="QLabel" name="topTemporaryLabel">
+                    <property name="font">
+                     <font>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="toolTip">
+                     <string>List of functions that produced the most temporary memory allocations.</string>
+                    </property>
+                    <property name="text">
+                     <string>Most Temporary Allocations</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QTreeView" name="topTemporary">
+                    <property name="toolTip">
+                     <string>List of functions that produced the most temporary memory allocations.</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+               <item>
+                <widget class="QWidget" name="widget_9" native="true">
+                 <layout class="QVBoxLayout" name="verticalLayout_12">
+                  <item>
+                   <widget class="QLabel" name="topAllocatedLabel">
+                    <property name="font">
+                     <font>
+                      <weight>75</weight>
+                      <bold>true</bold>
+                     </font>
+                    </property>
+                    <property name="toolTip">
+                     <string>List of functions that allocated the most memory overall, ignoring deallocations.</string>
+                    </property>
+                    <property name="text">
+                     <string>Most Memory Allocated</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignCenter</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QTreeView" name="topAllocated">
+                    <property name="toolTip">
+                     <string>List of functions that allocated the most memory overall, ignoring deallocations.</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </item>
+              </layout>
+              <zorder>summary</zorder>
+              <zorder>widget_5</zorder>
+              <zorder>widget_6</zorder>
+              <zorder>widget_7</zorder>
+              <zorder>widget_8</zorder>
+              <zorder>widget_9</zorder>
+             </widget>
+            </item>
+           </layout>
+          </widget>
           <widget class="QWidget" name="bottomUpTab">
            <attribute name="title">
             <string>Bottom-Up</string>

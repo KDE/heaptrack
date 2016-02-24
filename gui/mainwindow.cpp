@@ -32,6 +32,7 @@
 
 #include "treemodel.h"
 #include "treeproxy.h"
+#include "topproxy.h"
 #include "parser.h"
 #include "chartmodel.h"
 #include "chartproxy.h"
@@ -42,6 +43,7 @@ using namespace std;
 
 namespace {
 const int MAINWINDOW_VERSION = 1;
+
 namespace Config {
 namespace Groups {
 const char MainWindow[] = "MainWindow";
@@ -49,6 +51,19 @@ const char MainWindow[] = "MainWindow";
 namespace Entries {
 const char State[] = "State";
 }
+}
+
+void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type)
+{
+    auto proxy = new TopProxy(type, source);
+    proxy->setSourceModel(source);
+    proxy->setSortRole(TreeModel::SortRole);
+    view->setModel(proxy);
+    view->setRootIsDecorated(false);
+    view->setUniformRowHeights(true);
+    view->sortByColumn(0);
+    view->header()->setStretchLastSection(true);
+    view->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 }
 }
 
@@ -99,7 +114,6 @@ MainWindow::MainWindow(QWidget* parent)
         statusBar()->addWidget(m_ui->progressLabel, 1);
         statusBar()->addWidget(m_ui->loadingProgress);
         m_ui->pages->setCurrentWidget(m_ui->resultsPage);
-        m_ui->stacksDock->setVisible(true);
     });
     connect(m_parser, &Parser::topDownDataAvailable,
             this, [=] (const TreeData& data) {
@@ -160,7 +174,6 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->bottomUpResults->hideColumn(TreeModel::FileColumn);
     m_ui->bottomUpResults->hideColumn(TreeModel::LineColumn);
     m_ui->bottomUpResults->hideColumn(TreeModel::ModuleColumn);
-
     connect(m_ui->bottomUpFilterFunction, &QLineEdit::textChanged,
             bottomUpProxy, &TreeProxy::setFunctionFilter);
     connect(m_ui->bottomUpFilterFile, &QLineEdit::textChanged,
@@ -186,44 +199,13 @@ MainWindow::MainWindow(QWidget* parent)
     auto openFile = KStandardAction::open(this, SLOT(openFile()), this);
     m_ui->openFile->setDefaultAction(openFile);
 
-    auto stacksModel = new StacksModel(this);
-    m_ui->stacksTree->setModel(stacksModel);
-    m_ui->stacksTree->setRootIsDecorated(false);
-    auto updateStackSpinner = [this] (int stacks) {
-        m_ui->stackSpinner->setMinimum(min(stacks, 1));
-        m_ui->stackSpinner->setSuffix(i18n(" / %1", stacks));
-        m_ui->stackSpinner->setMaximum(stacks);
-    };
-    updateStackSpinner(0);
-    connect(stacksModel, &StacksModel::stacksFound,
-            this, updateStackSpinner);
-    connect(m_ui->stackSpinner, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            stacksModel, &StacksModel::setStackIndex);
-    auto fillFromIndex = [stacksModel] (const QModelIndex& current) {
-        if (!current.isValid()) {
-            stacksModel->clear();
-        } else {
-            auto proxy = qobject_cast<const TreeProxy*>(current.model());
-            Q_ASSERT(proxy);
-            auto leaf = proxy->mapToSource(current);
-            stacksModel->fillFromIndex(leaf);
-        }
-    };
-    connect(m_ui->bottomUpResults->selectionModel(), &QItemSelectionModel::currentChanged,
-            this, fillFromIndex);
-    connect(m_ui->topDownResults->selectionModel(), &QItemSelectionModel::currentChanged,
-            this, fillFromIndex);
-    connect(m_ui->tabWidget, &QTabWidget::currentChanged, this, [this, fillFromIndex] (int tabIndex) {
-        const auto widget = m_ui->tabWidget->widget(tabIndex);
-        const bool showDocks = (widget == m_ui->topDownTab || widget == m_ui->bottomUpTab);
-        m_ui->stacksDock->setVisible(showDocks);
-        if (showDocks) {
-            auto tree = (widget == m_ui->topDownTab) ? m_ui->topDownResults : m_ui->bottomUpResults;
-            fillFromIndex(tree->selectionModel()->currentIndex());
-        }
-    });
-    m_ui->stacksDock->setVisible(false);
-    m_ui->stacksDock->setFeatures(QDockWidget::DockWidgetMovable);
+    setupStacks();
+
+    setupTopView(bottomUpModel, m_ui->topPeak, TopProxy::Peak);
+    setupTopView(bottomUpModel, m_ui->topLeaked, TopProxy::Leaked);
+    setupTopView(bottomUpModel, m_ui->topAllocations, TopProxy::Allocations);
+    setupTopView(bottomUpModel, m_ui->topTemporary, TopProxy::Temporary);
+    setupTopView(bottomUpModel, m_ui->topAllocated, TopProxy::Allocated);
 
     setWindowTitle(i18n("Heaptrack"));
 }
@@ -251,4 +233,54 @@ void MainWindow::openFile()
     connect(dialog, &QFileDialog::fileSelected,
             this, &MainWindow::loadFile);
     dialog->show();
+}
+
+void MainWindow::setupStacks()
+{
+    auto stacksModel = new StacksModel(this);
+    m_ui->stacksTree->setModel(stacksModel);
+    m_ui->stacksTree->setRootIsDecorated(false);
+
+    auto updateStackSpinner = [this] (int stacks) {
+        m_ui->stackSpinner->setMinimum(min(stacks, 1));
+        m_ui->stackSpinner->setSuffix(i18n(" / %1", stacks));
+        m_ui->stackSpinner->setMaximum(stacks);
+    };
+    updateStackSpinner(0);
+    connect(stacksModel, &StacksModel::stacksFound,
+            this, updateStackSpinner);
+    connect(m_ui->stackSpinner, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            stacksModel, &StacksModel::setStackIndex);
+
+    auto fillFromIndex = [stacksModel] (const QModelIndex& current) {
+        if (!current.isValid()) {
+            stacksModel->clear();
+        } else {
+            auto proxy = qobject_cast<const TreeProxy*>(current.model());
+            Q_ASSERT(proxy);
+            auto leaf = proxy->mapToSource(current);
+            stacksModel->fillFromIndex(leaf);
+        }
+    };
+    connect(m_ui->bottomUpResults->selectionModel(), &QItemSelectionModel::currentChanged,
+            this, fillFromIndex);
+    connect(m_ui->topDownResults->selectionModel(), &QItemSelectionModel::currentChanged,
+            this, fillFromIndex);
+
+    auto tabChanged = [this, fillFromIndex] (int tabIndex) {
+        const auto widget = m_ui->tabWidget->widget(tabIndex);
+        const bool showDocks = (widget == m_ui->topDownTab || widget == m_ui->bottomUpTab);
+        m_ui->stacksDock->setVisible(showDocks);
+        if (showDocks) {
+            auto tree = (widget == m_ui->topDownTab) ? m_ui->topDownResults : m_ui->bottomUpResults;
+            fillFromIndex(tree->selectionModel()->currentIndex());
+        }
+    };
+    connect(m_ui->tabWidget, &QTabWidget::currentChanged,
+            this, tabChanged);
+    connect(m_parser, &Parser::bottomUpDataAvailable,
+            this, [tabChanged] () { tabChanged(0); });
+
+    m_ui->stacksDock->setVisible(false);
+    m_ui->stacksDock->setFeatures(QDockWidget::DockWidgetMovable);
 }

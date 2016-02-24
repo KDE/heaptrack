@@ -25,6 +25,7 @@ add_executable(heaptrack_gui
     parser.cpp
     flamegraph.cpp
     stacksmodel.cpp
+    topproxy.cpp
     ${UIFILES}
 )
 

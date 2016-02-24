@@ -300,20 +300,20 @@ QString generateSummary(const ParserData& data)
     KFormat format;
     QTextStream stream(&ret);
     const double totalTimeS = 0.001 * data.totalTime;
-    stream << "<qt>"
-           << i18n("<strong>debuggee</strong>: <code>%1</code>", QString::fromStdString(data.debuggee)) << "<br/>"
+    stream << "<qt><dl>"
+           << i18n("<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>", QString::fromStdString(data.debuggee))
            // xgettext:no-c-format
-           << i18n("<strong>total runtime</strong>: %1s", totalTimeS) << "<br/>"
-           << i18n("<strong>bytes allocated in total</strong> (ignoring deallocations): %1 (%2/s)",
-                   format.formatByteSize(data.totalAllocated, 2), format.formatByteSize(data.totalAllocated / totalTimeS)) << "<br/>"
-           << i18n("<strong>calls to allocation functions</strong>: %1 (%2/s)",
-                   data.totalAllocations, quint64(data.totalAllocations / totalTimeS)) << "<br/>"
-           << i18n("<strong>temporary allocations</strong>: %1 (%2%, %3/s)",
+           << i18n("<dt><b>total runtime</b>:</dt><dd>%1s</dd>", totalTimeS)
+           << i18n("<dt><b>bytes allocated in total</b> (ignoring deallocations):</dt><dd>%1 (%2/s)</dd>",
+                   format.formatByteSize(data.totalAllocated, 2), format.formatByteSize(data.totalAllocated / totalTimeS))
+           << i18n("<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>",
+                   data.totalAllocations, quint64(data.totalAllocations / totalTimeS))
+           << i18n("<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>",
                    data.totalTemporary, round(float(data.totalTemporary) * 100.f * 100.f / data.totalAllocations) / 100.f,
-                   quint64(data.totalTemporary / totalTimeS)) << "<br/>"
-           << i18n("<strong>peak heap memory consumption</strong>: %1", format.formatByteSize(data.peak)) << "<br/>"
-           << i18n("<strong>total memory leaked</strong>: %1", format.formatByteSize(data.leaked)) << "<br/>";
-    stream << "</qt>";
+                   quint64(data.totalTemporary / totalTimeS))
+           << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1</dd>", format.formatByteSize(data.peak))
+           << i18n("<dt><b>total memory leaked</b>:</dt><dd>%1</dd>", format.formatByteSize(data.leaked));
+    stream << "</dl></qt>";
     return ret;
 }
 
