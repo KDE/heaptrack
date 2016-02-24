@@ -412,7 +412,7 @@ private:
             writeError();
             return;
         }
-        dl_iterate_phdr(&dl_iterate_phdr_callback, s_data->out);
+        dl_iterate_phdr(&dl_iterate_phdr_callback, this);
         s_data->moduleCacheDirty = false;
     }
 
