@@ -424,7 +424,7 @@ HistogramData buildSizeHistogram(ParserData& data)
             return lhs.allocations > rhs.allocations;
         });
         // -1 to account for total row
-        for (size_t i = 0; i < size_t(HistogramRow::NUM_COLUMNS - 1); ++i) {
+        for (size_t i = 0; i < min(columnData.size(), size_t(HistogramRow::NUM_COLUMNS - 1)); ++i) {
             const auto& column = columnData[i];
             row.columns[i + 1] = {column.allocations, column.location};
         }
