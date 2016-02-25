@@ -131,6 +131,13 @@ struct AccumulatedTraceData
     uint64_t leaked = 0;
     uint64_t totalTime = 0;
     uint64_t peakTime = 0;
+    uint64_t peakRSS = 0;
+
+    struct SystemInfo {
+        uint64_t pages = 0;
+        uint64_t pageSize = 0;
+    };
+    SystemInfo systemInfo;
 
     // our indices are sequentially increasing thus a new allocation can only ever
     // occur with an index larger than any other we encountered so far

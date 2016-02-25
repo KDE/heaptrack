@@ -36,6 +36,8 @@ struct SummaryData
     uint64_t allocations;
     uint64_t temporary;
     uint64_t allocated;
+    uint64_t peakRSS;
+    uint64_t totalSystemMemory;
 };
 Q_DECLARE_METATYPE(SummaryData);
 

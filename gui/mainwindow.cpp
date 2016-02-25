@@ -160,6 +160,7 @@ MainWindow::MainWindow(QWidget* parent)
                            << i18n("<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>", data.debuggee)
                            // xgettext:no-c-format
                            << i18n("<dt><b>total runtime</b>:</dt><dd>%1s</dd>", totalTimeS)
+                           << i18n("<dt><b>total system memory</b>:</dt><dd>%1s</dd>", format.formatByteSize(data.totalSystemMemory))
                            << "</dl></qt>";
                 }
                 {
@@ -170,15 +171,16 @@ MainWindow::MainWindow(QWidget* parent)
                            << i18n("<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>",
                                    data.temporary, round(float(data.temporary) * 100.f * 100.f / data.allocations) / 100.f,
                                    quint64(data.temporary / totalTimeS))
+                           << i18n("<dt><b>bytes allocated in total</b> (ignoring deallocations):</dt><dd>%1 (%2/s)</dd>",
+                                   format.formatByteSize(data.allocated, 2), format.formatByteSize(data.allocated / totalTimeS))
                            << "</dl></qt>";
                 }
                 {
                     QTextStream stream(&textRight);
                     stream << "<qt><dl>"
                            << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2s</dd>", format.formatByteSize(data.peak), peakTimeS)
+                           << i18n("<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>", format.formatByteSize(data.peakRSS))
                            << i18n("<dt><b>total memory leaked</b>:</dt><dd>%1</dd>", format.formatByteSize(data.leaked))
-                           << i18n("<dt><b>bytes allocated in total</b> (ignoring deallocations):</dt><dd>%1 (%2/s)</dd>",
-                                   format.formatByteSize(data.allocated, 2), format.formatByteSize(data.allocated / totalTimeS))
                            << "</dl></qt>";
                 }
 

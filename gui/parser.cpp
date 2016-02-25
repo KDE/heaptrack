@@ -488,7 +488,9 @@ void Parser::parse(const QString& path)
             data->leaked,
             data->totalAllocations,
             data->totalTemporary,
-            data->totalAllocated
+            data->totalAllocated,
+            data->peakRSS * data->systemInfo.pageSize,
+            data->systemInfo.pages * data->systemInfo.pageSize
         });
 
         emit progressMessageAvailable(i18n("merging allocations..."));

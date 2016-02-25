@@ -144,6 +144,13 @@ void writeCommandLine(FILE* out)
     fputc('\n', out);
 }
 
+void writeSystemInfo(FILE* out)
+{
+    fprintf(out, "I %lx %lx\n",
+                sysconf(_SC_PAGESIZE),
+                sysconf(_SC_PHYS_PAGES));
+}
+
 FILE* createFile(const char* fileName)
 {
     string outputFileName;
@@ -251,6 +258,7 @@ public:
         writeVersion(out);
         writeExe(out);
         writeCommandLine(out);
+        writeSystemInfo(out);
 
         s_data = new LockedData(out, stopCallback);
 
@@ -272,6 +280,7 @@ public:
         debugLog<MinimalOutput>("%s", "shutdown()");
 
         writeTimestamp();
+        writeRSS();
 
         // NOTE: we leak heaptrack data on exit, intentionally
         // This way, we can be sure to get all static deallocations.
@@ -302,6 +311,26 @@ public:
         debugLog<VeryVerboseOutput>("writeTimestamp(%" PRIx64 ")", elapsed.count());
 
         if (fprintf(s_data->out, "c %" PRIx64 "\n", elapsed.count()) < 0) {
+            writeError();
+            return;
+        }
+    }
+
+    void writeRSS()
+    {
+        if (!s_data || !s_data->out || !s_data->procStatm) {
+            return;
+        }
+
+        // read RSS in pages from statm, then rewind for next read
+        size_t rss = 0;
+        fscanf(s_data->procStatm, "%*x %zx", &rss);
+        rewind(s_data->procStatm);
+        // TODO: compare to rusage.ru_maxrss (getrusage) to find "real" peak?
+        // TODO: use custom allocators with known page sizes to prevent tainting
+        //       the RSS numbers with heaptrack-internal data
+
+        if (fprintf(s_data->out, "R %zx\n", rss) < 0) {
             writeError();
             return;
         }
@@ -442,6 +471,10 @@ private:
             , stopCallback(stopCallback)
         {
             debugLog<MinimalOutput>("%s", "constructing LockedData");
+            procStatm = fopen("/proc/self/statm", "r");
+            if (!procStatm) {
+                fprintf(stderr, "WARNING: Failed to open /proc/self/statm for reading.\n");
+            }
             timerThread = thread([&] () {
                 RecursionGuard::isActive = true;
                 debugLog<MinimalOutput>("%s", "timer thread started");
@@ -452,6 +485,7 @@ private:
                     HeapTrack heaptrack([&] { return !stopTimerThread.load(); });
                     if (!stopTimerThread) {
                         heaptrack.writeTimestamp();
+                        heaptrack.writeRSS();
                     }
                 }
             });
@@ -471,6 +505,10 @@ private:
                 fclose(out);
             }
 
+            if (procStatm) {
+                fclose(procStatm);
+            }
+
             if (stopCallback && !s_atexit) {
                 stopCallback();
             }
@@ -483,6 +521,9 @@ private:
          *       to produce non-per-line-interleaved output.
          */
         FILE* out = nullptr;
+
+        /// /proc/self/statm file stream to read RSS value from
+        FILE* procStatm = nullptr;
 
         /**
          * Calls to dlopen/dlclose mark the cache as dirty.

@@ -157,6 +157,8 @@ bool AccumulatedTraceData::read(istream& in)
     peak = 0;
     peakTime = 0;
     leaked = 0;
+    systemInfo = {};
+    peakRSS = 0;
     allocations.clear();
     uint fileVersion = 0;
 
@@ -317,6 +319,12 @@ bool AccumulatedTraceData::read(istream& in)
             }
             handleTimeStamp(timeStamp, newStamp);
             timeStamp = newStamp;
+        } else if (reader.mode() == 'R') { // RSS timestamp
+            uint64_t rss = 0;
+            reader >> rss;
+            if (rss > peakRSS) {
+                peakRSS = rss;
+            }
         } else if (reader.mode() == 'X') {
             handleDebuggee(reader.line().c_str() + 2);
         } else if (reader.mode() == 'A') {
@@ -330,6 +338,9 @@ bool AccumulatedTraceData::read(istream& in)
                      << " and is thus not compatible with this build of heaptrack version " << hex << HEAPTRACK_VERSION << '.' << endl;
                 return false;
             }
+        } else if (reader.mode() == 'I') { // system information
+            reader >> systemInfo.pageSize;
+            reader >> systemInfo.pages;
         } else {
             cerr << "failed to parse line: " << reader.line() << endl;
         }
