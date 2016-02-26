@@ -48,12 +48,20 @@ TopProxy::TopProxy(Type type, QObject* parent)
 
 TopProxy::~TopProxy() = default;
 
-bool TopProxy::filterAcceptsColumn(int source_column, const QModelIndex& source_parent) const
+bool TopProxy::filterAcceptsColumn(int source_column, const QModelIndex& /*source_parent*/) const
 {
     return source_column == TreeModel::LocationColumn || source_column == toSource(m_type);
 }
 
 bool TopProxy::filterAcceptsRow(int source_row, const QModelIndex& source_parent) const
 {
-    return !source_parent.isValid();
+    if (source_parent.isValid()) {
+        // only show top rows
+        return false;
+    }
+    if (m_type == Leaked && !sourceModel()->index(source_row, TreeModel::LeakedColumn).data(TreeModel::SortRole).toULongLong()) {
+        // don't show rows that didn't leak anything
+        return false;
+    }
+    return true;
 }
