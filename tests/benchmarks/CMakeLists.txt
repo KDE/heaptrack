@@ -15,4 +15,6 @@ if (HAVE_MALLOC_H)
         include_directories(${SPARSEHASH_INCLUDE_DIRS})
         add_executable(bench_pointersparsehash bench_pointersparsehash.cpp)
     endif()
+
+    add_executable(measure_malloc_overhead measure_malloc_overhead.cpp)
 endif()
