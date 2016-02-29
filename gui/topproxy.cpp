@@ -59,9 +59,11 @@ bool TopProxy::filterAcceptsRow(int source_row, const QModelIndex& source_parent
         // only show top rows
         return false;
     }
-    if (m_type == Leaked && !sourceModel()->index(source_row, TreeModel::LeakedColumn).data(TreeModel::SortRole).toULongLong()) {
-        // don't show rows that didn't leak anything
-        return false;
+    if (m_type == Leaked || m_type == Temporary) {
+        if (!sourceModel()->index(source_row, toSource(m_type)).data(TreeModel::SortRole).toULongLong()) {
+            // don't show rows that didn't leak anything, or didn't trigger any temporary allocations
+            return false;
+        }
     }
     return true;
 }
