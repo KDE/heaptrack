@@ -1,5 +1,5 @@
 /* internal.h -- Internal header file for stack backtrace library.
-   Copyright (C) 2012-2014 Free Software Foundation, Inc.
+   Copyright (C) 2012-2016 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Google.
 
 Redistribution and use in source and binary forms, with or without
@@ -103,7 +103,7 @@ extern void backtrace_atomic_store_int (int *, int);
 /* We have neither the sync nor the atomic functions.  These will
    never be called.  */
 
-#define backtrace_atomic_load_pointer(p) (abort(), 0)
+#define backtrace_atomic_load_pointer(p) (abort(), (void *) NULL)
 #define backtrace_atomic_load_int(p) (abort(), 0)
 #define backtrace_atomic_store_pointer(p, v) abort()
 #define backtrace_atomic_store_size_t(p, v) abort()
@@ -205,13 +205,15 @@ extern int backtrace_close (int descriptor,
 extern void backtrace_qsort (void *base, size_t count, size_t size,
 			     int (*compar) (const void *, const void *));
 
-/* Allocate memory.  This is like malloc.  */
+/* Allocate memory.  This is like malloc.  If ERROR_CALLBACK is NULL,
+   this does not report an error, it just returns NULL.  */
 
 extern void *backtrace_alloc (struct backtrace_state *state, size_t size,
 			      backtrace_error_callback error_callback,
 			      void *data) ATTRIBUTE_MALLOC;
 
-/* Free memory allocated by backtrace_alloc.  */
+/* Free memory allocated by backtrace_alloc.  If ERROR_CALLBACK is
+   NULL, this does not report an error.  */
 
 extern void backtrace_free (struct backtrace_state *state, void *mem,
 			    size_t size,

@@ -1,5 +1,5 @@
 /* mmap.c -- Memory allocation with mmap.
-   Copyright (C) 2012-2014 Free Software Foundation, Inc.
+   Copyright (C) 2012-2016 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Google.
 
 Redistribution and use in source and binary forms, with or without
@@ -50,6 +50,10 @@ POSSIBILITY OF SUCH DAMAGE.  */
 #define MAP_ANONYMOUS MAP_ANON
 #endif
 
+#ifndef MAP_FAILED
+#define MAP_FAILED ((void *)-1)
+#endif
+
 /* A list of free memory blocks.  */
 
 struct backtrace_freelist_struct
@@ -77,7 +81,8 @@ backtrace_free_locked (struct backtrace_state *state, void *addr, size_t size)
     }
 }
 
-/* Allocate memory like malloc.  */
+/* Allocate memory like malloc.  If ERROR_CALLBACK is NULL, don't
+   report an error.  */
 
 void *
 backtrace_alloc (struct backtrace_state *state,
@@ -139,8 +144,11 @@ backtrace_alloc (struct backtrace_state *state,
       asksize = (size + pagesize - 1) & ~ (pagesize - 1);
       page = mmap (NULL, asksize, PROT_READ | PROT_WRITE,
 		   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-      if (page == NULL)
-	error_callback (data, "mmap", errno);
+      if (page == MAP_FAILED)
+	{
+	  if (error_callback)
+	    error_callback (data, "mmap", errno);
+	}
       else
 	{
 	  size = (size + 7) & ~ (size_t) 7;

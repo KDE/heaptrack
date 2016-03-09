@@ -1,5 +1,5 @@
 /* elf.c -- Get debug data from an ELF file for backtraces.
-   Copyright (C) 2012-2014 Free Software Foundation, Inc.
+   Copyright (C) 2012-2016 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Google.
 
 Redistribution and use in source and binary forms, with or without
@@ -791,7 +791,6 @@ elf_add (struct backtrace_state *state, int descriptor, uintptr_t base_address,
     {
       if (!backtrace_close (descriptor, error_callback, data))
 	goto fail;
-      *fileline_fn = elf_nodebug;
       return 1;
     }
 
@@ -925,7 +924,7 @@ backtrace_initialize (struct backtrace_state *state, int descriptor,
   int ret;
   int found_sym;
   int found_dwarf;
-  fileline elf_fileline_fn;
+  fileline elf_fileline_fn = elf_nodebug;
   struct phdr_data pd;
 
   ret = elf_add (state, descriptor, 0, error_callback, data, &elf_fileline_fn,
@@ -955,7 +954,8 @@ backtrace_initialize (struct backtrace_state *state, int descriptor,
       if (found_sym)
 	backtrace_atomic_store_pointer (&state->syminfo_fn, elf_syminfo);
       else
-	__sync_bool_compare_and_swap (&state->syminfo_fn, NULL, elf_nosyms);
+	(void) __sync_bool_compare_and_swap (&state->syminfo_fn, NULL,
+					     elf_nosyms);
     }
 
   if (!state->threaded)
