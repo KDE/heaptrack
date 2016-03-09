@@ -136,12 +136,16 @@ bool AccumulatedTraceData::read(istream& in)
     LineReader reader;
     uint64_t timeStamp = 0;
 
-    vector<StringIndex> opNewStrIndices;
-    opNewStrIndices.reserve(16);
     vector<string> opNewStrings = {
+        // 64 bit
         "operator new(unsigned long)",
-        "operator new[](unsigned long)"
+        "operator new[](unsigned long)",
+        // 32 bit
+        "operator new(unsigned int)",
+        "operator new[](unsigned int)",
     };
+    vector<StringIndex> opNewStrIndices;
+    opNewStrIndices.reserve(opNewStrings.size());
 
     vector<string> stopStrings = {
         "main",
