@@ -30,6 +30,7 @@
 #include <tuple>
 #include <algorithm>
 #include <stdio_ext.h>
+#include <inttypes.h>
 
 #include <cxxabi.h>
 
@@ -385,7 +386,7 @@ int main(int /*argc*/, char** /*argv*/)
 
             AllocationIndex index;
             if (allocationInfos.add(size, traceId, &index)) {
-                fprintf(stdout, "a %zx %x\n", size, traceId.index);
+                fprintf(stdout, "a %" PRIx64 " %x\n", size, traceId.index);
             }
             ptrToIndex.addPointer(ptr, index);
             lastPtr = ptr;
@@ -417,9 +418,9 @@ int main(int /*argc*/, char** /*argv*/)
     }
 
     fprintf(stderr, "heaptrack stats:\n"
-           "\tallocations:          \t%lu\n"
-           "\tleaked allocations:   \t%lu\n"
-           "\ttemporary allocations:\t%lu\n",
+           "\tallocations:          \t%" PRIu64 "\n"
+           "\tleaked allocations:   \t%" PRIu64 "\n"
+           "\ttemporary allocations:\t%" PRIu64 "\n",
            allocations, leakedAllocations, temporaryAllocations);
 
     return 0;
