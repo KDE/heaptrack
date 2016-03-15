@@ -143,11 +143,13 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
     if (index.row() < 0 || index.column() < 0 || index.column() > NUM_COLUMNS) {
         return {};
     }
-    const auto row = toRow(index);
-    if (role == Qt::DisplayRole || role == SortRole) {
+
+    const auto row = (role == MaxCostRole) ? &m_maxCost : toRow(index);
+
+    if (role == Qt::DisplayRole || role == SortRole || role == MaxCostRole) {
         switch (static_cast<Columns>(index.column())) {
         case AllocatedColumn:
-            if (role == SortRole) {
+            if (role == SortRole || role == MaxCostRole) {
                 return row->allocated;
             } else {
                 return m_format.formatByteSize(row->allocated);
@@ -157,13 +159,13 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         case TemporaryColumn:
             return row->temporary;
         case PeakColumn:
-            if (role == SortRole) {
+            if (role == SortRole || role == MaxCostRole) {
                 return row->peak;
             } else {
                 return m_format.formatByteSize(row->peak);
             }
         case LeakedColumn:
-            if (role == SortRole) {
+            if (role == SortRole || role == MaxCostRole) {
                 return row->leaked;
             } else {
                 return m_format.formatByteSize(row->leaked);
@@ -266,6 +268,17 @@ void TreeModel::resetData(const TreeData& data)
 {
     beginResetModel();
     m_data = data;
+    endResetModel();
+}
+
+void TreeModel::setSummary(const SummaryData& data)
+{
+    beginResetModel();
+    m_maxCost.allocated = data.allocated;
+    m_maxCost.leaked = data.leaked;
+    m_maxCost.peak = data.peak;
+    m_maxCost.allocations = data.allocations;
+    m_maxCost.temporary = data.temporary;
     endResetModel();
 }
 

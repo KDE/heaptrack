@@ -33,6 +33,7 @@
 #include "treemodel.h"
 #include "treeproxy.h"
 #include "topproxy.h"
+#include "costdelegate.h"
 #include "parser.h"
 #include "chartmodel.h"
 #include "chartproxy.h"
@@ -147,7 +148,9 @@ MainWindow::MainWindow(QWidget* parent)
                 m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->sizesTab), true);
             });
     connect(m_parser, &Parser::summaryAvailable,
-            this, [this] (const SummaryData& data) {
+            this, [this, bottomUpModel, topDownModel] (const SummaryData& data) {
+                bottomUpModel->setSummary(data);
+                topDownModel->setSummary(data);
                 KFormat format;
                 QString textLeft;
                 QString textCenter;
@@ -209,6 +212,12 @@ MainWindow::MainWindow(QWidget* parent)
     bottomUpProxy->setSourceModel(bottomUpModel);
     bottomUpProxy->setSortRole(TreeModel::SortRole);
     m_ui->bottomUpResults->setModel(bottomUpProxy);
+    auto costDelegate = new CostDelegate(this);
+    m_ui->bottomUpResults->setItemDelegateForColumn(TreeModel::PeakColumn, costDelegate);
+    m_ui->bottomUpResults->setItemDelegateForColumn(TreeModel::AllocatedColumn, costDelegate);
+    m_ui->bottomUpResults->setItemDelegateForColumn(TreeModel::LeakedColumn, costDelegate);
+    m_ui->bottomUpResults->setItemDelegateForColumn(TreeModel::AllocationsColumn, costDelegate);
+    m_ui->bottomUpResults->setItemDelegateForColumn(TreeModel::TemporaryColumn, costDelegate);
     m_ui->bottomUpResults->hideColumn(TreeModel::FunctionColumn);
     m_ui->bottomUpResults->hideColumn(TreeModel::FileColumn);
     m_ui->bottomUpResults->hideColumn(TreeModel::LineColumn);
@@ -224,6 +233,11 @@ MainWindow::MainWindow(QWidget* parent)
     topDownProxy->setSourceModel(topDownModel);
     topDownProxy->setSortRole(TreeModel::SortRole);
     m_ui->topDownResults->setModel(topDownProxy);
+    m_ui->topDownResults->setItemDelegateForColumn(TreeModel::PeakColumn, costDelegate);
+    m_ui->topDownResults->setItemDelegateForColumn(TreeModel::AllocatedColumn, costDelegate);
+    m_ui->topDownResults->setItemDelegateForColumn(TreeModel::LeakedColumn, costDelegate);
+    m_ui->topDownResults->setItemDelegateForColumn(TreeModel::AllocationsColumn, costDelegate);
+    m_ui->topDownResults->setItemDelegateForColumn(TreeModel::TemporaryColumn, costDelegate);
     m_ui->topDownResults->hideColumn(TreeModel::FunctionColumn);
     m_ui->topDownResults->hideColumn(TreeModel::FileColumn);
     m_ui->topDownResults->hideColumn(TreeModel::LineColumn);
@@ -241,10 +255,15 @@ MainWindow::MainWindow(QWidget* parent)
     setupStacks();
 
     setupTopView(bottomUpModel, m_ui->topPeak, TopProxy::Peak);
+    m_ui->topPeak->setItemDelegate(costDelegate);
     setupTopView(bottomUpModel, m_ui->topLeaked, TopProxy::Leaked);
+    m_ui->topLeaked->setItemDelegate(costDelegate);
     setupTopView(bottomUpModel, m_ui->topAllocations, TopProxy::Allocations);
+    m_ui->topAllocations->setItemDelegate(costDelegate);
     setupTopView(bottomUpModel, m_ui->topTemporary, TopProxy::Temporary);
+    m_ui->topTemporary->setItemDelegate(costDelegate);
     setupTopView(bottomUpModel, m_ui->topAllocated, TopProxy::Allocated);
+    m_ui->topAllocated->setItemDelegate(costDelegate);
 
     setWindowTitle(i18n("Heaptrack"));
 }

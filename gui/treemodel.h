@@ -29,6 +29,21 @@
 
 #include <memory>
 
+struct SummaryData
+{
+    QString debuggee;
+    uint64_t totalTime;
+    uint64_t peakTime;
+    uint64_t peak;
+    uint64_t leaked;
+    uint64_t allocations;
+    uint64_t temporary;
+    uint64_t allocated;
+    uint64_t peakRSS;
+    uint64_t totalSystemMemory;
+};
+Q_DECLARE_METATYPE(SummaryData);
+
 struct LocationData
 {
     QString function;
@@ -108,7 +123,8 @@ public:
     };
 
     enum Roles {
-        SortRole = Qt::UserRole
+        SortRole = Qt::UserRole,
+        MaxCostRole = Qt::UserRole + 1
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
@@ -120,6 +136,7 @@ public:
 
 public slots:
     void resetData(const TreeData& data);
+    void setSummary(const SummaryData& data);
 
 private:
     /// @return the row resembled by @p index
@@ -128,6 +145,7 @@ private:
     int rowOf(const RowData* row) const;
 
     TreeData m_data;
+    RowData m_maxCost;
     // TODO: update via global event filter when the locale changes (changeEvent)
     KFormat m_format;
 };

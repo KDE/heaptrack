@@ -16,6 +16,7 @@ add_executable(heaptrack_gui
     mainwindow.cpp
     treemodel.cpp
     treeproxy.cpp
+    costdelegate.cpp
     chartwidget.cpp
     chartmodel.cpp
     chartproxy.cpp

@@ -26,21 +26,6 @@
 #include "chartmodel.h"
 #include "histogrammodel.h"
 
-struct SummaryData
-{
-    QString debuggee;
-    uint64_t totalTime;
-    uint64_t peakTime;
-    uint64_t peak;
-    uint64_t leaked;
-    uint64_t allocations;
-    uint64_t temporary;
-    uint64_t allocated;
-    uint64_t peakRSS;
-    uint64_t totalSystemMemory;
-};
-Q_DECLARE_METATYPE(SummaryData);
-
 class Parser : public QObject
 {
     Q_OBJECT
