@@ -195,8 +195,14 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         QString tooltip;
         QTextStream stream(&tooltip);
         stream << "<qt><pre style='font-family:monospace;'>";
-        stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                        row->location->function, row->location->file, row->location->line, row->location->module);
+        if (row->location->line > 0) {
+            stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
+                            row->location->function,
+                            row->location->file, row->location->line, row->location->module);
+        } else {
+            stream << i18nc("1: function, 2: module", "%1\n  in %2",
+                            row->location->function, row->location->module);
+        }
         stream << '\n';
         KFormat format;
         stream << i18n("allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, leaked %6",
@@ -212,8 +218,15 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             }
             while (child->children.count() == 1 && max-- > 0) {
                 stream << "\n";
-                stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                                child->location->function, child->location->file, child->location->line, child->location->module);
+                if (child->location->line > 0) {
+                    stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
+                                    child->location->function,
+                                    child->location->file, child->location->line,
+                                    child->location->module);
+                } else {
+                    stream << i18nc("1: function, 2: module", "%1\n  in %2",
+                                    child->location->function, child->location->module);
+                }
                 child = child->children.data();
             }
             if (child->children.count() > 1) {
