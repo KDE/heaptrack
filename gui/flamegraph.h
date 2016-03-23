@@ -25,6 +25,7 @@
 
 class QGraphicsScene;
 class QGraphicsView;
+class QComboBox;
 
 class FrameGraphicsItem;
 
@@ -51,6 +52,7 @@ private:
     TreeData m_topDownData;
     TreeData m_bottomUpData;
 
+    QComboBox* m_costSource;
     QGraphicsScene* m_scene;
     QGraphicsView* m_view;
     FrameGraphicsItem* m_rootItem;

@@ -31,15 +31,28 @@
 #include <QToolTip>
 #include <QDebug>
 #include <QAction>
+#include <QComboBox>
+#include <QCheckBox>
 
 #include <ThreadWeaver/ThreadWeaver>
 #include <KLocalizedString>
 #include <KColorScheme>
 
+enum CostType
+{
+    Allocations,
+    Temporary,
+    Peak,
+    Leaked,
+    Allocated
+};
+Q_DECLARE_METATYPE(CostType)
+
 class FrameGraphicsItem : public QGraphicsRectItem
 {
 public:
-    FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent = nullptr);
+    FrameGraphicsItem(const quint64 cost, CostType costType, const QString& function, FrameGraphicsItem* parent = nullptr);
+    FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent);
 
     quint64 cost() const;
     void setCost(quint64 cost);
@@ -55,19 +68,26 @@ protected:
 private:
     quint64 m_cost;
     QString m_function;
+    CostType m_costType;
     bool m_isHovered;
 };
 
 Q_DECLARE_METATYPE(FrameGraphicsItem*);
 
-FrameGraphicsItem::FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent)
+FrameGraphicsItem::FrameGraphicsItem(const quint64 cost, CostType costType, const QString& function, FrameGraphicsItem* parent)
     : QGraphicsRectItem(parent)
     , m_cost(cost)
     , m_function(function)
+    , m_costType(costType)
     , m_isHovered(false)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setAcceptHoverEvents(true);
+}
+
+FrameGraphicsItem::FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent)
+    : FrameGraphicsItem(cost, parent->m_costType, function, parent)
+{
 }
 
 quint64 FrameGraphicsItem::cost() const
@@ -128,7 +148,31 @@ void FrameGraphicsItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 void FrameGraphicsItem::showToolTip() const
 {
     // we build the tooltip text on demand, which is much faster than doing that for potentially thousands of items when we load the data
-    QToolTip::showText(QCursor::pos(), i18nc("%1: number of allocations, %2: function label", "%1 allocations in %2 and below.", m_cost, m_function));
+    QString tooltip;
+    KFormat format;
+    switch (m_costType) {
+    case Allocations:
+        tooltip = i18nc("%1: number of allocations, %2: function label",
+                        "%1 allocations in %2 and below.", m_cost, m_function);
+        break;
+    case Temporary:
+        tooltip = i18nc("%1: number of temporary allocations, %2: function label",
+                        "%1 temporary allocations in %2 and below.", m_cost, m_function);
+        break;
+    case Peak:
+        tooltip = i18nc("%1: peak consumption in bytes, %2: function label",
+                        "%1 peak consumption in %2 and below.", format.formatByteSize(m_cost), m_function);
+        break;
+    case Leaked:
+        tooltip = i18nc("%1: leaked bytes, %2: function label",
+                        "%1 leaked in %2 and below.", format.formatByteSize(m_cost), m_function);
+        break;
+    case Allocated:
+        tooltip = i18nc("%1: allocated bytes, %2: function label",
+                        "%1 allocated in %2 and below.", format.formatByteSize(m_cost), m_function);
+        break;
+    }
+    QToolTip::showText(QCursor::pos(), tooltip);
 }
 
 void FrameGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
@@ -198,35 +242,73 @@ FrameGraphicsItem* findItemByFunction(const QList<QGraphicsItem*>& items, const 
 /**
  * Convert the top-down graph into a tree of FrameGraphicsItem.
  */
-void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent)
+void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent, quint64 RowData::* member)
 {
     foreach (const auto& row, data) {
         auto item = findItemByFunction(parent->childItems(), row.location->function);
         if (!item) {
-            item = new FrameGraphicsItem(row.allocations, row.location->function, parent);
+            item = new FrameGraphicsItem(row.*member, row.location->function, parent);
             item->setPen(parent->pen());
             item->setBrush(brush());
         } else {
-            item->setCost(item->cost() + row.allocations);
+            item->setCost(item->cost() + row.*member);
         }
-        toGraphicsItems(row.children, item);
+        toGraphicsItems(row.children, item, member);
     }
 }
 
-FrameGraphicsItem* parseData(const QVector<RowData>& topDownData)
+quint64 RowData::* memberForType(CostType type)
 {
+    switch (type) {
+    case Allocations:
+        return &RowData::allocations;
+    case Temporary:
+        return &RowData::temporary;
+    case Peak:
+        return &RowData::peak;
+    case Leaked:
+        return &RowData::leaked;
+    case Allocated:
+        return &RowData::allocated;
+    }
+    Q_UNREACHABLE();
+}
+
+FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type)
+{
+    quint64 RowData::* member = memberForType(type);
+
     double totalCost = 0;
     foreach(const auto& frame, topDownData) {
-        totalCost += frame.allocations;
+        totalCost += frame.*member;
     }
 
     KColorScheme scheme(QPalette::Active);
     const QPen pen(scheme.foreground().color());
 
-    auto rootItem = new FrameGraphicsItem(totalCost, i18n("%1 allocations in total", totalCost));
+    KFormat format;
+    QString label;
+    switch (type) {
+    case Allocations:
+        label = i18n("%1 allocations in total", totalCost);
+        break;
+    case Temporary:
+        label = i18n("%1 temporary allocations in total", totalCost);
+        break;
+    case Peak:
+        label = i18n("%1 peak consumption in total", format.formatByteSize(totalCost));
+        break;
+    case Leaked:
+        label = i18n("%1 leaked in total", format.formatByteSize(totalCost));
+        break;
+    case Allocated:
+        label = i18n("%1 allocated in total", format.formatByteSize(totalCost));
+        break;
+    }
+    auto rootItem = new FrameGraphicsItem(totalCost, type, label);
     rootItem->setBrush(scheme.background());
     rootItem->setPen(pen);
-    toGraphicsItems(topDownData, rootItem);
+    toGraphicsItems(topDownData, rootItem, member);
     return rootItem;
 }
 
@@ -234,6 +316,7 @@ FrameGraphicsItem* parseData(const QVector<RowData>& topDownData)
 
 FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     : QWidget(parent, flags)
+    , m_costSource(new QComboBox(this))
     , m_scene(new QGraphicsScene(this))
     , m_view(new QGraphicsView(this))
     , m_rootItem(nullptr)
@@ -242,7 +325,13 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
 {
     qRegisterMetaType<FrameGraphicsItem*>();
 
-    setLayout(new QVBoxLayout);
+    m_costSource->addItem(i18n("Allocations"), QVariant::fromValue(Allocations));
+    m_costSource->addItem(i18n("Temporary Allocations"), QVariant::fromValue(Temporary));
+    m_costSource->addItem(i18n("Peak Consumption"), QVariant::fromValue(Peak));
+    m_costSource->addItem(i18n("Leaked"), QVariant::fromValue(Leaked));
+    m_costSource->addItem(i18n("Allocated"), QVariant::fromValue(Allocated));
+    connect(m_costSource, static_cast<void (QComboBox::*) (int)>(&QComboBox::currentIndexChanged),
+            this, &FlameGraph::showData);
 
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
     m_view->setScene(m_scene);
@@ -250,14 +339,19 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     m_view->viewport()->setMouseTracking(true);
     m_view->setFont(QFont(QStringLiteral("monospace")));
     m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
-    auto bottomUpViewAction = new QAction(i18n("Bottom-Down View"), this);
-    bottomUpViewAction->setCheckable(true);
-    connect(bottomUpViewAction, &QAction::toggled, this, [this, bottomUpViewAction] {
-        m_showBottomUpData = bottomUpViewAction->isChecked();
+    auto bottomUpCheckbox = new QCheckBox(i18n("Bottom-Down View"), this);
+    connect(bottomUpCheckbox, &QCheckBox::toggled, this, [this, bottomUpCheckbox] {
+        m_showBottomUpData = bottomUpCheckbox->isChecked();
         showData();
     });
-    m_view->addAction(bottomUpViewAction);
 
+    auto controls = new QWidget(this);
+    controls->setLayout(new QHBoxLayout);
+    controls->layout()->addWidget(m_costSource);
+    controls->layout()->addWidget(bottomUpCheckbox);
+
+    setLayout(new QVBoxLayout);
+    layout()->addWidget(controls);
     layout()->addWidget(m_view);
 }
 
@@ -304,8 +398,9 @@ void FlameGraph::showData()
 
     using namespace ThreadWeaver;
     auto data = m_showBottomUpData ? m_bottomUpData : m_topDownData;
-    stream() << make_job([data, this]() {
-        auto parsedData = parseData(data);
+    auto source = m_costSource->currentData().value<CostType>();
+    stream() << make_job([data, source, this]() {
+        auto parsedData = parseData(data, source);
         QMetaObject::invokeMethod(this, "setData", Qt::QueuedConnection,
                                   Q_ARG(FrameGraphicsItem*, parsedData));
     });
