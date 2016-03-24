@@ -155,12 +155,8 @@ bool AccumulatedTraceData::read(istream& in)
 
     const bool reparsing = totalTime != 0;
     m_maxAllocationTraceIndex.index = 0;
-    totalAllocated = 0;
-    totalAllocations = 0;
-    totalTemporary = 0;
-    peak = 0;
+    totalCost = {};
     peakTime = 0;
-    leaked = 0;
     systemInfo = {};
     peakRSS = 0;
     allocations.clear();
@@ -250,11 +246,11 @@ bool AccumulatedTraceData::read(istream& in)
                 allocation.peak = allocation.leaked;
             }
 
-            totalAllocated += info.size;
-            ++totalAllocations;
-            leaked += info.size;
-            if (leaked > peak) {
-                peak = leaked;
+            ++totalCost.allocations;
+            totalCost.allocated += info.size;
+            totalCost.leaked += info.size;
+            if (totalCost.leaked > totalCost.peak) {
+                totalCost.peak = totalCost.leaked;
                 peakTime = timeStamp;
             }
 
@@ -297,10 +293,10 @@ bool AccumulatedTraceData::read(istream& in)
             } else {
                 allocation.leaked -= info.size;
             }
-            leaked -= info.size;
+            totalCost.leaked -= info.size;
             if (temporary) {
                 ++allocation.temporary;
-                ++totalTemporary;
+                ++totalCost.temporary;
             }
         } else if (reader.mode() == 'a') {
             if (reparsing) {
@@ -332,8 +328,7 @@ bool AccumulatedTraceData::read(istream& in)
         } else if (reader.mode() == 'X') {
             handleDebuggee(reader.line().c_str() + 2);
         } else if (reader.mode() == 'A') {
-            leaked = 0;
-            peak = 0;
+            totalCost = {};
             fromAttached = true;
         } else if (reader.mode() == 'v') {
             reader >> fileVersion;

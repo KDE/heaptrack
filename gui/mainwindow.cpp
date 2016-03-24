@@ -170,20 +170,20 @@ MainWindow::MainWindow(QWidget* parent)
                     QTextStream stream(&textCenter);
                     stream << "<qt><dl>"
                            << i18n("<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>",
-                                   data.allocations, quint64(data.allocations / totalTimeS))
+                                   data.cost.allocations, quint64(data.cost.allocations / totalTimeS))
                            << i18n("<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>",
-                                   data.temporary, round(float(data.temporary) * 100.f * 100.f / data.allocations) / 100.f,
-                                   quint64(data.temporary / totalTimeS))
+                                   data.cost.temporary, round(float(data.cost.temporary) * 100.f * 100.f / data.cost.allocations) / 100.f,
+                                   quint64(data.cost.temporary / totalTimeS))
                            << i18n("<dt><b>bytes allocated in total</b> (ignoring deallocations):</dt><dd>%1 (%2/s)</dd>",
-                                   format.formatByteSize(data.allocated, 2), format.formatByteSize(data.allocated / totalTimeS))
+                                   format.formatByteSize(data.cost.allocated, 2), format.formatByteSize(data.cost.allocated / totalTimeS))
                            << "</dl></qt>";
                 }
                 {
                     QTextStream stream(&textRight);
                     stream << "<qt><dl>"
-                           << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2s</dd>", format.formatByteSize(data.peak), peakTimeS)
+                           << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2s</dd>", format.formatByteSize(data.cost.peak), peakTimeS)
                            << i18n("<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>", format.formatByteSize(data.peakRSS))
-                           << i18n("<dt><b>total memory leaked</b>:</dt><dd>%1</dd>", format.formatByteSize(data.leaked))
+                           << i18n("<dt><b>total memory leaked</b>:</dt><dd>%1</dd>", format.formatByteSize(data.cost.leaked))
                            << "</dl></qt>";
                 }
 

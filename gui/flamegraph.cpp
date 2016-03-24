@@ -242,45 +242,45 @@ FrameGraphicsItem* findItemByFunction(const QList<QGraphicsItem*>& items, const 
 /**
  * Convert the top-down graph into a tree of FrameGraphicsItem.
  */
-void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent, quint64 RowData::* member)
+void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent, uint64_t AllocationData::* member)
 {
     foreach (const auto& row, data) {
         auto item = findItemByFunction(parent->childItems(), row.location->function);
         if (!item) {
-            item = new FrameGraphicsItem(row.*member, row.location->function, parent);
+            item = new FrameGraphicsItem(row.cost.*member, row.location->function, parent);
             item->setPen(parent->pen());
             item->setBrush(brush());
         } else {
-            item->setCost(item->cost() + row.*member);
+            item->setCost(item->cost() + row.cost.*member);
         }
         toGraphicsItems(row.children, item, member);
     }
 }
 
-quint64 RowData::* memberForType(CostType type)
+uint64_t AllocationData::* memberForType(CostType type)
 {
     switch (type) {
     case Allocations:
-        return &RowData::allocations;
+        return &AllocationData::allocations;
     case Temporary:
-        return &RowData::temporary;
+        return &AllocationData::temporary;
     case Peak:
-        return &RowData::peak;
+        return &AllocationData::peak;
     case Leaked:
-        return &RowData::leaked;
+        return &AllocationData::leaked;
     case Allocated:
-        return &RowData::allocated;
+        return &AllocationData::allocated;
     }
     Q_UNREACHABLE();
 }
 
 FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type)
 {
-    quint64 RowData::* member = memberForType(type);
+    uint64_t AllocationData::* member = memberForType(type);
 
     double totalCost = 0;
     foreach(const auto& frame, topDownData) {
-        totalCost += frame.*member;
+        totalCost += frame.cost.*member;
     }
 
     KColorScheme scheme(QPalette::Active);

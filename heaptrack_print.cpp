@@ -323,7 +323,7 @@ struct Printer final : public AccumulatedTraceData
     void writeMassifSnapshot(size_t timeStamp, bool isLast)
     {
         if (!lastMassifPeak) {
-            lastMassifPeak = leaked;
+            lastMassifPeak = totalCost.leaked;
             massifAllocations = allocations;
         }
         massifOut
@@ -436,9 +436,9 @@ struct Printer final : public AccumulatedTraceData
             ++sizeHistogram[info.size];
         }
 
-        if (leaked > lastMassifPeak && massifOut.is_open()) {
+        if (totalCost.leaked > lastMassifPeak && massifOut.is_open()) {
             massifAllocations = allocations;
-            lastMassifPeak = leaked;
+            lastMassifPeak = totalCost.leaked;
         }
     }
 
@@ -661,15 +661,15 @@ int main(int argc, char** argv)
 
     const double totalTimeS = 0.001 * data.totalTime;
     cout << "total runtime: " << fixed << totalTimeS << "s.\n"
-         << "bytes allocated in total (ignoring deallocations): " << formatBytes(data.totalAllocated)
-            << " (" << formatBytes(data.totalAllocated / totalTimeS) << "/s)" << '\n'
-         << "calls to allocation functions: " << data.totalAllocations
-            << " (" << size_t(data.totalAllocations / totalTimeS) << "/s)\n"
-         << "temporary memory allocations: " << data.totalTemporary
-            << " (" << size_t(data.totalTemporary / totalTimeS) << "/s)\n"
-         << "peak heap memory consumption: " << formatBytes(data.peak) << '\n'
+         << "bytes allocated in total (ignoring deallocations): " << formatBytes(data.totalCost.allocated)
+            << " (" << formatBytes(data.totalCost.allocated / totalTimeS) << "/s)" << '\n'
+         << "calls to allocation functions: " << data.totalCost.allocations
+            << " (" << size_t(data.totalCost.allocations / totalTimeS) << "/s)\n"
+         << "temporary memory allocations: " << data.totalCost.temporary
+            << " (" << size_t(data.totalCost.temporary / totalTimeS) << "/s)\n"
+         << "peak heap memory consumption: " << formatBytes(data.totalCost.peak) << '\n'
          << "peak RSS (including heaptrack overhead): " << formatBytes(data.peakRSS * data.systemInfo.pageSize) << '\n'
-         << "total memory leaked: " << formatBytes(data.leaked) << '\n';
+         << "total memory leaked: " << formatBytes(data.totalCost.leaked) << '\n';
 
     if (!printHistogram.empty()) {
         ofstream histogram(printHistogram, ios_base::out);

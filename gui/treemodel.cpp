@@ -150,25 +150,25 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         switch (static_cast<Columns>(index.column())) {
         case AllocatedColumn:
             if (role == SortRole || role == MaxCostRole) {
-                return row->allocated;
+                return static_cast<quint64>(row->cost.allocated);
             } else {
-                return m_format.formatByteSize(row->allocated);
+                return m_format.formatByteSize(row->cost.allocated);
             }
         case AllocationsColumn:
-            return row->allocations;
+            return static_cast<quint64>(row->cost.allocations);
         case TemporaryColumn:
-            return row->temporary;
+            return static_cast<quint64>(row->cost.temporary);
         case PeakColumn:
             if (role == SortRole || role == MaxCostRole) {
-                return row->peak;
+                return static_cast<quint64>(row->cost.peak);
             } else {
-                return m_format.formatByteSize(row->peak);
+                return m_format.formatByteSize(row->cost.peak);
             }
         case LeakedColumn:
             if (role == SortRole || role == MaxCostRole) {
-                return row->leaked;
+                return static_cast<quint64>(row->cost.leaked);
             } else {
-                return m_format.formatByteSize(row->leaked);
+                return m_format.formatByteSize(row->cost.leaked);
             }
         case FunctionColumn:
             return row->location->function;
@@ -206,9 +206,9 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         stream << '\n';
         KFormat format;
         stream << i18n("allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, leaked %6",
-                       format.formatByteSize(row->allocated), row->allocations, row->temporary,
-                       round(float(row->temporary) * 100.f * 100.f / row->allocations) / 100.f,
-                       format.formatByteSize(row->peak), format.formatByteSize(row->leaked));
+                       format.formatByteSize(row->cost.allocated), row->cost.allocations, row->cost.temporary,
+                       round(float(row->cost.temporary) * 100.f * 100.f / row->cost.allocations) / 100.f,
+                       format.formatByteSize(row->cost.peak), format.formatByteSize(row->cost.leaked));
         stream << '\n';
         if (!row->children.isEmpty()) {
             auto child = row;
@@ -287,11 +287,7 @@ void TreeModel::resetData(const TreeData& data)
 void TreeModel::setSummary(const SummaryData& data)
 {
     beginResetModel();
-    m_maxCost.allocated = data.allocated;
-    m_maxCost.leaked = data.leaked;
-    m_maxCost.peak = data.peak;
-    m_maxCost.allocations = data.allocations;
-    m_maxCost.temporary = data.temporary;
+    m_maxCost.cost = data.cost;
     endResetModel();
 }
 

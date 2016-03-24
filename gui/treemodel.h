@@ -25,20 +25,16 @@
 
 #include <KFormat>
 
-#include <boost/functional/hash.hpp>
-
 #include <memory>
+
+#include "../allocationdata.h"
 
 struct SummaryData
 {
     QString debuggee;
+    AllocationData cost;
     uint64_t totalTime;
     uint64_t peakTime;
-    uint64_t peak;
-    uint64_t leaked;
-    uint64_t allocations;
-    uint64_t temporary;
-    uint64_t allocated;
     uint64_t peakRSS;
     uint64_t totalSystemMemory;
 };
@@ -83,11 +79,7 @@ inline bool operator<(const std::shared_ptr<LocationData>& lhs, const LocationDa
 
 struct RowData
 {
-    quint64 allocations;
-    quint64 peak;
-    quint64 leaked;
-    quint64 allocated;
-    quint64 temporary;
+    AllocationData cost;
     std::shared_ptr<LocationData> location;
     const RowData* parent;
     QVector<RowData> children;

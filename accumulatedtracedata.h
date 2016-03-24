@@ -31,6 +31,7 @@
 #include <boost/functional/hash.hpp>
 
 #include "indices.h"
+#include "allocationdata.h"
 
 struct InstructionPointer
 {
@@ -57,20 +58,6 @@ struct TraceNode
 {
     IpIndex ipIndex;
     TraceIndex parentIndex;
-};
-
-struct AllocationData
-{
-    // number of allocations
-    uint64_t allocations = 0;
-    // bytes allocated in total
-    uint64_t allocated = 0;
-    // amount of bytes leaked
-    uint64_t leaked = 0;
-    // largest amount of bytes allocated
-    uint64_t peak = 0;
-    // number of temporary allocations
-    uint64_t temporary = 0;
 };
 
 struct Allocation : public AllocationData
@@ -124,11 +111,7 @@ struct AccumulatedTraceData
     bool fromAttached = false;
 
     std::vector<Allocation> allocations;
-    uint64_t totalAllocated = 0;
-    uint64_t totalAllocations = 0;
-    uint64_t totalTemporary = 0;
-    uint64_t peak = 0;
-    uint64_t leaked = 0;
+    AllocationData totalCost;
     uint64_t totalTime = 0;
     uint64_t peakTime = 0;
     uint64_t peakRSS = 0;

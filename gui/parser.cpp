@@ -190,7 +190,7 @@ struct ParserData final : public AccumulatedTraceData
         if (!buildCharts) {
             return;
         }
-        maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, leaked);
+        maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, totalCost.leaked);
         const uint64_t diffBetweenTimeStamps = totalTime / MAX_CHART_DATAPOINTS;
         if (newStamp != totalTime && newStamp - lastTimeStamp < diffBetweenTimeStamps) {
             return;
@@ -207,9 +207,9 @@ struct ParserData final : public AccumulatedTraceData
             return row;
         };
         auto consumed = createRow(newStamp, nowConsumed);
-        auto allocated = createRow(newStamp, totalAllocated);
-        auto allocs = createRow(newStamp, totalAllocations);
-        auto temporary = createRow(newStamp, totalTemporary);
+        auto allocated = createRow(newStamp, totalCost.allocated);
+        auto allocs = createRow(newStamp, totalCost.allocations);
+        auto temporary = createRow(newStamp, totalCost.temporary);
 
         // if the cost is non-zero and the ip corresponds to a hotspot function selected in the labels,
         // we add the cost to the rows column
@@ -240,7 +240,7 @@ struct ParserData final : public AccumulatedTraceData
 
     void handleAllocation(const AllocationInfo& info, const AllocationIndex index)
     {
-        maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, leaked);
+        maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, totalCost.leaked);
 
         if (index.index == allocationInfoCounter.size()) {
             allocationInfoCounter.push_back({info, 1});
@@ -313,14 +313,9 @@ QVector<RowData> mergeAllocations(const ParserData& data)
             auto location = data.stringCache.location(ip);
             auto it = lower_bound(rows->begin(), rows->end(), location);
             if (it != rows->end() && it->location == location) {
-                it->allocated += allocation.allocated;
-                it->allocations += allocation.allocations;
-                it->temporary += allocation.temporary;
-                it->leaked += allocation.leaked;
-                it->peak += allocation.peak;
+                it->cost += allocation;
             } else {
-                it = rows->insert(it, {allocation.allocations, allocation.peak, allocation.leaked, allocation.allocated, allocation.temporary,
-                                        location, nullptr, {}});
+                it = rows->insert(it, {allocation, location, nullptr, {}});
             }
             if (data.isStopIndex(ip.functionIndex)) {
                 break;
@@ -355,16 +350,12 @@ void buildTopDown(const QVector<RowData>& bottomUpData, QVector<RowData>* topDow
                 auto data = findByLocation(*node, stack);
                 if (!data) {
                     // create an empty top-down item for this bottom-up node
-                    *stack << RowData{0, 0, 0, 0, 0, node->location, nullptr, {}};
+                    *stack << RowData{{}, node->location, nullptr, {}};
                     data = &stack->back();
                 }
                 // always use the leaf node's cost and propagate that one up the chain
                 // otherwise we'd count the cost of some nodes multiple times
-                data->allocations += row.allocations;
-                data->peak += row.peak;
-                data->leaked += row.leaked;
-                data->allocated += row.allocated;
-                data->temporary += row.temporary;
+                data->cost += row.cost;
                 stack = &data->children;
                 node = node->parent;
             }
@@ -482,13 +473,9 @@ void Parser::parse(const QString& path)
 
         emit summaryAvailable({
             QString::fromStdString(data->debuggee),
+            data->totalCost,
             data->totalTime,
             data->peakTime,
-            data->peak,
-            data->leaked,
-            data->totalAllocations,
-            data->totalTemporary,
-            data->totalAllocated,
             data->peakRSS * data->systemInfo.pageSize,
             data->systemInfo.pages * data->systemInfo.pageSize
         });
