@@ -365,8 +365,11 @@ Allocation& AccumulatedTraceData::findAllocation(const TraceIndex traceIndex)
                             [] (const Allocation& allocation, const TraceIndex traceIndex) -> bool {
                                 return allocation.traceIndex < traceIndex;
                             });
-        assert(it != allocations.end());
-        assert(it->traceIndex == traceIndex);
+        if (it == allocations.end() || it->traceIndex != traceIndex) {
+            Allocation allocation;
+            allocation.traceIndex = traceIndex;
+            it = allocations.insert(it, allocation);
+        }
         return *it;
     } else if (traceIndex == m_maxAllocationTraceIndex && !allocations.empty()) {
         // reuse the last allocation
