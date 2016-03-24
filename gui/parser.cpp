@@ -304,7 +304,7 @@ QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
 {
     TreeData topRows;
     CallerCalleeRows callerCalleeRows;
-    callerCalleeRows.resize(data.instructionPointers.size());
+    callerCalleeRows.reserve(data.instructionPointers.size());
     // merge allocations, leave parent pointers invalid (their location may change)
     for (const auto& allocation : data.allocations) {
         auto traceIndex = allocation.traceIndex;
@@ -314,12 +314,19 @@ QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
             const auto& ip = data.findIp(trace.ipIndex);
             auto location = data.stringCache.location(ip);
 
-            auto& callerCallee = callerCalleeRows[trace.ipIndex.index - 1];
-            callerCallee.inclusiveCost += allocation;
-            if (traceIndex == allocation.traceIndex) {
-                callerCallee.selfCost += allocation;
+            { // aggregate caller-callee data
+                auto it = lower_bound(callerCalleeRows.begin(), callerCalleeRows.end(), location,
+                                      [] (const CallerCalleeData& lhs, const std::shared_ptr<LocationData>& rhs) {
+                    return lhs.location < rhs;
+                });
+                if (it == callerCalleeRows.end() || it->location != location) {
+                    it = callerCalleeRows.insert(it, {{}, {}, location});
+                }
+                it->inclusiveCost += allocation;
+                if (traceIndex == allocation.traceIndex) {
+                    it->selfCost += allocation;
+                }
             }
-            callerCallee.location = location;
 
             auto it = lower_bound(rows->begin(), rows->end(), location);
             if (it != rows->end() && it->location == location) {
@@ -336,9 +343,6 @@ QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
     }
     // now set the parents, the data is constant from here on
     setParents(topRows, nullptr);
-    callerCalleeRows.erase(std::remove_if(callerCalleeRows.begin(), callerCalleeRows.end(), [] (const CallerCalleeData& data) {
-        return !data.location;
-    }), callerCalleeRows.end());
     return qMakePair(topRows, callerCalleeRows);
 }
 
