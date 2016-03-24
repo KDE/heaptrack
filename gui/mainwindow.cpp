@@ -39,6 +39,7 @@
 #include "chartproxy.h"
 #include "histogrammodel.h"
 #include "stacksmodel.h"
+#include "callercalleemodel.h"
 
 using namespace std;
 
@@ -86,6 +87,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     auto bottomUpModel = new TreeModel(this);
     auto topDownModel = new TreeModel(this);
+    auto callerCalleeModel = new CallerCalleeModel(this);
 
     auto consumedModel = new ChartModel(ChartModel::Consumed, this);
     m_ui->consumedTab->setModel(consumedModel);
@@ -98,6 +100,7 @@ MainWindow::MainWindow(QWidget* parent)
     auto sizeHistogramModel = new HistogramModel(this);
     m_ui->sizesTab->setModel(sizeHistogramModel);
 
+    m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->callerCalleeTab), false);
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->consumedTab), false);
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->allocationsTab), false);
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->allocatedTab), false);
@@ -115,6 +118,11 @@ MainWindow::MainWindow(QWidget* parent)
         statusBar()->addWidget(m_ui->loadingProgress);
         m_ui->pages->setCurrentWidget(m_ui->resultsPage);
     });
+    connect(m_parser, &Parser::callerCalleeDataAvailable,
+            this, [=] (const CallerCalleeRows& data) {
+                callerCalleeModel->resetData(data);
+                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->callerCalleeTab), true);
+            });
     connect(m_parser, &Parser::topDownDataAvailable,
             this, [=] (const TreeData& data) {
                 topDownModel->resetData(data);
@@ -148,9 +156,10 @@ MainWindow::MainWindow(QWidget* parent)
                 m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->sizesTab), true);
             });
     connect(m_parser, &Parser::summaryAvailable,
-            this, [this, bottomUpModel, topDownModel] (const SummaryData& data) {
+            this, [=] (const SummaryData& data) {
                 bottomUpModel->setSummary(data);
                 topDownModel->setSummary(data);
+                callerCalleeModel->setSummary(data);
                 KFormat format;
                 QString textLeft;
                 QString textCenter;
@@ -208,7 +217,10 @@ MainWindow::MainWindow(QWidget* parent)
     });
     m_ui->messages->hide();
 
-    auto bottomUpProxy = new TreeProxy(bottomUpModel);
+    auto bottomUpProxy = new TreeProxy(TreeModel::FunctionColumn,
+                                       TreeModel::FileColumn,
+                                       TreeModel::ModuleColumn,
+                                       bottomUpModel);
     bottomUpProxy->setSourceModel(bottomUpModel);
     bottomUpProxy->setSortRole(TreeModel::SortRole);
     m_ui->bottomUpResults->setModel(bottomUpProxy);
@@ -229,7 +241,10 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_ui->bottomUpFilterModule, &QLineEdit::textChanged,
             bottomUpProxy, &TreeProxy::setModuleFilter);
 
-    auto topDownProxy = new TreeProxy(topDownModel);
+    auto topDownProxy = new TreeProxy(TreeModel::FunctionColumn,
+                                      TreeModel::FileColumn,
+                                      TreeModel::ModuleColumn,
+                                      topDownModel);
     topDownProxy->setSourceModel(topDownModel);
     topDownProxy->setSortRole(TreeModel::SortRole);
     m_ui->topDownResults->setModel(topDownProxy);
@@ -247,6 +262,34 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_ui->topDownFilterFile, &QLineEdit::textChanged,
             bottomUpProxy, &TreeProxy::setFileFilter);
     connect(m_ui->topDownFilterModule, &QLineEdit::textChanged,
+            bottomUpProxy, &TreeProxy::setModuleFilter);
+
+    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::FunctionColumn,
+                                           CallerCalleeModel::FileColumn,
+                                           CallerCalleeModel::ModuleColumn,
+                                           callerCalleeModel);
+    callerCalleeProxy->setSourceModel(callerCalleeModel);
+    callerCalleeProxy->setSortRole(CallerCalleeModel::SortRole);
+    m_ui->callerCalleeResults->setModel(callerCalleeProxy);
+    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfPeakColumn, costDelegate);
+    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfAllocatedColumn, costDelegate);
+    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfLeakedColumn, costDelegate);
+    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfAllocationsColumn, costDelegate);
+    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfTemporaryColumn, costDelegate);
+    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::InclusivePeakColumn, costDelegate);
+    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::InclusiveAllocatedColumn, costDelegate);
+    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::InclusiveLeakedColumn, costDelegate);
+    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::InclusiveAllocationsColumn, costDelegate);
+    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::InclusiveTemporaryColumn, costDelegate);
+    m_ui->callerCalleeResults->hideColumn(CallerCalleeModel::FunctionColumn);
+    m_ui->callerCalleeResults->hideColumn(CallerCalleeModel::FileColumn);
+    m_ui->callerCalleeResults->hideColumn(CallerCalleeModel::LineColumn);
+    m_ui->callerCalleeResults->hideColumn(CallerCalleeModel::ModuleColumn);
+    connect(m_ui->callerCalleeFilterFunction, &QLineEdit::textChanged,
+            bottomUpProxy, &TreeProxy::setFunctionFilter);
+    connect(m_ui->callerCalleeFilterFile, &QLineEdit::textChanged,
+            bottomUpProxy, &TreeProxy::setFileFilter);
+    connect(m_ui->callerCalleeFilterModule, &QLineEdit::textChanged,
             bottomUpProxy, &TreeProxy::setModuleFilter);
 
     auto openFile = KStandardAction::open(this, SLOT(openFile()), this);

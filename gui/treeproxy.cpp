@@ -19,10 +19,11 @@
 
 #include "treeproxy.h"
 
-#include "treemodel.h"
-
-TreeProxy::TreeProxy(QObject* parent)
+TreeProxy::TreeProxy(int functionColumn, int fileColumn, int moduleColumn, QObject* parent)
     : KRecursiveFilterProxyModel(parent)
+    , m_functionColumn(functionColumn)
+    , m_fileColumn(fileColumn)
+    , m_moduleColumn(moduleColumn)
 {
 }
 
@@ -53,19 +54,19 @@ bool TreeProxy::acceptRow(int sourceRow, const QModelIndex& sourceParent) const
         return false;
     }
     if (!m_functionFilter.isEmpty()) {
-        const auto& function = source->index(sourceRow, TreeModel::FunctionColumn, sourceParent).data().toString();
+        const auto& function = source->index(sourceRow, m_functionColumn, sourceParent).data().toString();
         if (!function.contains(m_functionFilter, Qt::CaseInsensitive)) {
             return false;
         }
     }
     if (!m_fileFilter.isEmpty()) {
-        const auto& file = source->index(sourceRow, TreeModel::FileColumn, sourceParent).data().toString();
+        const auto& file = source->index(sourceRow, m_fileColumn, sourceParent).data().toString();
         if (!file.contains(m_fileFilter, Qt::CaseInsensitive)) {
             return false;
         }
     }
     if (!m_moduleFilter.isEmpty()) {
-        const auto& module = source->index(sourceRow, TreeModel::ModuleColumn, sourceParent).data().toString();
+        const auto& module = source->index(sourceRow, m_moduleColumn, sourceParent).data().toString();
         if (!module.contains(m_moduleFilter, Qt::CaseInsensitive)) {
             return false;
         }

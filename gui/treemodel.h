@@ -25,57 +25,9 @@
 
 #include <KFormat>
 
-#include <memory>
-
+#include "locationdata.h"
+#include "summarydata.h"
 #include "../allocationdata.h"
-
-struct SummaryData
-{
-    QString debuggee;
-    AllocationData cost;
-    uint64_t totalTime;
-    uint64_t peakTime;
-    uint64_t peakRSS;
-    uint64_t totalSystemMemory;
-};
-Q_DECLARE_METATYPE(SummaryData);
-
-struct LocationData
-{
-    QString function;
-    QString file;
-    QString module;
-    int line;
-
-    bool operator==(const LocationData& rhs) const
-    {
-        return function == rhs.function
-            && file == rhs.file
-            && module == rhs.module
-            && line == rhs.line;
-    }
-
-    bool operator<(const LocationData& rhs) const
-    {
-        int i = function.compare(rhs.function);
-        if (!i) {
-            i = file.compare(rhs.file);
-        }
-        if (!i) {
-            i = line < rhs.line ? -1 : (line > rhs.line);
-        }
-        if (!i) {
-            i = module.compare(rhs.module);
-        }
-        return i < 0;
-    }
-};
-Q_DECLARE_TYPEINFO(LocationData, Q_MOVABLE_TYPE);
-
-inline bool operator<(const std::shared_ptr<LocationData>& lhs, const LocationData& rhs)
-{
-    return *lhs < rhs;
-}
 
 struct RowData
 {

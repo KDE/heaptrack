@@ -300,9 +300,11 @@ void setParents(QVector<RowData>& children, const RowData* parent)
     }
 }
 
-QVector<RowData> mergeAllocations(const ParserData& data)
+QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
 {
-    QVector<RowData> topRows;
+    TreeData topRows;
+    CallerCalleeRows callerCalleeRows;
+    callerCalleeRows.resize(data.instructionPointers.size());
     // merge allocations, leave parent pointers invalid (their location may change)
     for (const auto& allocation : data.allocations) {
         auto traceIndex = allocation.traceIndex;
@@ -311,6 +313,14 @@ QVector<RowData> mergeAllocations(const ParserData& data)
             const auto& trace = data.findTrace(traceIndex);
             const auto& ip = data.findIp(trace.ipIndex);
             auto location = data.stringCache.location(ip);
+
+            auto& callerCallee = callerCalleeRows[trace.ipIndex.index - 1];
+            callerCallee.inclusiveCost += allocation;
+            if (traceIndex == allocation.traceIndex) {
+                callerCallee.selfCost += allocation;
+            }
+            callerCallee.location = location;
+
             auto it = lower_bound(rows->begin(), rows->end(), location);
             if (it != rows->end() && it->location == location) {
                 it->cost += allocation;
@@ -326,7 +336,10 @@ QVector<RowData> mergeAllocations(const ParserData& data)
     }
     // now set the parents, the data is constant from here on
     setParents(topRows, nullptr);
-    return topRows;
+    callerCalleeRows.erase(std::remove_if(callerCalleeRows.begin(), callerCalleeRows.end(), [] (const CallerCalleeData& data) {
+        return !data.location;
+    }), callerCalleeRows.end());
+    return qMakePair(topRows, callerCalleeRows);
 }
 
 RowData* findByLocation(const RowData& row, QVector<RowData>* data)
@@ -339,7 +352,7 @@ RowData* findByLocation(const RowData& row, QVector<RowData>* data)
     return nullptr;
 }
 
-void buildTopDown(const QVector<RowData>& bottomUpData, QVector<RowData>* topDownData)
+void buildTopDown(const TreeData& bottomUpData, TreeData* topDownData)
 {
     foreach (const auto& row, bottomUpData) {
         if (row.children.isEmpty()) {
@@ -483,7 +496,8 @@ void Parser::parse(const QString& path)
         emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again
         const auto mergedAllocations = mergeAllocations(*data);
-        emit bottomUpDataAvailable(mergedAllocations);
+        emit bottomUpDataAvailable(mergedAllocations.first);
+        emit callerCalleeDataAvailable(mergedAllocations.second);
 
         // also calculate the size histogram
         emit progressMessageAvailable(i18n("building size histogram..."));
@@ -494,7 +508,7 @@ void Parser::parse(const QString& path)
         emit progressMessageAvailable(i18n("building charts..."));
         auto parallel = new Collection;
         *parallel << make_job([this, mergedAllocations, sizeHistogram]() {
-            const auto topDownData = toTopDownData(mergedAllocations);
+            const auto topDownData = toTopDownData(mergedAllocations.first);
             emit topDownDataAvailable(topDownData);
         }) << make_job([this, data, stdPath]() {
             // this mutates data, and thus anything running in parallel must

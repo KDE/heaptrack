@@ -402,6 +402,68 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="callerCalleeTab">
+           <attribute name="title">
+            <string>Caller / Callee</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_13">
+            <item>
+             <widget class="QWidget" name="widget_11" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <property name="spacing">
+                <number>6</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QLineEdit" name="callerCalleeFilterFunction">
+                 <property name="placeholderText">
+                  <string>filter by function...</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="callerCalleeFilterFile">
+                 <property name="placeholderText">
+                  <string>filter by file...</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLineEdit" name="callerCalleeFilterModule">
+                 <property name="placeholderText">
+                  <string>filter by module...</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QTreeView" name="callerCalleeResults">
+              <property name="rootIsDecorated">
+               <bool>false</bool>
+              </property>
+              <property name="uniformRowHeights">
+               <bool>true</bool>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
           <widget class="QWidget" name="topDownTab">
            <attribute name="title">
             <string>Top-Down</string>

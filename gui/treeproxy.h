@@ -26,7 +26,7 @@ class TreeProxy final : public KRecursiveFilterProxyModel
 {
     Q_OBJECT
 public:
-    explicit TreeProxy(QObject* parent = nullptr);
+    explicit TreeProxy(int functionColumn, int fileColumn, int moduleColumn, QObject* parent = nullptr);
     virtual ~TreeProxy();
 
 public slots:
@@ -36,6 +36,10 @@ public slots:
 
 private:
     bool acceptRow(int source_row, const QModelIndex& source_parent) const override;
+
+    int m_functionColumn;
+    int m_fileColumn;
+    int m_moduleColumn;
 
     QString m_functionFilter;
     QString m_fileFilter;

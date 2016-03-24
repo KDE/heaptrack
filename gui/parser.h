@@ -25,6 +25,7 @@
 #include "treemodel.h"
 #include "chartmodel.h"
 #include "histogrammodel.h"
+#include "callercalleemodel.h"
 
 class Parser : public QObject
 {
@@ -41,6 +42,7 @@ signals:
     void summaryAvailable(const SummaryData& summary);
     void bottomUpDataAvailable(const TreeData& data);
     void topDownDataAvailable(const TreeData& data);
+    void callerCalleeDataAvailable(const CallerCalleeRows& data);
     void consumedChartDataAvailable(const ChartData& data);
     void allocationsChartDataAvailable(const ChartData& data);
     void allocatedChartDataAvailable(const ChartData& data);
