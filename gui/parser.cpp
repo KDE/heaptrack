@@ -168,7 +168,7 @@ struct ParserData final : public AccumulatedTraceData
             sort(merged.begin(), merged.end(), [=] (const ChartMergeData& left, const ChartMergeData& right) {
                 return left.*member > right.*member;
             });
-            for (size_t i = 0; i < min(size_t(ChartRows::MAX_NUM_COST), merged.size()); ++i) {
+            for (size_t i = 0; i < min(size_t(ChartRows::MAX_NUM_COST - 1), merged.size()); ++i) {
                 const auto& alloc = merged[i];
                 if (!(alloc.*member)) {
                     break;

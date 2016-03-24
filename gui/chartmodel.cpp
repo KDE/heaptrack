@@ -159,6 +159,7 @@ int ChartModel::rowCount(const QModelIndex& parent) const
 
 void ChartModel::resetData(const ChartData& data)
 {
+    Q_ASSERT(m_data.labels.size() < ChartRows::MAX_NUM_COST);
     beginResetModel();
     m_data = data;
     endResetModel();
