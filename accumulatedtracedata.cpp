@@ -223,6 +223,9 @@ bool AccumulatedTraceData::read(istream& in)
                 if (!(reader >> allocationIndex.index)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     continue;
+                } else if (allocationIndex.index >= allocationInfos.size()) {
+                    cerr << "allocation index out of bounds: " << allocationIndex.index << ", maximum is: " << allocationInfos.size() << endl;
+                    continue;
                 }
                 info = allocationInfos[allocationIndex.index];
             } else { // backwards compatibility
