@@ -59,7 +59,7 @@ QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int ro
             return QVariant::fromValue(m_columnDataSetBrushes.at(section));
         }
 
-        if (role == Qt::DisplayRole || Qt::ToolTipRole) {
+        if (role == Qt::DisplayRole || role == Qt::ToolTipRole) {
             if (section == 0) {
                 return i18n("Elapsed Time");
             }
