@@ -204,12 +204,21 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
                             row->location->function, row->location->module);
         }
         stream << '\n';
-        KFormat format;
-        stream << i18n("allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, leaked %6",
-                       format.formatByteSize(row->cost.allocated), row->cost.allocations, row->cost.temporary,
-                       round(float(row->cost.temporary) * 100.f * 100.f / row->cost.allocations) / 100.f,
-                       format.formatByteSize(row->cost.peak), format.formatByteSize(row->cost.leaked));
         stream << '\n';
+        KFormat format;
+        const auto allocatedFraction = QString::number(double(row->cost.allocated)  * 100. / m_maxCost.cost.allocated, 'g', 3);
+        const auto peakFraction = QString::number(double(row->cost.peak)  * 100. / m_maxCost.cost.peak, 'g', 3);
+        const auto leakedFraction = QString::number(double(row->cost.leaked)  * 100. / m_maxCost.cost.leaked, 'g', 3);
+        const auto allocationsFraction = QString::number(double(row->cost.allocations)  * 100. / m_maxCost.cost.allocations, 'g', 3);
+        const auto temporaryFraction = QString::number(double(row->cost.temporary)  * 100. / row->cost.allocations, 'g', 3);
+        const auto temporaryFractionTotal = QString::number(double(row->cost.temporary)  * 100. / m_maxCost.cost.temporary, 'g', 3);
+        stream << i18n("allocated: %1 (%2% of total)\n",
+                       format.formatByteSize(row->cost.allocated), allocatedFraction);
+        stream << i18n("peak: %1 (%2% of total)\n", format.formatByteSize(row->cost.peak), peakFraction);
+        stream << i18n("leaked: %1 (%2% of total)\n", format.formatByteSize(row->cost.leaked), leakedFraction);
+        stream << i18n("allocations: %1 (%2% of total)\n", row->cost.allocations, allocationsFraction);
+        stream << i18n("temporary: %1 (%2% of allocations, %3% of total)\n",
+                       row->cost.temporary, temporaryFraction, temporaryFractionTotal);
         if (!row->children.isEmpty()) {
             auto child = row;
             int max = 5;
