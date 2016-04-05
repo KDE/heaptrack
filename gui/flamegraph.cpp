@@ -33,6 +33,7 @@
 #include <QAction>
 #include <QComboBox>
 #include <QCheckBox>
+#include <QDoubleSpinBox>
 
 #include <ThreadWeaver/ThreadWeaver>
 #include <KLocalizedString>
@@ -242,7 +243,8 @@ FrameGraphicsItem* findItemByFunction(const QList<QGraphicsItem*>& items, const 
 /**
  * Convert the top-down graph into a tree of FrameGraphicsItem.
  */
-void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent, uint64_t AllocationData::* member)
+void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent, uint64_t AllocationData::* member,
+                     const double costThreshold)
 {
     foreach (const auto& row, data) {
         auto item = findItemByFunction(parent->childItems(), row.location->function);
@@ -253,7 +255,9 @@ void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent, ui
         } else {
             item->setCost(item->cost() + row.cost.*member);
         }
-        toGraphicsItems(row.children, item, member);
+        if (item->cost() > costThreshold) {
+            toGraphicsItems(row.children, item, member, costThreshold);
+        }
     }
 }
 
@@ -274,7 +278,7 @@ uint64_t AllocationData::* memberForType(CostType type)
     Q_UNREACHABLE();
 }
 
-FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type)
+FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type, double costThreshold)
 {
     uint64_t AllocationData::* member = memberForType(type);
 
@@ -308,7 +312,7 @@ FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type)
     auto rootItem = new FrameGraphicsItem(totalCost, type, label);
     rootItem->setBrush(scheme.background());
     rootItem->setPen(pen);
-    toGraphicsItems(topDownData, rootItem, member);
+    toGraphicsItems(topDownData, rootItem, member, totalCost * costThreshold / 100.);
     return rootItem;
 }
 
@@ -339,16 +343,36 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     m_view->viewport()->setMouseTracking(true);
     m_view->setFont(QFont(QStringLiteral("monospace")));
     m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
+
     auto bottomUpCheckbox = new QCheckBox(i18n("Bottom-Down View"), this);
     connect(bottomUpCheckbox, &QCheckBox::toggled, this, [this, bottomUpCheckbox] {
         m_showBottomUpData = bottomUpCheckbox->isChecked();
         showData();
     });
 
+    auto costThreshold = new QDoubleSpinBox(this);
+    costThreshold->setDecimals(2);
+    costThreshold->setMinimum(0);
+    costThreshold->setMaximum(99.90);
+    costThreshold->setPrefix(i18n("Cost Threshold: "));
+    costThreshold->setSuffix(QStringLiteral("%"));
+    costThreshold->setValue(m_costThreshold);
+    costThreshold->setSingleStep(0.01);
+    costThreshold->setToolTip(i18n("<qt>The cost threshold defines a fractional cut-off value. "
+                                   "Items with a relative cost below this value will not be shown in the flame graph. "
+                                   "This is done as an optimization to quickly generate graphs for large data set with "
+                                   "low memory overhead. If you need more details, decrease the threshold value, or set it to zero.</qt>"));
+    connect(costThreshold, static_cast<void (QDoubleSpinBox::*) (double)>(&QDoubleSpinBox::valueChanged),
+            this, [this] (double threshold) {
+                m_costThreshold = threshold;
+                showData();
+            });
+
     auto controls = new QWidget(this);
     controls->setLayout(new QHBoxLayout);
     controls->layout()->addWidget(m_costSource);
     controls->layout()->addWidget(bottomUpCheckbox);
+    controls->layout()->addWidget(costThreshold);
 
     setLayout(new QVBoxLayout);
     layout()->addWidget(controls);
@@ -399,8 +423,9 @@ void FlameGraph::showData()
     using namespace ThreadWeaver;
     auto data = m_showBottomUpData ? m_bottomUpData : m_topDownData;
     auto source = m_costSource->currentData().value<CostType>();
-    stream() << make_job([data, source, this]() {
-        auto parsedData = parseData(data, source);
+    auto threshold = m_costThreshold;
+    stream() << make_job([data, source, threshold, this]() {
+        auto parsedData = parseData(data, source, threshold);
         QMetaObject::invokeMethod(this, "setData", Qt::QueuedConnection,
                                   Q_ARG(FrameGraphicsItem*, parsedData));
     });
