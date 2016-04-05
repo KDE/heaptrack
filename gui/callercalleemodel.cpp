@@ -220,11 +220,13 @@ QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
         stream << "<qt><pre style='font-family:monospace;'>";
         if (row.location->line > 0) {
             stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                            row.location->function,
-                            row.location->file, row.location->line, row.location->module);
+                            row.location->function.toHtmlEscaped(),
+                            row.location->file.toHtmlEscaped(), row.location->line,
+                            row.location->module.toHtmlEscaped());
         } else {
             stream << i18nc("1: function, 2: module", "%1\n  in %2",
-                            row.location->function, row.location->module);
+                            row.location->function.toHtmlEscaped(),
+                            row.location->module.toHtmlEscaped());
         }
         stream << '\n';
         stream << i18n("inclusive: allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, leaked %6",

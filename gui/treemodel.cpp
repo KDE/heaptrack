@@ -197,11 +197,11 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         stream << "<qt><pre style='font-family:monospace;'>";
         if (row->location->line > 0) {
             stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                            row->location->function,
-                            row->location->file, row->location->line, row->location->module);
+                            row->location->function.toHtmlEscaped(),
+                            row->location->file.toHtmlEscaped(), row->location->line, row->location->module.toHtmlEscaped());
         } else {
             stream << i18nc("1: function, 2: module", "%1\n  in %2",
-                            row->location->function, row->location->module);
+                            row->location->function.toHtmlEscaped(), row->location->module.toHtmlEscaped());
         }
         stream << '\n';
         stream << '\n';
@@ -229,12 +229,12 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
                 stream << "\n";
                 if (child->location->line > 0) {
                     stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                                    child->location->function,
-                                    child->location->file, child->location->line,
-                                    child->location->module);
+                                    child->location->function.toHtmlEscaped(),
+                                    child->location->file.toHtmlEscaped(), child->location->line,
+                                    child->location->module.toHtmlEscaped());
                 } else {
                     stream << i18nc("1: function, 2: module", "%1\n  in %2",
-                                    child->location->function, child->location->module);
+                                    child->location->function.toHtmlEscaped(), child->location->module.toHtmlEscaped());
                 }
                 child = child->children.data();
             }
