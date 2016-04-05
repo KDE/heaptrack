@@ -72,6 +72,9 @@ public slots:
 private:
     ChartData m_data;
     Type m_type;
+    // we cache the pens and brushes as constructing them requires allocations otherwise
+    QVector<QPen> m_columnDataSetPens;
+    QVector<QBrush> m_columnDataSetBrushes;
 };
 
 #endif // CHARTMODEL_H

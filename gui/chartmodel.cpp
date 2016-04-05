@@ -54,9 +54,9 @@ QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int ro
     Q_ASSERT(orientation == Qt::Horizontal || section < columnCount());
     if (orientation == Qt::Horizontal) {
         if (role == KChart::DatasetPenRole) {
-            return QVariant::fromValue(QPen(colorForColumn(section, columnCount())));
+            return QVariant::fromValue(m_columnDataSetPens.at(section));
         } else if (role == KChart::DatasetBrushRole) {
-            return QVariant::fromValue(QBrush(colorForColumn(section, columnCount())));
+            return QVariant::fromValue(m_columnDataSetBrushes.at(section));
         }
 
         if (role == Qt::DisplayRole || Qt::ToolTipRole) {
@@ -100,9 +100,9 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
 
 
     if ( role == KChart::DatasetPenRole ) {
-        return QVariant::fromValue(QPen(colorForColumn(index.column(), columnCount())));
+        return QVariant::fromValue(m_columnDataSetPens.at(index.column()));
     } else if ( role == KChart::DatasetBrushRole ) {
-        return QVariant::fromValue(QBrush(colorForColumn(index.column(), columnCount())));
+        return QVariant::fromValue(m_columnDataSetBrushes.at(index.column()));
     }
 
     if ( role != Qt::DisplayRole && role != Qt::ToolTipRole ) {
@@ -162,5 +162,13 @@ void ChartModel::resetData(const ChartData& data)
     Q_ASSERT(m_data.labels.size() < ChartRows::MAX_NUM_COST);
     beginResetModel();
     m_data = data;
+    m_columnDataSetBrushes.clear();
+    m_columnDataSetPens.clear();
+    const auto columns = columnCount();
+    for (int i = 0; i < columns; ++i) {
+        auto color = colorForColumn(i, columns);
+        m_columnDataSetBrushes << QBrush(color);
+        m_columnDataSetPens << QPen(color);
+    }
     endResetModel();
 }
