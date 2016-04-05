@@ -151,26 +151,35 @@ void FrameGraphicsItem::showToolTip() const
     // we build the tooltip text on demand, which is much faster than doing that for potentially thousands of items when we load the data
     QString tooltip;
     KFormat format;
+    quint64 totalCost = 0;
+    {
+        auto item = this;
+        while (item->parentItem()) {
+            item = static_cast<const FrameGraphicsItem*>(item->parentItem());
+        }
+        totalCost = item->cost();
+    }
+    const auto fraction = QString::number(double(m_cost)  * 100. / totalCost, 'g', 3);
     switch (m_costType) {
     case Allocations:
-        tooltip = i18nc("%1: number of allocations, %2: function label",
-                        "%1 allocations in %2 and below.", m_cost, m_function);
+        tooltip = i18nc("%1: number of allocations, %2: relative number, %3: function label",
+                        "%1 (%2%) allocations in %3 and below.", m_cost, fraction, m_function);
         break;
     case Temporary:
-        tooltip = i18nc("%1: number of temporary allocations, %2: function label",
-                        "%1 temporary allocations in %2 and below.", m_cost, m_function);
+        tooltip = i18nc("%1: number of temporary allocations, %2: relative number, %3 function label",
+                        "%1 (%2%) temporary allocations in %3 and below.", m_cost, fraction, m_function);
         break;
     case Peak:
-        tooltip = i18nc("%1: peak consumption in bytes, %2: function label",
-                        "%1 peak consumption in %2 and below.", format.formatByteSize(m_cost), m_function);
+        tooltip = i18nc("%1: peak consumption in bytes, %2: relative number, %3: function label",
+                        "%1 (%2%) peak consumption in %3 and below.", format.formatByteSize(m_cost), fraction, m_function);
         break;
     case Leaked:
-        tooltip = i18nc("%1: leaked bytes, %2: function label",
-                        "%1 leaked in %2 and below.", format.formatByteSize(m_cost), m_function);
+        tooltip = i18nc("%1: leaked bytes, %2: relative number, %3: function label",
+                        "%1 (%2%) leaked in %3 and below.", format.formatByteSize(m_cost), fraction, m_function);
         break;
     case Allocated:
-        tooltip = i18nc("%1: allocated bytes, %2: function label",
-                        "%1 allocated in %2 and below.", format.formatByteSize(m_cost), m_function);
+        tooltip = i18nc("%1: allocated bytes, %2: relative number, %3: function label",
+                        "%1 (%2%) allocated in %3 and below.", format.formatByteSize(m_cost), fraction, m_function);
         break;
     }
     QToolTip::showText(QCursor::pos(), tooltip);
