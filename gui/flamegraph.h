@@ -26,6 +26,7 @@
 class QGraphicsScene;
 class QGraphicsView;
 class QComboBox;
+class QLabel;
 
 class FrameGraphicsItem;
 
@@ -38,6 +39,8 @@ public:
 
     void setTopDownData(const TreeData& topDownData);
     void setBottomUpData(const TreeData& bottomUpData);
+
+    void setDisplayText(const QString& text);
 
 protected:
     bool eventFilter(QObject* object, QEvent* event) override;
@@ -55,6 +58,7 @@ private:
     QComboBox* m_costSource;
     QGraphicsScene* m_scene;
     QGraphicsView* m_view;
+    QLabel* m_displayLabel;
     FrameGraphicsItem* m_rootItem;
     FrameGraphicsItem* m_selectedItem;
     int m_minRootWidth;

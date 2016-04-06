@@ -25,6 +25,7 @@
 #include <QGraphicsScene>
 #include <QStyleOption>
 #include <QGraphicsView>
+#include <QLabel>
 #include <QGraphicsRectItem>
 #include <QWheelEvent>
 #include <QEvent>
@@ -61,10 +62,11 @@ public:
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
+    QString description() const;
+
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
-    void showToolTip() const;
 
 private:
     quint64 m_cost;
@@ -143,10 +145,9 @@ void FrameGraphicsItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     QGraphicsRectItem::hoverEnterEvent(event);
     m_isHovered = true;
-    showToolTip();
 }
 
-void FrameGraphicsItem::showToolTip() const
+QString FrameGraphicsItem::description() const
 {
     // we build the tooltip text on demand, which is much faster than doing that for potentially thousands of items when we load the data
     QString tooltip;
@@ -182,17 +183,14 @@ void FrameGraphicsItem::showToolTip() const
                         "%1 (%2%) allocated in %3 and below.", format.formatByteSize(m_cost), fraction, m_function);
         break;
     }
-    QToolTip::showText(QCursor::pos(), tooltip);
+
+    return tooltip;
 }
 
 void FrameGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     QGraphicsRectItem::hoverLeaveEvent(event);
     m_isHovered = false;
-
-    if (auto parent = static_cast<FrameGraphicsItem*>(parentItem())) {
-        parent->showToolTip();
-    }
 }
 
 namespace {
@@ -332,6 +330,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     , m_costSource(new QComboBox(this))
     , m_scene(new QGraphicsScene(this))
     , m_view(new QGraphicsView(this))
+    , m_displayLabel(new QLabel)
     , m_rootItem(nullptr)
     , m_selectedItem(nullptr)
     , m_minRootWidth(0)
@@ -386,6 +385,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     setLayout(new QVBoxLayout);
     layout()->addWidget(controls);
     layout()->addWidget(m_view);
+    layout()->addWidget(m_displayLabel);
 }
 
 FlameGraph::~FlameGraph() = default;
@@ -398,6 +398,14 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
             selectItem(static_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos())));
+        }
+    } else if (event->type() == QEvent::MouseMove) {
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        auto item = static_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos()));
+        if (item) {
+            setDisplayText(item->description());
+        } else {
+            setDisplayText(QString());
         }
     } else if (event->type() == QEvent::Resize || event->type() == QEvent::Show) {
         if (!m_rootItem) {
@@ -438,6 +446,11 @@ void FlameGraph::showData()
         QMetaObject::invokeMethod(this, "setData", Qt::QueuedConnection,
                                   Q_ARG(FrameGraphicsItem*, parsedData));
     });
+}
+
+void FlameGraph::setDisplayText(const QString& text)
+{
+    m_displayLabel->setText(text);
 }
 
 void FlameGraph::setData(FrameGraphicsItem* rootItem)
