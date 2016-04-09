@@ -376,6 +376,8 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
                 showData();
             });
 
+    m_displayLabel->setWordWrap(true);
+
     auto controls = new QWidget(this);
     controls->setLayout(new QHBoxLayout);
     controls->layout()->addWidget(m_costSource);
