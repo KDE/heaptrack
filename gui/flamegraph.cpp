@@ -340,12 +340,21 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     qRegisterMetaType<FrameGraphicsItem*>();
 
     m_costSource->addItem(i18n("Allocations"), QVariant::fromValue(Allocations));
+    m_costSource->setItemData(0, i18n("Show a flame graph over the number of allocations triggered by functions in your code."), Qt::ToolTipRole);
     m_costSource->addItem(i18n("Temporary Allocations"), QVariant::fromValue(Temporary));
+    m_costSource->setItemData(1, i18n("Show a flame graph over the number of temporary allocations triggered by functions in your code. "
+                                      "Allocations are marked as temporary when they are immediately followed by their deallocation."), Qt::ToolTipRole);
     m_costSource->addItem(i18n("Peak Consumption"), QVariant::fromValue(Peak));
+    m_costSource->setItemData(2, i18n("Show a flame graph over the peak heap memory consumption of your application."), Qt::ToolTipRole);
     m_costSource->addItem(i18n("Leaked"), QVariant::fromValue(Leaked));
+    m_costSource->setItemData(3, i18n("Show a flame graph over the leaked heap memory of your application. "
+                                      "Memory is considered to be leaked when it never got deallocated. "), Qt::ToolTipRole);
     m_costSource->addItem(i18n("Allocated"), QVariant::fromValue(Allocated));
+    m_costSource->setItemData(4, i18n("Show a flame graph over the total memory allocated by functions in your code. "
+                                      "This aggregates all memory allocations and ignores deallocations."), Qt::ToolTipRole);
     connect(m_costSource, static_cast<void (QComboBox::*) (int)>(&QComboBox::currentIndexChanged),
             this, &FlameGraph::showData);
+    m_costSource->setToolTip(i18n("Select the data source that should be visualized in the flame graph."));
 
     m_scene->setItemIndexMethod(QGraphicsScene::NoIndex);
     m_view->setScene(m_scene);
@@ -355,6 +364,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     auto bottomUpCheckbox = new QCheckBox(i18n("Bottom-Down View"), this);
+    bottomUpCheckbox->setToolTip(i18n("Enable the bottom-down flame graph view. When this is unchecked, the top-down view is enabled by default."));
     connect(bottomUpCheckbox, &QCheckBox::toggled, this, [this, bottomUpCheckbox] {
         m_showBottomUpData = bottomUpCheckbox->isChecked();
         showData();
@@ -370,7 +380,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     costThreshold->setSingleStep(0.01);
     costThreshold->setToolTip(i18n("<qt>The cost threshold defines a fractional cut-off value. "
                                    "Items with a relative cost below this value will not be shown in the flame graph. "
-                                   "This is done as an optimization to quickly generate graphs for large data set with "
+                                   "This is done as an optimization to quickly generate graphs for large data sets with "
                                    "low memory overhead. If you need more details, decrease the threshold value, or set it to zero.</qt>"));
     connect(costThreshold, static_cast<void (QDoubleSpinBox::*) (double)>(&QDoubleSpinBox::valueChanged),
             this, [this] (double threshold) {
