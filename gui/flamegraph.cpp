@@ -35,6 +35,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QDoubleSpinBox>
+#include <QCursor>
 
 #include <ThreadWeaver/ThreadWeaver>
 #include <KLocalizedString>
@@ -407,8 +408,10 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
         auto item = static_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos()));
         if (item) {
             setDisplayText(item->description());
+            m_view->setCursor(Qt::PointingHandCursor);
         } else {
             setDisplayText(QString());
+            m_view->setCursor(Qt::ArrowCursor);
         }
     } else if (event->type() == QEvent::Resize || event->type() == QEvent::Show) {
         if (!m_rootItem) {
@@ -464,9 +467,11 @@ void FlameGraph::setData(FrameGraphicsItem* rootItem)
     if (!rootItem) {
         auto text = m_scene->addText(i18n("generating flame graph..."));
         m_view->centerOn(text);
+        m_view->setCursor(Qt::BusyCursor);
         return;
     }
 
+    m_view->setCursor(Qt::ArrowCursor);
     // layouting needs a root item with a given height, the rest will be overwritten later
     rootItem->setRect(0, 0, 800, m_view->fontMetrics().height() + 4);
     m_scene->addItem(rootItem);
