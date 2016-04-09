@@ -161,26 +161,27 @@ QString FrameGraphicsItem::description() const
         totalCost = item->cost();
     }
     const auto fraction = QString::number(double(m_cost)  * 100. / totalCost, 'g', 3);
+    const auto function = QString(QLatin1String("<span style='font-family:monospace'>") + m_function.toHtmlEscaped() + QLatin1String("</span>"));
     switch (m_costType) {
     case Allocations:
         tooltip = i18nc("%1: number of allocations, %2: relative number, %3: function label",
-                        "%1 (%2%) allocations in %3 and below.", m_cost, fraction, m_function);
+                        "%1 (%2%) allocations in %3 and below.", m_cost, fraction, function);
         break;
     case Temporary:
         tooltip = i18nc("%1: number of temporary allocations, %2: relative number, %3 function label",
-                        "%1 (%2%) temporary allocations in %3 and below.", m_cost, fraction, m_function);
+                        "%1 (%2%) temporary allocations in %3 and below.", m_cost, fraction, function);
         break;
     case Peak:
         tooltip = i18nc("%1: peak consumption in bytes, %2: relative number, %3: function label",
-                        "%1 (%2%) peak consumption in %3 and below.", format.formatByteSize(m_cost), fraction, m_function);
+                        "%1 (%2%) peak consumption in %3 and below.", format.formatByteSize(m_cost), fraction, function);
         break;
     case Leaked:
         tooltip = i18nc("%1: leaked bytes, %2: relative number, %3: function label",
-                        "%1 (%2%) leaked in %3 and below.", format.formatByteSize(m_cost), fraction, m_function);
+                        "%1 (%2%) leaked in %3 and below.", format.formatByteSize(m_cost), fraction, function);
         break;
     case Allocated:
         tooltip = i18nc("%1: allocated bytes, %2: relative number, %3: function label",
-                        "%1 (%2%) allocated in %3 and below.", format.formatByteSize(m_cost), fraction, m_function);
+                        "%1 (%2%) allocated in %3 and below.", format.formatByteSize(m_cost), fraction, function);
         break;
     }
 
