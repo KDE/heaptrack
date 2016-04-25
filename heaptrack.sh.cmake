@@ -59,18 +59,15 @@ client=
 
 while true; do
     case "$1" in
-        "-d") ;&
-        "--debug")
+        "-d" | "--debug")
             debug=1
             shift 1
             ;;
-        "-h") ;&
-        "--help")
+        "-h" | "--help")
             usage
             exit 0
             ;;
-        "-p") ;&
-        "--pid")
+        "-p" | "--pid")
             pid=$2
             if [ -z "$pid" ]; then
                 echo "Missing PID argument."
@@ -89,8 +86,7 @@ while true; do
             fi
             break
             ;;
-        "-v") ;&
-        "--version")
+        "-v" | "--version")
             echo "heaptrack @HEAPTRACK_VERSION_MAJOR@.@HEAPTRACK_VERSION_MINOR@.@HEAPTRACK_VERSION_PATCH@"
             exit 0
             ;;
