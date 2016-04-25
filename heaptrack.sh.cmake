@@ -73,7 +73,7 @@ while true; do
                 echo "Missing PID argument."
                 exit 1
             fi
-            client=$(ps --no-headers -c -o comm -p $pid)
+            client=$(cat /proc/$pid/comm)
             if [ -z "$client" ]; then
                 echo "Cannot attach to unknown process with PID $pid."
                 exit 1
