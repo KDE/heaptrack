@@ -84,13 +84,37 @@ ChartWidget::ChartWidget(QWidget* parent)
 
 ChartWidget::~ChartWidget() = default;
 
-void ChartWidget::setModel(ChartModel* model)
+void ChartWidget::setModel(ChartModel* model, bool minimalMode)
 {
     auto* coordinatePlane = dynamic_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
     Q_ASSERT(coordinatePlane);
     foreach (auto diagram, coordinatePlane->diagrams()) {
         coordinatePlane->takeDiagram(diagram);
         delete diagram;
+    }
+
+    if (minimalMode) {
+        KChart::GridAttributes grid;
+        grid.setSubGridVisible(false);
+        coordinatePlane->setGlobalGridAttributes(grid);
+    }
+
+    switch (model->type()) {
+        case ChartModel::Consumed:
+            setToolTip(i18n("<qt>Shows the heap memory consumption over time.</qt>"));
+            break;
+        case ChartModel::Allocated:
+            setToolTip(i18n("<qt>Displays total memory allocated over time. "
+                            "This value ignores deallocations and just measures heap allocation throughput.</qt>"));
+            break;
+        case ChartModel::Allocations:
+            setToolTip(i18n("<qt>Shows number of memory allocations over time.</qt>"));
+            break;
+        case ChartModel::Temporary:
+            setToolTip(i18n("<qt>Shows number of temporary memory allocations over time. "
+                            "A temporary allocation is one that is followed immediately by its "
+                            "corresponding deallocation, without other allocations happening in-between.</qt>"));
+            break;
     }
 
     {
@@ -109,6 +133,14 @@ void ChartWidget::setModel(ChartModel* model)
         bottomAxis->setTextAttributes(axisTextAttributes);
         auto axisTitleTextAttributes = bottomAxis->titleTextAttributes();
         axisTitleTextAttributes.setPen(foreground);
+        auto fontSize = axisTitleTextAttributes.fontSize();
+        fontSize.setCalculationMode(KChartEnums::MeasureCalculationModeAbsolute);
+        if (minimalMode) {
+            fontSize.setValue(font().pointSizeF() - 2);
+        } else {
+            fontSize.setValue(font().pointSizeF() + 2);
+        }
+        axisTitleTextAttributes.setFontSize(fontSize);
         bottomAxis->setTitleTextAttributes(axisTitleTextAttributes);
         bottomAxis->setTitleText(model->headerData(0).toString());
         bottomAxis->setPosition(CartesianAxis::Bottom);
@@ -135,7 +167,11 @@ void ChartWidget::setModel(ChartModel* model)
         plotter->setModel(proxy);
         coordinatePlane->addDiagram(plotter);
     }
+}
 
+QSize ChartWidget::sizeHint() const
+{
+    return {400, 50};
 }
 
 #include "chartwidget.moc"

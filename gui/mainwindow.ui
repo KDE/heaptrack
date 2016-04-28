@@ -15,6 +15,18 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_6">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="KMessageWidget" name="messages">
       <property name="messageType">
@@ -104,6 +116,18 @@
       </widget>
       <widget class="QWidget" name="resultsPage">
        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
@@ -565,6 +589,9 @@
    </layout>
   </widget>
   <widget class="QDockWidget" name="stacksDock">
+   <property name="features">
+    <set>QDockWidget::NoDockWidgetFeatures</set>
+   </property>
    <property name="windowTitle">
     <string>S&amp;tacks</string>
    </property>
@@ -610,6 +637,33 @@
         <bool>true</bool>
        </property>
       </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="graphDock">
+   <property name="toolTip">
+    <string>Shows the heap memory consumption over time.</string>
+   </property>
+   <property name="features">
+    <set>QDockWidget::AllDockWidgetFeatures</set>
+   </property>
+   <property name="windowTitle">
+    <string>&amp;Graphs</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="QWidget" name="graphs">
+    <layout class="QVBoxLayout" name="verticalLayout_14">
+     <item>
+      <widget class="ChartWidget" name="consumedGraph" native="true"/>
+     </item>
+     <item>
+      <widget class="ChartWidget" name="allocationsGraph" native="true"/>
+     </item>
+     <item>
+      <widget class="ChartWidget" name="temporaryGraph" native="true"/>
      </item>
     </layout>
    </widget>

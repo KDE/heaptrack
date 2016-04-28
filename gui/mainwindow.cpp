@@ -91,12 +91,15 @@ MainWindow::MainWindow(QWidget* parent)
 
     auto consumedModel = new ChartModel(ChartModel::Consumed, this);
     m_ui->consumedTab->setModel(consumedModel);
+    m_ui->consumedGraph->setModel(consumedModel, true);
     auto allocationsModel = new ChartModel(ChartModel::Allocations, this);
     m_ui->allocationsTab->setModel(allocationsModel);
+    m_ui->allocationsGraph->setModel(allocationsModel, true);
     auto allocatedModel = new ChartModel(ChartModel::Allocated, this);
     m_ui->allocatedTab->setModel(allocatedModel);
     auto temporaryModel = new ChartModel(ChartModel::Temporary, this);
     m_ui->temporaryTab->setModel(temporaryModel);
+    m_ui->temporaryGraph->setModel(temporaryModel, true);
     auto sizeHistogramModel = new HistogramModel(this);
     m_ui->sizesTab->setModel(sizeHistogramModel);
 
@@ -134,6 +137,8 @@ MainWindow::MainWindow(QWidget* parent)
             this, [=] (const ChartData& data) {
                 consumedModel->resetData(data);
                 m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->consumedTab), true);
+                m_ui->graphDock->setVisible(true);
+                m_ui->consumedGraph->setVisible(true);
             });
     connect(m_parser, &Parser::allocatedChartDataAvailable,
             this, [=] (const ChartData& data) {
@@ -144,11 +149,15 @@ MainWindow::MainWindow(QWidget* parent)
             this, [=] (const ChartData& data) {
                 allocationsModel->resetData(data);
                 m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->allocationsTab), true);
+                m_ui->graphDock->setVisible(true);
+                m_ui->allocationsGraph->setVisible(true);
             });
     connect(m_parser, &Parser::temporaryChartDataAvailable,
             this, [=] (const ChartData& data) {
                 temporaryModel->resetData(data);
                 m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->temporaryTab), true);
+                m_ui->graphDock->setVisible(true);
+                m_ui->temporaryGraph->setVisible(true);
             });
     connect(m_parser, &Parser::sizeHistogramDataAvailable,
             this, [=] (const HistogramData& data) {
@@ -383,5 +392,8 @@ void MainWindow::setupStacks()
             this, [tabChanged] () { tabChanged(0); });
 
     m_ui->stacksDock->setVisible(false);
-    m_ui->stacksDock->setFeatures(QDockWidget::DockWidgetMovable);
+    m_ui->graphDock->setVisible(false);
+    m_ui->consumedGraph->setVisible(false);
+    m_ui->allocationsGraph->setVisible(false);
+    m_ui->temporaryGraph->setVisible(false);
 }

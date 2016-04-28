@@ -37,7 +37,9 @@ public:
     explicit ChartWidget(QWidget* parent = nullptr);
     virtual ~ChartWidget();
 
-    void setModel(ChartModel* model);
+    void setModel(ChartModel* model, bool minimalMode = false);
+
+    QSize sizeHint() const override;
 
 private:
     KChart::Chart* m_chart;
