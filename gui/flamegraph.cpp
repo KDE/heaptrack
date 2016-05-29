@@ -334,7 +334,6 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     , m_view(new QGraphicsView(this))
     , m_displayLabel(new QLabel)
     , m_rootItem(nullptr)
-    , m_selectedItem(nullptr)
     , m_minRootWidth(0)
 {
     qRegisterMetaType<FrameGraphicsItem*>();
@@ -400,6 +399,21 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     layout()->addWidget(controls);
     layout()->addWidget(m_view);
     layout()->addWidget(m_displayLabel);
+
+    {
+        auto action = new QAction(tr("back"), this);
+        action->setShortcuts({QKeySequence::Back, Qt::Key_Backspace});
+        connect(action, &QAction::triggered,
+                this, &FlameGraph::navigateBack);
+        addAction(action);
+    }
+    {
+        auto action = new QAction(tr("forward"), this);
+        action->setShortcuts(QKeySequence::Forward);
+        connect(action, &QAction::triggered,
+                this, &FlameGraph::navigateForward);
+        addAction(action);
+    }
 }
 
 FlameGraph::~FlameGraph() = default;
@@ -411,7 +425,15 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
     if (event->type() == QEvent::MouseButtonRelease) {
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
         if (mouseEvent->button() == Qt::LeftButton) {
-            selectItem(static_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos())));
+            auto item = static_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos()));
+            if (item && item != m_selectionHistory.at(m_selectedItem)) {
+                selectItem(item);
+                if (m_selectedItem != m_selectionHistory.size() - 1) {
+                    m_selectionHistory.remove(m_selectedItem + 1, m_selectionHistory.size() - m_selectedItem - 1);
+                }
+                m_selectedItem = m_selectionHistory.size();
+                m_selectionHistory.push_back(item);
+            }
         }
     } else if (event->type() == QEvent::MouseMove) {
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
@@ -427,7 +449,7 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
         if (!m_rootItem) {
             showData();
         } else {
-            selectItem(m_selectedItem);
+            selectItem(m_selectionHistory.at(m_selectedItem));
         }
     } else if (event->type() == QEvent::Hide) {
         setData(nullptr);
@@ -473,7 +495,9 @@ void FlameGraph::setData(FrameGraphicsItem* rootItem)
 {
     m_scene->clear();
     m_rootItem = rootItem;
-    m_selectedItem = rootItem;
+    m_selectionHistory.clear();
+    m_selectionHistory.push_back(rootItem);
+    m_selectedItem = 0;
     if (!rootItem) {
         auto text = m_scene->addText(i18n("generating flame graph..."));
         m_view->centerOn(text);
@@ -519,6 +543,20 @@ void FlameGraph::selectItem(FrameGraphicsItem* item)
 
     // and make sure it's visible
     m_view->centerOn(item);
+}
 
-    m_selectedItem = item;
+void FlameGraph::navigateBack()
+{
+    if (m_selectedItem > 0) {
+        --m_selectedItem;
+    }
+    selectItem(m_selectionHistory.at(m_selectedItem));
+}
+
+void FlameGraph::navigateForward()
+{
+    if ((m_selectedItem + 1) < m_selectionHistory.size()) {
+        ++m_selectedItem;
+    }
+    selectItem(m_selectionHistory.at(m_selectedItem));
 }

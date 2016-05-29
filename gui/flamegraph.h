@@ -21,6 +21,8 @@
 #define FLAMEGRAPH_H
 
 #include <QWidget>
+#include <QVector>
+
 #include "treemodel.h"
 
 class QGraphicsScene;
@@ -49,6 +51,8 @@ private slots:
     void setData(FrameGraphicsItem* rootItem);
 
 private:
+    void navigateBack();
+    void navigateForward();
     void showData();
     void selectItem(FrameGraphicsItem* item);
 
@@ -60,8 +64,9 @@ private:
     QGraphicsView* m_view;
     QLabel* m_displayLabel;
     FrameGraphicsItem* m_rootItem;
-    FrameGraphicsItem* m_selectedItem;
-    int m_minRootWidth;
+    QVector<FrameGraphicsItem*> m_selectionHistory;
+    int m_selectedItem = -1;
+    int m_minRootWidth = 0;
     bool m_showBottomUpData = false;
     // cost threshold in percent, items below that value will not be shown
     double m_costThreshold = 0.1;
