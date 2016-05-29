@@ -388,6 +388,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
             });
 
     m_displayLabel->setWordWrap(true);
+    m_displayLabel->setTextInteractionFlags(m_displayLabel->textInteractionFlags() | Qt::TextSelectableByMouse);
 
     auto controls = new QWidget(this);
     controls->setLayout(new QHBoxLayout);
