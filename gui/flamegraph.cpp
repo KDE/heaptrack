@@ -441,11 +441,11 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
         auto item = static_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos()));
         if (item) {
             setDisplayText(item->description());
-            m_view->setCursor(Qt::PointingHandCursor);
         } else {
-            setDisplayText(QString());
-            m_view->setCursor(Qt::ArrowCursor);
+            setDisplayText({});
         }
+    } else if (event->type() == QEvent::Leave) {
+        setDisplayText({});
     } else if (event->type() == QEvent::Resize || event->type() == QEvent::Show) {
         if (!m_rootItem) {
             showData();
@@ -489,7 +489,13 @@ void FlameGraph::showData()
 
 void FlameGraph::setDisplayText(const QString& text)
 {
-    m_displayLabel->setText(text);
+    if (text.isEmpty() && m_selectedItem != -1) {
+        m_displayLabel->setText(m_selectionHistory.at(m_selectedItem)->description());
+        m_view->setCursor(Qt::ArrowCursor);
+    } else {
+        m_displayLabel->setText(text);
+        m_view->setCursor(Qt::PointingHandCursor);
+    }
 }
 
 void FlameGraph::setData(FrameGraphicsItem* rootItem)
@@ -544,6 +550,8 @@ void FlameGraph::selectItem(FrameGraphicsItem* item)
 
     // and make sure it's visible
     m_view->centerOn(item);
+
+    setDisplayText(item->description());
 }
 
 void FlameGraph::navigateBack()
