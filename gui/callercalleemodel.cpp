@@ -151,45 +151,45 @@ QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
         switch (static_cast<Columns>(index.column())) {
         case SelfAllocatedColumn:
             if (role == SortRole || role == MaxCostRole) {
-                return static_cast<quint64>(row.selfCost.allocated);
+                return static_cast<qint64>(row.selfCost.allocated);
             } else {
                 return m_format.formatByteSize(row.selfCost.allocated);
             }
         case SelfAllocationsColumn:
-            return static_cast<quint64>(row.selfCost.allocations);
+            return static_cast<qint64>(row.selfCost.allocations);
         case SelfTemporaryColumn:
-            return static_cast<quint64>(row.selfCost.temporary);
+            return static_cast<qint64>(row.selfCost.temporary);
         case SelfPeakColumn:
             if (role == SortRole || role == MaxCostRole) {
-                return static_cast<quint64>(row.selfCost.peak);
+                return static_cast<qint64>(row.selfCost.peak);
             } else {
                 return m_format.formatByteSize(row.selfCost.peak);
             }
         case SelfLeakedColumn:
             if (role == SortRole || role == MaxCostRole) {
-                return static_cast<quint64>(row.selfCost.leaked);
+                return static_cast<qint64>(row.selfCost.leaked);
             } else {
                 return m_format.formatByteSize(row.selfCost.leaked);
             }
         case InclusiveAllocatedColumn:
             if (role == SortRole || role == MaxCostRole) {
-                return static_cast<quint64>(row.inclusiveCost.allocated);
+                return static_cast<qint64>(row.inclusiveCost.allocated);
             } else {
                 return m_format.formatByteSize(row.inclusiveCost.allocated);
             }
         case InclusiveAllocationsColumn:
-            return static_cast<quint64>(row.inclusiveCost.allocations);
+            return static_cast<qint64>(row.inclusiveCost.allocations);
         case InclusiveTemporaryColumn:
-            return static_cast<quint64>(row.inclusiveCost.temporary);
+            return static_cast<qint64>(row.inclusiveCost.temporary);
         case InclusivePeakColumn:
             if (role == SortRole || role == MaxCostRole) {
-                return static_cast<quint64>(row.inclusiveCost.peak);
+                return static_cast<qint64>(row.inclusiveCost.peak);
             } else {
                 return m_format.formatByteSize(row.inclusiveCost.peak);
             }
         case InclusiveLeakedColumn:
             if (role == SortRole || role == MaxCostRole) {
-                return static_cast<quint64>(row.inclusiveCost.leaked);
+                return static_cast<qint64>(row.inclusiveCost.leaked);
             } else {
                 return m_format.formatByteSize(row.inclusiveCost.leaked);
             }
@@ -231,12 +231,12 @@ QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
         stream << '\n';
         stream << i18n("inclusive: allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, leaked %6",
                        m_format.formatByteSize(row.inclusiveCost.allocated), row.inclusiveCost.allocations, row.inclusiveCost.temporary,
-                       round(float(row.inclusiveCost.temporary) * 100.f * 100.f / std::max(uint64_t(1), row.inclusiveCost.allocations)) / 100.f,
+                       round(float(row.inclusiveCost.temporary) * 100.f * 100.f / std::max(int64_t(1), row.inclusiveCost.allocations)) / 100.f,
                        m_format.formatByteSize(row.inclusiveCost.peak), m_format.formatByteSize(row.inclusiveCost.leaked));
         stream << '\n';
         stream << i18n("self: allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, leaked %6",
                        m_format.formatByteSize(row.selfCost.allocated), row.selfCost.allocations, row.selfCost.temporary,
-                       round(float(row.selfCost.temporary) * 100.f * 100.f / std::max(uint64_t(1), row.selfCost.allocations)) / 100.f,
+                       round(float(row.selfCost.temporary) * 100.f * 100.f / std::max(int64_t(1), row.selfCost.allocations)) / 100.f,
                        m_format.formatByteSize(row.selfCost.peak), m_format.formatByteSize(row.selfCost.leaked));
         stream << '\n';
         stream << "</pre></qt>";

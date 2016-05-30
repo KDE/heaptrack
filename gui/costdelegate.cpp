@@ -24,6 +24,8 @@
 #include <QDebug>
 #include <QPainter>
 
+#include <cmath>
+
 CostDelegate::CostDelegate(QObject* parent)
     : QStyledItemDelegate(parent)
 {
@@ -33,15 +35,16 @@ CostDelegate::~CostDelegate() = default;
 
 void CostDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    const uint64_t cost = index.data(TreeModel::SortRole).toULongLong();
+    // TODO: handle negative values
+    const int64_t cost = index.data(TreeModel::SortRole).toULongLong();
     if (cost == 0) {
         QStyledItemDelegate::paint(painter, option, index);
         return;
     }
 
-    const uint64_t maxCost = index.data(TreeModel::MaxCostRole).toULongLong();
+    const int64_t maxCost = index.data(TreeModel::MaxCostRole).toULongLong();
     // top-down can miscalculate the peak cost
-    const auto fraction = std::min(1.f, float(cost) / maxCost);
+    const auto fraction = std::min(1.f, std::abs(float(cost) / maxCost));
     auto rect = option.rect;
     rect.setWidth(rect.width() * fraction);
 

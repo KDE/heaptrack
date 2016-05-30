@@ -54,11 +54,11 @@ Q_DECLARE_METATYPE(CostType)
 class FrameGraphicsItem : public QGraphicsRectItem
 {
 public:
-    FrameGraphicsItem(const quint64 cost, CostType costType, const QString& function, FrameGraphicsItem* parent = nullptr);
-    FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent);
+    FrameGraphicsItem(const qint64 cost, CostType costType, const QString& function, FrameGraphicsItem* parent = nullptr);
+    FrameGraphicsItem(const qint64 cost, const QString& function, FrameGraphicsItem* parent);
 
-    quint64 cost() const;
-    void setCost(quint64 cost);
+    qint64 cost() const;
+    void setCost(qint64 cost);
     QString function() const;
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
@@ -70,7 +70,7 @@ protected:
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event) override;
 
 private:
-    quint64 m_cost;
+    qint64 m_cost;
     QString m_function;
     CostType m_costType;
     bool m_isHovered;
@@ -78,7 +78,7 @@ private:
 
 Q_DECLARE_METATYPE(FrameGraphicsItem*);
 
-FrameGraphicsItem::FrameGraphicsItem(const quint64 cost, CostType costType, const QString& function, FrameGraphicsItem* parent)
+FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, CostType costType, const QString& function, FrameGraphicsItem* parent)
     : QGraphicsRectItem(parent)
     , m_cost(cost)
     , m_function(function)
@@ -89,17 +89,17 @@ FrameGraphicsItem::FrameGraphicsItem(const quint64 cost, CostType costType, cons
     setAcceptHoverEvents(true);
 }
 
-FrameGraphicsItem::FrameGraphicsItem(const quint64 cost, const QString& function, FrameGraphicsItem* parent)
+FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, const QString& function, FrameGraphicsItem* parent)
     : FrameGraphicsItem(cost, parent->m_costType, function, parent)
 {
 }
 
-quint64 FrameGraphicsItem::cost() const
+qint64 FrameGraphicsItem::cost() const
 {
     return m_cost;
 }
 
-void FrameGraphicsItem::setCost(quint64 cost)
+void FrameGraphicsItem::setCost(qint64 cost)
 {
     m_cost = cost;
 }
@@ -153,7 +153,7 @@ QString FrameGraphicsItem::description() const
     // we build the tooltip text on demand, which is much faster than doing that for potentially thousands of items when we load the data
     QString tooltip;
     KFormat format;
-    quint64 totalCost = 0;
+    qint64 totalCost = 0;
     {
         auto item = this;
         while (item->parentItem()) {
@@ -225,10 +225,11 @@ void layoutItems(FrameGraphicsItem *parent)
     const qreal y_margin = 2.;
     const qreal y = pos.y() - h - y_margin;
     qreal x = pos.x();
+    // TODO: check this algorithm for differential flamegraphs
 
     foreach (auto child, parent->childItems()) {
         auto frameChild = static_cast<FrameGraphicsItem*>(child);
-        const qreal w = maxWidth * double(frameChild->cost()) / parent->cost();
+        const qreal w = std::abs(maxWidth * double(frameChild->cost()) / parent->cost());
         frameChild->setVisible(w > 1);
         if (frameChild->isVisible()) {
             frameChild->setRect(QRectF(x, y, w, h));
@@ -252,7 +253,7 @@ FrameGraphicsItem* findItemByFunction(const QList<QGraphicsItem*>& items, const 
 /**
  * Convert the top-down graph into a tree of FrameGraphicsItem.
  */
-void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent, uint64_t AllocationData::* member,
+void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent, int64_t AllocationData::* member,
                      const double costThreshold)
 {
     foreach (const auto& row, data) {
@@ -264,13 +265,13 @@ void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent, ui
         } else {
             item->setCost(item->cost() + row.cost.*member);
         }
-        if (item->cost() > costThreshold) {
+        if (std::abs(item->cost()) > costThreshold) {
             toGraphicsItems(row.children, item, member, costThreshold);
         }
     }
 }
 
-uint64_t AllocationData::* memberForType(CostType type)
+int64_t AllocationData::* memberForType(CostType type)
 {
     switch (type) {
     case Allocations:
@@ -289,7 +290,7 @@ uint64_t AllocationData::* memberForType(CostType type)
 
 FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type, double costThreshold)
 {
-    uint64_t AllocationData::* member = memberForType(type);
+    auto member = memberForType(type);
 
     double totalCost = 0;
     foreach(const auto& frame, topDownData) {
@@ -321,7 +322,7 @@ FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type,
     auto rootItem = new FrameGraphicsItem(totalCost, type, label);
     rootItem->setBrush(scheme.background());
     rootItem->setPen(pen);
-    toGraphicsItems(topDownData, rootItem, member, totalCost * costThreshold / 100.);
+    toGraphicsItems(topDownData, rootItem, member, std::abs(totalCost) * costThreshold / 100.);
     return rootItem;
 }
 

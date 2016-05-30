@@ -190,10 +190,10 @@ MainWindow::MainWindow(QWidget* parent)
                     QTextStream stream(&textCenter);
                     stream << "<qt><dl>"
                            << i18n("<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>",
-                                   data.cost.allocations, quint64(data.cost.allocations / totalTimeS))
+                                   data.cost.allocations, qint64(data.cost.allocations / totalTimeS))
                            << i18n("<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>",
                                    data.cost.temporary, std::round(float(data.cost.temporary) * 100.f * 100.f / data.cost.allocations) / 100.f,
-                                   quint64(data.cost.temporary / totalTimeS))
+                                   qint64(data.cost.temporary / totalTimeS))
                            << i18n("<dt><b>bytes allocated in total</b> (ignoring deallocations):</dt><dd>%1 (%2/s)</dd>",
                                    format.formatByteSize(data.cost.allocated, 2), format.formatByteSize(data.cost.allocated / totalTimeS))
                            << "</dl></qt>";

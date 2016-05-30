@@ -105,10 +105,10 @@ struct StringCache
 struct ChartMergeData
 {
     IpIndex ip;
-    quint64 consumed;
-    quint64 allocations;
-    quint64 allocated;
-    quint64 temporary;
+    qint64 consumed;
+    qint64 allocations;
+    qint64 allocated;
+    qint64 temporary;
     bool operator<(const IpIndex rhs) const
     {
         return ip < rhs;
@@ -164,7 +164,7 @@ struct ParserData final : public AccumulatedTraceData
             it->temporary += alloc.temporary;
         }
         // find the top hot spots for the individual data members and remember their IP and store the label
-        auto findTopChartEntries = [&] (quint64 ChartMergeData::* member, int LabelIds::* label, ChartData* data) {
+        auto findTopChartEntries = [&] (qint64 ChartMergeData::* member, int LabelIds::* label, ChartData* data) {
             sort(merged.begin(), merged.end(), [=] (const ChartMergeData& left, const ChartMergeData& right) {
                 return left.*member > right.*member;
             });
@@ -200,7 +200,7 @@ struct ParserData final : public AccumulatedTraceData
         lastTimeStamp = newStamp;
 
         // create the rows
-        auto createRow = [] (uint64_t timeStamp, uint64_t totalCost) {
+        auto createRow = [] (uint64_t timeStamp, int64_t totalCost) {
             ChartRows row;
             row.timeStamp = timeStamp;
             row.cost[0] = totalCost;
@@ -213,7 +213,7 @@ struct ParserData final : public AccumulatedTraceData
 
         // if the cost is non-zero and the ip corresponds to a hotspot function selected in the labels,
         // we add the cost to the rows column
-        auto addDataToRow = [] (uint64_t cost, int labelId, ChartRows* rows) {
+        auto addDataToRow = [] (int64_t cost, int labelId, ChartRows* rows) {
             if (!cost || labelId == -1) {
                 return;
             }
@@ -259,7 +259,7 @@ struct ParserData final : public AccumulatedTraceData
     struct CountedAllocationInfo
     {
         AllocationInfo info;
-        uint64_t allocations;
+        int64_t allocations;
         bool operator<(const CountedAllocationInfo& rhs) const
         {
             return tie(info.size, allocations)
@@ -284,7 +284,7 @@ struct ParserData final : public AccumulatedTraceData
         int temporary = -1;
     };
     QHash<IpIndex, LabelIds> labelIds;
-    uint64_t maxConsumedSinceLastTimeStamp = 0;
+    int64_t maxConsumedSinceLastTimeStamp = 0;
     uint64_t lastTimeStamp = 0;
 
     StringCache stringCache;
@@ -395,7 +395,7 @@ QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
 struct MergedHistogramColumnData
 {
     std::shared_ptr<LocationData> location;
-    uint64_t allocations;
+    int64_t allocations;
     bool operator<(const std::shared_ptr<LocationData>& rhs) const
     {
         return location < rhs;

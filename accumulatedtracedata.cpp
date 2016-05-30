@@ -289,7 +289,7 @@ bool AccumulatedTraceData::read(istream& in)
 
             const auto& info = allocationInfos[allocationInfoIndex.index];
             auto& allocation = findAllocation(info.traceIndex);
-            if (!allocation.allocations || allocation.leaked < info.size) {
+            if (!allocation.allocations || static_cast<uint64_t>(allocation.leaked) < info.size) {
                 if (!fromAttached) {
                     cerr << "inconsistent allocation info, underflowed allocations of " << info.traceIndex << endl;
                 }

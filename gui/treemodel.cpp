@@ -150,23 +150,28 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         switch (static_cast<Columns>(index.column())) {
         case AllocatedColumn:
             if (role == SortRole || role == MaxCostRole) {
-                return static_cast<quint64>(row->cost.allocated);
-            } else {
-                return m_format.formatByteSize(row->cost.allocated);
+                return static_cast<quint64>(abs(row->cost.allocated));
             }
+            return m_format.formatByteSize(row->cost.allocated);
         case AllocationsColumn:
-            return static_cast<quint64>(row->cost.allocations);
+            if (role == SortRole || role == MaxCostRole) {
+                return static_cast<quint64>(abs(row->cost.allocations));
+            }
+            return static_cast<qint64>(row->cost.allocations);
         case TemporaryColumn:
-            return static_cast<quint64>(row->cost.temporary);
+            if (role == SortRole || role == MaxCostRole) {
+                return static_cast<quint64>(abs(row->cost.temporary));
+            }
+            return static_cast<qint64>(row->cost.temporary);
         case PeakColumn:
             if (role == SortRole || role == MaxCostRole) {
-                return static_cast<quint64>(row->cost.peak);
+                return static_cast<quint64>(abs(row->cost.peak));
             } else {
                 return m_format.formatByteSize(row->cost.peak);
             }
         case LeakedColumn:
             if (role == SortRole || role == MaxCostRole) {
-                return static_cast<quint64>(row->cost.leaked);
+                return static_cast<quint64>(abs(row->cost.leaked));
             } else {
                 return m_format.formatByteSize(row->cost.leaked);
             }
