@@ -46,6 +46,8 @@ struct StringCache
         if (ip.functionIndex) {
             // TODO: support removal of template arguments
             return stringify(ip.functionIndex);
+        } else if (diffMode) {
+            return i18n("<unresolved function>");
         } else {
             auto& ipAddr = m_ipAddresses[ip.instructionPointer];
             if (ipAddr.isEmpty()) {
@@ -100,6 +102,8 @@ struct StringCache
     vector<QString> m_strings;
     mutable QHash<uint64_t, QString> m_ipAddresses;
     mutable vector<shared_ptr<LocationData>> m_locations;
+
+    bool diffMode = false;
 };
 
 struct ChartMergeData
@@ -474,16 +478,26 @@ Parser::Parser(QObject* parent)
 
 Parser::~Parser() = default;
 
-void Parser::parse(const QString& path)
+void Parser::parse(const QString& path, const QString& diffBase)
 {
     using namespace ThreadWeaver;
-    stream() << make_job([this, path]() {
+    stream() << make_job([this, path, diffBase]() {
         const auto stdPath = path.toStdString();
         auto data = make_shared<ParserData>();
         emit progressMessageAvailable(i18n("parsing data..."));
         if (!data->read(stdPath)) {
             emit failedToOpen(path);
             return;
+        }
+
+        if (!diffBase.isEmpty()) {
+            ParserData diffData;
+            if (!diffData.read(diffBase.toStdString())) {
+                emit failedToOpen(diffBase);
+                return;
+            }
+            data->diff(diffData);
+            data->stringCache.diffMode = true;
         }
 
         data->updateStringCache();

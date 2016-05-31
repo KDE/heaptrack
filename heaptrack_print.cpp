@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Milian Wolff <mail@milianw.de>
+ * Copyright 2014-2016 Milian Wolff <mail@milianw.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Library General Public License as
@@ -498,6 +498,8 @@ int main(int argc, char** argv)
     desc.add_options()
         ("file,f", po::value<string>(),
             "The heaptrack data file to print.")
+        ("diff,d", po::value<string>()->default_value({}),
+            "Find the differences to this file.")
         ("shorten-templates,t", po::value<bool>()->default_value(true)->implicit_value(true),
             "Shorten template identifiers.")
         ("merge-backtraces,m", po::value<bool>()->default_value(true)->implicit_value(true),
@@ -577,6 +579,7 @@ int main(int argc, char** argv)
     Printer data;
 
     const auto inputFile = vm["file"].as<string>();
+    const auto diffFile = vm["diff"].as<string>();
     data.shortenTemplates = vm["shorten-templates"].as<bool>();
     data.mergeBacktraces = vm["merge-backtraces"].as<bool>();
     data.filterBtFunction = vm["filter-bt-function"].as<string>();
@@ -605,6 +608,16 @@ int main(int argc, char** argv)
     if (!data.read(inputFile)) {
         return 1;
     }
+
+    if (!diffFile.empty()) {
+        cout << "reading diff file \"" << diffFile << "\" - please wait, this might take some time..." << endl;
+        Printer diffData;
+        if (!diffData.read(diffFile)) {
+            return 1;
+        }
+        data.diff(diffData);
+    }
+
     data.finalize();
 
     cout << "finished reading file, now analyzing data:\n" << endl;

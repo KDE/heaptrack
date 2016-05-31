@@ -329,12 +329,12 @@ MainWindow::~MainWindow()
     group.writeEntry(Config::Entries::State, state);
 }
 
-void MainWindow::loadFile(const QString& file)
+void MainWindow::loadFile(const QString& file, const QString& diffBase)
 {
     m_ui->loadingLabel->setText(i18n("Loading file %1, please wait...", file));
     setWindowTitle(i18nc("%1: file name that is open", "Heaptrack - %1", file));
     m_ui->pages->setCurrentWidget(m_ui->loadingPage);
-    m_parser->parse(file);
+    m_parser->parse(file, diffBase);
 }
 
 void MainWindow::openFile()
@@ -343,7 +343,9 @@ void MainWindow::openFile()
     dialog->setAttribute(Qt::WA_DeleteOnClose, true);
     dialog->setFileMode(QFileDialog::ExistingFile);
     connect(dialog, &QFileDialog::fileSelected,
-            this, &MainWindow::loadFile);
+            this, [this] (const QString& file) {
+                loadFile(file);
+            });
     dialog->show();
 }
 

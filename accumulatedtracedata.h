@@ -95,6 +95,8 @@ struct AccumulatedTraceData
     bool read(const std::string& inputFile);
     bool read(std::istream& in);
 
+    void diff(const AccumulatedTraceData& base);
+
     bool shortenTemplates = false;
     bool fromAttached = false;
 

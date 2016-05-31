@@ -39,7 +39,7 @@ public:
     virtual ~MainWindow();
 
 public slots:
-    void loadFile(const QString& path);
+    void loadFile(const QString& path, const QString& diffBase = {});
     void openFile();
 
 private:
