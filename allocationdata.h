@@ -46,9 +46,24 @@ inline AllocationData& operator+=(AllocationData& lhs, const AllocationData& rhs
     return lhs;
 }
 
+inline AllocationData& operator-=(AllocationData& lhs, const AllocationData& rhs)
+{
+    lhs.allocations -= rhs.allocations;
+    lhs.temporary -= rhs.temporary;
+    lhs.peak -= rhs.peak;
+    lhs.leaked -= rhs.leaked;
+    lhs.allocated -= rhs.allocated;
+    return lhs;
+}
+
 inline AllocationData operator+(AllocationData lhs, const AllocationData& rhs)
 {
     return lhs += rhs;
+}
+
+inline AllocationData operator-(AllocationData lhs, const AllocationData& rhs)
+{
+    return lhs -= rhs;
 }
 
 #endif // ALLOCATIONDATA_H
