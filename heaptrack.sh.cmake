@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 #
 # Copyright 2014 Milian Wolff <mail@milianw.de>
@@ -91,7 +91,7 @@ while true; do
             exit 0
             ;;
         *)
-            if [[ "$1" == "--" ]]; then
+            if [ "$1" = "--" ]; then
                 shift 1
             fi
             if [ ! -x "$(which "$1" 2> /dev/null)" ]; then
@@ -145,13 +145,13 @@ output="$output.gz"
 "$INTERPRETER" < $pipe | gzip -c > "$output" &
 debuggee=$!
 
-function cleanup {
+cleanup() {
     rm -f "$pipe"
     kill "$debuggee" 2> /dev/null
 
     echo "Heaptrack finished! Now run the following to investigate the data:"
     echo
-    if [[ "$(which heaptrack_gui 2> /dev/null)" != "" ]]; then
+    if [ "$(which heaptrack_gui 2> /dev/null)" != "" ]; then
         echo "  heaptrack_gui \"$output\""
     else
         echo "  heaptrack_print \"$output\" | less"
