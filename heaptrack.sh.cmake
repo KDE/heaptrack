@@ -59,24 +59,21 @@ client=
 
 while true; do
     case "$1" in
-        "-d") ;&
-        "--debug")
+        "-d" | "--debug")
             debug=1
             shift 1
             ;;
-        "-h") ;&
-        "--help")
+        "-h" | "--help")
             usage
             exit 0
             ;;
-        "-p") ;&
-        "--pid")
+        "-p" | "--pid")
             pid=$2
             if [ -z "$pid" ]; then
                 echo "Missing PID argument."
                 exit 1
             fi
-            client=$(ps --no-headers -c -o comm -p $pid)
+            client=$(cat /proc/$pid/comm)
             if [ -z "$client" ]; then
                 echo "Cannot attach to unknown process with PID $pid."
                 exit 1
@@ -89,8 +86,7 @@ while true; do
             fi
             break
             ;;
-        "-v") ;&
-        "--version")
+        "-v" | "--version")
             echo "heaptrack @HEAPTRACK_VERSION_MAJOR@.@HEAPTRACK_VERSION_MINOR@.@HEAPTRACK_VERSION_PATCH@"
             exit 0
             ;;
