@@ -37,6 +37,17 @@ namespace po = boost::program_options;
 
 namespace {
 
+/**
+ * Merged allocation information by instruction pointer outside of alloc funcs
+ */
+struct MergedAllocation : public AllocationData
+{
+    // individual backtraces
+    std::vector<Allocation> traces;
+    // location
+    IpIndex ipIndex;
+};
+
 class formatBytes
 {
 public:

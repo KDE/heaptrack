@@ -67,18 +67,6 @@ struct Allocation : public AllocationData
 };
 
 /**
- * Merged allocation information by instruction pointer outside of alloc funcs
- */
-struct MergedAllocation : public AllocationData
-{
-    // individual backtraces
-    std::vector<Allocation> traces;
-    // location
-    IpIndex ipIndex;
-};
-
-
-/**
  * Information for a single call to an allocation function.
  */
 struct AllocationInfo
