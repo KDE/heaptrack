@@ -166,6 +166,9 @@ bool AccumulatedTraceData::read(istream& in)
     // newer versions handle this in heaptrack_interpret already
     AllocationInfoSet allocationInfoSet;
     PointerMap pointers;
+    // in older files, this contains the pointer address, in newer formats
+    // it holds the allocation info index. both can be used to find temporary
+    // allocations, i.e. when a deallocation follows with the same data
     uint64_t lastAllocationPtr = 0;
 
     while (reader.getLine(in)) {
@@ -228,6 +231,7 @@ bool AccumulatedTraceData::read(istream& in)
                     continue;
                 }
                 info = allocationInfos[allocationIndex.index];
+                lastAllocationPtr = allocationIndex.index;
             } else { // backwards compatibility
                 uint64_t ptr = 0;
                 if (!(reader >> info.size) || !(reader >> info.traceIndex) || !(reader >> ptr)) {
@@ -266,9 +270,7 @@ bool AccumulatedTraceData::read(istream& in)
                     cerr << "failed to parse line: " << reader.line() << endl;
                     continue;
                 }
-                // optional, and thus may fail.
-                // but that's OK since we default to false anyways
-                reader >> temporary;
+                temporary = lastAllocationPtr == allocationInfoIndex.index;
             } else { // backwards compatibility
                 uint64_t ptr = 0;
                 if (!(reader >> ptr)) {
@@ -282,8 +284,8 @@ bool AccumulatedTraceData::read(istream& in)
                 }
                 allocationInfoIndex = taken.first;
                 temporary = lastAllocationPtr == ptr;
-                lastAllocationPtr = 0;
             }
+            lastAllocationPtr = 0;
 
             const auto& info = allocationInfos[allocationInfoIndex.index];
             auto& allocation = findAllocation(info.traceIndex);

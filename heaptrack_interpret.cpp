@@ -404,12 +404,9 @@ int main(int /*argc*/, char** /*argv*/)
             if (!allocation.second) {
                 continue;
             }
-            fprintf(stdout, "- %x", allocation.first.index);
+            fprintf(stdout, "- %x\n", allocation.first.index);
             if (temporary) {
                 ++temporaryAllocations;
-                fputs(" 1\n", stdout);
-            } else {
-                fputc('\n', stdout);
             }
         } else {
             fputs(reader.line().c_str(), stdout);
