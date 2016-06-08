@@ -161,35 +161,48 @@ struct posix_memalign
     }
 };
 
-struct hook
+template<typename Hook>
+bool hook(const char *symname, ElfW(Addr) addr, bool restore)
 {
-    const char * const name;
-    void* address;
-    void* originalAddress;
+    static_assert(std::is_convertible<decltype(&Hook::hook), decltype(Hook::original)>::value,
+                  "hook is not compatible to original function");
 
-    template<typename Hook>
-    static constexpr hook wrap() noexcept
-    {
-        static_assert(sizeof(&Hook::hook) == sizeof(void*), "Mismatched pointer sizes");
-        static_assert(std::is_convertible<decltype(&Hook::hook), decltype(Hook::original)>::value,
-                      "hook is not compatible to original function");
-        // TODO: why is (void*) cast allowed, but not reinterpret_cast?
-        return {Hook::name, (void*)(&Hook::hook), (void*)(Hook::original)};
+    if (strcmp(Hook::name, symname) != 0) {
+        return false;
     }
-};
 
-constexpr hook list[] = {
-    hook::wrap<malloc>(),
-    hook::wrap<free>(),
-    hook::wrap<realloc>(),
-    hook::wrap<calloc>(),
+    // try to make the page read/write accessible, which is hackish
+    // but apparently required for some shared libraries
+    auto page = reinterpret_cast<void *>(addr & ~(0x1000 - 1));
+    mprotect(page, 0x1000, PROT_READ | PROT_WRITE);
+
+    // now write to the address
+    auto typedAddr = reinterpret_cast<typename std::remove_const<decltype(Hook::original)>::type*>(addr);
+    if (restore) {
+        // restore the original address on shutdown
+        *typedAddr = Hook::original;
+    } else {
+        // now actually inject our hook
+        *typedAddr = &Hook::hook;
+    }
+
+    return true;
+}
+
+void apply(const char *symname, ElfW(Addr) addr, bool restore)
+{
+    // TODO: use std::apply once we can rely on C++17
+    hook<malloc>(symname, addr, restore)
+        || hook<free>(symname, addr, restore)
+        || hook<realloc>(symname, addr, restore)
+        || hook<calloc>(symname, addr, restore)
 #if HAVE_CFREE
-    hook::wrap<cfree>(),
+        || hook<cfree>(symname, addr, restore)
 #endif
-    hook::wrap<posix_memalign>(),
-    hook::wrap<dlopen>(),
-    hook::wrap<dlclose>(),
-};
+        || hook<posix_memalign>(symname, addr, restore)
+        || hook<dlopen>(symname, addr, restore)
+        || hook<dlclose>(symname, addr, restore);
+}
 
 }
 
@@ -232,23 +245,9 @@ void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base, const bo
     for (auto rela = jmprels.table; rela < rela_end; rela++) {
         const auto index = ELF_R_SYM(rela->r_info);
         const char *symname = strings.table + symbols.table[index].st_name;
-        auto addr = reinterpret_cast<void**>(rela->r_offset + base);
-        for (const auto& hook : hooks::list) {
-            if (!strcmp(hook.name, symname)) {
-                // try to make the page read/write accessible, which is hackish
-                // but apparently required for some shared libraries
-                void *page = (void *)((intptr_t)addr & ~(0x1000 - 1));
-                mprotect(page, 0x1000, PROT_READ | PROT_WRITE);
-                if (restore) {
-                    // restore the original address on shutdown
-                    *addr = hook.originalAddress;
-                } else {
-                    // now actually inject our hook
-                    *addr = hook.address;
-                }
-                break;
-            }
-        }
+        auto addr = rela->r_offset + base;
+
+        hooks::apply(symname, addr, restore);
     }
 }
 
