@@ -36,10 +36,9 @@ namespace {
 
 namespace hooks {
 
-template<typename SignatureT, typename Base>
+template<typename Signature, typename Base>
 struct hook
 {
-    using Signature = SignatureT*;
     Signature original = nullptr;
 
     void init() noexcept
@@ -64,7 +63,7 @@ struct hook
     }
 };
 
-#define HOOK(name) struct name ## _t : public hook<decltype(::name), name ## _t> { \
+#define HOOK(name) struct name ## _t : public hook<decltype(&::name), name ## _t> { \
     static constexpr const char* identifier = #name; } name
 
 HOOK(malloc);
