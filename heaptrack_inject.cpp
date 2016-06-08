@@ -41,6 +41,9 @@
 #error unsupported word size
 #endif
 
+#define HAVE_ALIGNED_ALLOC defined(_ISOC11_SOURCE)
+#define HAVE_CFREE (defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(__USE_MISC))
+
 namespace {
 
 void overwrite_symbols() noexcept;
@@ -98,6 +101,7 @@ struct calloc
     }
 };
 
+#if HAVE_CFREE
 struct cfree
 {
     static constexpr auto name = "cfree";
@@ -109,6 +113,7 @@ struct cfree
         original(ptr);
     }
 };
+#endif
 
 struct dlopen
 {
@@ -178,7 +183,9 @@ constexpr hook list[] = {
     hook::wrap<free>(),
     hook::wrap<realloc>(),
     hook::wrap<calloc>(),
+#if HAVE_CFREE
     hook::wrap<cfree>(),
+#endif
     hook::wrap<posix_memalign>(),
     hook::wrap<dlopen>(),
     hook::wrap<dlclose>(),

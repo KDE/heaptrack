@@ -30,6 +30,7 @@
 using namespace std;
 
 #define HAVE_ALIGNED_ALLOC defined(_ISOC11_SOURCE)
+#define HAVE_CFREE (defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(__USE_MISC))
 
 namespace {
 
@@ -69,7 +70,9 @@ struct hook
 HOOK(malloc);
 HOOK(free);
 HOOK(calloc);
+#if HAVE_CFREE
 HOOK(cfree);
+#endif
 HOOK(realloc);
 HOOK(posix_memalign);
 HOOK(valloc);
@@ -111,7 +114,9 @@ void init()
         hooks::malloc.init();
         hooks::free.init();
         hooks::calloc.init();
+#if HAVE_CFREE
         hooks::cfree.init();
+#endif
         hooks::realloc.init();
         hooks::posix_memalign.init();
         hooks::valloc.init();
@@ -188,6 +193,7 @@ void* calloc(size_t num, size_t size) noexcept
     return ret;
 }
 
+#if HAVE_CFREE
 void cfree(void* ptr) noexcept
 {
     if (!hooks::cfree) {
@@ -203,6 +209,7 @@ void cfree(void* ptr) noexcept
 
     hooks::cfree(ptr);
 }
+#endif
 
 int posix_memalign(void **memptr, size_t alignment, size_t size) noexcept
 {
