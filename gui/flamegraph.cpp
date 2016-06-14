@@ -489,7 +489,7 @@ void FlameGraph::showData()
 
 void FlameGraph::setDisplayText(const QString& text)
 {
-    if (text.isEmpty() && m_selectedItem != -1) {
+    if (text.isEmpty() && m_selectedItem != -1 && m_selectionHistory.at(m_selectedItem)) {
         m_displayLabel->setText(m_selectionHistory.at(m_selectedItem)->description());
         m_view->setCursor(Qt::ArrowCursor);
     } else {
