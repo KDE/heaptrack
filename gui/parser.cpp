@@ -189,13 +189,13 @@ struct ParserData final : public AccumulatedTraceData
         findTopChartEntries(&ChartMergeData::temporary, &LabelIds::temporary, &temporaryChartData);
     }
 
-    void handleTimeStamp(uint64_t /*oldStamp*/, uint64_t newStamp)
+    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp)
     {
         if (!buildCharts) {
             return;
         }
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, totalCost.leaked);
-        const uint64_t diffBetweenTimeStamps = totalTime / MAX_CHART_DATAPOINTS;
+        const int64_t diffBetweenTimeStamps = totalTime / MAX_CHART_DATAPOINTS;
         if (newStamp != totalTime && newStamp - lastTimeStamp < diffBetweenTimeStamps) {
             return;
         }
@@ -204,7 +204,7 @@ struct ParserData final : public AccumulatedTraceData
         lastTimeStamp = newStamp;
 
         // create the rows
-        auto createRow = [] (uint64_t timeStamp, int64_t totalCost) {
+        auto createRow = [] (int64_t timeStamp, int64_t totalCost) {
             ChartRows row;
             row.timeStamp = timeStamp;
             row.cost[0] = totalCost;
@@ -289,7 +289,7 @@ struct ParserData final : public AccumulatedTraceData
     };
     QHash<IpIndex, LabelIds> labelIds;
     int64_t maxConsumedSinceLastTimeStamp = 0;
-    uint64_t lastTimeStamp = 0;
+    int64_t lastTimeStamp = 0;
 
     StringCache stringCache;
 

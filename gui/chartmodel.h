@@ -33,7 +33,8 @@ struct ChartRows
     enum {
         MAX_NUM_COST = 20
     };
-    quint64 timeStamp = 0;
+    // time in ms
+    qint64 timeStamp = 0;
     std::array<qint64, MAX_NUM_COST> cost;
 };
 Q_DECLARE_TYPEINFO(ChartRows, Q_MOVABLE_TYPE);

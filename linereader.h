@@ -93,6 +93,11 @@ public:
         return true;
     }
 
+    bool operator>>(int64_t& hex)
+    {
+        return readHex(hex);
+    }
+
     bool operator>>(uint64_t& hex)
     {
         return readHex(hex);

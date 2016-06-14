@@ -28,10 +28,10 @@ struct SummaryData
 {
     QString debuggee;
     AllocationData cost;
-    uint64_t totalTime;
-    uint64_t peakTime;
-    uint64_t peakRSS;
-    uint64_t totalSystemMemory;
+    int64_t totalTime;
+    int64_t peakTime;
+    int64_t peakRSS;
+    int64_t totalSystemMemory;
 };
 Q_DECLARE_METATYPE(SummaryData);
 

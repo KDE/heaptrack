@@ -140,7 +140,7 @@ bool AccumulatedTraceData::read(const string& inputFile)
 bool AccumulatedTraceData::read(istream& in)
 {
     LineReader reader;
-    uint64_t timeStamp = 0;
+    int64_t timeStamp = 0;
 
     vector<string> opNewStrings = {
         // 64 bit
@@ -295,15 +295,7 @@ bool AccumulatedTraceData::read(istream& in)
 
             const auto& info = allocationInfos[allocationInfoIndex.index];
             auto& allocation = findAllocation(info.traceIndex);
-            if (!allocation.allocations || static_cast<uint64_t>(allocation.leaked) < info.size) {
-                if (!fromAttached) {
-                    cerr << "inconsistent allocation info, underflowed allocations of " << info.traceIndex << endl;
-                }
-                allocation.leaked = 0;
-                allocation.allocations = 0;
-            } else {
-                allocation.leaked -= info.size;
-            }
+            allocation.leaked -= info.size;
             totalCost.leaked -= info.size;
             if (temporary) {
                 ++allocation.temporary;
@@ -323,7 +315,7 @@ bool AccumulatedTraceData::read(istream& in)
             // comment or empty line
             continue;
         } else if (reader.mode() == 'c') {
-            uint64_t newStamp = 0;
+            int64_t newStamp = 0;
             if (!(reader >> newStamp)) {
                 cerr << "Failed to read time stamp: " << reader.line() << endl;
                 continue;
@@ -331,7 +323,7 @@ bool AccumulatedTraceData::read(istream& in)
             handleTimeStamp(timeStamp, newStamp);
             timeStamp = newStamp;
         } else if (reader.mode() == 'R') { // RSS timestamp
-            uint64_t rss = 0;
+            int64_t rss = 0;
             reader >> rss;
             if (rss > peakRSS) {
                 peakRSS = rss;
@@ -466,6 +458,10 @@ POTENTIALLY_UNUSED void printTrace(const AccumulatedTraceData& data, TraceIndex 
 void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
 {
     totalCost -= base.totalCost;
+    totalTime -= base.totalTime;
+    peakRSS -= base.peakRSS;
+    systemInfo.pages -= base.systemInfo.pages;
+    systemInfo.pageSize -= base.systemInfo.pageSize;
 
     // step 0: remap strings and ips
     const auto& stringMap = remapStrings(strings, base.strings);
