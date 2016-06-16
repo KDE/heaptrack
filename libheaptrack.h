@@ -17,11 +17,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include <cstdio>
+#include <stdio.h>
 
+#ifdef __cplusplus
 extern "C" {
-using heaptrack_callback_t = void (*) ();
-using heaptrack_callback_initialized_t = void (*) (FILE*);
+#endif
+
+typedef void (*heaptrack_callback_t) ();
+typedef void (*heaptrack_callback_initialized_t) (FILE*);
 
 void heaptrack_init(const char *outputFileName,
                     heaptrack_callback_t initCallbackBefore,
@@ -38,4 +41,6 @@ void heaptrack_realloc(void *ptr_in, size_t size, void *ptr_out);
 
 void heaptrack_invalidate_module_cache();
 
+#ifdef __cplusplus
 }
+#endif
