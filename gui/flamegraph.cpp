@@ -225,11 +225,10 @@ void layoutItems(FrameGraphicsItem *parent)
     const qreal y_margin = 2.;
     const qreal y = pos.y() - h - y_margin;
     qreal x = pos.x();
-    // TODO: check this algorithm for differential flamegraphs
 
     foreach (auto child, parent->childItems()) {
         auto frameChild = static_cast<FrameGraphicsItem*>(child);
-        const qreal w = std::abs(maxWidth * double(frameChild->cost()) / parent->cost());
+        const qreal w = maxWidth * double(frameChild->cost()) / parent->cost();
         frameChild->setVisible(w > 1);
         if (frameChild->isVisible()) {
             frameChild->setRect(QRectF(x, y, w, h));
@@ -265,7 +264,7 @@ void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent, in
         } else {
             item->setCost(item->cost() + row.cost.*member);
         }
-        if (std::abs(item->cost()) > costThreshold) {
+        if (item->cost() > costThreshold) {
             toGraphicsItems(row.children, item, member, costThreshold);
         }
     }
@@ -322,7 +321,7 @@ FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type,
     auto rootItem = new FrameGraphicsItem(totalCost, type, label);
     rootItem->setBrush(scheme.background());
     rootItem->setPen(pen);
-    toGraphicsItems(topDownData, rootItem, member, std::abs(totalCost) * costThreshold / 100.);
+    toGraphicsItems(topDownData, rootItem, member, totalCost * costThreshold / 100.);
     return rootItem;
 }
 

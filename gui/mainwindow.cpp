@@ -116,7 +116,9 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_parser, &Parser::bottomUpDataAvailable,
             this, [=] (const TreeData& data) {
         bottomUpModel->resetData(data);
-        m_ui->flameGraphTab->setBottomUpData(data);
+        if (!m_diffMode) {
+            m_ui->flameGraphTab->setBottomUpData(data);
+        }
         m_ui->progressLabel->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
         statusBar()->addWidget(m_ui->progressLabel, 1);
         statusBar()->addWidget(m_ui->loadingProgress);
@@ -130,9 +132,11 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_parser, &Parser::topDownDataAvailable,
             this, [=] (const TreeData& data) {
                 topDownModel->resetData(data);
-                m_ui->flameGraphTab->setTopDownData(data);
                 m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->topDownTab), true);
-                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->flameGraphTab), true);
+                if (!m_diffMode) {
+                    m_ui->flameGraphTab->setTopDownData(data);
+                }
+                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->flameGraphTab), !m_diffMode);
             });
     connect(m_parser, &Parser::consumedChartDataAvailable,
             this, [=] (const ChartData& data) {
@@ -368,9 +372,11 @@ void MainWindow::loadFile(const QString& file, const QString& diffBase)
     if (diffBase.isEmpty()) {
         setWindowTitle(i18nc("%1: file name that is open", "Heaptrack - %1",
                              QFileInfo(file).fileName()));
+        m_diffMode = false;
     } else {
         setWindowTitle(i18nc("%1, %2: file names that are open", "Heaptrack - %1 compared to %2",
                              QFileInfo(file).fileName(), QFileInfo(diffBase).fileName()));
+        m_diffMode = true;
     }
     m_ui->pages->setCurrentWidget(m_ui->loadingPage);
     m_parser->parse(file, diffBase);

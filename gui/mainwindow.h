@@ -49,6 +49,7 @@ private:
     QScopedPointer<Ui::MainWindow> m_ui;
     Parser* m_parser;
     KSharedConfig::Ptr m_config;
+    bool m_diffMode = false;
 };
 
 #endif // MAINWINDOW_H
