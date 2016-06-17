@@ -109,7 +109,7 @@ target_link_libraries(heaptrack_interpret backtrace)
 add_library(sharedprint STATIC accumulatedtracedata.cpp)
 target_link_libraries(sharedprint LINK_PUBLIC ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
 add_executable(heaptrack_print heaptrack_print.cpp)
-target_link_libraries(heaptrack_print LINK_PRIVATE sharedprint)
+target_link_libraries(heaptrack_print LINK_PRIVATE sharedprint ${CMAKE_THREAD_LIBS_INIT})
 
 set(BIN_INSTALL_DIR "bin")
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")

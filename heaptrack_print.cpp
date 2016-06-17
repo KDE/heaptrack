@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <future>
 
 #include "config.h"
 
@@ -605,17 +606,21 @@ int main(int argc, char** argv)
     const bool printTemporary = vm["print-temporary"].as<bool>();
 
     cout << "reading file \"" << inputFile << "\" - please wait, this might take some time..." << endl;
-    if (!data.read(inputFile)) {
-        return 1;
-    }
 
     if (!diffFile.empty()) {
         cout << "reading diff file \"" << diffFile << "\" - please wait, this might take some time..." << endl;
         Printer diffData;
-        if (!diffData.read(diffFile)) {
+        auto diffRead = async(launch::async, [&diffData, diffFile] () {
+            return diffData.read(diffFile);
+        });
+
+        if (!data.read(inputFile) || !diffRead.get()) {
             return 1;
         }
+
         data.diff(diffData);
+    } else if (!data.read(inputFile)) {
+        return 1;
     }
 
     data.finalize();

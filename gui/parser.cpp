@@ -28,6 +28,7 @@
 
 #include <vector>
 #include <tuple>
+#include <future>
 
 using namespace std;
 
@@ -485,20 +486,28 @@ void Parser::parse(const QString& path, const QString& diffBase)
         const auto stdPath = path.toStdString();
         auto data = make_shared<ParserData>();
         emit progressMessageAvailable(i18n("parsing data..."));
-        if (!data->read(stdPath)) {
-            emit failedToOpen(path);
-            return;
-        }
 
         if (!diffBase.isEmpty()) {
             ParserData diffData;
-            if (!diffData.read(diffBase.toStdString())) {
+            auto readBase = async(launch::async, [&diffData, diffBase] () {
+                return diffData.read(diffBase.toStdString());
+            });
+            if (!data->read(stdPath)) {
+                emit failedToOpen(path);
+                return;
+            }
+            if (!readBase.get()) {
                 emit failedToOpen(diffBase);
                 return;
             }
             data->diff(diffData);
             data->stringCache.diffMode = true;
+        } else if (!data->read(stdPath)) {
+            emit failedToOpen(path);
+            return;
         }
+
+
 
         data->updateStringCache();
 
