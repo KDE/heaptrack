@@ -135,6 +135,9 @@ struct ParserData final : public AccumulatedTraceData
 
     void prepareBuildCharts()
     {
+        if (stringCache.diffMode) {
+            return;
+        }
         consumedChartData.rows.reserve(MAX_CHART_DATAPOINTS);
         allocatedChartData.rows.reserve(MAX_CHART_DATAPOINTS);
         allocationsChartData.rows.reserve(MAX_CHART_DATAPOINTS);
@@ -192,7 +195,7 @@ struct ParserData final : public AccumulatedTraceData
 
     void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp)
     {
-        if (!buildCharts) {
+        if (!buildCharts || stringCache.diffMode) {
             return;
         }
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, totalCost.leaked);
@@ -537,16 +540,20 @@ void Parser::parse(const QString& path, const QString& diffBase)
         *parallel << make_job([this, mergedAllocations, sizeHistogram]() {
             const auto topDownData = toTopDownData(mergedAllocations.first);
             emit topDownDataAvailable(topDownData);
-        }) << make_job([this, data, stdPath]() {
-            // this mutates data, and thus anything running in parallel must
-            // not access data
-            data->prepareBuildCharts();
-            data->read(stdPath);
-            emit consumedChartDataAvailable(data->consumedChartData);
-            emit allocationsChartDataAvailable(data->allocationsChartData);
-            emit allocatedChartDataAvailable(data->allocatedChartData);
-            emit temporaryChartDataAvailable(data->temporaryChartData);
         });
+        if (!data->stringCache.diffMode) {
+            // only build charts when we are not diffing
+            *parallel << make_job([this, data, stdPath]() {
+                // this mutates data, and thus anything running in parallel must
+                // not access data
+                data->prepareBuildCharts();
+                data->read(stdPath);
+                emit consumedChartDataAvailable(data->consumedChartData);
+                emit allocationsChartDataAvailable(data->allocationsChartData);
+                emit allocatedChartDataAvailable(data->allocatedChartData);
+                emit temporaryChartDataAvailable(data->temporaryChartData);
+            });
+        }
 
         auto sequential = new Sequence;
         *sequential << parallel << make_job([this]() {
