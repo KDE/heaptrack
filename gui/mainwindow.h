@@ -43,6 +43,7 @@ public slots:
     void openFile();
 
 private:
+    void showError(const QString &message);
     void setupStacks();
 
     QScopedPointer<Ui::MainWindow> m_ui;

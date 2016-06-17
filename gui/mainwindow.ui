@@ -41,16 +41,106 @@
     <item>
      <widget class="QStackedWidget" name="pages">
       <widget class="QWidget" name="openPage">
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <layout class="QVBoxLayout" name="verticalLayout_15">
         <item>
-         <widget class="QToolButton" name="openFile">
-          <property name="text">
-           <string notr="true">...</string>
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
-          <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonTextUnderIcon</enum>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox">
+          <property name="title">
+           <string>Open Heaptrack Data</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout">
+           <item row="1" column="1">
+            <widget class="KUrlRequester" name="openFile">
+             <property name="toolTip">
+              <string>&lt;qt&gt;&lt;p&gt;This field specifies the primary heaptrack data file. These files are called &lt;tt&gt;heaptrack.$APP.$PID.gz&lt;/tt&gt;. You can produce such a file by profiling your application, e.g. via:&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;heaptrack &amp;lt;yourapplication&amp;gt; ...&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Or, alternatively, you can attach to a running process via&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;heaptrack --pid $(pidof &amp;lt;yourapplication&amp;gt;)&lt;/code&gt;&lt;/pre&gt;&lt;/qt&gt;</string>
+             </property>
+             <property name="filter">
+              <string>heaptrack.*.*.gz</string>
+             </property>
+             <property name="placeholderText">
+              <string>path/to/heaptrack.$APP.$PID.gz</string>
+             </property>
+             <property name="fileDialogModality">
+              <enum>Qt::WindowModal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="KUrlRequester" name="compareTo">
+             <property name="toolTip">
+              <string>&lt;qt&gt;You can optionally specify a second heaptrack data file to compare to. If set, this file will be used as a base and its cost gets subtracted from the primary data costs.&lt;/qt&gt;</string>
+             </property>
+             <property name="filter">
+              <string>heaptrack.*.*.gz</string>
+             </property>
+             <property name="placeholderText">
+              <string>path/to/heaptrack.$APP.$PID.gz</string>
+             </property>
+             <property name="fileDialogModality">
+              <enum>Qt::WindowModal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="openFileLabel">
+             <property name="text">
+              <string>Profile &amp;Data:</string>
+             </property>
+             <property name="buddy">
+              <cstring>openFile</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="compareToLabel">
+             <property name="text">
+              <string>Compare to:</string>
+             </property>
+             <property name="buddy">
+              <cstring>compareTo</cstring>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QDialogButtonBox" name="buttonBox">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="standardButtons">
+           <set>QDialogButtonBox::Open</set>
           </property>
          </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </widget>
@@ -683,6 +773,11 @@
    <class>KMessageWidget</class>
    <extends>QFrame</extends>
    <header>kmessagewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KUrlRequester</class>
+   <extends>QWidget</extends>
+   <header>kurlrequester.h</header>
   </customwidget>
   <customwidget>
    <class>ChartWidget</class>

@@ -24,7 +24,6 @@
 #include <cmath>
 
 #include <KRecursiveFilterProxyModel>
-#include <KStandardAction>
 #include <KLocalizedString>
 
 #include <QFileDialog>
@@ -223,8 +222,7 @@ MainWindow::MainWindow(QWidget* parent)
             this, [this, removeProgress] (const QString& failedFile) {
         removeProgress();
         m_ui->pages->setCurrentWidget(m_ui->openPage);
-        m_ui->messages->setText(i18n("Failed to parse file %1.", failedFile));
-        m_ui->messages->show();
+        showError(i18n("Failed to parse file %1.", failedFile));
     });
     m_ui->messages->hide();
 
@@ -303,8 +301,43 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_ui->callerCalleeFilterModule, &QLineEdit::textChanged,
             bottomUpProxy, &TreeProxy::setModuleFilter);
 
-    auto openFile = KStandardAction::open(this, SLOT(openFile()), this);
-    m_ui->openFile->setDefaultAction(openFile);
+    auto validateInputFile = [this] (const QString &path, bool allowEmpty) -> bool {
+        if (path.isEmpty()) {
+            return allowEmpty;
+        }
+
+        const auto file = QFileInfo(path);
+        if (!file.exists()) {
+            showError(i18n("Input data %1 does not exist.", path));
+        } else if (!file.isFile()) {
+            showError(i18n("Input data %1 is not a file.", path));
+        } else if (!file.isReadable()) {
+            showError(i18n("Input data %1 is not readable.", path));
+        } else {
+            return true;
+        }
+        return false;
+    };
+
+    auto validateInput = [this, validateInputFile] () {
+        m_ui->messages->hide();
+        m_ui->buttonBox->setEnabled(
+            validateInputFile(m_ui->openFile->url().toLocalFile(), false)
+            && validateInputFile(m_ui->compareTo->url().toLocalFile(), true)
+        );
+    };
+
+    connect(m_ui->openFile, &KUrlRequester::textChanged,
+            this, validateInput);
+    connect(m_ui->compareTo, &KUrlRequester::textChanged,
+            this, validateInput);
+    connect(m_ui->buttonBox, &QDialogButtonBox::accepted,
+            this, [this] () {
+                const auto path = m_ui->openFile->url().toLocalFile();
+                Q_ASSERT(!path.isEmpty());
+                const auto base = m_ui->compareTo->url().toLocalFile();
+                loadFile(path, base);
+            });
 
     setupStacks();
 
@@ -332,7 +365,13 @@ MainWindow::~MainWindow()
 void MainWindow::loadFile(const QString& file, const QString& diffBase)
 {
     m_ui->loadingLabel->setText(i18n("Loading file %1, please wait...", file));
-    setWindowTitle(i18nc("%1: file name that is open", "Heaptrack - %1", file));
+    if (diffBase.isEmpty()) {
+        setWindowTitle(i18nc("%1: file name that is open", "Heaptrack - %1",
+                             QFileInfo(file).fileName()));
+    } else {
+        setWindowTitle(i18nc("%1, %2: file names that are open", "Heaptrack - %1 compared to %2",
+                             QFileInfo(file).fileName(), QFileInfo(diffBase).fileName()));
+    }
     m_ui->pages->setCurrentWidget(m_ui->loadingPage);
     m_parser->parse(file, diffBase);
 }
@@ -347,6 +386,12 @@ void MainWindow::openFile()
                 loadFile(file);
             });
     dialog->show();
+}
+
+void MainWindow::showError(const QString &message)
+{
+    m_ui->messages->setText(message);
+    m_ui->messages->show();
 }
 
 void MainWindow::setupStacks()
