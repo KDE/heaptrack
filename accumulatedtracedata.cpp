@@ -357,7 +357,7 @@ bool AccumulatedTraceData::read(istream& in)
     return true;
 }
 
-namespace {
+namespace { // helpers for diffing
 
 template<typename IndexT, typename SortF>
 vector<IndexT> sortedIndices(size_t numIndices, SortF sorter)
@@ -463,20 +463,6 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     systemInfo.pages -= base.systemInfo.pages;
     systemInfo.pageSize -= base.systemInfo.pageSize;
 
-    // step 0: remap strings and ips
-    const auto& stringMap = remapStrings(strings, base.strings);
-    auto remapString = [&stringMap] (StringIndex& index) {
-        if (index) {
-            index.index = stringMap[index.index].index;
-        }
-    };
-    auto remapIp = [&remapString] (InstructionPointer ip) -> InstructionPointer {
-        remapString(ip.moduleIndex);
-        remapString(ip.functionIndex);
-        remapString(ip.fileIndex);
-        return ip;
-    };
-
     // step 1: sort trace indices of allocations for efficient lookup
     // step 2: while at it, also merge equal allocations
     vector<TraceIndex> allocationTraceNodes;
@@ -502,7 +488,22 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
         }
     }
 
-    // step 3: iterate over rhs data and find matching traces
+    // step 3: map string indices from rhs to lhs data
+
+    const auto& stringMap = remapStrings(strings, base.strings);
+    auto remapString = [&stringMap] (StringIndex& index) {
+        if (index) {
+            index.index = stringMap[index.index].index;
+        }
+    };
+    auto remapIp = [&remapString] (InstructionPointer ip) -> InstructionPointer {
+        remapString(ip.moduleIndex);
+        remapString(ip.functionIndex);
+        remapString(ip.fileIndex);
+        return ip;
+    };
+
+    // step 4: iterate over rhs data and find matching traces
     //         if no match is found, copy the data over
 
     auto sortedIps = sortedIndices<IpIndex>(instructionPointers.size(),
@@ -510,6 +511,8 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
             return findIp(lhs).compareWithoutAddress(findIp(rhs));
         });
 
+    // map an IpIndex from the rhs data into the lhs data space, or copy the data
+    // if it does not exist yet
     auto remapIpIndex = [&sortedIps, this, &base, &remapIp] (IpIndex rhsIndex) -> IpIndex {
         if (!rhsIndex) {
             return rhsIndex;
@@ -535,6 +538,7 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
         return ret;
     };
 
+    // copy the rhs trace index and the data it references into the lhs data, recursively
     function<TraceIndex (TraceIndex)> copyTrace = [this, &base, remapIpIndex, &copyTrace] (TraceIndex rhsIndex) -> TraceIndex {
         if (!rhsIndex) {
             return rhsIndex;
@@ -554,6 +558,9 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
         return ret;
     };
 
+    // find an equivalent trace or copy the data over if it does not exist yet
+    // a trace is equivalent if the complete backtrace has equal InstructionPointer
+    // data while ignoring the actual pointer address
     auto remapTrace = [&base, &allocationTraceNodes, this, remapIp, copyTrace] (TraceIndex rhsIndex) -> TraceIndex {
         if (!rhsIndex) {
             return rhsIndex;
@@ -581,7 +588,10 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
         findAllocation(lhsTrace) -= rhsAllocation;
     }
 
-    // step 4: remove allocations that don't show any differences
+    // step 5: remove allocations that don't show any differences
+    //         note that when there are differences in the backtraces,
+    //         we can still end up with merged backtraces that have a total
+    //         of 0, but different "tails" of different origin with non-zero cost
     allocations.erase(remove_if(allocations.begin(), allocations.end(),
         [] (const Allocation& allocation) -> bool {
             return !allocation.allocated && !allocation.allocations && !allocation.leaked
