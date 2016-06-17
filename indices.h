@@ -38,6 +38,21 @@ struct Index
         return index < o.index;
     }
 
+    bool operator<=(Index o) const
+    {
+        return index <= o.index;
+    }
+
+    bool operator>(Index o) const
+    {
+        return index > o.index;
+    }
+
+    bool operator>=(Index o) const
+    {
+        return index >= o.index;
+    }
+
     bool operator!=(Index o) const
     {
         return index != o.index;

@@ -28,6 +28,7 @@
 
 #include <vector>
 #include <tuple>
+#include <future>
 
 using namespace std;
 
@@ -46,6 +47,8 @@ struct StringCache
         if (ip.functionIndex) {
             // TODO: support removal of template arguments
             return stringify(ip.functionIndex);
+        } else if (diffMode) {
+            return i18n("<unresolved function>");
         } else {
             auto& ipAddr = m_ipAddresses[ip.instructionPointer];
             if (ipAddr.isEmpty()) {
@@ -100,15 +103,17 @@ struct StringCache
     vector<QString> m_strings;
     mutable QHash<uint64_t, QString> m_ipAddresses;
     mutable vector<shared_ptr<LocationData>> m_locations;
+
+    bool diffMode = false;
 };
 
 struct ChartMergeData
 {
     IpIndex ip;
-    quint64 consumed;
-    quint64 allocations;
-    quint64 allocated;
-    quint64 temporary;
+    qint64 consumed;
+    qint64 allocations;
+    qint64 allocated;
+    qint64 temporary;
     bool operator<(const IpIndex rhs) const
     {
         return ip < rhs;
@@ -130,6 +135,9 @@ struct ParserData final : public AccumulatedTraceData
 
     void prepareBuildCharts()
     {
+        if (stringCache.diffMode) {
+            return;
+        }
         consumedChartData.rows.reserve(MAX_CHART_DATAPOINTS);
         allocatedChartData.rows.reserve(MAX_CHART_DATAPOINTS);
         allocationsChartData.rows.reserve(MAX_CHART_DATAPOINTS);
@@ -164,7 +172,7 @@ struct ParserData final : public AccumulatedTraceData
             it->temporary += alloc.temporary;
         }
         // find the top hot spots for the individual data members and remember their IP and store the label
-        auto findTopChartEntries = [&] (quint64 ChartMergeData::* member, int LabelIds::* label, ChartData* data) {
+        auto findTopChartEntries = [&] (qint64 ChartMergeData::* member, int LabelIds::* label, ChartData* data) {
             sort(merged.begin(), merged.end(), [=] (const ChartMergeData& left, const ChartMergeData& right) {
                 return left.*member > right.*member;
             });
@@ -185,13 +193,13 @@ struct ParserData final : public AccumulatedTraceData
         findTopChartEntries(&ChartMergeData::temporary, &LabelIds::temporary, &temporaryChartData);
     }
 
-    void handleTimeStamp(uint64_t /*oldStamp*/, uint64_t newStamp)
+    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp)
     {
-        if (!buildCharts) {
+        if (!buildCharts || stringCache.diffMode) {
             return;
         }
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, totalCost.leaked);
-        const uint64_t diffBetweenTimeStamps = totalTime / MAX_CHART_DATAPOINTS;
+        const int64_t diffBetweenTimeStamps = totalTime / MAX_CHART_DATAPOINTS;
         if (newStamp != totalTime && newStamp - lastTimeStamp < diffBetweenTimeStamps) {
             return;
         }
@@ -200,7 +208,7 @@ struct ParserData final : public AccumulatedTraceData
         lastTimeStamp = newStamp;
 
         // create the rows
-        auto createRow = [] (uint64_t timeStamp, uint64_t totalCost) {
+        auto createRow = [] (int64_t timeStamp, int64_t totalCost) {
             ChartRows row;
             row.timeStamp = timeStamp;
             row.cost[0] = totalCost;
@@ -213,7 +221,7 @@ struct ParserData final : public AccumulatedTraceData
 
         // if the cost is non-zero and the ip corresponds to a hotspot function selected in the labels,
         // we add the cost to the rows column
-        auto addDataToRow = [] (uint64_t cost, int labelId, ChartRows* rows) {
+        auto addDataToRow = [] (int64_t cost, int labelId, ChartRows* rows) {
             if (!cost || labelId == -1) {
                 return;
             }
@@ -259,7 +267,7 @@ struct ParserData final : public AccumulatedTraceData
     struct CountedAllocationInfo
     {
         AllocationInfo info;
-        uint64_t allocations;
+        int64_t allocations;
         bool operator<(const CountedAllocationInfo& rhs) const
         {
             return tie(info.size, allocations)
@@ -284,8 +292,8 @@ struct ParserData final : public AccumulatedTraceData
         int temporary = -1;
     };
     QHash<IpIndex, LabelIds> labelIds;
-    uint64_t maxConsumedSinceLastTimeStamp = 0;
-    uint64_t lastTimeStamp = 0;
+    int64_t maxConsumedSinceLastTimeStamp = 0;
+    int64_t lastTimeStamp = 0;
 
     StringCache stringCache;
 
@@ -395,7 +403,7 @@ QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
 struct MergedHistogramColumnData
 {
     std::shared_ptr<LocationData> location;
-    uint64_t allocations;
+    int64_t allocations;
     bool operator<(const std::shared_ptr<LocationData>& rhs) const
     {
         return location < rhs;
@@ -474,17 +482,35 @@ Parser::Parser(QObject* parent)
 
 Parser::~Parser() = default;
 
-void Parser::parse(const QString& path)
+void Parser::parse(const QString& path, const QString& diffBase)
 {
     using namespace ThreadWeaver;
-    stream() << make_job([this, path]() {
+    stream() << make_job([this, path, diffBase]() {
         const auto stdPath = path.toStdString();
         auto data = make_shared<ParserData>();
         emit progressMessageAvailable(i18n("parsing data..."));
-        if (!data->read(stdPath)) {
+
+        if (!diffBase.isEmpty()) {
+            ParserData diffData;
+            auto readBase = async(launch::async, [&diffData, diffBase] () {
+                return diffData.read(diffBase.toStdString());
+            });
+            if (!data->read(stdPath)) {
+                emit failedToOpen(path);
+                return;
+            }
+            if (!readBase.get()) {
+                emit failedToOpen(diffBase);
+                return;
+            }
+            data->diff(diffData);
+            data->stringCache.diffMode = true;
+        } else if (!data->read(stdPath)) {
             emit failedToOpen(path);
             return;
         }
+
+
 
         data->updateStringCache();
 
@@ -514,16 +540,20 @@ void Parser::parse(const QString& path)
         *parallel << make_job([this, mergedAllocations, sizeHistogram]() {
             const auto topDownData = toTopDownData(mergedAllocations.first);
             emit topDownDataAvailable(topDownData);
-        }) << make_job([this, data, stdPath]() {
-            // this mutates data, and thus anything running in parallel must
-            // not access data
-            data->prepareBuildCharts();
-            data->read(stdPath);
-            emit consumedChartDataAvailable(data->consumedChartData);
-            emit allocationsChartDataAvailable(data->allocationsChartData);
-            emit allocatedChartDataAvailable(data->allocatedChartData);
-            emit temporaryChartDataAvailable(data->temporaryChartData);
         });
+        if (!data->stringCache.diffMode) {
+            // only build charts when we are not diffing
+            *parallel << make_job([this, data, stdPath]() {
+                // this mutates data, and thus anything running in parallel must
+                // not access data
+                data->prepareBuildCharts();
+                data->read(stdPath);
+                emit consumedChartDataAvailable(data->consumedChartData);
+                emit allocationsChartDataAvailable(data->allocationsChartData);
+                emit allocatedChartDataAvailable(data->allocatedChartData);
+                emit temporaryChartDataAvailable(data->temporaryChartData);
+            });
+        }
 
         auto sequential = new Sequence;
         *sequential << parallel << make_job([this]() {

@@ -25,15 +25,15 @@
 struct AllocationData
 {
     // number of allocations
-    uint64_t allocations = 0;
+    int64_t allocations = 0;
     // number of temporary allocations
-    uint64_t temporary = 0;
+    int64_t temporary = 0;
     // bytes allocated in total
-    uint64_t allocated = 0;
+    int64_t allocated = 0;
     // amount of bytes leaked
-    uint64_t leaked = 0;
+    int64_t leaked = 0;
     // largest amount of bytes allocated
-    uint64_t peak = 0;
+    int64_t peak = 0;
 };
 
 inline AllocationData& operator+=(AllocationData& lhs, const AllocationData& rhs)
@@ -46,9 +46,24 @@ inline AllocationData& operator+=(AllocationData& lhs, const AllocationData& rhs
     return lhs;
 }
 
+inline AllocationData& operator-=(AllocationData& lhs, const AllocationData& rhs)
+{
+    lhs.allocations -= rhs.allocations;
+    lhs.temporary -= rhs.temporary;
+    lhs.peak -= rhs.peak;
+    lhs.leaked -= rhs.leaked;
+    lhs.allocated -= rhs.allocated;
+    return lhs;
+}
+
 inline AllocationData operator+(AllocationData lhs, const AllocationData& rhs)
 {
     return lhs += rhs;
+}
+
+inline AllocationData operator-(AllocationData lhs, const AllocationData& rhs)
+{
+    return lhs -= rhs;
 }
 
 #endif // ALLOCATIONDATA_H

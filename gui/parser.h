@@ -35,7 +35,7 @@ public:
     virtual ~Parser();
 
 public slots:
-    void parse(const QString& path);
+    void parse(const QString& path, const QString& diffBase);
 
 signals:
     void progressMessageAvailable(const QString& progress);

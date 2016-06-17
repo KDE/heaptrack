@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Milian Wolff <mail@milianw.de>
+ * Copyright 2014-2016 Milian Wolff <mail@milianw.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Library General Public License as
@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <future>
 
 #include "config.h"
 
@@ -51,7 +52,7 @@ struct MergedAllocation : public AllocationData
 class formatBytes
 {
 public:
-    formatBytes(uint64_t bytes)
+    formatBytes(int64_t bytes)
         : m_bytes(bytes)
     {
     }
@@ -59,11 +60,15 @@ public:
     friend ostream& operator<<(ostream& out, const formatBytes data);
 
 private:
-    uint64_t m_bytes;
+    int64_t m_bytes;
 };
 
 ostream& operator<<(ostream& out, const formatBytes data)
 {
+    if (data.m_bytes < 0) {
+        // handle negative values
+        return out << '-' << formatBytes(-data.m_bytes);
+    }
     if (data.m_bytes < 1000) {
         // no fancy formatting for plain byte values, esp. no .00 factions
         return out << data.m_bytes << 'B';
@@ -272,7 +277,7 @@ struct Printer final : public AccumulatedTraceData
     void printMerged(T AllocationData::* member, LabelPrinter label, SubLabelPrinter sublabel)
     {
         auto sortOrder = [member] (const AllocationData& l, const AllocationData& r) {
-            return l.*member > r.*member;
+            return std::abs(l.*member) > std::abs(r.*member);
         };
         sort(mergedAllocations.begin(), mergedAllocations.end(), sortOrder);
         for (size_t i = 0; i < min(peakLimit, mergedAllocations.size()); ++i) {
@@ -284,7 +289,7 @@ struct Printer final : public AccumulatedTraceData
             printIp(allocation.ipIndex, cout);
 
             sort(allocation.traces.begin(), allocation.traces.end(), sortOrder);
-            size_t handled = 0;
+            int64_t handled = 0;
             for (size_t j = 0; j < min(subPeakLimit, allocation.traces.size()); ++j) {
                 const auto& trace = allocation.traces[j];
                 sublabel(trace);
@@ -309,7 +314,7 @@ struct Printer final : public AccumulatedTraceData
     {
         sort(allocations.begin(), allocations.end(),
             [member] (const Allocation& l, const Allocation &r) {
-                return l.*member > r.*member;
+                return std::abs(l.*member) > std::abs(r.*member);
             });
         for (size_t i = 0; i < min(peakLimit, allocations.size()); ++i) {
             const auto& allocation = allocations[i];
@@ -361,7 +366,7 @@ struct Printer final : public AccumulatedTraceData
     void writeMassifBacktrace(const vector<Allocation>& allocations, size_t heapSize, size_t threshold,
                               const IpIndex& location, size_t depth = 0)
     {
-        size_t skippedLeaked = 0;
+        int64_t skippedLeaked = 0;
         size_t numAllocs = 0;
         size_t skipped = 0;
         auto mergedAllocations = mergeAllocations(allocations);
@@ -375,13 +380,13 @@ struct Printer final : public AccumulatedTraceData
         const bool shouldStop = isStopIndex(ip.functionIndex);
         if (!shouldStop) {
             for (auto& merged : mergedAllocations) {
-                if (!merged.leaked) {
+                if (merged.leaked < 0) {
                     // list is sorted, so we can bail out now - these entries are uninteresting for massif
                     break;
                 }
 
                 // skip items below threshold
-                if (merged.leaked >= threshold) {
+                if (static_cast<size_t>(merged.leaked) >= threshold) {
                     ++numAllocs;
                     // skip the first level of the backtrace, otherwise we'd endlessly recurse
                     for (auto& alloc : merged.traces) {
@@ -429,7 +434,7 @@ struct Printer final : public AccumulatedTraceData
 
         if (!shouldStop) {
             for (const auto& merged : mergedAllocations) {
-                if (merged.leaked && merged.leaked >= threshold) {
+                if (merged.leaked > 0 && static_cast<size_t>(merged.leaked) >= threshold) {
                     if (skippedLeaked > merged.leaked) {
                         // manually inject this entry to keep the output sorted
                         writeSkipped();
@@ -447,13 +452,13 @@ struct Printer final : public AccumulatedTraceData
             ++sizeHistogram[info.size];
         }
 
-        if (totalCost.leaked > lastMassifPeak && massifOut.is_open()) {
+        if (totalCost.leaked > 0 && static_cast<size_t>(totalCost.leaked) > lastMassifPeak && massifOut.is_open()) {
             massifAllocations = allocations;
             lastMassifPeak = totalCost.leaked;
         }
     }
 
-    void handleTimeStamp(uint64_t /*oldStamp*/, uint64_t newStamp) override
+    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp) override
     {
         if (massifOut.is_open()) {
             writeMassifSnapshot(newStamp, newStamp == totalTime);
@@ -494,6 +499,8 @@ int main(int argc, char** argv)
     desc.add_options()
         ("file,f", po::value<string>(),
             "The heaptrack data file to print.")
+        ("diff,d", po::value<string>()->default_value({}),
+            "Find the differences to this file.")
         ("shorten-templates,t", po::value<bool>()->default_value(true)->implicit_value(true),
             "Shorten template identifiers.")
         ("merge-backtraces,m", po::value<bool>()->default_value(true)->implicit_value(true),
@@ -573,6 +580,7 @@ int main(int argc, char** argv)
     Printer data;
 
     const auto inputFile = vm["file"].as<string>();
+    const auto diffFile = vm["diff"].as<string>();
     data.shortenTemplates = vm["shorten-templates"].as<bool>();
     data.mergeBacktraces = vm["merge-backtraces"].as<bool>();
     data.filterBtFunction = vm["filter-bt-function"].as<string>();
@@ -598,9 +606,23 @@ int main(int argc, char** argv)
     const bool printTemporary = vm["print-temporary"].as<bool>();
 
     cout << "reading file \"" << inputFile << "\" - please wait, this might take some time..." << endl;
-    if (!data.read(inputFile)) {
+
+    if (!diffFile.empty()) {
+        cout << "reading diff file \"" << diffFile << "\" - please wait, this might take some time..." << endl;
+        Printer diffData;
+        auto diffRead = async(launch::async, [&diffData, diffFile] () {
+            return diffData.read(diffFile);
+        });
+
+        if (!data.read(inputFile) || !diffRead.get()) {
+            return 1;
+        }
+
+        data.diff(diffData);
+    } else if (!data.read(inputFile)) {
         return 1;
     }
+
     data.finalize();
 
     cout << "finished reading file, now analyzing data:\n" << endl;
@@ -675,9 +697,9 @@ int main(int argc, char** argv)
          << "bytes allocated in total (ignoring deallocations): " << formatBytes(data.totalCost.allocated)
             << " (" << formatBytes(data.totalCost.allocated / totalTimeS) << "/s)" << '\n'
          << "calls to allocation functions: " << data.totalCost.allocations
-            << " (" << size_t(data.totalCost.allocations / totalTimeS) << "/s)\n"
+            << " (" << int64_t(data.totalCost.allocations / totalTimeS) << "/s)\n"
          << "temporary memory allocations: " << data.totalCost.temporary
-            << " (" << size_t(data.totalCost.temporary / totalTimeS) << "/s)\n"
+            << " (" << int64_t(data.totalCost.temporary / totalTimeS) << "/s)\n"
          << "peak heap memory consumption: " << formatBytes(data.totalCost.peak) << '\n'
          << "peak RSS (including heaptrack overhead): " << formatBytes(data.peakRSS * data.systemInfo.pageSize) << '\n'
          << "total memory leaked: " << formatBytes(data.totalCost.leaked) << '\n';

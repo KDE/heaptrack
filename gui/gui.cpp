@@ -53,6 +53,12 @@ int main(int argc, char** argv)
     parser.addHelpOption();
     aboutData.setupCommandLine(&parser);
 
+    QCommandLineOption diffOption {
+        { QStringLiteral("d"), QStringLiteral("diff")},
+        i18n("Base profile data to compare other files to."),
+        QStringLiteral("<file>")
+    };
+    parser.addOption(diffOption);
     parser.addPositionalArgument(QStringLiteral("files"), i18n( "Files to load" ), i18n("[FILE...]"));
 
     parser.process(app);
@@ -66,7 +72,7 @@ int main(int argc, char** argv)
     };
 
     foreach (const QString &file, parser.positionalArguments()) {
-        createWindow()->loadFile(file);
+        createWindow()->loadFile(file, parser.value(diffOption));
     }
 
     if (parser.positionalArguments().isEmpty()) {

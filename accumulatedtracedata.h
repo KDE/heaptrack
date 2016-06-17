@@ -84,7 +84,7 @@ struct AccumulatedTraceData
     AccumulatedTraceData();
     virtual ~AccumulatedTraceData() = default;
 
-    virtual void handleTimeStamp(uint64_t oldStamp, uint64_t newStamp) = 0;
+    virtual void handleTimeStamp(int64_t oldStamp, int64_t newStamp) = 0;
     virtual void handleAllocation(const AllocationInfo& info, const AllocationIndex index) = 0;
     virtual void handleDebuggee(const char* command) = 0;
 
@@ -95,18 +95,20 @@ struct AccumulatedTraceData
     bool read(const std::string& inputFile);
     bool read(std::istream& in);
 
+    void diff(const AccumulatedTraceData& base);
+
     bool shortenTemplates = false;
     bool fromAttached = false;
 
     std::vector<Allocation> allocations;
     AllocationData totalCost;
-    uint64_t totalTime = 0;
-    uint64_t peakTime = 0;
-    uint64_t peakRSS = 0;
+    int64_t totalTime = 0;
+    int64_t peakTime = 0;
+    int64_t peakRSS = 0;
 
     struct SystemInfo {
-        uint64_t pages = 0;
-        uint64_t pageSize = 0;
+        int64_t pages = 0;
+        int64_t pageSize = 0;
     };
     SystemInfo systemInfo;
 

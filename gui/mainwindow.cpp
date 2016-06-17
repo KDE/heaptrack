@@ -24,7 +24,6 @@
 #include <cmath>
 
 #include <KRecursiveFilterProxyModel>
-#include <KStandardAction>
 #include <KLocalizedString>
 
 #include <QFileDialog>
@@ -117,7 +116,9 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_parser, &Parser::bottomUpDataAvailable,
             this, [=] (const TreeData& data) {
         bottomUpModel->resetData(data);
-        m_ui->flameGraphTab->setBottomUpData(data);
+        if (!m_diffMode) {
+            m_ui->flameGraphTab->setBottomUpData(data);
+        }
         m_ui->progressLabel->setAlignment(Qt::AlignVCenter | Qt::AlignRight);
         statusBar()->addWidget(m_ui->progressLabel, 1);
         statusBar()->addWidget(m_ui->loadingProgress);
@@ -131,9 +132,11 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_parser, &Parser::topDownDataAvailable,
             this, [=] (const TreeData& data) {
                 topDownModel->resetData(data);
-                m_ui->flameGraphTab->setTopDownData(data);
                 m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->topDownTab), true);
-                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->flameGraphTab), true);
+                if (!m_diffMode) {
+                    m_ui->flameGraphTab->setTopDownData(data);
+                }
+                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->flameGraphTab), !m_diffMode);
             });
     connect(m_parser, &Parser::consumedChartDataAvailable,
             this, [=] (const ChartData& data) {
@@ -190,10 +193,10 @@ MainWindow::MainWindow(QWidget* parent)
                     QTextStream stream(&textCenter);
                     stream << "<qt><dl>"
                            << i18n("<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>",
-                                   data.cost.allocations, quint64(data.cost.allocations / totalTimeS))
+                                   data.cost.allocations, qint64(data.cost.allocations / totalTimeS))
                            << i18n("<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>",
                                    data.cost.temporary, std::round(float(data.cost.temporary) * 100.f * 100.f / data.cost.allocations) / 100.f,
-                                   quint64(data.cost.temporary / totalTimeS))
+                                   qint64(data.cost.temporary / totalTimeS))
                            << i18n("<dt><b>bytes allocated in total</b> (ignoring deallocations):</dt><dd>%1 (%2/s)</dd>",
                                    format.formatByteSize(data.cost.allocated, 2), format.formatByteSize(data.cost.allocated / totalTimeS))
                            << "</dl></qt>";
@@ -223,8 +226,7 @@ MainWindow::MainWindow(QWidget* parent)
             this, [this, removeProgress] (const QString& failedFile) {
         removeProgress();
         m_ui->pages->setCurrentWidget(m_ui->openPage);
-        m_ui->messages->setText(i18n("Failed to parse file %1.", failedFile));
-        m_ui->messages->show();
+        showError(i18n("Failed to parse file %1.", failedFile));
     });
     m_ui->messages->hide();
 
@@ -303,8 +305,43 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_ui->callerCalleeFilterModule, &QLineEdit::textChanged,
             bottomUpProxy, &TreeProxy::setModuleFilter);
 
-    auto openFile = KStandardAction::open(this, SLOT(openFile()), this);
-    m_ui->openFile->setDefaultAction(openFile);
+    auto validateInputFile = [this] (const QString &path, bool allowEmpty) -> bool {
+        if (path.isEmpty()) {
+            return allowEmpty;
+        }
+
+        const auto file = QFileInfo(path);
+        if (!file.exists()) {
+            showError(i18n("Input data %1 does not exist.", path));
+        } else if (!file.isFile()) {
+            showError(i18n("Input data %1 is not a file.", path));
+        } else if (!file.isReadable()) {
+            showError(i18n("Input data %1 is not readable.", path));
+        } else {
+            return true;
+        }
+        return false;
+    };
+
+    auto validateInput = [this, validateInputFile] () {
+        m_ui->messages->hide();
+        m_ui->buttonBox->setEnabled(
+            validateInputFile(m_ui->openFile->url().toLocalFile(), false)
+            && validateInputFile(m_ui->compareTo->url().toLocalFile(), true)
+        );
+    };
+
+    connect(m_ui->openFile, &KUrlRequester::textChanged,
+            this, validateInput);
+    connect(m_ui->compareTo, &KUrlRequester::textChanged,
+            this, validateInput);
+    connect(m_ui->buttonBox, &QDialogButtonBox::accepted,
+            this, [this] () {
+                const auto path = m_ui->openFile->url().toLocalFile();
+                Q_ASSERT(!path.isEmpty());
+                const auto base = m_ui->compareTo->url().toLocalFile();
+                loadFile(path, base);
+            });
 
     setupStacks();
 
@@ -329,12 +366,20 @@ MainWindow::~MainWindow()
     group.writeEntry(Config::Entries::State, state);
 }
 
-void MainWindow::loadFile(const QString& file)
+void MainWindow::loadFile(const QString& file, const QString& diffBase)
 {
     m_ui->loadingLabel->setText(i18n("Loading file %1, please wait...", file));
-    setWindowTitle(i18nc("%1: file name that is open", "Heaptrack - %1", file));
+    if (diffBase.isEmpty()) {
+        setWindowTitle(i18nc("%1: file name that is open", "Heaptrack - %1",
+                             QFileInfo(file).fileName()));
+        m_diffMode = false;
+    } else {
+        setWindowTitle(i18nc("%1, %2: file names that are open", "Heaptrack - %1 compared to %2",
+                             QFileInfo(file).fileName(), QFileInfo(diffBase).fileName()));
+        m_diffMode = true;
+    }
     m_ui->pages->setCurrentWidget(m_ui->loadingPage);
-    m_parser->parse(file);
+    m_parser->parse(file, diffBase);
 }
 
 void MainWindow::openFile()
@@ -343,8 +388,16 @@ void MainWindow::openFile()
     dialog->setAttribute(Qt::WA_DeleteOnClose, true);
     dialog->setFileMode(QFileDialog::ExistingFile);
     connect(dialog, &QFileDialog::fileSelected,
-            this, &MainWindow::loadFile);
+            this, [this] (const QString& file) {
+                loadFile(file);
+            });
     dialog->show();
+}
+
+void MainWindow::showError(const QString &message)
+{
+    m_ui->messages->setText(message);
+    m_ui->messages->show();
 }
 
 void MainWindow::setupStacks()
