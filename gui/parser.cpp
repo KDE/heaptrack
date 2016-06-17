@@ -351,6 +351,16 @@ QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
     }
     // now set the parents, the data is constant from here on
     setParents(topRows, nullptr);
+
+    if (data.stringCache.diffMode) {
+        // remove rows without cost
+        callerCalleeRows.erase(remove_if(callerCalleeRows.begin(), callerCalleeRows.end(),
+            [] (const CallerCalleeData& data) -> bool {
+                return data.inclusiveCost == AllocationData()
+                    && data.selfCost == AllocationData();
+            }), callerCalleeRows.end());
+    }
+
     return qMakePair(topRows, callerCalleeRows);
 }
 

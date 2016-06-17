@@ -594,8 +594,7 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     //         of 0, but different "tails" of different origin with non-zero cost
     allocations.erase(remove_if(allocations.begin(), allocations.end(),
         [] (const Allocation& allocation) -> bool {
-            return !allocation.allocated && !allocation.allocations && !allocation.leaked
-                && !allocation.peak && !allocation.temporary;
+            return allocation == AllocationData();
         }), allocations.end());
 }
 

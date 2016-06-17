@@ -36,6 +36,15 @@ struct AllocationData
     int64_t peak = 0;
 };
 
+inline bool operator==(const AllocationData& lhs, const AllocationData& rhs)
+{
+    return lhs.allocations == rhs.allocations
+        && lhs.temporary == rhs.temporary
+        && lhs.allocated == rhs.allocated
+        && lhs.leaked == rhs.leaked
+        && lhs.peak == rhs.peak;
+}
+
 inline AllocationData& operator+=(AllocationData& lhs, const AllocationData& rhs)
 {
     lhs.allocations += rhs.allocations;
