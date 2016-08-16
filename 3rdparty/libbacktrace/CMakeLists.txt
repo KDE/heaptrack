@@ -160,7 +160,7 @@ include (CheckIncludeFile)
 find_path(DWARF_INCLUDE_DIR dwarf.h
       PATH_SUFFIXES libdwarf)
 if (NOT DWARF_INCLUDE_DIR)
-    message(FATAL_ERROR "Could not find dwarf.h, try installing the elfutils development package.")
+    message(FATAL_ERROR "Could not find dwarf.h, try installing the dwarf or elfutils development package.")
 endif ()
 include_directories(${DWARF_INCLUDE_DIR})
 
