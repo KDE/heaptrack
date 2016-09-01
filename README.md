@@ -5,7 +5,7 @@ Dedicated analysis tools then allow you to interpret the heap memory profile to:
 
 - find hotspots that need to be optimized to reduce the **memory footprint** of your application
 - find **memory leaks**, i.e. locations that allocate memory which is never deallocated
-- find **allocation hotspots**, i.e. code locations that trigger a lot of memory allocation calls 
+- find **allocation hotspots**, i.e. code locations that trigger a lot of memory allocation calls
 - find **temporary allocations**, which are allocations that are directly followed by their deallocation
 
 ## Using heaptrack
@@ -13,19 +13,19 @@ Dedicated analysis tools then allow you to interpret the heap memory profile to:
 The recommended way is to launch your application and start tracing from the beginning:
 
     heaptrack <your application and its parameters>
-    
+
     heaptrack output will be written to "/tmp/heaptrack.APP.PID.gz"
     starting application, this might take some time...
-    
+
     ...
-    
+
     heaptrack stats:
         allocations:            65
         leaked allocations:     60
         temporary allocations:  1
-    
+
     Heaptrack finished! Now run the following to investigate the data:
-    
+
         heaptrack_gui "/tmp/heaptrack.APP.PID.gz"
 
 Alternatively, you can attach to an already running process:
@@ -35,11 +35,11 @@ Alternatively, you can attach to an already running process:
     heaptrack output will be written to "/tmp/heaptrack.APP.PID.gz"
     injecting heaptrack into application via GDB, this might take some time...
     injection finished
-    
+
     ...
-    
+
     Heaptrack finished! Now run the following to investigate the data:
-    
+
         heaptrack_gui "/tmp/heaptrack.APP.PID.gz"
 
 ## Interpreting the heap profile
