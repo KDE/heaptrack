@@ -13,6 +13,9 @@ set(HEAPTRACK_VERSION_PATCH 0)
 set(HEAPTRACK_LIB_VERSION 1.0.0)
 set(HEAPTRACK_LIB_SOVERSION 1)
 
+# would be nice for this to pick up a value from the environment optionally
+set(LIBUNWIND_ROOT "" CACHE PATH "Directory under which to search for modern libunwind and headers.")
+
 find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options)
 find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)

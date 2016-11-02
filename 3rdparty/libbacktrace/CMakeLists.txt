@@ -151,7 +151,8 @@ check_function_exists (strnlen HAVE_DECL_STRNLEN)
 
 check_function_exists (getexecname HAVE_GETEXECNAME)
 
-find_library(LIBUNWIND_LIBRARY NAMES unwind libunwind REQUIRE)
+message("I see LIBUNWIND_ROOT as ${LIBUNWIND_ROOT} and FIND_LIBRARY_USE_LIB64_PATHS as ${FIND_LIBRARY_USE_LIB64_PATHS}")
+find_library(LIBUNWIND_LIBRARY NAMES unwind libunwind HINTS ${LIBUNWIND_ROOT} REQUIRE)
 
 include (CheckLibraryExists)
 check_library_exists (${LIBUNWIND_LIBRARY} unw_backtrace_skip "" HAVE_UNW_BACKTRACE_SKIP)
