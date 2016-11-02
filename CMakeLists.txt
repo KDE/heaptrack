@@ -81,8 +81,6 @@ if (NOT HAVE_LINUX_HEADERS)
     message(FATAL_ERROR "You are missing some Linux headers required to compile heaptrack.")
 endif()
 
-add_subdirectory(tests)
-
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${Boost_INCLUDE_DIRS}
@@ -90,6 +88,8 @@ include_directories(
     ${LIBUNWIND_INCLUDE_DIR}
     ${ZLIB_INCLUDE_DIRS}
 )
+
+add_subdirectory(tests)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(HEAPTRACK_DEBUG_BUILD 1)
