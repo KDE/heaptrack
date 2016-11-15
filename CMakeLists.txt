@@ -97,10 +97,10 @@ endif()
 configure_file(config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 add_library(heaptrack_preload MODULE heaptrack_preload.cpp libheaptrack.cpp)
-target_link_libraries(heaptrack_preload LINK_PRIVATE ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} backtrace rt)
+target_link_libraries(heaptrack_preload LINK_PRIVATE ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} ${LIBUNWIND_LIBRARY} rt)
 set_target_properties(heaptrack_preload PROPERTIES VERSION ${HEAPTRACK_LIB_VERSION} SOVERSION ${HEAPTRACK_LIB_SOVERSION})
 add_library(heaptrack_inject MODULE heaptrack_inject.cpp libheaptrack.cpp)
-target_link_libraries(heaptrack_inject LINK_PRIVATE ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} backtrace rt)
+target_link_libraries(heaptrack_inject LINK_PRIVATE ${CMAKE_DL_LIBS} ${CMAKE_THREAD_LIBS_INIT} ${LIBUNWIND_LIBRARY} rt)
 set_target_properties(heaptrack_inject PROPERTIES VERSION ${HEAPTRACK_LIB_VERSION} SOVERSION ${HEAPTRACK_LIB_SOVERSION})
 
 add_executable(heaptrack_interpret heaptrack_interpret.cpp)
