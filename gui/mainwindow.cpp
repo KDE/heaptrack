@@ -36,11 +36,18 @@
 #include "topproxy.h"
 #include "costdelegate.h"
 #include "parser.h"
-#include "chartmodel.h"
-#include "chartproxy.h"
-#include "histogrammodel.h"
 #include "stacksmodel.h"
 #include "callercalleemodel.h"
+
+#include "gui_config.h"
+
+#if KChart_FOUND
+#include "chartwidget.h"
+#include "chartmodel.h"
+#include "chartproxy.h"
+#include "histogramwidget.h"
+#include "histogrammodel.h"
+#endif
 
 using namespace std;
 
@@ -67,6 +74,24 @@ void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type)
     view->sortByColumn(0);
     view->header()->setStretchLastSection(true);
 }
+
+#if KChart_FOUND
+void addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel::Type type,
+                 const Parser* parser, void (Parser::*dataReady)(const ChartData&))
+{
+    auto tab = new ChartWidget(tabWidget->parentWidget());
+    tabWidget->addTab(tab, title);
+    tabWidget->setTabEnabled(tabWidget->indexOf(tab), false);
+    auto model = new ChartModel(type, tab);
+    tab->setModel(model);
+    QObject::connect(parser, dataReady,
+        tab, [=] (const ChartData& data) {
+            model->resetData(data);
+            tabWidget->setTabEnabled(tabWidget->indexOf(tab), true);
+        });
+}
+#endif
+
 }
 
 MainWindow::MainWindow(QWidget* parent)
@@ -90,26 +115,7 @@ MainWindow::MainWindow(QWidget* parent)
     auto topDownModel = new TreeModel(this);
     auto callerCalleeModel = new CallerCalleeModel(this);
 
-    auto consumedModel = new ChartModel(ChartModel::Consumed, this);
-    m_ui->consumedTab->setModel(consumedModel);
-    m_ui->consumedGraph->setModel(consumedModel, true);
-    auto allocationsModel = new ChartModel(ChartModel::Allocations, this);
-    m_ui->allocationsTab->setModel(allocationsModel);
-    m_ui->allocationsGraph->setModel(allocationsModel, true);
-    auto allocatedModel = new ChartModel(ChartModel::Allocated, this);
-    m_ui->allocatedTab->setModel(allocatedModel);
-    auto temporaryModel = new ChartModel(ChartModel::Temporary, this);
-    m_ui->temporaryTab->setModel(temporaryModel);
-    m_ui->temporaryGraph->setModel(temporaryModel, true);
-    auto sizeHistogramModel = new HistogramModel(this);
-    m_ui->sizesTab->setModel(sizeHistogramModel);
-
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->callerCalleeTab), false);
-    m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->consumedTab), false);
-    m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->allocationsTab), false);
-    m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->allocatedTab), false);
-    m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->temporaryTab), false);
-    m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->sizesTab), false);
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->topDownTab), false);
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->flameGraphTab), false);
 
@@ -137,37 +143,6 @@ MainWindow::MainWindow(QWidget* parent)
                     m_ui->flameGraphTab->setTopDownData(data);
                 }
                 m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->flameGraphTab), !m_diffMode);
-            });
-    connect(m_parser, &Parser::consumedChartDataAvailable,
-            this, [=] (const ChartData& data) {
-                consumedModel->resetData(data);
-                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->consumedTab), true);
-                m_ui->graphDock->setVisible(true);
-                m_ui->consumedGraph->setVisible(true);
-            });
-    connect(m_parser, &Parser::allocatedChartDataAvailable,
-            this, [=] (const ChartData& data) {
-                allocatedModel->resetData(data);
-                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->allocatedTab), true);
-            });
-    connect(m_parser, &Parser::allocationsChartDataAvailable,
-            this, [=] (const ChartData& data) {
-                allocationsModel->resetData(data);
-                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->allocationsTab), true);
-                m_ui->graphDock->setVisible(true);
-                m_ui->allocationsGraph->setVisible(true);
-            });
-    connect(m_parser, &Parser::temporaryChartDataAvailable,
-            this, [=] (const ChartData& data) {
-                temporaryModel->resetData(data);
-                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->temporaryTab), true);
-                m_ui->graphDock->setVisible(true);
-                m_ui->temporaryGraph->setVisible(true);
-            });
-    connect(m_parser, &Parser::sizeHistogramDataAvailable,
-            this, [=] (const HistogramData& data) {
-                sizeHistogramModel->resetData(data);
-                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->sizesTab), true);
             });
     connect(m_parser, &Parser::summaryAvailable,
             this, [=] (const SummaryData& data) {
@@ -229,6 +204,29 @@ MainWindow::MainWindow(QWidget* parent)
         showError(i18n("Failed to parse file %1.", failedFile));
     });
     m_ui->messages->hide();
+
+#if KChart_FOUND
+    addChartTab(m_ui->tabWidget, tr("Consumed"), ChartModel::Consumed,
+                m_parser, &Parser::consumedChartDataAvailable);
+    addChartTab(m_ui->tabWidget, tr("Allocations"), ChartModel::Allocations,
+                m_parser, &Parser::allocationsChartDataAvailable);
+    addChartTab(m_ui->tabWidget, tr("Temporary Allocations"), ChartModel::Temporary,
+                m_parser, &Parser::temporaryChartDataAvailable);
+    addChartTab(m_ui->tabWidget, tr("Allocated"), ChartModel::Allocated,
+                m_parser, &Parser::allocatedChartDataAvailable);
+
+    auto sizesTab = new HistogramWidget(this);
+    m_ui->tabWidget->addTab(sizesTab, tr("Sizes"));
+    m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(sizesTab), false);
+    auto sizeHistogramModel = new HistogramModel(this);
+    sizesTab->setModel(sizeHistogramModel);
+
+    connect(m_parser, &Parser::sizeHistogramDataAvailable,
+            this, [=] (const HistogramData& data) {
+                sizeHistogramModel->resetData(data);
+                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(sizesTab), true);
+            });
+#endif
 
     auto bottomUpProxy = new TreeProxy(TreeModel::FunctionColumn,
                                        TreeModel::FileColumn,
@@ -447,8 +445,4 @@ void MainWindow::setupStacks()
             this, [tabChanged] () { tabChanged(0); });
 
     m_ui->stacksDock->setVisible(false);
-    m_ui->graphDock->setVisible(false);
-    m_ui->consumedGraph->setVisible(false);
-    m_ui->allocationsGraph->setVisible(false);
-    m_ui->temporaryGraph->setVisible(false);
 }

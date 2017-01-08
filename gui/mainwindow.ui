@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
+    <width>1332</width>
     <height>896</height>
    </rect>
   </property>
@@ -649,31 +649,6 @@
             </item>
            </layout>
           </widget>
-          <widget class="ChartWidget" name="consumedTab">
-           <attribute name="title">
-            <string>Consumed</string>
-           </attribute>
-          </widget>
-          <widget class="ChartWidget" name="allocationsTab">
-           <attribute name="title">
-            <string>Allocations</string>
-           </attribute>
-          </widget>
-          <widget class="ChartWidget" name="temporaryTab">
-           <attribute name="title">
-            <string>Temporary Allocations</string>
-           </attribute>
-          </widget>
-          <widget class="ChartWidget" name="allocatedTab">
-           <attribute name="title">
-            <string>Allocated</string>
-           </attribute>
-          </widget>
-          <widget class="HistogramWidget" name="sizesTab">
-           <attribute name="title">
-            <string>Sizes</string>
-           </attribute>
-          </widget>
           <widget class="FlameGraph" name="flameGraphTab">
            <attribute name="title">
             <string>Flame Graph</string>
@@ -740,33 +715,6 @@
     </layout>
    </widget>
   </widget>
-  <widget class="QDockWidget" name="graphDock">
-   <property name="toolTip">
-    <string>Shows the heap memory consumption over time.</string>
-   </property>
-   <property name="features">
-    <set>QDockWidget::AllDockWidgetFeatures</set>
-   </property>
-   <property name="windowTitle">
-    <string>&amp;Graphs</string>
-   </property>
-   <attribute name="dockWidgetArea">
-    <number>8</number>
-   </attribute>
-   <widget class="QWidget" name="graphs">
-    <layout class="QVBoxLayout" name="verticalLayout_14">
-     <item>
-      <widget class="ChartWidget" name="consumedGraph" native="true"/>
-     </item>
-     <item>
-      <widget class="ChartWidget" name="allocationsGraph" native="true"/>
-     </item>
-     <item>
-      <widget class="ChartWidget" name="temporaryGraph" native="true"/>
-     </item>
-    </layout>
-   </widget>
-  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -780,21 +728,9 @@
    <header>kurlrequester.h</header>
   </customwidget>
   <customwidget>
-   <class>ChartWidget</class>
-   <extends>QWidget</extends>
-   <header>chartwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>FlameGraph</class>
    <extends>QWidget</extends>
    <header>flamegraph.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>HistogramWidget</class>
-   <extends>QWidget</extends>
-   <header>histogramwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

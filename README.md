@@ -84,9 +84,12 @@ depends on Qt 5 and some KDE libraries:
 - extra-cmake-modules
 - Qt 5.2 or higher: Core, Widgets
 - KDE Frameworks 5: CoreAddons, I18n, ItemModels, ThreadWeaver, ConfigWidgets, KIO
-- KDiagram: KChart
 
 When any of these dependencies is missing, `heaptrack_gui` will not be build.
+Optionally, install the following dependencies to get additional features in
+the GUI:
+
+- KDiagram: KChart (for chart visualizations)
 
 ### Compiling
 
