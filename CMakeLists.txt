@@ -10,8 +10,12 @@ endif()
 set(HEAPTRACK_VERSION_MAJOR 1)
 set(HEAPTRACK_VERSION_MINOR 2)
 set(HEAPTRACK_VERSION_PATCH 0)
+set(HEAPTRACK_VERSION ${HEAPTRACK_VERSION_MAJOR}.${HEAPTRACK_VERSION_MINOR}.${HEAPTRACK_VERSION_PATCH})
 set(HEAPTRACK_LIB_VERSION 1.0.0)
 set(HEAPTRACK_LIB_SOVERSION 1)
+
+# would be nice for this to pick up a value from the environment optionally
+set(LIBUNWIND_ROOT "" CACHE PATH "Directory under which to search for modern libunwind and headers.")
 
 find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options)
 find_package(Threads REQUIRED)
@@ -78,8 +82,6 @@ if (NOT HAVE_LINUX_HEADERS)
     message(FATAL_ERROR "You are missing some Linux headers required to compile heaptrack.")
 endif()
 
-add_subdirectory(tests)
-
 include_directories(
     ${CMAKE_CURRENT_BINARY_DIR}
     ${Boost_INCLUDE_DIRS}
@@ -87,6 +89,8 @@ include_directories(
     ${LIBUNWIND_INCLUDE_DIR}
     ${ZLIB_INCLUDE_DIRS}
 )
+
+add_subdirectory(tests)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set(HEAPTRACK_DEBUG_BUILD 1)
@@ -134,3 +138,13 @@ install(TARGETS heaptrack_preload LIBRARY DESTINATION ${LIB_INSTALL_DIR}/heaptra
 install(FILES heaptrack_api.h DESTINATION ${CMAKE_INSTALL_PREFIX}/include)
 
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
+
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "HEAPTRACK")
+set(CPACK_PACKAGE_VENDOR "HeapTrack")
+set(CPACK_PACKAGE_CONTACT "http://milianw.de/blog/heaptrack-a-heap-memory-profiler-for-linux")
+set(CPACK_PACKAGE_VERSION_MAJOR ${HEAPTRACK_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${HEAPTRACK_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_DATABASE ${HEAPTRACK_VERSION_DATABASE})
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/COPYING")
+set(CPACK_PACKAGE_VERSION "${HEAPTRACK_VERSION}")
+include(CPack)
