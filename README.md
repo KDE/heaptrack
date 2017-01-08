@@ -76,6 +76,8 @@ following libraries:
 - libunwind
 - elfutils: libdwarf
 
+For runtime-attaching, you will need `gdb` installed.
+
 ### `heaptrack_gui` dependencies
 
 The graphical user interface to interpret and analyze the data collected by heaptrack
