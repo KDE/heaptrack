@@ -1,5 +1,7 @@
 # heaptrack - a heap memory profiler for Linux
 
+![heaptrack_gui summary page](screenshots/gui_summary.png?raw=true "heaptrack_gui summary page")
+
 Heaptrack traces all memory allocations and annotates these events with stack traces.
 Dedicated analysis tools then allow you to interpret the heap memory profile to:
 
@@ -110,6 +112,10 @@ Heaptrack generates data files that are impossible to analyze for a human. Inste
 to use either `heaptrack_print` or `heaptrack_gui` to interpret the results.
 
 ### heaptrack_gui
+
+![heaptrack_gui flamegraph page](screenshots/gui_flamegraph.png?raw=true "heaptrack_gui flamegraph page")
+
+![heaptrack_gui allocations chart page](screenshots/gui_allocations_chart.png?raw=true "heaptrack_gui allocations chart page")
 
 The highly recommended way to analyze a heap prfile is by using the `heaptrack_gui` tool.
 It depends on Qt 5 and KF 5 to graphically visualize the recorded data. It features:
