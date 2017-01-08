@@ -42,6 +42,63 @@ Alternatively, you can attach to an already running process:
     
         heaptrack_gui "/tmp/heaptrack.APP.PID.gz"
 
+## Building heaptrack
+
+Heaptrack is split into two parts: The data collector, i.e. `heaptrack` itself, and the
+analyzer GUI called `heaptrack_gui`. The following summarizes the dependencies for these
+two parts as they can be build independently. You will find corresponding development
+packages on all major distributions for these dependencies.
+
+On an embedded device or older Linux distribution, you will only want to build `heaptrack`.
+The data can then be analyzed on a different machine with a more modern Linux distribution
+that has access to the required GUI dependencies.
+
+If you need help with building, deploying or using heaptrack, you can contact KDAB for
+commercial support: https://www.kdab.com/software-services/workshops/profiling-workshops/
+
+### Shared dependencies
+
+Both parts require the following tools and libraries:
+
+- cmake 2.8.9 or higher
+- a C\+\+11 enabled compiler like g\+\+ or clang\+\+
+- zlib
+- libdl
+- pthread
+- libc
+
+### `heaptrack` dependencies
+
+The heaptrack data collector and the simplistic `heaptrack_print` analyzer depend on the
+following libraries:
+
+- boost 1.41 or higher: iostream, program_options
+- libunwind
+- elfutils: libdwarf
+
+### `heaptrack_gui` dependencies
+
+The graphical user interface to interpret and analyze the data collected by heaptrack
+depends on Qt 5 and some KDE libraries:
+
+- extra-cmake-modules
+- Qt 5.2 or higher: Core, Widgets
+- KDE Frameworks 5: CoreAddons, I18n, ItemModels, ThreadWeaver, ConfigWidgets, KIO
+- KDiagram: KChart
+
+When any of these dependencies is missing, `heaptrack_gui` will not be build.
+
+### Compiling
+
+Run the following commands to compile heaptrack. Do pay attention to the output
+of the CMake command, as it will tell you about missing dependencies!
+
+    cd heaptrack # i.e. the source folder
+    mkdir build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=Release .. # look for messages about missing dependencies!
+    make -j$(nproc)
+
 ## Interpreting the heap profile
 
 Heaptrack generates data files that are impossible to analyze for a human. Instead, you need
