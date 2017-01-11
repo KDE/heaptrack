@@ -24,7 +24,7 @@
 
 #include <QDebug>
 
-#include "../accumulatedtracedata.h"
+#include "analyze/accumulatedtracedata.h"
 
 #include <vector>
 #include <tuple>

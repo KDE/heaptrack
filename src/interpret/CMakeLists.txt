@@ -1,0 +1,17 @@
+include_directories(
+    ${Boost_INCLUDE_DIRS}
+    ${PROJECT_SOURCE_DIR}/3rdparty/
+    ${ZLIB_INCLUDE_DIRS}
+)
+
+add_executable(heaptrack_interpret
+    heaptrack_interpret.cpp
+)
+
+target_link_libraries(heaptrack_interpret
+    backtrace
+)
+
+install(TARGETS heaptrack_interpret
+    RUNTIME DESTINATION ${LIBEXEC_INSTALL_DIR}
+)

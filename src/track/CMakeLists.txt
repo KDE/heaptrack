@@ -1,0 +1,60 @@
+include_directories(
+    ${Boost_INCLUDE_DIRS}
+    ${LIBUNWIND_INCLUDE_DIR}
+)
+
+# heaptrack: bash script to inject/preload
+configure_file(heaptrack.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/heaptrack @ONLY)
+
+install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/heaptrack
+    DESTINATION ${BIN_INSTALL_DIR}
+)
+
+# heaptrack_preload: track a newly started process
+add_library(heaptrack_preload MODULE
+    heaptrack_preload.cpp
+    libheaptrack.cpp
+)
+
+target_link_libraries(heaptrack_preload LINK_PRIVATE
+    ${CMAKE_DL_LIBS}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${LIBUNWIND_LIBRARY}
+    rt
+)
+
+set_target_properties(heaptrack_preload PROPERTIES
+    VERSION ${HEAPTRACK_LIB_VERSION}
+    SOVERSION ${HEAPTRACK_LIB_SOVERSION}
+)
+
+install(TARGETS heaptrack_preload
+    LIBRARY DESTINATION ${LIB_INSTALL_DIR}/heaptrack/
+)
+
+# heaptrack_inject: track an already running process
+add_library(heaptrack_inject MODULE
+    heaptrack_inject.cpp
+    libheaptrack.cpp
+)
+
+target_link_libraries(heaptrack_inject LINK_PRIVATE
+    ${CMAKE_DL_LIBS}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${LIBUNWIND_LIBRARY}
+    rt
+)
+
+set_target_properties(heaptrack_inject PROPERTIES
+    VERSION ${HEAPTRACK_LIB_VERSION}
+    SOVERSION ${HEAPTRACK_LIB_SOVERSION}
+)
+
+install(TARGETS heaptrack_inject
+    LIBRARY DESTINATION ${LIB_INSTALL_DIR}/heaptrack/
+)
+
+# public API for custom pool allocators or static binaries
+install(FILES heaptrack_api.h
+    DESTINATION ${CMAKE_INSTALL_PREFIX}/include
+)

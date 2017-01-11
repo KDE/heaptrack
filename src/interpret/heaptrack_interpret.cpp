@@ -38,8 +38,8 @@
 
 #include "libbacktrace/backtrace.h"
 #include "libbacktrace/internal.h"
-#include "linereader.h"
-#include "pointermap.h"
+#include "util/linereader.h"
+#include "util/pointermap.h"
 
 using namespace std;
 

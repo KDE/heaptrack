@@ -2,7 +2,7 @@ set(CMAKE_BUILD_TYPE Debug)
 
 include_directories(
     ${LIBUNWIND_INCLUDE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/../..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../
 )
 add_definitions(-DCATCH_CONFIG_MAIN)
 add_executable(tst_trace tst_trace.cpp)

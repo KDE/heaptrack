@@ -41,7 +41,7 @@
 #include <boost/algorithm/string/replace.hpp>
 
 #include "tracetree.h"
-#include "config.h"
+#include "util/config.h"
 
 /**
  * uncomment this to get extended debug code for known pointers

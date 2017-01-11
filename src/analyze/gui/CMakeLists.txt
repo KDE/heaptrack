@@ -4,6 +4,10 @@ ki18n_wrap_ui(UIFILES
     mainwindow.ui
 )
 
+unset(BIN_INSTALL_DIR)
+unset(LIB_INSTALL_DIR)
+unset(LIBEXEC_INSTALL_DIR)
+
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)

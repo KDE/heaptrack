@@ -20,7 +20,7 @@
 #include <unordered_map>
 
 #include "bench_pointers.h"
-#include "indices.h"
+#include "src/util/indices.h"
 
 struct PointerHashMap
 {

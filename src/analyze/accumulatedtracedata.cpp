@@ -28,9 +28,9 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
-#include "linereader.h"
-#include "config.h"
-#include "pointermap.h"
+#include "util/linereader.h"
+#include "util/config.h"
+#include "util/pointermap.h"
 
 #ifdef __GNUC__
 #define POTENTIALLY_UNUSED __attribute__ ((unused))

@@ -25,13 +25,13 @@
 
 #include <boost/program_options.hpp>
 
-#include "accumulatedtracedata.h"
+#include "analyze/accumulatedtracedata.h"
 
 #include <iostream>
 #include <iomanip>
 #include <future>
 
-#include "config.h"
+#include "util/config.h"
 
 using namespace std;
 namespace po = boost::program_options;

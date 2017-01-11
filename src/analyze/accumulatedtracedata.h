@@ -30,7 +30,7 @@
 #include <map>
 #include <boost/functional/hash.hpp>
 
-#include "indices.h"
+#include "util/indices.h"
 #include "allocationdata.h"
 
 struct InstructionPointer

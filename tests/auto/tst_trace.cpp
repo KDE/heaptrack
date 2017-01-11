@@ -17,7 +17,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "trace.h"
+#include "src/track/trace.h"
 #include "3rdparty/catch.hpp"
 
 #include <algorithm>

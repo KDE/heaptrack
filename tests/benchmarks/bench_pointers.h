@@ -27,7 +27,7 @@
 
 #include <malloc.h>
 
-#include "indices.h"
+#include "src/util/indices.h"
 
 template<typename Map>
 void benchPointers()
