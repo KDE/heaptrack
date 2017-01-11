@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Milian Wolff <mail@milianw.de>
+ * Copyright 2016-2017 Milian Wolff <mail@milianw.de>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Library General Public License as
