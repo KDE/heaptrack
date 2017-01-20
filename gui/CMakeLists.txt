@@ -11,25 +11,46 @@ include(ECMAddTests)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(heaptrack_gui
+configure_file(gui_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/gui_config.h)
+
+set(SRCFILES
     gui.cpp
     mainwindow.cpp
     treemodel.cpp
     treeproxy.cpp
     costdelegate.cpp
-    chartwidget.cpp
-    chartmodel.cpp
-    chartproxy.cpp
-    histogramwidget.cpp
-    histogrammodel.cpp
     modeltest.cpp
     parser.cpp
     flamegraph.cpp
     stacksmodel.cpp
     topproxy.cpp
     callercalleemodel.cpp
-    ${UIFILES}
 )
+
+set(LIBRARIES
+    Qt5::Widgets
+    KF5::ItemModels
+    KF5::ThreadWeaver
+    KF5::ConfigWidgets
+    KF5::I18n
+    KF5::KIOWidgets
+    sharedprint
+    ${CMAKE_THREAD_LIBS_INIT}
+)
+
+
+if (KChart_FOUND)
+    list(APPEND SRCFILES
+        chartwidget.cpp
+        chartmodel.cpp
+        chartproxy.cpp
+        histogramwidget.cpp
+        histogrammodel.cpp
+    )
+    list(APPEND LIBRARIES
+        KChart
+    )
+endif()
 
 add_definitions(-Wall
     -DQT_NO_URL_CAST_FROM_STRING
@@ -38,15 +59,13 @@ add_definitions(-Wall
     -DQT_USE_QSTRINGBUILDER
 )
 
+add_executable(heaptrack_gui
+    ${SRCFILES}
+    ${UIFILES}
+)
+
 target_link_libraries(heaptrack_gui
-    Qt5::Widgets
-    KF5::ItemModels
-    KF5::ThreadWeaver
-    KF5::ConfigWidgets
-    KF5::I18n
-    KF5::KIOWidgets
-    KChart
-    sharedprint
-    ${CMAKE_THREAD_LIBS_INIT})
+    ${LIBRARIES}
+)
 
 install(TARGETS heaptrack_gui ${INSTALL_TARGETS_DEFAULT_ARGS})

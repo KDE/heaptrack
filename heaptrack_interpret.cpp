@@ -199,7 +199,7 @@ struct AccumulatedTraceData
         return data;
     }
 
-    size_t intern(const string& str)
+    size_t intern(const string& str, const char** internedString = nullptr)
     {
         if (str.empty()) {
             return 0;
@@ -207,10 +207,16 @@ struct AccumulatedTraceData
 
         auto it = m_internedData.find(str);
         if (it != m_internedData.end()) {
+            if (internedString) {
+                *internedString = it->first.c_str();
+            }
             return it->second;
         }
         const size_t id = m_internedData.size() + 1;
-        m_internedData.insert(it, make_pair(str, id));
+        it = m_internedData.insert(it, make_pair(str, id));
+        if (internedString) {
+            *internedString = it->first.c_str();
+        }
         fprintf(stdout, "s %s\n", str.c_str());
         return id;
     }
@@ -259,7 +265,7 @@ struct AccumulatedTraceData
      * Prevent the same file from being initialized multiple times.
      * This drastically cuts the memory consumption down
      */
-    backtrace_state* findBacktraceState(const string& fileName, uintptr_t addressStart)
+    backtrace_state* findBacktraceState(const char* fileName, uintptr_t addressStart)
     {
         if (boost::algorithm::starts_with(fileName, "linux-vdso.so")) {
             // prevent warning, since this will always fail
@@ -272,21 +278,21 @@ struct AccumulatedTraceData
         }
 
         struct CallbackData {
-            const string* fileName;
+            const char* fileName;
         };
-        CallbackData data = {&fileName};
+        CallbackData data = {fileName};
 
         auto errorHandler = [] (void *rawData, const char *msg, int errnum) {
             auto data = reinterpret_cast<const CallbackData*>(rawData);
-            cerr << "Failed to create backtrace state for module " << *data->fileName << ": "
+            cerr << "Failed to create backtrace state for module " << data->fileName << ": "
                  << msg << " / " << strerror(errnum) << " (error code " << errnum << ")" << endl;
         };
 
-        auto state = backtrace_create_state(fileName.c_str(), /* we are single threaded, so: not thread safe */ false,
+        auto state = backtrace_create_state(fileName, /* we are single threaded, so: not thread safe */ false,
                                             errorHandler, &data);
 
         if (state) {
-            const int descriptor = backtrace_open(fileName.c_str(), errorHandler, &data, nullptr);
+            const int descriptor = backtrace_open(fileName, errorHandler, &data, nullptr);
             if (descriptor >= 1) {
                 int foundSym = 0;
                 int foundDwarf = 0;
@@ -305,7 +311,7 @@ struct AccumulatedTraceData
 
 private:
     vector<Module> m_modules;
-    unordered_map<string, backtrace_state*> m_backtraceStates;
+    unordered_map<const char*, backtrace_state*> m_backtraceStates;
     bool m_modulesDirty = false;
 
     unordered_map<string, size_t> m_internedData;
@@ -347,13 +353,14 @@ int main(int /*argc*/, char** /*argv*/)
                 if (fileName == "x") {
                     fileName = exe;
                 }
-                const auto moduleIndex = data.intern(fileName);
+                const char *internedString = nullptr;
+                const auto moduleIndex = data.intern(fileName, &internedString);
                 uintptr_t addressStart = 0;
                 if (!(reader >> addressStart)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     return 1;
                 }
-                auto state = data.findBacktraceState(fileName, addressStart);
+                auto state = data.findBacktraceState(internedString, addressStart);
                 uintptr_t vAddr = 0;
                 uintptr_t memSize = 0;
                 while ((reader >> vAddr) && (reader >> memSize)) {

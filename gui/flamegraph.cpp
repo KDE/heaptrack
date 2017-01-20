@@ -163,6 +163,10 @@ QString FrameGraphicsItem::description() const
     }
     const auto fraction = QString::number(double(m_cost)  * 100. / totalCost, 'g', 3);
     const auto function = QString(QLatin1String("<span style='font-family:monospace'>") + m_function.toHtmlEscaped() + QLatin1String("</span>"));
+    if (!parentItem()) {
+        return function;
+    }
+
     switch (m_costType) {
     case Allocations:
         tooltip = i18nc("%1: number of allocations, %2: relative number, %3: function label",

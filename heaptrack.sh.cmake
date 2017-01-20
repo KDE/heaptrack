@@ -173,8 +173,8 @@ else
   else
     echo "injecting heaptrack into application via GDB, this might take some time..."
     gdb --batch-silent -n -iex="set auto-solib-add off" -p $pid \
-        --eval-command="sharedlibrary libdl" \
-        --eval-command="call (void) dlmopen(0x00, \"$LIBHEAPTRACK_INJECT\", 0x002)" \
+        --eval-command="sharedlibrary libc.so" \
+        --eval-command="call (void) __libc_dlopen_mode(\"$LIBHEAPTRACK_INJECT\", 0x80000000 | 0x002)" \
         --eval-command="sharedlibrary libheaptrack_inject" \
         --eval-command="call (void) heaptrack_inject(\"$pipe\")" \
         --eval-command="detach"
