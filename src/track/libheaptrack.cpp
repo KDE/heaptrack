@@ -37,6 +37,7 @@
 #include <unordered_set>
 #include <mutex>
 #include <thread>
+#include <cinttypes>
 
 #include <boost/algorithm/string/replace.hpp>
 

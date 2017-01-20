@@ -30,7 +30,7 @@
 #include <tuple>
 #include <algorithm>
 #include <stdio_ext.h>
-#include <inttypes.h>
+#include <cinttypes>
 
 #include <cxxabi.h>
 
