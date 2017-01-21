@@ -282,6 +282,7 @@ MainWindow::MainWindow(QWidget* parent)
     callerCalleeProxy->setSourceModel(callerCalleeModel);
     callerCalleeProxy->setSortRole(CallerCalleeModel::SortRole);
     m_ui->callerCalleeResults->setModel(callerCalleeProxy);
+    m_ui->callerCalleeResults->sortByColumn(CallerCalleeModel::InclusivePeakColumn);
     m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfPeakColumn, costDelegate);
     m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfAllocatedColumn, costDelegate);
     m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfLeakedColumn, costDelegate);

@@ -48,21 +48,21 @@ public:
     ~CallerCalleeModel();
 
     enum Columns {
-        InclusiveAllocationsColumn,
-        InclusiveTemporaryColumn,
-        InclusivePeakColumn,
-        InclusiveLeakedColumn,
-        InclusiveAllocatedColumn,
-        SelfAllocationsColumn,
-        SelfTemporaryColumn,
-        SelfPeakColumn,
-        SelfLeakedColumn,
-        SelfAllocatedColumn,
+        LocationColumn,
         FunctionColumn,
         FileColumn,
         LineColumn,
         ModuleColumn,
-        LocationColumn,
+        InclusivePeakColumn,
+        InclusiveLeakedColumn,
+        InclusiveAllocationsColumn,
+        InclusiveTemporaryColumn,
+        InclusiveAllocatedColumn,
+        SelfPeakColumn,
+        SelfLeakedColumn,
+        SelfAllocationsColumn,
+        SelfTemporaryColumn,
+        SelfAllocatedColumn,
         NUM_COLUMNS
     };
 
