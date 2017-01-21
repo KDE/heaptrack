@@ -257,9 +257,12 @@ FrameGraphicsItem* findItemByFunction(const QList<QGraphicsItem*>& items, const 
  * Convert the top-down graph into a tree of FrameGraphicsItem.
  */
 void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent, int64_t AllocationData::* member,
-                     const double costThreshold)
+                     const double costThreshold, bool collapseRecursion)
 {
     foreach (const auto& row, data) {
+        if (collapseRecursion && row.location->function == parent->function()) {
+            continue;
+        }
         auto item = findItemByFunction(parent->childItems(), row.location->function);
         if (!item) {
             item = new FrameGraphicsItem(row.cost.*member, row.location->function, parent);
@@ -269,7 +272,8 @@ void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem *parent, in
             item->setCost(item->cost() + row.cost.*member);
         }
         if (item->cost() > costThreshold) {
-            toGraphicsItems(row.children, item, member, costThreshold);
+            toGraphicsItems(row.children, item, member,
+                            costThreshold, collapseRecursion);
         }
     }
 }
@@ -291,7 +295,8 @@ int64_t AllocationData::* memberForType(CostType type)
     Q_UNREACHABLE();
 }
 
-FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type, double costThreshold)
+FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type,
+                             double costThreshold, bool collapseRecursion)
 {
     auto member = memberForType(type);
 
@@ -325,7 +330,8 @@ FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type,
     auto rootItem = new FrameGraphicsItem(totalCost, type, label);
     rootItem->setBrush(scheme.background());
     rootItem->setPen(pen);
-    toGraphicsItems(topDownData, rootItem, member, totalCost * costThreshold / 100.);
+    toGraphicsItems(topDownData, rootItem, member,
+                    totalCost * costThreshold / 100., collapseRecursion);
     return rootItem;
 }
 
@@ -373,6 +379,15 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
         showData();
     });
 
+    auto collapseRecursionCheckbox = new QCheckBox(i18n("Collapse Recursion"), this);
+    collapseRecursionCheckbox->setChecked(m_collapseRecursion);
+    collapseRecursionCheckbox->setToolTip(i18n("Collapse stack frames for functions calling themselves. "
+                                               "When this is unchecked, recursive frames will be visualized separately."));
+    connect(collapseRecursionCheckbox, &QCheckBox::toggled, this, [this, collapseRecursionCheckbox] {
+        m_collapseRecursion = collapseRecursionCheckbox->isChecked();
+        showData();
+    });
+
     auto costThreshold = new QDoubleSpinBox(this);
     costThreshold->setDecimals(2);
     costThreshold->setMinimum(0);
@@ -398,6 +413,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     controls->setLayout(new QHBoxLayout);
     controls->layout()->addWidget(m_costSource);
     controls->layout()->addWidget(bottomUpCheckbox);
+    controls->layout()->addWidget(collapseRecursionCheckbox);
     controls->layout()->addWidget(costThreshold);
 
     setLayout(new QVBoxLayout);
@@ -482,10 +498,11 @@ void FlameGraph::showData()
 
     using namespace ThreadWeaver;
     auto data = m_showBottomUpData ? m_bottomUpData : m_topDownData;
+    bool collapseRecursion = m_collapseRecursion;
     auto source = m_costSource->currentData().value<CostType>();
     auto threshold = m_costThreshold;
-    stream() << make_job([data, source, threshold, this]() {
-        auto parsedData = parseData(data, source, threshold);
+    stream() << make_job([data, source, threshold, collapseRecursion, this]() {
+        auto parsedData = parseData(data, source, threshold, collapseRecursion);
         QMetaObject::invokeMethod(this, "setData", Qt::QueuedConnection,
                                   Q_ARG(FrameGraphicsItem*, parsedData));
     });

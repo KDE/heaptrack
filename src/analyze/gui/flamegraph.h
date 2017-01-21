@@ -68,6 +68,7 @@ private:
     int m_selectedItem = -1;
     int m_minRootWidth = 0;
     bool m_showBottomUpData = false;
+    bool m_collapseRecursion = true;
     // cost threshold in percent, items below that value will not be shown
     double m_costThreshold = 0.1;
 };
