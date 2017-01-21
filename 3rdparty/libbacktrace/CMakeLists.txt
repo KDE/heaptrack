@@ -151,11 +151,6 @@ check_function_exists (strnlen HAVE_DECL_STRNLEN)
 
 check_function_exists (getexecname HAVE_GETEXECNAME)
 
-find_library(LIBUNWIND_LIBRARY NAMES unwind libunwind REQUIRE)
-
-include (CheckLibraryExists)
-check_library_exists (${LIBUNWIND_LIBRARY} unw_backtrace_skip "" HAVE_UNW_BACKTRACE_SKIP)
-
 include (CheckIncludeFile)
 find_path(DWARF_INCLUDE_DIR dwarf.h
       PATH_SUFFIXES libdwarf)
@@ -167,8 +162,6 @@ include_directories(${DWARF_INCLUDE_DIR})
 configure_file (backtrace-supported.h.in backtrace-supported.h)
 
 configure_file (config.h.in.cmake config.h)
-
-find_path(LIBUNWIND_INCLUDE_DIR libunwind.h)
 
 include_directories (BEFORE
     ${CMAKE_CURRENT_BINARY_DIR}

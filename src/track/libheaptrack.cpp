@@ -43,6 +43,7 @@
 
 #include "tracetree.h"
 #include "util/config.h"
+#include "util/libunwind_config.h"
 
 /**
  * uncomment this to get extended debug code for known pointers
@@ -229,7 +230,7 @@ public:
             if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
                 fprintf(stderr, "WARNING: Failed to enable per-thread libunwind caching.\n");
             }
-            #if HAVE_UNW_SET_CACHE_SIZE
+            #if LIBUNWIND_HAS_UNW_SET_CACHE_SIZE
             if (unw_set_cache_size(unw_local_addr_space, 1024)) {
                 fprintf(stderr, "WARNING: Failed to set libunwind cache size.\n");
             }

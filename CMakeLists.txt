@@ -13,12 +13,13 @@ set(HEAPTRACK_VERSION_PATCH 0)
 set(HEAPTRACK_LIB_VERSION 1.0.0)
 set(HEAPTRACK_LIB_SOVERSION 1)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+find_package(Libunwind REQUIRED)
 find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options)
 find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 include(FeatureSummary)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 option(
   HEAPTRACK_BUILD_GUI
@@ -40,13 +41,6 @@ endif()
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wpedantic")
-
-check_library_exists (${LIBUNWIND_LIBRARY} unw_backtrace "" HAVE_UNW_BACKTRACE)
-if (NOT HAVE_UNW_BACKTRACE)
-    message(FATAL_ERROR "Your libunwind version is apparently too old and does not have the unw_backtrace function.")
-endif()
-
-check_library_exists (${LIBUNWIND_LIBRARY} _ULx86_64_set_cache_size "" HAVE_UNW_SET_CACHE_SIZE)
 
 include (CheckCXXSourceCompiles)
 check_cxx_source_compiles(
