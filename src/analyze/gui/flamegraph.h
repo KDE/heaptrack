@@ -42,8 +42,6 @@ public:
     void setTopDownData(const TreeData& topDownData);
     void setBottomUpData(const TreeData& bottomUpData);
 
-    void setDisplayText(const QString& text);
-
 protected:
     bool eventFilter(QObject* object, QEvent* event) override;
 
@@ -51,6 +49,8 @@ private slots:
     void setData(FrameGraphicsItem* rootItem);
 
 private:
+    void setTooltipItem(const FrameGraphicsItem* item);
+    void updateTooltip();
     void navigateBack();
     void navigateForward();
     void showData();
@@ -63,7 +63,8 @@ private:
     QGraphicsScene* m_scene;
     QGraphicsView* m_view;
     QLabel* m_displayLabel;
-    FrameGraphicsItem* m_rootItem;
+    const FrameGraphicsItem* m_tooltipItem = nullptr;
+    FrameGraphicsItem* m_rootItem = nullptr;
     QVector<FrameGraphicsItem*> m_selectionHistory;
     int m_selectedItem = -1;
     int m_minRootWidth = 0;

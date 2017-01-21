@@ -343,8 +343,6 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     , m_scene(new QGraphicsScene(this))
     , m_view(new QGraphicsView(this))
     , m_displayLabel(new QLabel)
-    , m_rootItem(nullptr)
-    , m_minRootWidth(0)
 {
     qRegisterMetaType<FrameGraphicsItem*>();
 
@@ -459,19 +457,16 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
     } else if (event->type() == QEvent::MouseMove) {
         QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
         auto item = static_cast<FrameGraphicsItem*>(m_view->itemAt(mouseEvent->pos()));
-        if (item) {
-            setDisplayText(item->description());
-        } else {
-            setDisplayText({});
-        }
+        setTooltipItem(item);
     } else if (event->type() == QEvent::Leave) {
-        setDisplayText({});
+        setTooltipItem(nullptr);
     } else if (event->type() == QEvent::Resize || event->type() == QEvent::Show) {
         if (!m_rootItem) {
             showData();
         } else {
             selectItem(m_selectionHistory.at(m_selectedItem));
         }
+        updateTooltip();
     } else if (event->type() == QEvent::Hide) {
         setData(nullptr);
     }
@@ -508,15 +503,26 @@ void FlameGraph::showData()
     });
 }
 
-void FlameGraph::setDisplayText(const QString& text)
+void FlameGraph::setTooltipItem(const FrameGraphicsItem* item)
 {
-    if (text.isEmpty() && m_selectedItem != -1 && m_selectionHistory.at(m_selectedItem)) {
-        m_displayLabel->setText(m_selectionHistory.at(m_selectedItem)->description());
+    if (!item && m_selectedItem != -1 && m_selectionHistory.at(m_selectedItem)) {
+        item = m_selectionHistory.at(m_selectedItem);
         m_view->setCursor(Qt::ArrowCursor);
     } else {
-        m_displayLabel->setText(text);
         m_view->setCursor(Qt::PointingHandCursor);
     }
+    m_tooltipItem = item;
+    updateTooltip();
+}
+
+void FlameGraph::updateTooltip()
+{
+    const auto text = m_tooltipItem ? m_tooltipItem->description() : QString();
+    m_displayLabel->setToolTip(text);
+    const auto metrics = m_displayLabel->fontMetrics();
+    // FIXME: the HTML text has tons of stuff that is not printed,
+    //        which lets the text get cut-off too soon...
+    m_displayLabel->setText(metrics.elidedText(text, Qt::ElideRight, m_displayLabel->width()));
 }
 
 void FlameGraph::setData(FrameGraphicsItem* rootItem)
@@ -572,7 +578,7 @@ void FlameGraph::selectItem(FrameGraphicsItem* item)
     // and make sure it's visible
     m_view->centerOn(item);
 
-    setDisplayText(item->description());
+    setTooltipItem(item);
 }
 
 void FlameGraph::navigateBack()
