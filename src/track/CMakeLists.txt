@@ -4,9 +4,11 @@ include_directories(
 )
 
 # heaptrack: bash script to inject/preload
-configure_file(heaptrack.sh.cmake ${CMAKE_CURRENT_BINARY_DIR}/heaptrack @ONLY)
+configure_file(heaptrack.sh.cmake
+    ${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}/heaptrack @ONLY
+)
 
-install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/heaptrack
+install(PROGRAMS ${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}/heaptrack
     DESTINATION ${BIN_INSTALL_DIR}
 )
 
@@ -26,6 +28,7 @@ target_link_libraries(heaptrack_preload LINK_PRIVATE
 set_target_properties(heaptrack_preload PROPERTIES
     VERSION ${HEAPTRACK_LIB_VERSION}
     SOVERSION ${HEAPTRACK_LIB_SOVERSION}
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${LIB_INSTALL_DIR}/heaptrack"
 )
 
 install(TARGETS heaptrack_preload
@@ -48,6 +51,7 @@ target_link_libraries(heaptrack_inject LINK_PRIVATE
 set_target_properties(heaptrack_inject PROPERTIES
     VERSION ${HEAPTRACK_LIB_VERSION}
     SOVERSION ${HEAPTRACK_LIB_SOVERSION}
+    LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${LIB_INSTALL_DIR}/heaptrack"
 )
 
 install(TARGETS heaptrack_inject

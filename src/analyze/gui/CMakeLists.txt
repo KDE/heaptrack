@@ -72,4 +72,10 @@ target_link_libraries(heaptrack_gui
     ${LIBRARIES}
 )
 
-install(TARGETS heaptrack_gui ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS heaptrack_gui
+    ${INSTALL_TARGETS_DEFAULT_ARGS}
+)
+
+set_target_properties(heaptrack_gui PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}"
+)
