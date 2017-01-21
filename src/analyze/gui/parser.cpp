@@ -317,12 +317,14 @@ QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
     for (const auto& allocation : data.allocations) {
         auto traceIndex = allocation.traceIndex;
         auto rows = &topRows;
+        // we must not count locations more than once in the caller-callee data
+        QSet<IpIndex> recursionGuard;
         while (traceIndex) {
             const auto& trace = data.findTrace(traceIndex);
             const auto& ip = data.findIp(trace.ipIndex);
             auto location = data.stringCache.location(ip);
 
-            { // aggregate caller-callee data
+            if (!recursionGuard.contains(trace.ipIndex)) { // aggregate caller-callee data
                 auto it = lower_bound(callerCalleeRows.begin(), callerCalleeRows.end(), location,
                                       [] (const CallerCalleeData& lhs, const std::shared_ptr<LocationData>& rhs) {
                     return lhs.location < rhs;
@@ -334,6 +336,7 @@ QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
                 if (traceIndex == allocation.traceIndex) {
                     it->selfCost += allocation;
                 }
+                recursionGuard.insert(trace.ipIndex);
             }
 
             auto it = lower_bound(rows->begin(), rows->end(), location);
