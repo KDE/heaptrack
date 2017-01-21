@@ -45,7 +45,7 @@ struct HistogramRow
     std::array<HistogramColumn, NUM_COLUMNS> columns;
 };
 Q_DECLARE_TYPEINFO(HistogramRow, Q_MOVABLE_TYPE);
-Q_DECLARE_METATYPE(HistogramRow);
+Q_DECLARE_METATYPE(HistogramRow)
 
 using HistogramData = QVector<HistogramRow>;
 

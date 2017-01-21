@@ -76,7 +76,7 @@ private:
     bool m_isHovered;
 };
 
-Q_DECLARE_METATYPE(FrameGraphicsItem*);
+Q_DECLARE_METATYPE(FrameGraphicsItem*)
 
 FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, CostType costType, const QString& function, FrameGraphicsItem* parent)
     : QGraphicsRectItem(parent)

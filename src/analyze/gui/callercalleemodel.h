@@ -38,7 +38,7 @@ struct CallerCalleeData
 Q_DECLARE_TYPEINFO(CallerCalleeData, Q_MOVABLE_TYPE);
 
 using CallerCalleeRows = QVector<CallerCalleeData>;
-Q_DECLARE_METATYPE(CallerCalleeRows);
+Q_DECLARE_METATYPE(CallerCalleeRows)
 
 class CallerCalleeModel : public QAbstractTableModel
 {

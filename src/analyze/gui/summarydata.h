@@ -33,6 +33,6 @@ struct SummaryData
     int64_t peakRSS;
     int64_t totalSystemMemory;
 };
-Q_DECLARE_METATYPE(SummaryData);
+Q_DECLARE_METATYPE(SummaryData)
 
 #endif // SUMMARYDATA_H
