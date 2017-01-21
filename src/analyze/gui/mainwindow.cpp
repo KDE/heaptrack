@@ -269,11 +269,11 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->topDownResults->hideColumn(TreeModel::LineColumn);
     m_ui->topDownResults->hideColumn(TreeModel::ModuleColumn);
     connect(m_ui->topDownFilterFunction, &QLineEdit::textChanged,
-            bottomUpProxy, &TreeProxy::setFunctionFilter);
+            topDownProxy, &TreeProxy::setFunctionFilter);
     connect(m_ui->topDownFilterFile, &QLineEdit::textChanged,
-            bottomUpProxy, &TreeProxy::setFileFilter);
+            topDownProxy, &TreeProxy::setFileFilter);
     connect(m_ui->topDownFilterModule, &QLineEdit::textChanged,
-            bottomUpProxy, &TreeProxy::setModuleFilter);
+            topDownProxy, &TreeProxy::setModuleFilter);
 
     auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::FunctionColumn,
                                            CallerCalleeModel::FileColumn,
@@ -298,11 +298,11 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->callerCalleeResults->hideColumn(CallerCalleeModel::LineColumn);
     m_ui->callerCalleeResults->hideColumn(CallerCalleeModel::ModuleColumn);
     connect(m_ui->callerCalleeFilterFunction, &QLineEdit::textChanged,
-            bottomUpProxy, &TreeProxy::setFunctionFilter);
+            callerCalleeProxy, &TreeProxy::setFunctionFilter);
     connect(m_ui->callerCalleeFilterFile, &QLineEdit::textChanged,
-            bottomUpProxy, &TreeProxy::setFileFilter);
+            callerCalleeProxy, &TreeProxy::setFileFilter);
     connect(m_ui->callerCalleeFilterModule, &QLineEdit::textChanged,
-            bottomUpProxy, &TreeProxy::setModuleFilter);
+            callerCalleeProxy, &TreeProxy::setModuleFilter);
 
     auto validateInputFile = [this] (const QString &path, bool allowEmpty) -> bool {
         if (path.isEmpty()) {
