@@ -241,6 +241,8 @@ QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
         stream << '\n';
         stream << "</pre></qt>";
         return tooltip;
+    } else if (role == LocationRole) {
+        return QVariant::fromValue(row.location);
     }
     return {};
 }

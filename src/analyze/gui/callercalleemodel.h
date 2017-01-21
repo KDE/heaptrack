@@ -33,7 +33,7 @@ struct CallerCalleeData
 {
     AllocationData inclusiveCost;
     AllocationData selfCost;
-    std::shared_ptr<LocationData> location;
+    LocationData::Ptr location;
 };
 Q_DECLARE_TYPEINFO(CallerCalleeData, Q_MOVABLE_TYPE);
 
@@ -68,7 +68,8 @@ public:
 
     enum Roles {
         SortRole = Qt::UserRole,
-        MaxCostRole = Qt::UserRole + 1
+        MaxCostRole,
+        LocationRole
     };
 
     QVariant headerData(int section, Qt::Orientation orientation = Qt::Horizontal,

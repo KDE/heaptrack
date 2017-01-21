@@ -25,11 +25,14 @@
 
 #include <KRecursiveFilterProxyModel>
 #include <KLocalizedString>
+#include <KConfigGroup>
 
 #include <QFileDialog>
 #include <QStatusBar>
-#include <KConfigGroup>
 #include <QDebug>
+#include <QMenu>
+#include <QAction>
+#include <QDesktopServices>
 
 #include "treemodel.h"
 #include "treeproxy.h"
@@ -63,6 +66,34 @@ const char State[] = "State";
 }
 }
 
+void addContextMenu(QTreeView* treeView, int role)
+{
+    treeView->setContextMenuPolicy(Qt::CustomContextMenu);
+    QObject::connect(treeView, &QTreeView::customContextMenuRequested,
+        treeView, [treeView, role] (const QPoint& pos) {
+            auto index = treeView->indexAt(pos);
+            if (!index.isValid()) {
+                return;
+            }
+            const auto location = index.data(role).value<LocationData::Ptr>();
+            if (!location || !QFile::exists(location->file)) {
+                return;
+            }
+            auto menu = new QMenu(treeView);
+            auto openFile = new QAction(QIcon::fromTheme(QStringLiteral("document-open")),
+                                        QObject::tr("Open file in editor"));
+            QObject::connect(openFile, &QAction::triggered,
+                openFile, [location] {
+                    /// FIXME: add settings to let user configure this
+                    auto url = QUrl::fromLocalFile(location->file);
+                    url.setFragment(QString::number(location->line));
+                    QDesktopServices::openUrl(url);
+                });
+            menu->addAction(openFile);
+            menu->popup(treeView->mapToGlobal(pos));
+        });
+}
+
 void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type)
 {
     auto proxy = new TopProxy(type, source);
@@ -73,6 +104,7 @@ void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type)
     view->setUniformRowHeights(true);
     view->sortByColumn(0);
     view->header()->setStretchLastSection(true);
+    addContextMenu(view, TreeModel::LocationRole);
 }
 
 #if KChart_FOUND
@@ -251,6 +283,7 @@ MainWindow::MainWindow(QWidget* parent)
             bottomUpProxy, &TreeProxy::setFileFilter);
     connect(m_ui->bottomUpFilterModule, &QLineEdit::textChanged,
             bottomUpProxy, &TreeProxy::setModuleFilter);
+    addContextMenu(m_ui->bottomUpResults, TreeModel::LocationRole);
 
     auto topDownProxy = new TreeProxy(TreeModel::FunctionColumn,
                                       TreeModel::FileColumn,
@@ -274,6 +307,7 @@ MainWindow::MainWindow(QWidget* parent)
             topDownProxy, &TreeProxy::setFileFilter);
     connect(m_ui->topDownFilterModule, &QLineEdit::textChanged,
             topDownProxy, &TreeProxy::setModuleFilter);
+    addContextMenu(m_ui->topDownResults, TreeModel::LocationRole);
 
     auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::FunctionColumn,
                                            CallerCalleeModel::FileColumn,
@@ -303,6 +337,7 @@ MainWindow::MainWindow(QWidget* parent)
             callerCalleeProxy, &TreeProxy::setFileFilter);
     connect(m_ui->callerCalleeFilterModule, &QLineEdit::textChanged,
             callerCalleeProxy, &TreeProxy::setModuleFilter);
+    addContextMenu(m_ui->callerCalleeResults, CallerCalleeModel::LocationRole);
 
     auto validateInputFile = [this] (const QString &path, bool allowEmpty) -> bool {
         if (path.isEmpty()) {

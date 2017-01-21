@@ -26,6 +26,8 @@
 
 struct LocationData
 {
+    using Ptr = std::shared_ptr<LocationData>;
+
     QString function;
     QString file;
     QString module;
@@ -55,8 +57,9 @@ struct LocationData
     }
 };
 Q_DECLARE_TYPEINFO(LocationData, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(LocationData::Ptr)
 
-inline bool operator<(const std::shared_ptr<LocationData>& lhs, const LocationData& rhs)
+inline bool operator<(const LocationData::Ptr& lhs, const LocationData& rhs)
 {
     return *lhs < rhs;
 }

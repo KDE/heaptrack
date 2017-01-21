@@ -250,6 +250,8 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         }
         stream << "</pre></qt>";
         return tooltip;
+    } else if (role == LocationRole) {
+        return QVariant::fromValue(row->location);
     }
     return {};
 }

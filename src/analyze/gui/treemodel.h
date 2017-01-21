@@ -32,7 +32,7 @@
 struct RowData
 {
     AllocationData cost;
-    std::shared_ptr<LocationData> location;
+    LocationData::Ptr location;
     const RowData* parent;
     QVector<RowData> children;
     bool operator<(const std::shared_ptr<LocationData>& rhs) const
@@ -68,7 +68,8 @@ public:
 
     enum Roles {
         SortRole = Qt::UserRole,
-        MaxCostRole = Qt::UserRole + 1
+        MaxCostRole,
+        LocationRole
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
