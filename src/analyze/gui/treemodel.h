@@ -35,7 +35,7 @@ struct RowData
     LocationData::Ptr location;
     const RowData* parent;
     QVector<RowData> children;
-    bool operator<(const std::shared_ptr<LocationData>& rhs) const
+    bool operator<(const LocationData::Ptr& rhs) const
     {
         return *location < *rhs;
     }

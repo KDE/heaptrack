@@ -81,7 +81,7 @@ struct StringCache
         }
     }
 
-    shared_ptr<LocationData> location(const InstructionPointer& ip) const
+    LocationData::Ptr location(const InstructionPointer& ip) const
     {
         LocationData data = {func(ip), file(ip), module(ip), ip.line};
         auto it = lower_bound(m_locations.begin(), m_locations.end(), data);
@@ -102,7 +102,7 @@ struct StringCache
 
     vector<QString> m_strings;
     mutable QHash<uint64_t, QString> m_ipAddresses;
-    mutable vector<shared_ptr<LocationData>> m_locations;
+    mutable vector<LocationData::Ptr> m_locations;
 
     bool diffMode = false;
 };
@@ -326,7 +326,7 @@ QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
 
             if (!recursionGuard.contains(trace.ipIndex)) { // aggregate caller-callee data
                 auto it = lower_bound(callerCalleeRows.begin(), callerCalleeRows.end(), location,
-                                      [] (const CallerCalleeData& lhs, const std::shared_ptr<LocationData>& rhs) {
+                                      [] (const CallerCalleeData& lhs, const LocationData::Ptr& rhs) {
                     return lhs.location < rhs;
                 });
                 if (it == callerCalleeRows.end() || it->location != location) {
@@ -415,9 +415,9 @@ QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
 
 struct MergedHistogramColumnData
 {
-    std::shared_ptr<LocationData> location;
+    LocationData::Ptr location;
     int64_t allocations;
-    bool operator<(const std::shared_ptr<LocationData>& rhs) const
+    bool operator<(const LocationData::Ptr& rhs) const
     {
         return location < rhs;
     }

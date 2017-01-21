@@ -27,7 +27,7 @@
 struct HistogramColumn
 {
     qint64 allocations;
-    std::shared_ptr<LocationData> location;
+    LocationData::Ptr location;
 };
 Q_DECLARE_TYPEINFO(HistogramColumn, Q_MOVABLE_TYPE);
 
