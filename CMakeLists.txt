@@ -1,4 +1,10 @@
-cmake_minimum_required(VERSION 2.8.9)
+if (CMAKE_VERSION VERSION_LESS "2.8.12")
+    cmake_minimum_required(VERSION 2.8.9)
+    set(HEAPTRACK_BUILD_GUI OFF)
+else()
+    cmake_minimum_required(VERSION 2.8.12)
+endif()
+
 project(heaptrack)
 enable_testing()
 
