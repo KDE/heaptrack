@@ -37,24 +37,13 @@ namespace {
 // TODO: use QString directly
 struct StringCache
 {
-    StringCache()
-    {
-        m_ipAddresses.reserve(16384);
-    }
-
     QString func(const InstructionPointer& ip) const
     {
         if (ip.functionIndex) {
             // TODO: support removal of template arguments
             return stringify(ip.functionIndex);
-        } else if (diffMode) {
-            return i18n("<unresolved function>");
         } else {
-            auto& ipAddr = m_ipAddresses[ip.instructionPointer];
-            if (ipAddr.isEmpty()) {
-                ipAddr = QLatin1String("0x") + QString::number(ip.instructionPointer, 16);
-            }
-            return ipAddr;
+            return i18n("<unresolved function>");
         }
     }
 
@@ -110,7 +99,6 @@ struct StringCache
     }
 
     vector<QString> m_strings;
-    mutable QHash<uint64_t, QString> m_ipAddresses;
     mutable vector<LocationData::Ptr> m_locations;
     mutable QHash<IpIndex, LocationData::Ptr> m_locationsMap;
 
