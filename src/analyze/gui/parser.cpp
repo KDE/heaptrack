@@ -533,8 +533,6 @@ void Parser::parse(const QString& path, const QString& diffBase)
             return;
         }
 
-
-
         data->updateStringCache();
 
         emit summaryAvailable({
