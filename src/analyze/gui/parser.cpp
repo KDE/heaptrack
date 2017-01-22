@@ -81,17 +81,26 @@ struct StringCache
         }
     }
 
-    LocationData::Ptr location(const InstructionPointer& ip) const
+    LocationData::Ptr location(const IpIndex& index, const InstructionPointer& ip) const
     {
-        LocationData data = {func(ip), file(ip), module(ip), ip.line};
-        auto it = lower_bound(m_locations.begin(), m_locations.end(), data);
-        if (it != m_locations.end() && **it == data) {
-            return *it;
-        } else {
-            auto interned = make_shared<LocationData>(data);
-            m_locations.insert(it, interned);
-            return interned;
+        // first try a fast index-based lookup
+        auto& location = m_locationsMap[index];
+        if (!location) {
+            // slow-path, look for interned location
+            // note that we can get the same locatoin for different IPs
+            LocationData data = {func(ip), file(ip), module(ip), ip.line};
+            auto it = lower_bound(m_locations.begin(), m_locations.end(), data);
+            if (it != m_locations.end() && **it == data) {
+                // we got the location already from a different ip, cache it
+                location = *it;
+            } else {
+                // completely new location, cache it in both containers
+                auto interned = make_shared<LocationData>(data);
+                m_locations.insert(it, interned);
+                location = interned;
+            }
         }
+        return location;
     }
 
     void update(const vector<string>& strings)
@@ -103,6 +112,7 @@ struct StringCache
     vector<QString> m_strings;
     mutable QHash<uint64_t, QString> m_ipAddresses;
     mutable vector<LocationData::Ptr> m_locations;
+    mutable QHash<IpIndex, LocationData::Ptr> m_locationsMap;
 
     bool diffMode = false;
 };
@@ -322,7 +332,7 @@ QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
         while (traceIndex) {
             const auto& trace = data.findTrace(traceIndex);
             const auto& ip = data.findIp(trace.ipIndex);
-            auto location = data.stringCache.location(ip);
+            auto location = data.stringCache.location(trace.ipIndex, ip);
 
             if (!recursionGuard.contains(trace.ipIndex)) { // aggregate caller-callee data
                 auto it = lower_bound(callerCalleeRows.begin(), callerCalleeRows.end(), location,
@@ -472,7 +482,7 @@ HistogramData buildSizeHistogram(ParserData& data)
         }
         const auto ipIndex = data.findTrace(info.info.traceIndex).ipIndex;
         const auto ip = data.findIp(ipIndex);
-        const auto location = data.stringCache.location(ip);
+        const auto location = data.stringCache.location(ipIndex, ip);
         auto it = lower_bound(columnData.begin(), columnData.end(), location);
         if (it == columnData.end() || it->location != location) {
             columnData.insert(it, {location, info.allocations});
