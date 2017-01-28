@@ -155,6 +155,41 @@ void setupTreeModel(TreeModel* model, QTreeView* view,
     addContextMenu(view, TreeModel::LocationRole);
 }
 
+void setupCallerCalle(CallerCalleeModel* model, QTreeView* view,
+                      CostDelegate* costDelegate, QLineEdit* filterFunction,
+                      QLineEdit* filterFile, QLineEdit* filterModule)
+{
+    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::FunctionColumn,
+                                           CallerCalleeModel::FileColumn,
+                                           CallerCalleeModel::ModuleColumn,
+                                           model);
+    callerCalleeProxy->setSourceModel(model);
+    callerCalleeProxy->setSortRole(CallerCalleeModel::SortRole);
+    view->setModel(callerCalleeProxy);
+    view->sortByColumn(CallerCalleeModel::InclusivePeakColumn);
+    view->setItemDelegateForColumn(CallerCalleeModel::SelfPeakColumn, costDelegate);
+    view->setItemDelegateForColumn(CallerCalleeModel::SelfAllocatedColumn, costDelegate);
+    view->setItemDelegateForColumn(CallerCalleeModel::SelfLeakedColumn, costDelegate);
+    view->setItemDelegateForColumn(CallerCalleeModel::SelfAllocationsColumn, costDelegate);
+    view->setItemDelegateForColumn(CallerCalleeModel::SelfTemporaryColumn, costDelegate);
+    view->setItemDelegateForColumn(CallerCalleeModel::InclusivePeakColumn, costDelegate);
+    view->setItemDelegateForColumn(CallerCalleeModel::InclusiveAllocatedColumn, costDelegate);
+    view->setItemDelegateForColumn(CallerCalleeModel::InclusiveLeakedColumn, costDelegate);
+    view->setItemDelegateForColumn(CallerCalleeModel::InclusiveAllocationsColumn, costDelegate);
+    view->setItemDelegateForColumn(CallerCalleeModel::InclusiveTemporaryColumn, costDelegate);
+    view->hideColumn(CallerCalleeModel::FunctionColumn);
+    view->hideColumn(CallerCalleeModel::FileColumn);
+    view->hideColumn(CallerCalleeModel::LineColumn);
+    view->hideColumn(CallerCalleeModel::ModuleColumn);
+    QObject::connect(filterFunction, &QLineEdit::textChanged,
+                     callerCalleeProxy, &TreeProxy::setFunctionFilter);
+    QObject::connect(filterFile, &QLineEdit::textChanged,
+                     callerCalleeProxy, &TreeProxy::setFileFilter);
+    QObject::connect(filterModule, &QLineEdit::textChanged,
+                     callerCalleeProxy, &TreeProxy::setModuleFilter);
+    addContextMenu(view, CallerCalleeModel::LocationRole);
+}
+
 }
 
 MainWindow::MainWindow(QWidget* parent)
@@ -301,35 +336,10 @@ MainWindow::MainWindow(QWidget* parent)
                    m_ui->topDownFilterFunction, m_ui->topDownFilterFile,
                    m_ui->topDownFilterModule);
 
-    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::FunctionColumn,
-                                           CallerCalleeModel::FileColumn,
-                                           CallerCalleeModel::ModuleColumn,
-                                           callerCalleeModel);
-    callerCalleeProxy->setSourceModel(callerCalleeModel);
-    callerCalleeProxy->setSortRole(CallerCalleeModel::SortRole);
-    m_ui->callerCalleeResults->setModel(callerCalleeProxy);
-    m_ui->callerCalleeResults->sortByColumn(CallerCalleeModel::InclusivePeakColumn);
-    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfPeakColumn, costDelegate);
-    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfAllocatedColumn, costDelegate);
-    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfLeakedColumn, costDelegate);
-    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfAllocationsColumn, costDelegate);
-    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::SelfTemporaryColumn, costDelegate);
-    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::InclusivePeakColumn, costDelegate);
-    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::InclusiveAllocatedColumn, costDelegate);
-    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::InclusiveLeakedColumn, costDelegate);
-    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::InclusiveAllocationsColumn, costDelegate);
-    m_ui->callerCalleeResults->setItemDelegateForColumn(CallerCalleeModel::InclusiveTemporaryColumn, costDelegate);
-    m_ui->callerCalleeResults->hideColumn(CallerCalleeModel::FunctionColumn);
-    m_ui->callerCalleeResults->hideColumn(CallerCalleeModel::FileColumn);
-    m_ui->callerCalleeResults->hideColumn(CallerCalleeModel::LineColumn);
-    m_ui->callerCalleeResults->hideColumn(CallerCalleeModel::ModuleColumn);
-    connect(m_ui->callerCalleeFilterFunction, &QLineEdit::textChanged,
-            callerCalleeProxy, &TreeProxy::setFunctionFilter);
-    connect(m_ui->callerCalleeFilterFile, &QLineEdit::textChanged,
-            callerCalleeProxy, &TreeProxy::setFileFilter);
-    connect(m_ui->callerCalleeFilterModule, &QLineEdit::textChanged,
-            callerCalleeProxy, &TreeProxy::setModuleFilter);
-    addContextMenu(m_ui->callerCalleeResults, CallerCalleeModel::LocationRole);
+    setupCallerCalle(callerCalleeModel, m_ui->callerCalleeResults, costDelegate,
+                     m_ui->callerCalleeFilterFunction,
+                     m_ui->callerCalleeFilterFile,
+                     m_ui->callerCalleeFilterModule);
 
     auto validateInputFile = [this] (const QString &path, bool allowEmpty) -> bool {
         if (path.isEmpty()) {
