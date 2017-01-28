@@ -1,1 +1,1 @@
-kate: indent-width 4; replace-tabs on;
+kate: indent-width 4; replace-tabs on; word-wrap-column 120;
