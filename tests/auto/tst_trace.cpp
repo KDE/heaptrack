@@ -17,8 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "src/track/trace.h"
 #include "3rdparty/catch.hpp"
+#include "src/track/trace.h"
 
 #include <algorithm>
 
@@ -36,27 +36,27 @@ bool fill(Trace& trace, int depth, int skip)
 
 void validateTrace(const Trace& trace, int expectedSize)
 {
-    SECTION("validate the trace size") {
+    SECTION ("validate the trace size") {
         REQUIRE(trace.size() == expectedSize);
         REQUIRE(distance(trace.begin(), trace.end()) == trace.size());
     }
-    SECTION("validate trace contents") {
+    SECTION ("validate trace contents") {
         REQUIRE(find(trace.begin(), trace.end(), Trace::ip_t(0)) == trace.end());
     }
 }
 }
 
-TEST_CASE("getting backtrace traces", "[trace]") {
+TEST_CASE ("getting backtrace traces", "[trace]") {
     Trace trace;
     validateTrace(trace, 0);
 
-    SECTION("fill without skipping") {
+    SECTION ("fill without skipping") {
         REQUIRE(trace.fill(0));
         const auto offset = trace.size();
         REQUIRE(offset > 1);
         validateTrace(trace, offset);
 
-        SECTION("fill with skipping") {
+        SECTION ("fill with skipping") {
             for (auto skip : {0, 1, 2}) {
                 for (int i = 0; i < 2 * Trace::MAX_SIZE; ++i) {
                     REQUIRE(fill(trace, i, skip));

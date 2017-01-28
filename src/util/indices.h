@@ -23,7 +23,7 @@
 #include <unordered_map>
 
 // sadly, C++ doesn't yet have opaque typedefs
-template<typename Base>
+template <typename Base>
 struct Index
 {
     uint32_t index = 0;
@@ -64,15 +64,16 @@ struct Index
     }
 };
 
-template<typename Base>
+template <typename Base>
 uint qHash(const Index<Base> index, uint seed = 0) noexcept
 {
     return qHash(index.index, seed);
 }
 
 namespace std {
-template<typename Base>
-struct hash<Index<Base>> {
+template <typename Base>
+struct hash<Index<Base>>
+{
     std::size_t operator()(const Index<Base> index) const
     {
         return std::hash<uint32_t>()(index.index);
@@ -80,12 +81,26 @@ struct hash<Index<Base>> {
 };
 }
 
-struct StringIndex : public Index<StringIndex> {};
-struct ModuleIndex : public StringIndex {};
-struct FunctionIndex : public StringIndex {};
-struct FileIndex : public StringIndex {};
-struct IpIndex : public Index<IpIndex> {};
-struct TraceIndex : public Index<TraceIndex> {};
-struct AllocationIndex : public Index<AllocationIndex> {};
+struct StringIndex : public Index<StringIndex>
+{
+};
+struct ModuleIndex : public StringIndex
+{
+};
+struct FunctionIndex : public StringIndex
+{
+};
+struct FileIndex : public StringIndex
+{
+};
+struct IpIndex : public Index<IpIndex>
+{
+};
+struct TraceIndex : public Index<TraceIndex>
+{
+};
+struct AllocationIndex : public Index<AllocationIndex>
+{
+};
 
 #endif // INDICES_H

@@ -35,7 +35,6 @@ public:
 Foo::Foo()
     : d(new Private)
 {
-
 }
 
 Foo::~Foo()

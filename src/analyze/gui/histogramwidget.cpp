@@ -19,23 +19,23 @@
 
 #include "histogramwidget.h"
 
-#include <QVBoxLayout>
 #include <QSortFilterProxyModel>
+#include <QVBoxLayout>
 
-#include <KChartChart>
 #include <KChartBarDiagram>
+#include <KChartChart>
 
+#include <KChartBackgroundAttributes>
+#include <KChartCartesianCoordinatePlane>
+#include <KChartDataValueAttributes>
+#include <KChartFrameAttributes.h>
 #include <KChartGridAttributes>
 #include <KChartHeaderFooter>
-#include <KChartCartesianCoordinatePlane>
 #include <KChartLegend>
-#include <KChartDataValueAttributes>
-#include <KChartBackgroundAttributes>
-#include <KChartFrameAttributes.h>
 
-#include <KLocalizedString>
 #include <KColorScheme>
 #include <KFormat>
+#include <KLocalizedString>
 
 #include "histogrammodel.h"
 
@@ -48,7 +48,8 @@ class SizeAxis : public CartesianAxis
 public:
     explicit SizeAxis(AbstractCartesianDiagram* diagram = nullptr)
         : CartesianAxis(diagram)
-    {}
+    {
+    }
 
     const QString customizedLabel(const QString& label) const override
     {
@@ -81,7 +82,6 @@ protected:
 private:
     bool m_showTotal;
 };
-
 }
 
 HistogramWidget::HistogramWidget(QWidget* parent)

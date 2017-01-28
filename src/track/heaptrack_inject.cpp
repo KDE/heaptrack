@@ -19,11 +19,13 @@
 
 #include "libheaptrack.h"
 
-#include <link.h>
-#include <cstring>
 #include <cstdlib>
-#include <sys/mman.h>
+#include <cstring>
+
+#include <link.h>
 #include <malloc.h>
+
+#include <sys/mman.h>
 
 #include <type_traits>
 
@@ -68,7 +70,7 @@ struct free
     static constexpr auto name = "free";
     static constexpr auto original = &::free;
 
-    static void hook(void *ptr) noexcept
+    static void hook(void* ptr) noexcept
     {
         heaptrack_free(ptr);
         original(ptr);
@@ -80,7 +82,7 @@ struct realloc
     static constexpr auto name = "realloc";
     static constexpr auto original = &::realloc;
 
-    static void* hook(void *ptr, size_t size) noexcept
+    static void* hook(void* ptr, size_t size) noexcept
     {
         auto ret = original(ptr, size);
         heaptrack_realloc(ptr, size, ret);
@@ -107,7 +109,7 @@ struct cfree
     static constexpr auto name = "cfree";
     static constexpr auto original = &::cfree;
 
-    static void hook(void *ptr) noexcept
+    static void hook(void* ptr) noexcept
     {
         heaptrack_free(ptr);
         original(ptr);
@@ -120,7 +122,7 @@ struct dlopen
     static constexpr auto name = "dlopen";
     static constexpr auto original = &::dlopen;
 
-    static void* hook(const char *filename, int flag) noexcept
+    static void* hook(const char* filename, int flag) noexcept
     {
         auto ret = original(filename, flag);
         if (ret) {
@@ -136,7 +138,7 @@ struct dlclose
     static constexpr auto name = "dlclose";
     static constexpr auto original = &::dlclose;
 
-    static int hook(void *handle) noexcept
+    static int hook(void* handle) noexcept
     {
         auto ret = original(handle);
         if (!ret) {
@@ -151,7 +153,7 @@ struct posix_memalign
     static constexpr auto name = "posix_memalign";
     static constexpr auto original = &::posix_memalign;
 
-    static int hook(void **memptr, size_t alignment, size_t size) noexcept
+    static int hook(void** memptr, size_t alignment, size_t size) noexcept
     {
         auto ret = original(memptr, alignment, size);
         if (!ret) {
@@ -161,8 +163,8 @@ struct posix_memalign
     }
 };
 
-template<typename Hook>
-bool hook(const char *symname, ElfW(Addr) addr, bool restore)
+template <typename Hook>
+bool hook(const char* symname, ElfW(Addr) addr, bool restore)
 {
     static_assert(std::is_convertible<decltype(&Hook::hook), decltype(Hook::original)>::value,
                   "hook is not compatible to original function");
@@ -173,7 +175,7 @@ bool hook(const char *symname, ElfW(Addr) addr, bool restore)
 
     // try to make the page read/write accessible, which is hackish
     // but apparently required for some shared libraries
-    auto page = reinterpret_cast<void *>(addr & ~(0x1000 - 1));
+    auto page = reinterpret_cast<void*>(addr & ~(0x1000 - 1));
     mprotect(page, 0x1000, PROT_READ | PROT_WRITE);
 
     // now write to the address
@@ -189,30 +191,26 @@ bool hook(const char *symname, ElfW(Addr) addr, bool restore)
     return true;
 }
 
-void apply(const char *symname, ElfW(Addr) addr, bool restore)
+void apply(const char* symname, ElfW(Addr) addr, bool restore)
 {
     // TODO: use std::apply once we can rely on C++17
-    hook<malloc>(symname, addr, restore)
-        || hook<free>(symname, addr, restore)
-        || hook<realloc>(symname, addr, restore)
+    hook<malloc>(symname, addr, restore) || hook<free>(symname, addr, restore) || hook<realloc>(symname, addr, restore)
         || hook<calloc>(symname, addr, restore)
 #if HAVE_CFREE
         || hook<cfree>(symname, addr, restore)
 #endif
-        || hook<posix_memalign>(symname, addr, restore)
-        || hook<dlopen>(symname, addr, restore)
+        || hook<posix_memalign>(symname, addr, restore) || hook<dlopen>(symname, addr, restore)
         || hook<dlclose>(symname, addr, restore);
 }
-
 }
 
-template<typename T, ElfW(Sxword) AddrTag, ElfW(Sxword) SizeTag>
+template <typename T, ElfW(Sxword) AddrTag, ElfW(Sxword) SizeTag>
 struct elftable
 {
     T* table = nullptr;
     ElfW(Xword) size = ElfW(Xword)();
 
-    bool consume(const ElfW(Dyn) *dyn) noexcept
+    bool consume(const ElfW(Dyn) * dyn) noexcept
     {
         if (dyn->d_tag == AddrTag) {
             table = reinterpret_cast<T*>(dyn->d_un.d_ptr);
@@ -229,7 +227,7 @@ using elf_string_table = elftable<const char, DT_STRTAB, DT_STRSZ>;
 using elf_jmprel_table = elftable<ElfW(Rela), DT_JMPREL, DT_PLTRELSZ>;
 using elf_symbol_table = elftable<ElfW(Sym), DT_SYMTAB, DT_SYMENT>;
 
-void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base, const bool restore) noexcept
+void try_overwrite_symbols(const ElfW(Dyn) * dyn, const ElfW(Addr) base, const bool restore) noexcept
 {
     elf_symbol_table symbols;
     elf_jmprel_table jmprels;
@@ -241,17 +239,17 @@ void try_overwrite_symbols(const ElfW(Dyn) *dyn, const ElfW(Addr) base, const bo
     }
 
     // find symbols to overwrite
-    const auto rela_end = reinterpret_cast<ElfW(Rela) *>(reinterpret_cast<char *>(jmprels.table) + jmprels.size);
+    const auto rela_end = reinterpret_cast<ElfW(Rela)*>(reinterpret_cast<char*>(jmprels.table) + jmprels.size);
     for (auto rela = jmprels.table; rela < rela_end; rela++) {
         const auto index = ELF_R_SYM(rela->r_info);
-        const char *symname = strings.table + symbols.table[index].st_name;
+        const char* symname = strings.table + symbols.table[index].st_name;
         auto addr = rela->r_offset + base;
 
         hooks::apply(symname, addr, restore);
     }
 }
 
-int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data) noexcept
+int iterate_phdrs(dl_phdr_info* info, size_t /*size*/, void* data) noexcept
 {
     if (strstr(info->dlpi_name, "/libheaptrack_inject.so")) {
         // prevent infinite recursion: do not overwrite our own symbols
@@ -263,8 +261,8 @@ int iterate_phdrs(dl_phdr_info *info, size_t /*size*/, void *data) noexcept
 
     for (auto phdr = info->dlpi_phdr, end = phdr + info->dlpi_phnum; phdr != end; ++phdr) {
         if (phdr->p_type == PT_DYNAMIC) {
-            try_overwrite_symbols(reinterpret_cast<const ElfW(Dyn) *>(phdr->p_vaddr + info->dlpi_addr),
-                                  info->dlpi_addr, data != nullptr);
+            try_overwrite_symbols(reinterpret_cast<const ElfW(Dyn)*>(phdr->p_vaddr + info->dlpi_addr), info->dlpi_addr,
+                                  data != nullptr);
         }
     }
     return 0;
@@ -274,21 +272,16 @@ void overwrite_symbols() noexcept
 {
     dl_iterate_phdr(&iterate_phdrs, nullptr);
 }
-
 }
 
 extern "C" {
 
-void heaptrack_inject(const char *outputFileName) noexcept
+void heaptrack_inject(const char* outputFileName) noexcept
 {
-    heaptrack_init(outputFileName, [] () {
-        overwrite_symbols();
-    }, [] (FILE* out) {
-        fprintf(out, "A\n");
-    }, [] () {
-        bool do_shutdown = true;
-        dl_iterate_phdr(&iterate_phdrs, &do_shutdown);
-    });
+    heaptrack_init(outputFileName, []() { overwrite_symbols(); }, [](FILE* out) { fprintf(out, "A\n"); },
+                   []() {
+                       bool do_shutdown = true;
+                       dl_iterate_phdr(&iterate_phdrs, &do_shutdown);
+                   });
 }
-
 }

@@ -20,16 +20,16 @@
 #ifndef BENCH_POINTERS
 #define BENCH_POINTERS
 
-#include <cstdint>
-#include <vector>
 #include <algorithm>
+#include <cstdint>
 #include <iostream>
+#include <vector>
 
 #include <malloc.h>
 
 #include "src/util/indices.h"
 
-template<typename Map>
+template <typename Map>
 void benchPointers()
 {
     uint32_t matches = 0;
@@ -61,7 +61,8 @@ void benchPointers()
             }
 
             const auto added = mallinfo().uordblks - baseline;
-            std::cerr << "pointers added:          \t" << added << " (" << (float(added) * 100.f / allocated) << "% overhead)" << std::endl;
+            std::cerr << "pointers added:          \t" << added << " (" << (float(added) * 100.f / allocated)
+                      << "% overhead)" << std::endl;
 
             std::random_shuffle(pointers.begin(), pointers.end());
             for (auto ptr : pointers) {

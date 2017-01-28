@@ -21,6 +21,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+
 #include <KSharedConfig>
 
 namespace Ui {
@@ -43,7 +44,7 @@ public slots:
     void openFile();
 
 private:
-    void showError(const QString &message);
+    void showError(const QString& message);
     void setupStacks();
 
     QScopedPointer<Ui::MainWindow> m_ui;

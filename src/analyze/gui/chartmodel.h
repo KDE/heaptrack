@@ -20,9 +20,10 @@
 #ifndef CHARTMODEL_H
 #define CHARTMODEL_H
 
+#include <array>
+
 #include <QAbstractTableModel>
 #include <QVector>
-#include <array>
 
 struct ChartRows
 {
@@ -30,7 +31,8 @@ struct ChartRows
     {
         cost.fill(0);
     }
-    enum {
+    enum
+    {
         MAX_NUM_COST = 20
     };
     // time in ms
@@ -51,7 +53,8 @@ class ChartModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    enum Type {
+    enum Type
+    {
         Consumed,
         Allocations,
         Allocated,
@@ -62,7 +65,8 @@ public:
 
     Type type() const;
 
-    QVariant headerData(int section, Qt::Orientation orientation = Qt::Horizontal, int role = Qt::DisplayRole) const override;
+    QVariant headerData(int section, Qt::Orientation orientation = Qt::Horizontal,
+                        int role = Qt::DisplayRole) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     int columnCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -73,7 +77,8 @@ public slots:
 private:
     ChartData m_data;
     Type m_type;
-    // we cache the pens and brushes as constructing them requires allocations otherwise
+    // we cache the pens and brushes as constructing them requires allocations
+    // otherwise
     QVector<QPen> m_columnDataSetPens;
     QVector<QBrush> m_columnDataSetBrushes;
 };

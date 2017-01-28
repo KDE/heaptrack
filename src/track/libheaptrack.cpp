@@ -27,17 +27,17 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <stdio_ext.h>
 #include <fcntl.h>
 #include <link.h>
+#include <stdio_ext.h>
 
 #include <atomic>
-#include <string>
-#include <memory>
-#include <unordered_set>
-#include <mutex>
-#include <thread>
 #include <cinttypes>
+#include <memory>
+#include <mutex>
+#include <string>
+#include <thread>
+#include <unordered_set>
 
 #include <boost/algorithm/string/replace.hpp>
 
@@ -71,7 +71,7 @@ constexpr const DebugVerbosity s_debugVerbosity = NoDebugOutput;
  * Call this to optionally show debug information but give the compiler
  * a hand in removing it all if debug output is disabled.
  */
-template<DebugVerbosity debugLevel, typename... Args>
+template <DebugVerbosity debugLevel, typename... Args>
 inline void debugLog(const char fmt[], Args... args)
 {
     if (debugLevel <= s_debugVerbosity) {
@@ -135,11 +135,12 @@ void writeCommandLine(FILE* out)
     char buf[BUF_SIZE + 1];
     auto fd = open("/proc/self/cmdline", O_RDONLY);
     int bytesRead = read(fd, buf, BUF_SIZE);
-    char *end = buf + bytesRead;
-    for (char *p = buf; p < end;) {
+    char* end = buf + bytesRead;
+    for (char* p = buf; p < end;) {
         fputc(' ', out);
         fputs(p, out);
-        while (*p++); // skip until start of next 0-terminated section
+        while (*p++)
+            ; // skip until start of next 0-terminated section
     }
 
     close(fd);
@@ -148,9 +149,7 @@ void writeCommandLine(FILE* out)
 
 void writeSystemInfo(FILE* out)
 {
-    fprintf(out, "I %lx %lx\n",
-                sysconf(_SC_PAGESIZE),
-                sysconf(_SC_PHYS_PAGES));
+    fprintf(out, "I %lx %lx\n", sysconf(_SC_PAGESIZE), sysconf(_SC_PHYS_PAGES));
 }
 
 FILE* createFile(const char* fileName)
@@ -185,11 +184,14 @@ FILE* createFile(const char* fileName)
 /**
  * Thread-Safe heaptrack API
  *
- * The only critical section in libheaptrack is the output of the data, dl_iterate_phdr
+ * The only critical section in libheaptrack is the output of the data,
+ * dl_iterate_phdr
  * calls, as well as initialization and shutdown.
  *
- * This uses a spinlock, instead of a std::mutex, as the latter can lead to deadlocks
- * on destruction. The spinlock is "simple", and OK to only guard the small sections.
+ * This uses a spinlock, instead of a std::mutex, as the latter can lead to
+ * deadlocks
+ * on destruction. The spinlock is "simple", and OK to only guard the small
+ * sections.
  */
 class HeapTrack
 {
@@ -205,10 +207,8 @@ public:
         s_locked.store(false, memory_order_release);
     }
 
-    void initialize(const char* fileName,
-                    heaptrack_callback_t initBeforeCallback,
-                    heaptrack_callback_initialized_t initAfterCallback,
-                    heaptrack_callback_t stopCallback)
+    void initialize(const char* fileName, heaptrack_callback_t initBeforeCallback,
+                    heaptrack_callback_initialized_t initAfterCallback, heaptrack_callback_t stopCallback)
     {
         debugLog<MinimalOutput>("initializing: %s", fileName);
         if (s_data) {
@@ -230,17 +230,17 @@ public:
             if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
                 fprintf(stderr, "WARNING: Failed to enable per-thread libunwind caching.\n");
             }
-            #ifdef unw_set_cache_size
+#ifdef unw_set_cache_size
             if (unw_set_cache_size(unw_local_addr_space, 1024, 0)) {
                 fprintf(stderr, "WARNING: Failed to set libunwind cache size.\n");
             }
-            #endif
+#endif
 
             // do not trace forked child processes
             // TODO: make this configurable
             pthread_atfork(&prepare_fork, &parent_fork, &child_fork);
 
-            atexit([] () {
+            atexit([]() {
                 debugLog<MinimalOutput>("%s", "atexit()");
                 s_atexit.store(true);
                 heaptrack_stop();
@@ -338,7 +338,7 @@ public:
         }
     }
 
-    void handleMalloc(void* ptr, size_t size, const Trace &trace)
+    void handleMalloc(void* ptr, size_t size, const Trace& trace)
     {
         if (!s_data || !s_data->out) {
             return;
@@ -377,10 +377,10 @@ public:
     }
 
 private:
-    static int dl_iterate_phdr_callback(struct dl_phdr_info *info, size_t /*size*/, void *data)
+    static int dl_iterate_phdr_callback(struct dl_phdr_info* info, size_t /*size*/, void* data)
     {
         auto heaptrack = reinterpret_cast<HeapTrack*>(data);
-        const char *fileName = info->dlpi_name;
+        const char* fileName = info->dlpi_name;
         if (!fileName || !fileName[0]) {
             fileName = "x";
         }
@@ -454,7 +454,7 @@ private:
         shutdown();
     }
 
-    template<typename AdditionalLockCheck>
+    template <typename AdditionalLockCheck>
     HeapTrack(AdditionalLockCheck lockCheck)
     {
         debugLog<VeryVerboseOutput>("%s", "acquiring lock");
@@ -477,7 +477,7 @@ private:
             if (!procStatm) {
                 fprintf(stderr, "WARNING: Failed to open /proc/self/statm for reading.\n");
             }
-            timerThread = thread([&] () {
+            timerThread = thread([&]() {
                 RecursionGuard::isActive = true;
                 debugLog<MinimalOutput>("%s", "timer thread started");
                 while (!stopTimerThread) {
@@ -500,7 +500,8 @@ private:
             if (timerThread.joinable()) {
                 try {
                     timerThread.join();
-                } catch(std::system_error) {}
+                } catch (std::system_error) {
+                }
             }
 
             if (out) {
@@ -544,9 +545,9 @@ private:
 
         heaptrack_callback_t stopCallback = nullptr;
 
-        #ifdef DEBUG_MALLOC_PTRS
+#ifdef DEBUG_MALLOC_PTRS
         unordered_set<void*> known;
-        #endif
+#endif
     };
 
     static atomic<bool> s_locked;
@@ -555,23 +556,18 @@ private:
 
 atomic<bool> HeapTrack::s_locked{false};
 HeapTrack::LockedData* HeapTrack::s_data{nullptr};
-
 }
 extern "C" {
 
-void heaptrack_init(const char *outputFileName,
-                    heaptrack_callback_t initBeforeCallback,
-                    heaptrack_callback_initialized_t initAfterCallback,
-                    heaptrack_callback_t stopCallback)
+void heaptrack_init(const char* outputFileName, heaptrack_callback_t initBeforeCallback,
+                    heaptrack_callback_initialized_t initAfterCallback, heaptrack_callback_t stopCallback)
 {
     RecursionGuard guard;
 
     debugLog<MinimalOutput>("heaptrack_init(%s)", outputFileName);
 
     HeapTrack heaptrack(guard);
-    heaptrack.initialize(outputFileName,
-                         initBeforeCallback, initAfterCallback,
-                         stopCallback);
+    heaptrack.initialize(outputFileName, initBeforeCallback, initAfterCallback, stopCallback);
 }
 
 void heaptrack_stop()
@@ -638,5 +634,4 @@ void heaptrack_invalidate_module_cache()
     HeapTrack heaptrack(guard);
     heaptrack.invalidateModuleCache();
 }
-
 }

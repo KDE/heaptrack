@@ -25,7 +25,7 @@
 
 #include <cmath>
 
-namespace{
+namespace {
 /// TODO: share code
 QString basename(const QString& path)
 {
@@ -48,95 +48,112 @@ QVariant CallerCalleeModel::headerData(int section, Qt::Orientation orientation,
         return {};
     }
     if (role == Qt::InitialSortOrderRole) {
-        if (section == SelfAllocatedColumn || section == SelfAllocationsColumn
-            || section == SelfPeakColumn || section == SelfLeakedColumn
-            || section == SelfTemporaryColumn
-            || section == InclusiveAllocatedColumn || section == InclusiveAllocationsColumn
-            || section == InclusivePeakColumn || section == InclusiveLeakedColumn
-            || section == InclusiveTemporaryColumn)
-        {
+        if (section == SelfAllocatedColumn || section == SelfAllocationsColumn || section == SelfPeakColumn
+            || section == SelfLeakedColumn || section == SelfTemporaryColumn || section == InclusiveAllocatedColumn
+            || section == InclusiveAllocationsColumn || section == InclusivePeakColumn
+            || section == InclusiveLeakedColumn || section == InclusiveTemporaryColumn) {
             return Qt::DescendingOrder;
         }
     }
     if (role == Qt::DisplayRole) {
         switch (static_cast<Columns>(section)) {
-            case FileColumn:
-                return i18n("File");
-            case LineColumn:
-                return i18n("Line");
-            case FunctionColumn:
-                return i18n("Function");
-            case ModuleColumn:
-                return i18n("Module");
-            case SelfAllocationsColumn:
-                return i18n("Allocations (Self)");
-            case SelfTemporaryColumn:
-                return i18n("Temporary (Self)");
-            case SelfPeakColumn:
-                return i18n("Peak (Self)");
-            case SelfLeakedColumn:
-                return i18n("Leaked (Self)");
-            case SelfAllocatedColumn:
-                return i18n("Allocated (Self)");
-            case InclusiveAllocationsColumn:
-                return i18n("Allocations (Incl.)");
-            case InclusiveTemporaryColumn:
-                return i18n("Temporary (Incl.)");
-            case InclusivePeakColumn:
-                return i18n("Peak (Incl.)");
-            case InclusiveLeakedColumn:
-                return i18n("Leaked (Incl.)");
-            case InclusiveAllocatedColumn:
-                return i18n("Allocated (Incl.)");
-            case LocationColumn:
-                return i18n("Location");
-            case NUM_COLUMNS:
-                break;
+        case FileColumn:
+            return i18n("File");
+        case LineColumn:
+            return i18n("Line");
+        case FunctionColumn:
+            return i18n("Function");
+        case ModuleColumn:
+            return i18n("Module");
+        case SelfAllocationsColumn:
+            return i18n("Allocations (Self)");
+        case SelfTemporaryColumn:
+            return i18n("Temporary (Self)");
+        case SelfPeakColumn:
+            return i18n("Peak (Self)");
+        case SelfLeakedColumn:
+            return i18n("Leaked (Self)");
+        case SelfAllocatedColumn:
+            return i18n("Allocated (Self)");
+        case InclusiveAllocationsColumn:
+            return i18n("Allocations (Incl.)");
+        case InclusiveTemporaryColumn:
+            return i18n("Temporary (Incl.)");
+        case InclusivePeakColumn:
+            return i18n("Peak (Incl.)");
+        case InclusiveLeakedColumn:
+            return i18n("Leaked (Incl.)");
+        case InclusiveAllocatedColumn:
+            return i18n("Allocated (Incl.)");
+        case LocationColumn:
+            return i18n("Location");
+        case NUM_COLUMNS:
+            break;
         }
     } else if (role == Qt::ToolTipRole) {
         switch (static_cast<Columns>(section)) {
-            case FileColumn:
-                return i18n("<qt>The file where the allocation function was called from. "
-                            "May be empty when debug information is missing.</qt>");
-            case LineColumn:
-                return i18n("<qt>The line number where the allocation function was called from. "
-                            "May be empty when debug information is missing.</qt>");
-            case FunctionColumn:
-                return i18n("<qt>The parent function that called an allocation function. "
-                            "May be unknown when debug information is missing.</qt>");
-            case ModuleColumn:
-                return i18n("<qt>The module, i.e. executable or shared library, from which an allocation function was called.</qt>");
-            case SelfAllocationsColumn:
-                return i18n("<qt>The number of times an allocation function was directly called from this location.</qt>");
-            case SelfTemporaryColumn:
-                return i18n("<qt>The number of direct temporary allocations. These allocations are directly followed by a free without any other allocations in-between.</qt>");
-            case SelfPeakColumn:
-                return i18n("<qt>The maximum heap memory in bytes consumed from allocations originating directly at this location. "
-                            "This takes deallocations into account.</qt>");
-            case SelfLeakedColumn:
-                return i18n("<qt>The bytes allocated directly at this location that have not been deallocated.</qt>");
-            case SelfAllocatedColumn:
-                return i18n("<qt>The sum of all bytes directly allocated from this location, ignoring deallocations.</qt>");
-            case InclusiveAllocationsColumn:
-                return i18n("<qt>The inclusive number of times an allocation function was called from this location or any functions called from here.</qt>");
-            case InclusiveTemporaryColumn:
-                return i18n("<qt>The number of inclusive temporary allocations. These allocations are directly followed by a free without any other allocations in-between.</qt>");
-            case InclusivePeakColumn:
-                return i18n("<qt>The inclusive maximum heap memory in bytes consumed from allocations originating at this location or from functions called from here. "
-                            "This takes deallocations into account.</qt>");
-            case InclusiveLeakedColumn:
-                return i18n("<qt>The bytes allocated at this location that have not been deallocated.</qt>");
-            case InclusiveAllocatedColumn:
-                return i18n("<qt>The inclusive sum of all bytes allocated from this location or functions called from here, ignoring deallocations.</qt>");
-            case LocationColumn:
-                return i18n("<qt>The location from which an allocation function was called. Function symbol and file information "
-                            "may be unknown when debug information was missing when heaptrack was run.</qt>");
-            case NUM_COLUMNS:
-                break;
+        case FileColumn:
+            return i18n("<qt>The file where the allocation function was called from. "
+                        "May be empty when debug information is missing.</qt>");
+        case LineColumn:
+            return i18n("<qt>The line number where the allocation function was called from. "
+                        "May be empty when debug information is missing.</qt>");
+        case FunctionColumn:
+            return i18n("<qt>The parent function that called an allocation function. "
+                        "May be unknown when debug information is missing.</qt>");
+        case ModuleColumn:
+            return i18n("<qt>The module, i.e. executable or shared library, from "
+                        "which an allocation function was "
+                        "called.</qt>");
+        case SelfAllocationsColumn:
+            return i18n("<qt>The number of times an allocation function was directly "
+                        "called from this location.</qt>");
+        case SelfTemporaryColumn:
+            return i18n("<qt>The number of direct temporary allocations. These "
+                        "allocations are directly followed by a "
+                        "free without any other allocations in-between.</qt>");
+        case SelfPeakColumn:
+            return i18n("<qt>The maximum heap memory in bytes consumed from "
+                        "allocations originating directly at "
+                        "this location. "
+                        "This takes deallocations into account.</qt>");
+        case SelfLeakedColumn:
+            return i18n("<qt>The bytes allocated directly at this location that have "
+                        "not been deallocated.</qt>");
+        case SelfAllocatedColumn:
+            return i18n("<qt>The sum of all bytes directly allocated from this "
+                        "location, ignoring deallocations.</qt>");
+        case InclusiveAllocationsColumn:
+            return i18n("<qt>The inclusive number of times an allocation function "
+                        "was called from this location or any "
+                        "functions called from here.</qt>");
+        case InclusiveTemporaryColumn:
+            return i18n("<qt>The number of inclusive temporary allocations. These "
+                        "allocations are directly followed by "
+                        "a free without any other allocations in-between.</qt>");
+        case InclusivePeakColumn:
+            return i18n("<qt>The inclusive maximum heap memory in bytes consumed "
+                        "from allocations originating at this "
+                        "location or from functions called from here. "
+                        "This takes deallocations into account.</qt>");
+        case InclusiveLeakedColumn:
+            return i18n("<qt>The bytes allocated at this location that have not been "
+                        "deallocated.</qt>");
+        case InclusiveAllocatedColumn:
+            return i18n("<qt>The inclusive sum of all bytes allocated from this "
+                        "location or functions called from "
+                        "here, ignoring deallocations.</qt>");
+        case LocationColumn:
+            return i18n("<qt>The location from which an allocation function was "
+                        "called. Function symbol and file "
+                        "information "
+                        "may be unknown when debug information was missing when "
+                        "heaptrack was run.</qt>");
+        case NUM_COLUMNS:
+            break;
         }
     }
     return {};
-
 }
 
 QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
@@ -203,13 +220,10 @@ QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
             return row.location->line;
         case LocationColumn:
             if (row.location->file.isEmpty()) {
-                return i18n("%1 in ?? (%2)",
-                            basename(row.location->function),
-                            basename(row.location->module));
+                return i18n("%1 in ?? (%2)", basename(row.location->function), basename(row.location->module));
             } else {
-                return i18n("%1 in %2:%3 (%4)", row.location->function,
-                            basename(row.location->file), row.location->line,
-                            basename(row.location->module));
+                return i18n("%1 in %2:%3 (%4)", row.location->function, basename(row.location->file),
+                            row.location->line, basename(row.location->module));
             }
         case NUM_COLUMNS:
             break;
@@ -220,24 +234,29 @@ QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
         stream << "<qt><pre style='font-family:monospace;'>";
         if (row.location->line > 0) {
             stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                            row.location->function.toHtmlEscaped(),
-                            row.location->file.toHtmlEscaped(), row.location->line,
-                            row.location->module.toHtmlEscaped());
+                            row.location->function.toHtmlEscaped(), row.location->file.toHtmlEscaped(),
+                            row.location->line, row.location->module.toHtmlEscaped());
         } else {
-            stream << i18nc("1: function, 2: module", "%1\n  in %2",
-                            row.location->function.toHtmlEscaped(),
+            stream << i18nc("1: function, 2: module", "%1\n  in %2", row.location->function.toHtmlEscaped(),
                             row.location->module.toHtmlEscaped());
         }
         stream << '\n';
-        stream << i18n("inclusive: allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, leaked %6",
-                       m_format.formatByteSize(row.inclusiveCost.allocated), row.inclusiveCost.allocations, row.inclusiveCost.temporary,
-                       round(float(row.inclusiveCost.temporary) * 100.f * 100.f / std::max(int64_t(1), row.inclusiveCost.allocations)) / 100.f,
-                       m_format.formatByteSize(row.inclusiveCost.peak), m_format.formatByteSize(row.inclusiveCost.leaked));
+        stream << i18n("inclusive: allocated %1 over %2 calls (%3 temporary, i.e. "
+                       "%4%), peak at %5, leaked %6",
+                       m_format.formatByteSize(row.inclusiveCost.allocated), row.inclusiveCost.allocations,
+                       row.inclusiveCost.temporary, round(float(row.inclusiveCost.temporary) * 100.f * 100.f
+                                                          / std::max(int64_t(1), row.inclusiveCost.allocations))
+                           / 100.f,
+                       m_format.formatByteSize(row.inclusiveCost.peak),
+                       m_format.formatByteSize(row.inclusiveCost.leaked));
         stream << '\n';
-        stream << i18n("self: allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, leaked %6",
-                       m_format.formatByteSize(row.selfCost.allocated), row.selfCost.allocations, row.selfCost.temporary,
-                       round(float(row.selfCost.temporary) * 100.f * 100.f / std::max(int64_t(1), row.selfCost.allocations)) / 100.f,
-                       m_format.formatByteSize(row.selfCost.peak), m_format.formatByteSize(row.selfCost.leaked));
+        stream << i18n(
+            "self: allocated %1 over %2 calls (%3 temporary, i.e. %4%), "
+            "peak at %5, leaked %6",
+            m_format.formatByteSize(row.selfCost.allocated), row.selfCost.allocations, row.selfCost.temporary,
+            round(float(row.selfCost.temporary) * 100.f * 100.f / std::max(int64_t(1), row.selfCost.allocations))
+                / 100.f,
+            m_format.formatByteSize(row.selfCost.peak), m_format.formatByteSize(row.selfCost.leaked));
         stream << '\n';
         stream << "</pre></qt>";
         return tooltip;

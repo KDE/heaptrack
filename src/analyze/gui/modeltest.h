@@ -20,6 +20,7 @@
 ** WARRANTY OF DESIGN, MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 **
 ****************************************************************************/
+// clang-format off
 
 #ifndef KDEVPLATFORM_MODELTEST_H
 #define KDEVPLATFORM_MODELTEST_H

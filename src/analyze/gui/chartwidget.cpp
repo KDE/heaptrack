@@ -24,17 +24,17 @@
 #include <KChartChart>
 #include <KChartPlotter>
 
+#include <KChartBackgroundAttributes>
+#include <KChartCartesianCoordinatePlane>
+#include <KChartDataValueAttributes>
+#include <KChartFrameAttributes.h>
 #include <KChartGridAttributes>
 #include <KChartHeaderFooter>
-#include <KChartCartesianCoordinatePlane>
 #include <KChartLegend>
-#include <KChartDataValueAttributes>
-#include <KChartBackgroundAttributes>
-#include <KChartFrameAttributes.h>
 
+#include <KColorScheme>
 #include <KFormat>
 #include <KLocalizedString>
-#include <KColorScheme>
 
 #include "chartmodel.h"
 #include "chartproxy.h"
@@ -48,7 +48,8 @@ class TimeAxis : public CartesianAxis
 public:
     explicit TimeAxis(AbstractCartesianDiagram* diagram = nullptr)
         : CartesianAxis(diagram)
-    {}
+    {
+    }
 
     const QString customizedLabel(const QString& label) const override
     {
@@ -63,7 +64,8 @@ class SizeAxis : public CartesianAxis
 public:
     explicit SizeAxis(AbstractCartesianDiagram* diagram = nullptr)
         : CartesianAxis(diagram)
-    {}
+    {
+    }
 
     const QString customizedLabel(const QString& label) const override
     {
@@ -100,21 +102,23 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
     }
 
     switch (model->type()) {
-        case ChartModel::Consumed:
-            setToolTip(i18n("<qt>Shows the heap memory consumption over time.</qt>"));
-            break;
-        case ChartModel::Allocated:
-            setToolTip(i18n("<qt>Displays total memory allocated over time. "
-                            "This value ignores deallocations and just measures heap allocation throughput.</qt>"));
-            break;
-        case ChartModel::Allocations:
-            setToolTip(i18n("<qt>Shows number of memory allocations over time.</qt>"));
-            break;
-        case ChartModel::Temporary:
-            setToolTip(i18n("<qt>Shows number of temporary memory allocations over time. "
-                            "A temporary allocation is one that is followed immediately by its "
-                            "corresponding deallocation, without other allocations happening in-between.</qt>"));
-            break;
+    case ChartModel::Consumed:
+        setToolTip(i18n("<qt>Shows the heap memory consumption over time.</qt>"));
+        break;
+    case ChartModel::Allocated:
+        setToolTip(i18n("<qt>Displays total memory allocated over time. "
+                        "This value ignores deallocations and just measures heap "
+                        "allocation throughput.</qt>"));
+        break;
+    case ChartModel::Allocations:
+        setToolTip(i18n("<qt>Shows number of memory allocations over time.</qt>"));
+        break;
+    case ChartModel::Temporary:
+        setToolTip(i18n("<qt>Shows number of temporary memory allocations over time. "
+                        "A temporary allocation is one that is followed immediately by its "
+                        "corresponding deallocation, without other allocations happening "
+                        "in-between.</qt>"));
+        break;
     }
 
     {
@@ -147,7 +151,8 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
         totalPlotter->addAxis(bottomAxis);
 
         CartesianAxis* rightAxis = model->type() == ChartModel::Allocations || model->type() == ChartModel::Temporary
-                                    ? new CartesianAxis(totalPlotter) : new SizeAxis(totalPlotter);
+            ? new CartesianAxis(totalPlotter)
+            : new SizeAxis(totalPlotter);
         rightAxis->setTextAttributes(axisTextAttributes);
         rightAxis->setTitleTextAttributes(axisTitleTextAttributes);
         rightAxis->setTitleText(model->headerData(1).toString());

@@ -19,13 +19,13 @@
 
 #include "libheaptrack.h"
 
-#include <dlfcn.h>
 #include <cstdio>
-#include <cstring>
 #include <cstdlib>
+#include <cstring>
+#include <dlfcn.h>
 
-#include <type_traits>
 #include <atomic>
+#include <type_traits>
 
 using namespace std;
 
@@ -36,7 +36,7 @@ namespace {
 
 namespace hooks {
 
-template<typename Signature, typename Base>
+template <typename Signature, typename Base>
 struct hook
 {
     Signature original = nullptr;
@@ -51,20 +51,23 @@ struct hook
         original = reinterpret_cast<Signature>(ret);
     }
 
-    template<typename... Args>
-    auto operator() (Args... args) const noexcept -> decltype(original(args...))
+    template <typename... Args>
+    auto operator()(Args... args) const noexcept -> decltype(original(args...))
     {
         return original(args...);
     }
 
-    explicit operator bool () const noexcept
+    explicit operator bool() const noexcept
     {
         return original;
     }
 };
 
-#define HOOK(name) struct name ## _t : public hook<decltype(&::name), name ## _t> { \
-    static constexpr const char* identifier = #name; } name
+#define HOOK(name)                                                                                                     \
+    struct name##_t : public hook<decltype(&::name), name##_t>                                                         \
+    {                                                                                                                  \
+        static constexpr const char* identifier = #name;                                                               \
+    } name
 
 HOOK(malloc);
 HOOK(free);
@@ -82,9 +85,11 @@ HOOK(dlopen);
 HOOK(dlclose);
 
 /**
- * Dummy implementation, since the call to dlsym from findReal triggers a call to calloc.
+ * Dummy implementation, since the call to dlsym from findReal triggers a call
+ * to calloc.
  *
- * This is only called at startup and will eventually be replaced by the "proper" calloc implementation.
+ * This is only called at startup and will eventually be replaced by the
+ * "proper" calloc implementation.
  */
 void* dummy_calloc(size_t num, size_t size) noexcept
 {
@@ -97,7 +102,9 @@ void* dummy_calloc(size_t num, size_t size) noexcept
     size_t oldOffset = offset;
     offset += num * size;
     if (offset >= MAX_SIZE) {
-        fprintf(stderr, "failed to initialize, dummy calloc buf size exhausted: %zu requested, %zu available\n", offset, MAX_SIZE);
+        fprintf(stderr, "failed to initialize, dummy calloc buf size exhausted: "
+                        "%zu requested, %zu available\n",
+                offset, MAX_SIZE);
         abort();
     }
     return buf + oldOffset;
@@ -105,32 +112,32 @@ void* dummy_calloc(size_t num, size_t size) noexcept
 
 void init()
 {
-    heaptrack_init(getenv("DUMP_HEAPTRACK_OUTPUT"), [] {
-        hooks::calloc.original = &dummy_calloc;
-        hooks::calloc.init();
-        hooks::dlopen.init();
-        hooks::dlclose.init();
-        hooks::malloc.init();
-        hooks::free.init();
-        hooks::calloc.init();
+    heaptrack_init(getenv("DUMP_HEAPTRACK_OUTPUT"),
+                   [] {
+                       hooks::calloc.original = &dummy_calloc;
+                       hooks::calloc.init();
+                       hooks::dlopen.init();
+                       hooks::dlclose.init();
+                       hooks::malloc.init();
+                       hooks::free.init();
+                       hooks::calloc.init();
 #if HAVE_CFREE
-        hooks::cfree.init();
+                       hooks::cfree.init();
 #endif
-        hooks::realloc.init();
-        hooks::posix_memalign.init();
-        hooks::valloc.init();
+                       hooks::realloc.init();
+                       hooks::posix_memalign.init();
+                       hooks::valloc.init();
 #if HAVE_ALIGNED_ALLOC
-        hooks::aligned_alloc.init();
+                       hooks::aligned_alloc.init();
 #endif
 
-        // cleanup environment to prevent tracing of child apps
-        unsetenv("LD_PRELOAD");
-        unsetenv("DUMP_HEAPTRACK_OUTPUT");
-    }, nullptr, nullptr);
+                       // cleanup environment to prevent tracing of child apps
+                       unsetenv("LD_PRELOAD");
+                       unsetenv("DUMP_HEAPTRACK_OUTPUT");
+                   },
+                   nullptr, nullptr);
 }
-
 }
-
 }
 
 extern "C" {
@@ -210,7 +217,7 @@ void cfree(void* ptr) noexcept
 }
 #endif
 
-int posix_memalign(void **memptr, size_t alignment, size_t size) noexcept
+int posix_memalign(void** memptr, size_t alignment, size_t size) noexcept
 {
     if (!hooks::posix_memalign) {
         hooks::init();
@@ -257,7 +264,7 @@ void* valloc(size_t size) noexcept
     return ret;
 }
 
-void *dlopen(const char *filename, int flag) noexcept
+void* dlopen(const char* filename, int flag) noexcept
 {
     if (!hooks::dlopen) {
         hooks::init();
@@ -272,7 +279,7 @@ void *dlopen(const char *filename, int flag) noexcept
     return ret;
 }
 
-int dlclose(void *handle) noexcept
+int dlclose(void* handle) noexcept
 {
     if (!hooks::dlclose) {
         hooks::init();
@@ -286,5 +293,4 @@ int dlclose(void *handle) noexcept
 
     return ret;
 }
-
 }

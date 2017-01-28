@@ -23,21 +23,19 @@
 extern "C" {
 #endif
 
-typedef void (*heaptrack_callback_t) ();
-typedef void (*heaptrack_callback_initialized_t) (FILE*);
+typedef void (*heaptrack_callback_t)();
+typedef void (*heaptrack_callback_initialized_t)(FILE*);
 
-void heaptrack_init(const char *outputFileName,
-                    heaptrack_callback_t initCallbackBefore,
-                    heaptrack_callback_initialized_t initCallbackAfter,
-                    heaptrack_callback_t stopCallback);
+void heaptrack_init(const char* outputFileName, heaptrack_callback_t initCallbackBefore,
+                    heaptrack_callback_initialized_t initCallbackAfter, heaptrack_callback_t stopCallback);
 
 void heaptrack_stop();
 
-void heaptrack_malloc(void *ptr, size_t size);
+void heaptrack_malloc(void* ptr, size_t size);
 
-void heaptrack_free(void *ptr);
+void heaptrack_free(void* ptr);
 
-void heaptrack_realloc(void *ptr_in, size_t size, void *ptr_out);
+void heaptrack_realloc(void* ptr_in, size_t size, void* ptr_out);
 
 void heaptrack_invalidate_module_cache();
 

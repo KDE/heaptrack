@@ -26,11 +26,10 @@ class CostDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    explicit CostDelegate(QObject *parent = nullptr);
+    explicit CostDelegate(QObject* parent = nullptr);
     ~CostDelegate();
 
-    void paint(QPainter *painter, const QStyleOptionViewItem &option,
-               const QModelIndex &index) const override;
+    void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 };
 
 #endif // COSTDELEGATE_H

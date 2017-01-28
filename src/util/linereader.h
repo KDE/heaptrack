@@ -61,7 +61,7 @@ public:
         return m_line;
     }
 
-    template<typename T>
+    template <typename T>
     bool readHex(T& in)
     {
         auto it = m_it;

@@ -17,8 +17,8 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include "src/util/pointermap.h"
 #include "bench_pointers.h"
+#include "src/util/pointermap.h"
 
 int main()
 {

@@ -25,9 +25,9 @@
 
 #include <KFormat>
 
+#include "../allocationdata.h"
 #include "locationdata.h"
 #include "summarydata.h"
-#include "../allocationdata.h"
 
 struct RowData
 {
@@ -52,7 +52,8 @@ public:
     TreeModel(QObject* parent);
     virtual ~TreeModel();
 
-    enum Columns {
+    enum Columns
+    {
         AllocationsColumn,
         TemporaryColumn,
         PeakColumn,
@@ -66,7 +67,8 @@ public:
         NUM_COLUMNS
     };
 
-    enum Roles {
+    enum Roles
+    {
         SortRole = Qt::UserRole,
         MaxCostRole,
         LocationRole
@@ -96,4 +98,3 @@ private:
 };
 
 #endif // TREEMODEL_H
-

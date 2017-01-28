@@ -35,10 +35,7 @@ struct LocationData
 
     bool operator==(const LocationData& rhs) const
     {
-        return function == rhs.function
-            && file == rhs.file
-            && module == rhs.module
-            && line == rhs.line;
+        return function == rhs.function && file == rhs.file && module == rhs.module && line == rhs.line;
     }
 
     bool operator<(const LocationData& rhs) const

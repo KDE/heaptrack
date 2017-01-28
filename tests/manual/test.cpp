@@ -1,9 +1,10 @@
-#include <cstdlib>
 #include <cstdio>
+#include <cstdlib>
 
 #define HAVE_ALIGNED_ALLOC defined(_ISOC11_SOURCE)
 
-struct Foo {
+struct Foo
+{
     Foo()
         : i(new int)
     {

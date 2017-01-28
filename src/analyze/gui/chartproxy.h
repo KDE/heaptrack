@@ -21,6 +21,7 @@
 #define CHARTPROXY_H
 
 #include <QSortFilterProxyModel>
+
 #include "chartmodel.h"
 
 class ChartProxy : public QSortFilterProxyModel
@@ -37,4 +38,4 @@ private:
     bool m_showTotal;
 };
 
-#endif //CHARTPROXY_H
+#endif // CHARTPROXY_H

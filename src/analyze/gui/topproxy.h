@@ -28,7 +28,8 @@ class TopProxy : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    enum Type {
+    enum Type
+    {
         Peak,
         Leaked,
         Allocations,

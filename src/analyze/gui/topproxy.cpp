@@ -30,7 +30,7 @@ TreeModel::Columns toSource(TopProxy::Type type)
     case TopProxy::Leaked:
         return TreeModel::LeakedColumn;
     case TopProxy::Allocations:
-        return TreeModel::AllocationsColumn;;
+        return TreeModel::AllocationsColumn;
     case TopProxy::Temporary:
         return TreeModel::TemporaryColumn;
     case TopProxy::Allocated:
@@ -60,7 +60,8 @@ bool TopProxy::filterAcceptsRow(int source_row, const QModelIndex& source_parent
         return false;
     }
     if (!sourceModel()->index(source_row, toSource(m_type)).data(TreeModel::SortRole).toULongLong()) {
-        // don't show rows that didn't leak anything, or didn't trigger any temporary allocations
+        // don't show rows that didn't leak anything, or didn't trigger any
+        // temporary allocations
         return false;
     }
     return true;

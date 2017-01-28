@@ -37,7 +37,8 @@ struct HistogramRow
     {
         columns.fill({0, {}});
     }
-    enum {
+    enum
+    {
         NUM_COLUMNS = 10 + 1
     };
     QString sizeLabel;

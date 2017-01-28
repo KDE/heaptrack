@@ -32,7 +32,8 @@ struct Trace
 {
     using ip_t = void*;
 
-    enum : int {
+    enum : int
+    {
         MAX_SIZE = 64
     };
 
@@ -46,7 +47,7 @@ struct Trace
         return begin() + m_size;
     }
 
-    ip_t operator[] (int i) const
+    ip_t operator[](int i) const
     {
         return m_data[m_skip + i];
     }

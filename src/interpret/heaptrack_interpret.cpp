@@ -23,14 +23,14 @@
  * @brief Interpret raw heaptrack data and add Dwarf based debug information.
  */
 
+#include <algorithm>
+#include <cinttypes>
 #include <iostream>
 #include <sstream>
+#include <stdio_ext.h>
+#include <tuple>
 #include <unordered_map>
 #include <vector>
-#include <tuple>
-#include <algorithm>
-#include <stdio_ext.h>
-#include <cinttypes>
 
 #include <cxxabi.h>
 
@@ -88,23 +88,27 @@ struct Module
         }
 
         backtrace_pcinfo(backtraceState, address,
-                         [] (void *data, uintptr_t /*addr*/, const char *file, int line, const char *function) -> int {
-                            auto info = reinterpret_cast<AddressInformation*>(data);
-                            info->function = demangle(function);
-                            info->file = file ? file : "";
-                            info->line = line;
-                            return 0;
-                         }, [] (void */*data*/, const char */*msg*/, int /*errnum*/) {}, &info);
+                         [](void* data, uintptr_t /*addr*/, const char* file, int line, const char* function) -> int {
+                             auto info = reinterpret_cast<AddressInformation*>(data);
+                             info->function = demangle(function);
+                             info->file = file ? file : "";
+                             info->line = line;
+                             return 0;
+                         },
+                         [](void* /*data*/, const char* /*msg*/, int /*errnum*/) {}, &info);
 
         if (info.function.empty()) {
-            backtrace_syminfo(backtraceState, address,
-                              [] (void *data, uintptr_t /*pc*/, const char *symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
-                                if (symname) {
-                                    reinterpret_cast<AddressInformation*>(data)->function = demangle(symname);
-                                }
-                              }, [] (void */*data*/, const char *msg, int errnum) {
-                                cerr << "Module backtrace error (code " << errnum << "): " << msg << endl;
-                              }, &info);
+            backtrace_syminfo(
+                backtraceState, address,
+                [](void* data, uintptr_t /*pc*/, const char* symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
+                    if (symname) {
+                        reinterpret_cast<AddressInformation*>(data)->function = demangle(symname);
+                    }
+                },
+                [](void* /*data*/, const char* msg, int errnum) {
+                    cerr << "Module backtrace error (code " << errnum << "): " << msg << endl;
+                },
+                &info);
         }
 
         return info;
@@ -113,7 +117,7 @@ struct Module
     bool operator<(const Module& module) const
     {
         return tie(addressStart, addressEnd, moduleIndex)
-             < tie(module.addressStart, module.addressEnd, module.moduleIndex);
+            < tie(module.addressStart, module.addressEnd, module.moduleIndex);
     }
 
     bool operator!=(const Module& module) const
@@ -148,8 +152,7 @@ struct AccumulatedTraceData
 
     ~AccumulatedTraceData()
     {
-        fprintf(stdout, "# strings: %zu\n# ips: %zu\n",
-                m_internedData.size(), m_encounteredIps.size());
+        fprintf(stdout, "# strings: %zu\n# ips: %zu\n", m_internedData.size(), m_encounteredIps.size());
     }
 
     ResolvedIP resolve(const uintptr_t ip)
@@ -166,12 +169,11 @@ struct AccumulatedTraceData
                         continue;
                     }
                     const auto& m2 = m_modules[j];
-                    if ((m1.addressStart <= m2.addressStart && m1.addressEnd > m2.addressStart) ||
-                        (m1.addressStart < m2.addressEnd && m1.addressEnd >= m2.addressEnd))
-                    {
-                        cerr << "OVERLAPPING MODULES: " << hex
-                             << m1.moduleIndex << " (" << m1.addressStart << " to " << m1.addressEnd << ") and "
-                             << m1.moduleIndex << " (" << m2.addressStart << " to " << m2.addressEnd << ")\n"
+                    if ((m1.addressStart <= m2.addressStart && m1.addressEnd > m2.addressStart)
+                        || (m1.addressStart < m2.addressEnd && m1.addressEnd >= m2.addressEnd)) {
+                        cerr << "OVERLAPPING MODULES: " << hex << m1.moduleIndex << " (" << m1.addressStart << " to "
+                             << m1.addressEnd << ") and " << m1.moduleIndex << " (" << m2.addressStart << " to "
+                             << m2.addressEnd << ")\n"
                              << dec;
                     } else if (m2.addressStart >= m1.addressEnd) {
                         break;
@@ -185,10 +187,9 @@ struct AccumulatedTraceData
 
         ResolvedIP data;
         // find module for this instruction pointer
-        auto module = lower_bound(m_modules.begin(), m_modules.end(), ip,
-                                    [] (const Module& module, const uintptr_t ip) -> bool {
-                                        return module.addressEnd < ip;
-                                    });
+        auto module =
+            lower_bound(m_modules.begin(), m_modules.end(), ip,
+                        [](const Module& module, const uintptr_t ip) -> bool { return module.addressEnd < ip; });
         if (module != m_modules.end() && module->addressStart <= ip && module->addressEnd >= ip) {
             data.moduleIndex = module->moduleIndex;
             const auto info = module->resolveAddress(ip);
@@ -221,8 +222,8 @@ struct AccumulatedTraceData
         return id;
     }
 
-    void addModule(backtrace_state* backtraceState, const size_t moduleIndex,
-                   const uintptr_t addressStart, const uintptr_t addressEnd)
+    void addModule(backtrace_state* backtraceState, const size_t moduleIndex, const uintptr_t addressStart,
+                   const uintptr_t addressEnd)
     {
         m_modules.emplace_back(addressStart, addressEnd, backtraceState, moduleIndex);
         m_modulesDirty = true;
@@ -277,15 +278,16 @@ struct AccumulatedTraceData
             return it->second;
         }
 
-        struct CallbackData {
+        struct CallbackData
+        {
             const char* fileName;
         };
         CallbackData data = {fileName};
 
-        auto errorHandler = [] (void *rawData, const char *msg, int errnum) {
+        auto errorHandler = [](void* rawData, const char* msg, int errnum) {
             auto data = reinterpret_cast<const CallbackData*>(rawData);
-            cerr << "Failed to create backtrace state for module " << data->fileName << ": "
-                 << msg << " / " << strerror(errnum) << " (error code " << errnum << ")" << endl;
+            cerr << "Failed to create backtrace state for module " << data->fileName << ": " << msg << " / "
+                 << strerror(errnum) << " (error code " << errnum << ")" << endl;
         };
 
         auto state = backtrace_create_state(fileName, /* we are single threaded, so: not thread safe */ false,
@@ -296,8 +298,8 @@ struct AccumulatedTraceData
             if (descriptor >= 1) {
                 int foundSym = 0;
                 int foundDwarf = 0;
-                auto ret = elf_add(state, descriptor, addressStart, errorHandler, &data,
-                                   &state->fileline_fn, &foundSym, &foundDwarf, false);
+                auto ret = elf_add(state, descriptor, addressStart, errorHandler, &data, &state->fileline_fn, &foundSym,
+                                   &foundDwarf, false);
                 if (ret && foundSym) {
                     state->syminfo_fn = &elf_syminfo;
                 }
@@ -317,7 +319,6 @@ private:
     unordered_map<string, size_t> m_internedData;
     unordered_map<uintptr_t, size_t> m_encounteredIps;
 };
-
 }
 
 int main(int /*argc*/, char** /*argv*/)
@@ -353,7 +354,7 @@ int main(int /*argc*/, char** /*argv*/)
                 if (fileName == "x") {
                     fileName = exe;
                 }
-                const char *internedString = nullptr;
+                const char* internedString = nullptr;
                 const auto moduleIndex = data.intern(fileName, &internedString);
                 uintptr_t addressStart = 0;
                 if (!(reader >> addressStart)) {
@@ -364,9 +365,7 @@ int main(int /*argc*/, char** /*argv*/)
                 uintptr_t vAddr = 0;
                 uintptr_t memSize = 0;
                 while ((reader >> vAddr) && (reader >> memSize)) {
-                    data.addModule(state, moduleIndex,
-                                   addressStart + vAddr,
-                                   addressStart + vAddr + memSize);
+                    data.addModule(state, moduleIndex, addressStart + vAddr, addressStart + vAddr + memSize);
                 }
             }
         } else if (reader.mode() == 't') {
@@ -422,10 +421,10 @@ int main(int /*argc*/, char** /*argv*/)
     }
 
     fprintf(stderr, "heaptrack stats:\n"
-           "\tallocations:          \t%" PRIu64 "\n"
-           "\tleaked allocations:   \t%" PRIu64 "\n"
-           "\ttemporary allocations:\t%" PRIu64 "\n",
-           allocations, leakedAllocations, temporaryAllocations);
+                    "\tallocations:          \t%" PRIu64 "\n"
+                    "\tleaked allocations:   \t%" PRIu64 "\n"
+                    "\ttemporary allocations:\t%" PRIu64 "\n",
+            allocations, leakedAllocations, temporaryAllocations);
 
     return 0;
 }

@@ -19,21 +19,21 @@
 
 #include "accumulatedtracedata.h"
 
-#include <iostream>
-#include <memory>
 #include <algorithm>
 #include <cassert>
+#include <iostream>
+#include <memory>
 
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
 
-#include "util/linereader.h"
 #include "util/config.h"
+#include "util/linereader.h"
 #include "util/pointermap.h"
 
 #ifdef __GNUC__
-#define POTENTIALLY_UNUSED __attribute__ ((unused))
+#define POTENTIALLY_UNUSED __attribute__((unused))
 #else
 #define POTENTIALLY_UNUSED
 #endif
@@ -42,19 +42,18 @@ using namespace std;
 
 namespace {
 
-template<typename Base>
-bool operator>>(LineReader& reader, Index<Base> &index)
+template <typename Base>
+bool operator>>(LineReader& reader, Index<Base>& index)
 {
     return reader.readHex(index.index);
 }
 
-template<typename Base>
-ostream& operator<<(ostream &out, const Index<Base> index)
+template <typename Base>
+ostream& operator<<(ostream& out, const Index<Base> index)
 {
     out << index.index;
     return out;
 }
-
 }
 
 AccumulatedTraceData::AccumulatedTraceData()
@@ -144,20 +143,14 @@ bool AccumulatedTraceData::read(istream& in)
 
     vector<string> opNewStrings = {
         // 64 bit
-        "operator new(unsigned long)",
-        "operator new[](unsigned long)",
+        "operator new(unsigned long)", "operator new[](unsigned long)",
         // 32 bit
-        "operator new(unsigned int)",
-        "operator new[](unsigned int)",
+        "operator new(unsigned int)", "operator new[](unsigned int)",
     };
     vector<StringIndex> opNewStrIndices;
     opNewStrIndices.reserve(opNewStrings.size());
 
-    vector<string> stopStrings = {
-        "main",
-        "__libc_start_main",
-        "__static_initialization_and_destruction_0"
-    };
+    vector<string> stopStrings = {"main", "__libc_start_main", "__static_initialization_and_destruction_0"};
 
     const bool reparsing = totalTime != 0;
     m_maxAllocationTraceIndex.index = 0;
@@ -233,7 +226,8 @@ bool AccumulatedTraceData::read(istream& in)
                     cerr << "failed to parse line: " << reader.line() << endl;
                     continue;
                 } else if (allocationIndex.index >= allocationInfos.size()) {
-                    cerr << "allocation index out of bounds: " << allocationIndex.index << ", maximum is: " << allocationInfos.size() << endl;
+                    cerr << "allocation index out of bounds: " << allocationIndex.index
+                         << ", maximum is: " << allocationInfos.size() << endl;
                     continue;
                 }
                 info = allocationInfos[allocationIndex.index];
@@ -344,10 +338,11 @@ bool AccumulatedTraceData::read(istream& in)
                 fileVersion = 1;
             }
             if (fileVersion > HEAPTRACK_FILE_FORMAT_VERSION) {
-                cerr << "The data file has version " << hex << fileVersion
-                     << " (written by heaptrack version " << hex << heaptrackVersion << ")\n"
-                     << "This is not compatible with this build of heaptrack (version " << hex << HEAPTRACK_VERSION << ")"
-                     << ", which can read file format version " << hex << HEAPTRACK_FILE_FORMAT_VERSION << " and below" << endl;
+                cerr << "The data file has version " << hex << fileVersion << " and was written by heaptrack version "
+                     << hex << heaptrackVersion << ")\n"
+                     << "This is not compatible with this build of heaptrack (version " << hex << HEAPTRACK_VERSION
+                     << "), which can read file format version " << hex << HEAPTRACK_FILE_FORMAT_VERSION << " and below"
+                     << endl;
                 return false;
             }
         } else if (reader.mode() == 'I') { // system information
@@ -369,7 +364,7 @@ bool AccumulatedTraceData::read(istream& in)
 
 namespace { // helpers for diffing
 
-template<typename IndexT, typename SortF>
+template <typename IndexT, typename SortF>
 vector<IndexT> sortedIndices(size_t numIndices, SortF sorter)
 {
     vector<IndexT> indices;
@@ -411,16 +406,15 @@ vector<StringIndex> remapStrings(vector<string>& lhs, const vector<string>& rhs)
     return map;
 }
 
-template<typename T>
+template <typename T>
 inline const T& identity(const T& t)
 {
     return t;
 }
 
-template<typename IpMapper>
-int compareTraceIndices(const TraceIndex &lhs, const AccumulatedTraceData& lhsData,
-                          const TraceIndex &rhs, const AccumulatedTraceData& rhsData,
-                          IpMapper ipMapper)
+template <typename IpMapper>
+int compareTraceIndices(const TraceIndex& lhs, const AccumulatedTraceData& lhsData, const TraceIndex& rhs,
+                        const AccumulatedTraceData& rhsData, IpMapper ipMapper)
 {
     if (!lhs && !rhs) {
         return 0;
@@ -436,7 +430,8 @@ int compareTraceIndices(const TraceIndex &lhs, const AccumulatedTraceData& lhsDa
     const auto& lhsTrace = lhsData.findTrace(lhs);
     const auto& rhsTrace = rhsData.findTrace(rhs);
 
-    const int parentComparsion = compareTraceIndices(lhsTrace.parentIndex, lhsData, rhsTrace.parentIndex, rhsData, ipMapper);
+    const int parentComparsion =
+        compareTraceIndices(lhsTrace.parentIndex, lhsData, rhsTrace.parentIndex, rhsData, ipMapper);
     if (parentComparsion != 0) {
         return parentComparsion;
     } // else fall-through to below, parents are equal
@@ -454,11 +449,9 @@ POTENTIALLY_UNUSED void printTrace(const AccumulatedTraceData& data, TraceIndex 
     do {
         const auto trace = data.findTrace(index);
         const auto& ip = data.findIp(trace.ipIndex);
-        cerr << index << " (" << trace.ipIndex << ", " << trace.parentIndex << ")"
-            << '\t' << data.stringify(ip.functionIndex)
-            << " in " << data.stringify(ip.moduleIndex)
-            << " at " << data.stringify(ip.fileIndex) << ':' << ip.line
-            << '\n';
+        cerr << index << " (" << trace.ipIndex << ", " << trace.parentIndex << ")" << '\t'
+             << data.stringify(ip.functionIndex) << " in " << data.stringify(ip.moduleIndex) << " at "
+             << data.stringify(ip.fileIndex) << ':' << ip.line << '\n';
         index = trace.parentIndex;
     } while (index);
     cerr << "---\n";
@@ -479,15 +472,13 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     allocationTraceNodes.reserve(allocations.size());
     for (auto it = allocations.begin(); it != allocations.end();) {
         const auto& allocation = *it;
-        auto sortedIt = lower_bound(allocationTraceNodes.begin(), allocationTraceNodes.end(), allocation.traceIndex,
-            [this] (const TraceIndex& lhs, const TraceIndex& rhs) -> bool {
-                return compareTraceIndices(lhs, *this,
-                                           rhs, *this,
-                                           identity<InstructionPointer>) < 0;
-            });
+        auto sortedIt =
+            lower_bound(allocationTraceNodes.begin(), allocationTraceNodes.end(), allocation.traceIndex,
+                        [this](const TraceIndex& lhs, const TraceIndex& rhs) -> bool {
+                            return compareTraceIndices(lhs, *this, rhs, *this, identity<InstructionPointer>) < 0;
+                        });
         if (sortedIt == allocationTraceNodes.end()
-            || compareTraceIndices(allocation.traceIndex, *this, *sortedIt, *this, identity<InstructionPointer>) != 0)
-        {
+            || compareTraceIndices(allocation.traceIndex, *this, *sortedIt, *this, identity<InstructionPointer>) != 0) {
             allocationTraceNodes.insert(sortedIt, allocation.traceIndex);
             ++it;
         } else if (*sortedIt != allocation.traceIndex) {
@@ -501,12 +492,12 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     // step 3: map string indices from rhs to lhs data
 
     const auto& stringMap = remapStrings(strings, base.strings);
-    auto remapString = [&stringMap] (StringIndex& index) {
+    auto remapString = [&stringMap](StringIndex& index) {
         if (index) {
             index.index = stringMap[index.index].index;
         }
     };
-    auto remapIp = [&remapString] (InstructionPointer ip) -> InstructionPointer {
+    auto remapIp = [&remapString](InstructionPointer ip) -> InstructionPointer {
         remapString(ip.moduleIndex);
         remapString(ip.functionIndex);
         remapString(ip.fileIndex);
@@ -516,14 +507,13 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     // step 4: iterate over rhs data and find matching traces
     //         if no match is found, copy the data over
 
-    auto sortedIps = sortedIndices<IpIndex>(instructionPointers.size(),
-        [this] (const IpIndex &lhs, const IpIndex &rhs) {
-            return findIp(lhs).compareWithoutAddress(findIp(rhs));
-        });
+    auto sortedIps = sortedIndices<IpIndex>(instructionPointers.size(), [this](const IpIndex& lhs, const IpIndex& rhs) {
+        return findIp(lhs).compareWithoutAddress(findIp(rhs));
+    });
 
     // map an IpIndex from the rhs data into the lhs data space, or copy the data
     // if it does not exist yet
-    auto remapIpIndex = [&sortedIps, this, &base, &remapIp] (IpIndex rhsIndex) -> IpIndex {
+    auto remapIpIndex = [&sortedIps, this, &base, &remapIp](IpIndex rhsIndex) -> IpIndex {
         if (!rhsIndex) {
             return rhsIndex;
         }
@@ -532,7 +522,7 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
         const auto& lhsIp = remapIp(rhsIp);
 
         auto it = lower_bound(sortedIps.begin(), sortedIps.end(), lhsIp,
-                              [this] (const IpIndex &lhs, const InstructionPointer &rhs) {
+                              [this](const IpIndex& lhs, const InstructionPointer& rhs) {
                                   return findIp(lhs).compareWithoutAddress(rhs);
                               });
         if (it != sortedIps.end() && findIp(*it).equalWithoutAddress(lhsIp)) {
@@ -548,8 +538,10 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
         return ret;
     };
 
-    // copy the rhs trace index and the data it references into the lhs data, recursively
-    function<TraceIndex (TraceIndex)> copyTrace = [this, &base, remapIpIndex, &copyTrace] (TraceIndex rhsIndex) -> TraceIndex {
+    // copy the rhs trace index and the data it references into the lhs data,
+    // recursively
+    function<TraceIndex(TraceIndex)> copyTrace = [this, &base, remapIpIndex,
+                                                  &copyTrace](TraceIndex rhsIndex) -> TraceIndex {
         if (!rhsIndex) {
             return rhsIndex;
         }
@@ -569,21 +561,20 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     };
 
     // find an equivalent trace or copy the data over if it does not exist yet
-    // a trace is equivalent if the complete backtrace has equal InstructionPointer
+    // a trace is equivalent if the complete backtrace has equal
+    // InstructionPointer
     // data while ignoring the actual pointer address
-    auto remapTrace = [&base, &allocationTraceNodes, this, remapIp, copyTrace] (TraceIndex rhsIndex) -> TraceIndex {
+    auto remapTrace = [&base, &allocationTraceNodes, this, remapIp, copyTrace](TraceIndex rhsIndex) -> TraceIndex {
         if (!rhsIndex) {
             return rhsIndex;
         }
 
         auto it = lower_bound(allocationTraceNodes.begin(), allocationTraceNodes.end(), rhsIndex,
-            [&base, this, remapIp] (const TraceIndex& lhs, const TraceIndex& rhs) -> bool {
-                return compareTraceIndices(lhs, *this, rhs, base, remapIp) < 0;
-            });
+                              [&base, this, remapIp](const TraceIndex& lhs, const TraceIndex& rhs) -> bool {
+                                  return compareTraceIndices(lhs, *this, rhs, base, remapIp) < 0;
+                              });
 
-        if (it != allocationTraceNodes.end()
-            && compareTraceIndices(*it, *this, rhsIndex, base, remapIp) == 0)
-        {
+        if (it != allocationTraceNodes.end() && compareTraceIndices(*it, *this, rhsIndex, base, remapIp) == 0) {
             return *it;
         }
 
@@ -594,7 +585,8 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
 
     for (const auto& rhsAllocation : base.allocations) {
         const auto lhsTrace = remapTrace(rhsAllocation.traceIndex);
-        assert(base.findIp(base.findTrace(rhsAllocation.traceIndex).ipIndex).equalWithoutAddress(findIp(findTrace(lhsTrace).ipIndex)));
+        assert(base.findIp(base.findTrace(rhsAllocation.traceIndex).ipIndex)
+                   .equalWithoutAddress(findIp(findTrace(lhsTrace).ipIndex)));
         findAllocation(lhsTrace) -= rhsAllocation;
     }
 
@@ -603,9 +595,8 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     //         we can still end up with merged backtraces that have a total
     //         of 0, but different "tails" of different origin with non-zero cost
     allocations.erase(remove_if(allocations.begin(), allocations.end(),
-        [] (const Allocation& allocation) -> bool {
-            return allocation == AllocationData();
-        }), allocations.end());
+                                [](const Allocation& allocation) -> bool { return allocation == AllocationData(); }),
+                      allocations.end());
 }
 
 Allocation& AccumulatedTraceData::findAllocation(const TraceIndex traceIndex)
@@ -613,9 +604,9 @@ Allocation& AccumulatedTraceData::findAllocation(const TraceIndex traceIndex)
     if (traceIndex < m_maxAllocationTraceIndex) {
         // only need to search when the trace index is previously known
         auto it = lower_bound(allocations.begin(), allocations.end(), traceIndex,
-                            [] (const Allocation& allocation, const TraceIndex traceIndex) -> bool {
-                                return allocation.traceIndex < traceIndex;
-                            });
+                              [](const Allocation& allocation, const TraceIndex traceIndex) -> bool {
+                                  return allocation.traceIndex < traceIndex;
+                              });
         if (it == allocations.end() || it->traceIndex != traceIndex) {
             Allocation allocation;
             allocation.traceIndex = traceIndex;

@@ -18,6 +18,7 @@
  */
 
 #include <sparse_hash_map>
+
 #include "bench_pointers.h"
 #include "src/util/indices.h"
 

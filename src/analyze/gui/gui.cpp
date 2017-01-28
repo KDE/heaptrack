@@ -33,10 +33,11 @@ int main(int argc, char** argv)
 
     KAboutData aboutData(QStringLiteral("heaptrack_gui"), i18n("Heaptrack GUI"), QStringLiteral("0.1"),
                          i18n("A visualizer for heaptrack data files."), KAboutLicense::LGPL,
-                         i18n("Copyright 2015, Milian Wolff <mail@milianw.de>"), QString(), QStringLiteral("mail@milianw.de"));
+                         i18n("Copyright 2015, Milian Wolff <mail@milianw.de>"), QString(),
+                         QStringLiteral("mail@milianw.de"));
 
-    aboutData.addAuthor(i18n("Milian Wolff"), i18n("Original author, maintainer"),
-                        QStringLiteral("mail@milianw.de"), QStringLiteral("http://milianw.de"));
+    aboutData.addAuthor(i18n("Milian Wolff"), i18n("Original author, maintainer"), QStringLiteral("mail@milianw.de"),
+                        QStringLiteral("http://milianw.de"));
 
     aboutData.setOrganizationDomain("kde.org");
     KAboutData::setApplicationData(aboutData);
@@ -53,25 +54,23 @@ int main(int argc, char** argv)
     parser.addHelpOption();
     aboutData.setupCommandLine(&parser);
 
-    QCommandLineOption diffOption {
-        { QStringLiteral("d"), QStringLiteral("diff")},
-        i18n("Base profile data to compare other files to."),
-        QStringLiteral("<file>")
-    };
+    QCommandLineOption diffOption{{QStringLiteral("d"), QStringLiteral("diff")},
+                                  i18n("Base profile data to compare other files to."),
+                                  QStringLiteral("<file>")};
     parser.addOption(diffOption);
-    parser.addPositionalArgument(QStringLiteral("files"), i18n( "Files to load" ), i18n("[FILE...]"));
+    parser.addPositionalArgument(QStringLiteral("files"), i18n("Files to load"), i18n("[FILE...]"));
 
     parser.process(app);
     aboutData.processCommandLine(&parser);
 
-    auto createWindow = [] () -> MainWindow* {
+    auto createWindow = []() -> MainWindow* {
         auto window = new MainWindow;
         window->setAttribute(Qt::WA_DeleteOnClose);
         window->show();
         return window;
     };
 
-    foreach (const QString &file, parser.positionalArguments()) {
+    foreach (const QString& file, parser.positionalArguments()) {
         createWindow()->loadFile(file, parser.value(diffOption));
     }
 

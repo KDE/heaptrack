@@ -66,11 +66,17 @@ __attribute__((weak)) void heaptrack_free(void* ptr);
 }
 #endif
 
-#define heaptrack_report_alloc(ptr, size) if (heaptrack_malloc) heaptrack_malloc(ptr, size)
+#define heaptrack_report_alloc(ptr, size)                                                                              \
+    if (heaptrack_malloc)                                                                                              \
+    heaptrack_malloc(ptr, size)
 
-#define heaptrack_report_realloc(ptr_in, size, ptr_out) if (heaptrack_realloc) heaptrack_realloc(ptr_in, size, ptr_out)
+#define heaptrack_report_realloc(ptr_in, size, ptr_out)                                                                \
+    if (heaptrack_realloc)                                                                                             \
+    heaptrack_realloc(ptr_in, size, ptr_out)
 
-#define heaptrack_report_free(ptr) if (heaptrack_free) heaptrack_free(ptr)
+#define heaptrack_report_free(ptr)                                                                                     \
+    if (heaptrack_free)                                                                                                \
+    heaptrack_free(ptr)
 
 #else // HEAPTRACK_API_DLSYM
 
@@ -95,9 +101,9 @@ __attribute__((weak)) void heaptrack_free(void* ptr);
 
 struct heaptrack_api_t
 {
-    void (*malloc) (void *, size_t);
-    void (*free) (void *);
-    void (*realloc) (void *, size_t, void *);
+    void (*malloc)(void*, size_t);
+    void (*free)(void*);
+    void (*realloc)(void*, size_t, void*);
 };
 static struct heaptrack_api_t heaptrack_api = {0, 0, 0};
 
@@ -107,37 +113,40 @@ void heaptrack_init_api()
     if (!initialized) {
         void* sym = dlsym(RTLD_NEXT, "heaptrack_malloc");
         if (sym)
-            heaptrack_api.malloc = (void (*) (void *, size_t)) sym;
+            heaptrack_api.malloc = (void (*)(void*, size_t))sym;
 
         sym = dlsym(RTLD_NEXT, "heaptrack_realloc");
         if (sym)
-            heaptrack_api.realloc = (void (*) (void *, size_t, void *)) sym;
+            heaptrack_api.realloc = (void (*)(void*, size_t, void*))sym;
 
         sym = dlsym(RTLD_NEXT, "heaptrack_free");
         if (sym)
-            heaptrack_api.free = (void (*) (void *)) sym;
+            heaptrack_api.free = (void (*)(void*))sym;
 
         initialized = 1;
     }
 }
 
-#define heaptrack_report_alloc(ptr, size) \
-    do { \
-        heaptrack_init_api(); \
-        if (heaptrack_api.malloc) heaptrack_api.malloc(ptr, size); \
-    } while(0)
+#define heaptrack_report_alloc(ptr, size)                                                                              \
+    do {                                                                                                               \
+        heaptrack_init_api();                                                                                          \
+        if (heaptrack_api.malloc)                                                                                      \
+            heaptrack_api.malloc(ptr, size);                                                                           \
+    } while (0)
 
-#define heaptrack_report_realloc(ptr_in, size, ptr_out) \
-    do { \
-        heaptrack_init_api(); \
-        if (heaptrack_api.realloc) heaptrack_api.realloc(ptr_in, size, ptr_out); \
-    } while(0)
+#define heaptrack_report_realloc(ptr_in, size, ptr_out)                                                                \
+    do {                                                                                                               \
+        heaptrack_init_api();                                                                                          \
+        if (heaptrack_api.realloc)                                                                                     \
+            heaptrack_api.realloc(ptr_in, size, ptr_out);                                                              \
+    } while (0)
 
-#define heaptrack_report_free(ptr) \
-    do { \
-        heaptrack_init_api(); \
-        if (heaptrack_api.free) heaptrack_api.free(ptr); \
-    } while(0)
+#define heaptrack_report_free(ptr)                                                                                     \
+    do {                                                                                                               \
+        heaptrack_init_api();                                                                                          \
+        if (heaptrack_api.free)                                                                                        \
+            heaptrack_api.free(ptr);                                                                                   \
+    } while (0)
 
 #endif // HEAPTRACK_API_DLSYM
 

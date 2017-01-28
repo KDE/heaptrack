@@ -20,9 +20,9 @@
 #ifndef SUMMARYDATA_H
 #define SUMMARYDATA_H
 
-#include <QString>
-#include <QMetaType>
 #include "../allocationdata.h"
+#include <QMetaType>
+#include <QString>
 
 struct SummaryData
 {

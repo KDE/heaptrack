@@ -22,10 +22,10 @@
 
 #include <QObject>
 
-#include "treemodel.h"
+#include "callercalleemodel.h"
 #include "chartmodel.h"
 #include "histogrammodel.h"
-#include "callercalleemodel.h"
+#include "treemodel.h"
 
 class Parser : public QObject
 {

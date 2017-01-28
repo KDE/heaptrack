@@ -25,8 +25,8 @@
  * @brief Efficiently combine and store the data of multiple Traces.
  */
 
-#include <vector>
 #include <algorithm>
+#include <vector>
 
 #include "trace.h"
 
@@ -57,7 +57,8 @@ public:
     }
 
     /**
-     * Index the data in @p trace and return the index of the last instruction pointer.
+     * Index the data in @p trace and return the index of the last instruction
+     * pointer.
      *
      * Unknown instruction pointers will be printed to @p out.
      */
@@ -70,9 +71,9 @@ public:
             if (!ip) {
                 continue;
             }
-            auto it = std::lower_bound(parent->children.begin(), parent->children.end(), ip, [] (const TraceEdge& l, const Trace::ip_t ip) {
-                return l.instructionPointer < ip;
-            });
+            auto it =
+                std::lower_bound(parent->children.begin(), parent->children.end(), ip,
+                                 [](const TraceEdge& l, const Trace::ip_t ip) { return l.instructionPointer < ip; });
             if (it == parent->children.end() || it->instructionPointer != ip) {
                 index = m_index++;
                 it = parent->children.insert(it, {ip, index, {}});

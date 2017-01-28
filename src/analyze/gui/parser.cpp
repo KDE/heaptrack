@@ -19,16 +19,16 @@
 
 #include "parser.h"
 
-#include <ThreadWeaver/ThreadWeaver>
 #include <KLocalizedString>
+#include <ThreadWeaver/ThreadWeaver>
 
 #include <QDebug>
 
 #include "analyze/accumulatedtracedata.h"
 
-#include <vector>
-#include <tuple>
 #include <future>
+#include <tuple>
+#include <vector>
 
 using namespace std;
 
@@ -94,8 +94,8 @@ struct StringCache
 
     void update(const vector<string>& strings)
     {
-        transform(strings.begin() + m_strings.size(), strings.end(),
-                  back_inserter(m_strings), [] (const string& str) { return QString::fromStdString(str); });
+        transform(strings.begin() + m_strings.size(), strings.end(), back_inserter(m_strings),
+                  [](const string& str) { return QString::fromStdString(str); });
     }
 
     vector<QString> m_strings;
@@ -169,11 +169,11 @@ struct ParserData final : public AccumulatedTraceData
             it->allocations += alloc.allocations;
             it->temporary += alloc.temporary;
         }
-        // find the top hot spots for the individual data members and remember their IP and store the label
-        auto findTopChartEntries = [&] (qint64 ChartMergeData::* member, int LabelIds::* label, ChartData* data) {
-            sort(merged.begin(), merged.end(), [=] (const ChartMergeData& left, const ChartMergeData& right) {
-                return left.*member > right.*member;
-            });
+        // find the top hot spots for the individual data members and remember their
+        // IP and store the label
+        auto findTopChartEntries = [&](qint64 ChartMergeData::*member, int LabelIds::*label, ChartData* data) {
+            sort(merged.begin(), merged.end(),
+                 [=](const ChartMergeData& left, const ChartMergeData& right) { return left.*member > right.*member; });
             for (size_t i = 0; i < min(size_t(ChartRows::MAX_NUM_COST - 1), merged.size()); ++i) {
                 const auto& alloc = merged[i];
                 if (!(alloc.*member)) {
@@ -206,7 +206,7 @@ struct ParserData final : public AccumulatedTraceData
         lastTimeStamp = newStamp;
 
         // create the rows
-        auto createRow = [] (int64_t timeStamp, int64_t totalCost) {
+        auto createRow = [](int64_t timeStamp, int64_t totalCost) {
             ChartRows row;
             row.timeStamp = timeStamp;
             row.cost[0] = totalCost;
@@ -217,9 +217,10 @@ struct ParserData final : public AccumulatedTraceData
         auto allocs = createRow(newStamp, totalCost.allocations);
         auto temporary = createRow(newStamp, totalCost.temporary);
 
-        // if the cost is non-zero and the ip corresponds to a hotspot function selected in the labels,
+        // if the cost is non-zero and the ip corresponds to a hotspot function
+        // selected in the labels,
         // we add the cost to the rows column
-        auto addDataToRow = [] (int64_t cost, int labelId, ChartRows* rows) {
+        auto addDataToRow = [](int64_t cost, int labelId, ChartRows* rows) {
             if (!cost || labelId == -1) {
                 return;
             }
@@ -268,8 +269,7 @@ struct ParserData final : public AccumulatedTraceData
         int64_t allocations;
         bool operator<(const CountedAllocationInfo& rhs) const
         {
-            return tie(info.size, allocations)
-                 < tie(rhs.info.size, rhs.allocations);
+            return tie(info.size, allocations) < tie(rhs.info.size, rhs.allocations);
         }
     };
     vector<CountedAllocationInfo> allocationInfoCounter;
@@ -300,7 +300,7 @@ struct ParserData final : public AccumulatedTraceData
 
 void setParents(QVector<RowData>& children, const RowData* parent)
 {
-    for (auto& row: children) {
+    for (auto& row : children) {
         row.parent = parent;
         setParents(row.children, &row);
     }
@@ -311,7 +311,8 @@ QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
     TreeData topRows;
     CallerCalleeRows callerCalleeRows;
     callerCalleeRows.reserve(data.instructionPointers.size());
-    // merge allocations, leave parent pointers invalid (their location may change)
+    // merge allocations, leave parent pointers invalid (their location may
+    // change)
     for (const auto& allocation : data.allocations) {
         auto traceIndex = allocation.traceIndex;
         auto rows = &topRows;
@@ -323,10 +324,9 @@ QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
             auto location = data.stringCache.location(trace.ipIndex, ip);
 
             if (!recursionGuard.contains(trace.ipIndex)) { // aggregate caller-callee data
-                auto it = lower_bound(callerCalleeRows.begin(), callerCalleeRows.end(), location,
-                                      [] (const CallerCalleeData& lhs, const LocationData::Ptr& rhs) {
-                    return lhs.location < rhs;
-                });
+                auto it = lower_bound(
+                    callerCalleeRows.begin(), callerCalleeRows.end(), location,
+                    [](const CallerCalleeData& lhs, const LocationData::Ptr& rhs) { return lhs.location < rhs; });
                 if (it == callerCalleeRows.end() || it->location != location) {
                     it = callerCalleeRows.insert(it, {{}, {}, location});
                 }
@@ -356,10 +356,11 @@ QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
     if (data.stringCache.diffMode) {
         // remove rows without cost
         callerCalleeRows.erase(remove_if(callerCalleeRows.begin(), callerCalleeRows.end(),
-            [] (const CallerCalleeData& data) -> bool {
-                return data.inclusiveCost == AllocationData()
-                    && data.selfCost == AllocationData();
-            }), callerCalleeRows.end());
+                                         [](const CallerCalleeData& data) -> bool {
+                                             return data.inclusiveCost == AllocationData()
+                                                 && data.selfCost == AllocationData();
+                                         }),
+                               callerCalleeRows.end());
     }
 
     return qMakePair(topRows, callerCalleeRows);
@@ -430,26 +431,25 @@ HistogramData buildSizeHistogram(ParserData& data)
     sort(data.allocationInfoCounter.begin(), data.allocationInfoCounter.end());
     const auto totalLabel = i18n("total");
     HistogramRow row;
-    const pair<uint64_t, QString> buckets[] = {
-        {8, i18n("0B to 8B")},
-        {16, i18n("9B to 16B")},
-        {32, i18n("17B to 32B")},
-        {64, i18n("33B to 64B")},
-        {128, i18n("65B to 128B")},
-        {256, i18n("129B to 256B")},
-        {512, i18n("257B to 512B")},
-        {1024, i18n("512B to 1KB")},
-        {numeric_limits<uint64_t>::max(), i18n("more than 1KB")}
-    };
+    const pair<uint64_t, QString> buckets[] = {{8, i18n("0B to 8B")},
+                                               {16, i18n("9B to 16B")},
+                                               {32, i18n("17B to 32B")},
+                                               {64, i18n("33B to 64B")},
+                                               {128, i18n("65B to 128B")},
+                                               {256, i18n("129B to 256B")},
+                                               {512, i18n("257B to 512B")},
+                                               {1024, i18n("512B to 1KB")},
+                                               {numeric_limits<uint64_t>::max(), i18n("more than 1KB")}};
     uint bucketIndex = 0;
     row.size = buckets[bucketIndex].first;
     row.sizeLabel = buckets[bucketIndex].second;
     vector<MergedHistogramColumnData> columnData;
     columnData.reserve(128);
-    auto insertColumns = [&] () {
-        sort(columnData.begin(), columnData.end(), [] (const MergedHistogramColumnData& lhs, const MergedHistogramColumnData& rhs) {
-            return lhs.allocations > rhs.allocations;
-        });
+    auto insertColumns = [&]() {
+        sort(columnData.begin(), columnData.end(),
+             [](const MergedHistogramColumnData& lhs, const MergedHistogramColumnData& rhs) {
+                 return lhs.allocations > rhs.allocations;
+             });
         // -1 to account for total row
         for (size_t i = 0; i < min(columnData.size(), size_t(HistogramRow::NUM_COLUMNS - 1)); ++i) {
             const auto& column = columnData[i];
@@ -482,7 +482,6 @@ HistogramData buildSizeHistogram(ParserData& data)
     ret << row;
     return ret;
 }
-
 }
 
 Parser::Parser(QObject* parent)
@@ -503,9 +502,8 @@ void Parser::parse(const QString& path, const QString& diffBase)
 
         if (!diffBase.isEmpty()) {
             ParserData diffData;
-            auto readBase = async(launch::async, [&diffData, diffBase] () {
-                return diffData.read(diffBase.toStdString());
-            });
+            auto readBase =
+                async(launch::async, [&diffData, diffBase]() { return diffData.read(diffBase.toStdString()); });
             if (!data->read(stdPath)) {
                 emit failedToOpen(path);
                 return;
@@ -523,14 +521,9 @@ void Parser::parse(const QString& path, const QString& diffBase)
 
         data->updateStringCache();
 
-        emit summaryAvailable({
-            QString::fromStdString(data->debuggee),
-            data->totalCost,
-            data->totalTime,
-            data->peakTime,
-            data->peakRSS * data->systemInfo.pageSize,
-            data->systemInfo.pages * data->systemInfo.pageSize
-        });
+        emit summaryAvailable({QString::fromStdString(data->debuggee), data->totalCost, data->totalTime, data->peakTime,
+                               data->peakRSS * data->systemInfo.pageSize,
+                               data->systemInfo.pages * data->systemInfo.pageSize});
 
         emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again
@@ -565,9 +558,7 @@ void Parser::parse(const QString& path, const QString& diffBase)
         }
 
         auto sequential = new Sequence;
-        *sequential << parallel << make_job([this]() {
-            emit finished();
-        });
+        *sequential << parallel << make_job([this]() { emit finished(); });
 
         stream() << sequential;
     });

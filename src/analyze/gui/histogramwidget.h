@@ -45,4 +45,3 @@ private:
 };
 
 #endif // HISTOGRAMWIDGET_H
-

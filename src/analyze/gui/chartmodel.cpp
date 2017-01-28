@@ -21,12 +21,12 @@
 
 #include <KChartGlobal>
 #include <KChartLineAttributes>
-#include <KLocalizedString>
 #include <KFormat>
+#include <KLocalizedString>
 
-#include <QPen>
 #include <QBrush>
 #include <QDebug>
+#include <QPen>
 
 namespace {
 QColor colorForColumn(int column, int columnCount)
@@ -87,7 +87,7 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
     Q_ASSERT(index.column() >= 0 && index.column() < columnCount(index.parent()));
     Q_ASSERT(!index.parent().isValid());
 
-    if ( role == KChart::LineAttributesRole ) {
+    if (role == KChart::LineAttributesRole) {
         KChart::LineAttributes attributes;
         attributes.setDisplayArea(true);
         if (index.column() > 1) {
@@ -98,14 +98,13 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
         return QVariant::fromValue(attributes);
     }
 
-
-    if ( role == KChart::DatasetPenRole ) {
+    if (role == KChart::DatasetPenRole) {
         return QVariant::fromValue(m_columnDataSetPens.at(index.column()));
-    } else if ( role == KChart::DatasetBrushRole ) {
+    } else if (role == KChart::DatasetBrushRole) {
         return QVariant::fromValue(m_columnDataSetBrushes.at(index.column()));
     }
 
-    if ( role != Qt::DisplayRole && role != Qt::ToolTipRole ) {
+    if (role != Qt::DisplayRole && role != Qt::ToolTipRole) {
         return {};
     }
 
@@ -124,34 +123,36 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
         KFormat format;
         if (column == 0) {
             switch (m_type) {
-                case Allocations:
-                    return i18n("<qt>%1 allocations in total after %2</qt>",
-                                cost, time);
-                case Temporary:
-                    return i18n("<qt>%1 temporary allocations in total after %2</qt>",
-                                cost, time);
-                case Consumed:
-                    return i18n("<qt>%1 consumed in total after %2</qt>",
-                                format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
-                case Allocated:
-                    return i18n("<qt>%2 allocated in total after %2</qt>",
-                                format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
+            case Allocations:
+                return i18n("<qt>%1 allocations in total after %2</qt>", cost, time);
+            case Temporary:
+                return i18n("<qt>%1 temporary allocations in total after %2</qt>", cost, time);
+            case Consumed:
+                return i18n("<qt>%1 consumed in total after %2</qt>",
+                            format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
+            case Allocated:
+                return i18n("<qt>%2 allocated in total after %2</qt>",
+                            format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
             }
         } else {
             const auto label = m_data.labels.value(column).toHtmlEscaped();
             switch (m_type) {
-                case Allocations:
-                    return i18n("<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>",
-                                label, cost, time);
-                case Temporary:
-                    return i18n("<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</p></qt>",
-                                label, cost, time);
-                case Consumed:
-                    return i18n("<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>",
-                                label, format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
-                case Allocated:
-                    return i18n("<qt>%2 allocated after %3 from:<p style='margin-left:10px'>%1</p></qt>",
-                                label, format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
+            case Allocations:
+                return i18n("<qt>%2 allocations after %3 from:<p "
+                            "style='margin-left:10px;'>%1</p></qt>",
+                            label, cost, time);
+            case Temporary:
+                return i18n("<qt>%2 temporary allocations after %3 from:<p "
+                            "style='margin-left:10px'>%1</p></qt>",
+                            label, cost, time);
+            case Consumed:
+                return i18n("<qt>%2 consumed after %3 from:<p "
+                            "style='margin-left:10px'>%1</p></qt>",
+                            label, format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
+            case Allocated:
+                return i18n("<qt>%2 allocated after %3 from:<p "
+                            "style='margin-left:10px'>%1</p></qt>",
+                            label, format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
             }
         }
         return {};

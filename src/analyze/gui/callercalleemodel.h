@@ -20,8 +20,8 @@
 #ifndef CALLERCALLEEMODEL_H
 #define CALLERCALLEEMODEL_H
 
-#include <QVector>
 #include <QAbstractTableModel>
+#include <QVector>
 
 #include <KFormat>
 
@@ -47,7 +47,8 @@ public:
     explicit CallerCalleeModel(QObject* parent = nullptr);
     ~CallerCalleeModel();
 
-    enum Columns {
+    enum Columns
+    {
         LocationColumn,
         FunctionColumn,
         FileColumn,
@@ -66,7 +67,8 @@ public:
         NUM_COLUMNS
     };
 
-    enum Roles {
+    enum Roles
+    {
         SortRole = Qt::UserRole,
         MaxCostRole,
         LocationRole
@@ -77,10 +79,11 @@ public:
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
     int columnCount(const QModelIndex& parent = {}) const override;
-    int rowCount(const QModelIndex &parent = {}) const override;
+    int rowCount(const QModelIndex& parent = {}) const override;
 
     void resetData(const QVector<CallerCalleeData>& rows);
     void setSummary(const SummaryData& data);
+
 private:
     QVector<CallerCalleeData> m_rows;
     CallerCalleeData m_maxCost;

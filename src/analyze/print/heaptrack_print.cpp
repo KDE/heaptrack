@@ -27,9 +27,9 @@
 
 #include "analyze/accumulatedtracedata.h"
 
-#include <iostream>
-#include <iomanip>
 #include <future>
+#include <iomanip>
+#include <iostream>
 
 #include "util/config.h"
 
@@ -74,13 +74,7 @@ ostream& operator<<(ostream& out, const formatBytes data)
         return out << data.m_bytes << 'B';
     }
 
-    static const auto units = {
-        "B",
-        "KB",
-        "MB",
-        "GB",
-        "TB"
-    };
+    static const auto units = {"B", "KB", "MB", "GB", "TB"};
     auto unit = units.begin();
     size_t i = 0;
     double bytes = data.m_bytes;
@@ -105,14 +99,15 @@ struct Printer final : public AccumulatedTraceData
         const auto trace = findTrace(allocation.traceIndex);
         const auto traceIp = findIp(trace.ipIndex);
         auto it = lower_bound(mergedAllocations->begin(), mergedAllocations->end(), traceIp,
-                                [this] (const MergedAllocation& allocation, const InstructionPointer traceIp) -> bool {
-                                    // Compare meta data without taking the instruction pointer address into account.
-                                    // This is useful since sometimes, esp. when we lack debug symbols, the same function
-                                    // allocates memory at different IP addresses which is pretty useless information most of the time
-                                    // TODO: make this configurable, but on-by-default
-                                    const auto allocationIp = findIp(allocation.ipIndex);
-                                    return allocationIp.compareWithoutAddress(traceIp);
-                                });
+                              [this](const MergedAllocation& allocation, const InstructionPointer traceIp) -> bool {
+                                  // Compare meta data without taking the instruction pointer address into account.
+                                  // This is useful since sometimes, esp. when we lack debug symbols, the same
+                                  // function allocates memory at different IP addresses which is pretty useless
+                                  // information most of the time
+                                  // TODO: make this configurable, but on-by-default
+                                  const auto allocationIp = findIp(allocation.ipIndex);
+                                  return allocationIp.compareWithoutAddress(traceIp);
+                              });
         if (it == mergedAllocations->end() || !findIp(it->ipIndex).equalWithoutAddress(traceIp)) {
             MergedAllocation merged;
             merged.ipIndex = trace.ipIndex;
@@ -137,7 +132,7 @@ struct Printer final : public AccumulatedTraceData
             }
         }
         for (MergedAllocation& merged : ret) {
-            for (const Allocation& allocation: merged.traces) {
+            for (const Allocation& allocation : merged.traces) {
                 merged.allocated += allocation.allocated;
                 merged.allocations += allocation.allocations;
                 merged.leaked += allocation.leaked;
@@ -153,20 +148,22 @@ struct Printer final : public AccumulatedTraceData
         if (filterBtFunction.empty()) {
             return;
         }
-        allocations.erase(remove_if(allocations.begin(), allocations.end(), [&] (const Allocation& allocation) -> bool {
-            auto node = findTrace(allocation.traceIndex);
-            while (node.ipIndex) {
-                const auto& ip = findIp(node.ipIndex);
-                if (isStopIndex(ip.functionIndex)) {
-                    break;
-                }
-                if (stringify(ip.functionIndex).find(filterBtFunction) != string::npos) {
-                    return false;
-                }
-                node = findTrace(node.parentIndex);
-            };
-            return true;
-        }), allocations.end());
+        allocations.erase(remove_if(allocations.begin(), allocations.end(),
+                                    [&](const Allocation& allocation) -> bool {
+                                        auto node = findTrace(allocation.traceIndex);
+                                        while (node.ipIndex) {
+                                            const auto& ip = findIp(node.ipIndex);
+                                            if (isStopIndex(ip.functionIndex)) {
+                                                break;
+                                            }
+                                            if (stringify(ip.functionIndex).find(filterBtFunction) != string::npos) {
+                                                return false;
+                                            }
+                                            node = findTrace(node.parentIndex);
+                                        };
+                                        return true;
+                                    }),
+                          allocations.end());
     }
 
     void printIndent(ostream& out, size_t indent, const char* indentString = "  ") const
@@ -176,7 +173,7 @@ struct Printer final : public AccumulatedTraceData
         }
     }
 
-    void printIp(const IpIndex ip, ostream &out, const size_t indent = 0) const
+    void printIp(const IpIndex ip, ostream& out, const size_t indent = 0) const
     {
         printIp(findIp(ip), out, indent);
     }
@@ -218,7 +215,8 @@ struct Printer final : public AccumulatedTraceData
         out << '\n';
     }
 
-    void printBacktrace(const TraceIndex traceIndex, ostream& out, const size_t indent = 0, bool skipFirst = false) const
+    void printBacktrace(const TraceIndex traceIndex, ostream& out, const size_t indent = 0,
+                        bool skipFirst = false) const
     {
         if (!traceIndex) {
             out << "  ??";
@@ -263,8 +261,8 @@ struct Printer final : public AccumulatedTraceData
         printIp(ip, out, 0, true);
     }
 
-    template<typename T, typename LabelPrinter, typename SubLabelPrinter>
-    void printAllocations(T AllocationData::* member, LabelPrinter label, SubLabelPrinter sublabel)
+    template <typename T, typename LabelPrinter, typename SubLabelPrinter>
+    void printAllocations(T AllocationData::*member, LabelPrinter label, SubLabelPrinter sublabel)
     {
         if (mergeBacktraces) {
             printMerged(member, label, sublabel);
@@ -273,10 +271,10 @@ struct Printer final : public AccumulatedTraceData
         }
     }
 
-    template<typename T, typename LabelPrinter, typename SubLabelPrinter>
-    void printMerged(T AllocationData::* member, LabelPrinter label, SubLabelPrinter sublabel)
+    template <typename T, typename LabelPrinter, typename SubLabelPrinter>
+    void printMerged(T AllocationData::*member, LabelPrinter label, SubLabelPrinter sublabel)
     {
-        auto sortOrder = [member] (const AllocationData& l, const AllocationData& r) {
+        auto sortOrder = [member](const AllocationData& l, const AllocationData& r) {
             return std::abs(l.*member) > std::abs(r.*member);
         };
         sort(mergedAllocations.begin(), mergedAllocations.end(), sortOrder);
@@ -309,13 +307,11 @@ struct Printer final : public AccumulatedTraceData
         }
     }
 
-    template<typename T, typename LabelPrinter>
-    void printUnmerged(T AllocationData::* member, LabelPrinter label)
+    template <typename T, typename LabelPrinter>
+    void printUnmerged(T AllocationData::*member, LabelPrinter label)
     {
         sort(allocations.begin(), allocations.end(),
-            [member] (const Allocation& l, const Allocation &r) {
-                return std::abs(l.*member) > std::abs(r.*member);
-            });
+             [member](const Allocation& l, const Allocation& r) { return std::abs(l.*member) > std::abs(r.*member); });
         for (size_t i = 0; i < min(peakLimit, allocations.size()); ++i) {
             const auto& allocation = allocations[i];
             if (!(allocation.*member)) {
@@ -342,14 +338,13 @@ struct Printer final : public AccumulatedTraceData
             lastMassifPeak = totalCost.leaked;
             massifAllocations = allocations;
         }
-        massifOut
-            << "#-----------\n"
-            << "snapshot=" << massifSnapshotId << '\n'
-            << "#-----------\n"
-            << "time=" << (0.001 * timeStamp) << '\n'
-            << "mem_heap_B=" << lastMassifPeak << '\n'
-            << "mem_heap_extra_B=0\n"
-            << "mem_stacks_B=0\n";
+        massifOut << "#-----------\n"
+                  << "snapshot=" << massifSnapshotId << '\n'
+                  << "#-----------\n"
+                  << "time=" << (0.001 * timeStamp) << '\n'
+                  << "mem_heap_B=" << lastMassifPeak << '\n'
+                  << "mem_heap_extra_B=0\n"
+                  << "mem_stacks_B=0\n";
 
         if (massifDetailedFreq && (isLast || !(massifSnapshotId % massifDetailedFreq))) {
             massifOut << "heap_tree=detailed\n";
@@ -370,9 +365,8 @@ struct Printer final : public AccumulatedTraceData
         size_t numAllocs = 0;
         size_t skipped = 0;
         auto mergedAllocations = mergeAllocations(allocations);
-        sort(mergedAllocations.begin(), mergedAllocations.end(), [] (const MergedAllocation& l, const MergedAllocation& r) {
-            return l.leaked > r.leaked;
-        });
+        sort(mergedAllocations.begin(), mergedAllocations.end(),
+             [](const MergedAllocation& l, const MergedAllocation& r) { return l.leaked > r.leaked; });
 
         const auto ip = findIp(location);
 
@@ -381,14 +375,16 @@ struct Printer final : public AccumulatedTraceData
         if (!shouldStop) {
             for (auto& merged : mergedAllocations) {
                 if (merged.leaked < 0) {
-                    // list is sorted, so we can bail out now - these entries are uninteresting for massif
+                    // list is sorted, so we can bail out now - these entries are
+                    // uninteresting for massif
                     break;
                 }
 
                 // skip items below threshold
                 if (static_cast<size_t>(merged.leaked) >= threshold) {
                     ++numAllocs;
-                    // skip the first level of the backtrace, otherwise we'd endlessly recurse
+                    // skip the first level of the backtrace, otherwise we'd endlessly
+                    // recurse
                     for (auto& alloc : merged.traces) {
                         alloc.traceIndex = findTrace(alloc.traceIndex).parentIndex;
                     }
@@ -402,10 +398,10 @@ struct Printer final : public AccumulatedTraceData
         printIndent(massifOut, depth, " ");
         massifOut << 'n' << (numAllocs + (skipped ? 1 : 0)) << ": " << heapSize;
         if (!depth) {
-            massifOut << " (heap allocation functions) malloc/new/new[], --alloc-fns, etc.\n";
+            massifOut << " (heap allocation functions) malloc/new/new[], "
+                         "--alloc-fns, etc.\n";
         } else {
-            massifOut << " 0x" << hex << ip.instructionPointer << dec
-                      << ": ";
+            massifOut << " 0x" << hex << ip.instructionPointer << dec << ": ";
             if (ip.functionIndex) {
                 massifOut << stringify(ip.functionIndex);
             } else {
@@ -426,8 +422,8 @@ struct Printer final : public AccumulatedTraceData
         auto writeSkipped = [&] {
             if (skipped) {
                 printIndent(massifOut, depth, " ");
-                massifOut << " n0: " << skippedLeaked << " in " << skipped
-                        << " places, all below massif's threshold (" << massifThreshold << ")\n";
+                massifOut << " n0: " << skippedLeaked << " in " << skipped << " places, all below massif's threshold ("
+                          << massifThreshold << ")\n";
                 skipped = 0;
             }
         };
@@ -496,67 +492,67 @@ struct Printer final : public AccumulatedTraceData
 int main(int argc, char** argv)
 {
     po::options_description desc("Options", 120, 60);
-    desc.add_options()
-        ("file,f", po::value<string>(),
-            "The heaptrack data file to print.")
-        ("diff,d", po::value<string>()->default_value({}),
-            "Find the differences to this file.")
-        ("shorten-templates,t", po::value<bool>()->default_value(true)->implicit_value(true),
-            "Shorten template identifiers.")
-        ("merge-backtraces,m", po::value<bool>()->default_value(true)->implicit_value(true),
-            "Merge backtraces.\nNOTE: the merged peak consumption is not correct.")
-        ("print-peaks,p", po::value<bool>()->default_value(true)->implicit_value(true),
-            "Print backtraces to top allocators, sorted by peak consumption.")
-        ("print-allocators,a", po::value<bool>()->default_value(true)->implicit_value(true),
-            "Print backtraces to top allocators, sorted by number of calls to allocation functions.")
-        ("print-temporary,T", po::value<bool>()->default_value(true)->implicit_value(true),
-            "Print backtraces to top allocators, sorted by number of temporary allocations.")
-        ("print-leaks,l", po::value<bool>()->default_value(false)->implicit_value(true),
-            "Print backtraces to leaked memory allocations.")
-        ("print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
-            "Print top overall allocators, ignoring memory frees.")
-         ("peak-limit,n", po::value<size_t>()->default_value(10)->implicit_value(10),
-            "Limit the number of reported peaks.")
-         ("sub-peak-limit,s", po::value<size_t>()->default_value(5)->implicit_value(5),
-            "Limit the number of reported backtraces of merged peak locations.")
-        ("print-histogram,H", po::value<string>()->default_value(string()),
-            "Path to output file where an allocation size histogram will be written to.")
-        ("print-flamegraph,F", po::value<string>()->default_value(string()),
-            "Path to output file where a flame-graph compatible stack file will be written to.\n"
-            "To visualize the resulting file, use flamegraph.pl from https://github.com/brendangregg/FlameGraph:\n"
-            "  heaptrack_print heaptrack.someapp.PID.gz -F stacks.txt\n"
-            "  # optionally pass --reverse to flamegraph.pl\n"
-            "  flamegraph.pl --title \"heaptrack: allocations\" --colors mem \\\n"
-            "    --countname allocations < stacks.txt > heaptrack.someapp.PID.svg\n"
-            "  [firefox|chromium] heaptrack.someapp.PID.svg\n")
-        ("print-massif,M", po::value<string>()->default_value(string()),
-            "Path to output file where a massif compatible data file will be written to.")
-        ("massif-threshold", po::value<double>()->default_value(1.),
-            "Percentage of current memory usage, below which allocations are aggregated into a 'below threshold' entry.\n"
-            "This is only used in the massif output file so far.\n")
-        ("massif-detailed-freq", po::value<size_t>()->default_value(2),
-            "Frequency of detailed snapshots in the massif output file. Increase this to reduce the file size.\n"
-            "You can set the value to zero to disable detailed snapshots.\n")
-        ("filter-bt-function", po::value<string>()->default_value(string()),
-            "Only print allocations where the backtrace contains the given function.")
-        ("help,h",
-            "Show this help message.")
-        ("version,v",
-            "Displays version information.");
+    desc.add_options()("file,f", po::value<string>(), "The heaptrack data file to print.")(
+        "diff,d", po::value<string>()->default_value({}), "Find the differences to this file.")(
+        "shorten-templates,t", po::value<bool>()->default_value(true)->implicit_value(true),
+        "Shorten template identifiers.")("merge-backtraces,m",
+                                         po::value<bool>()->default_value(true)->implicit_value(true),
+                                         "Merge backtraces.\nNOTE: the merged peak consumption is not correct.")(
+        "print-peaks,p", po::value<bool>()->default_value(true)->implicit_value(true),
+        "Print backtraces to top allocators, sorted by peak consumption.")(
+        "print-allocators,a", po::value<bool>()->default_value(true)->implicit_value(true),
+        "Print backtraces to top allocators, sorted by number of calls to "
+        "allocation functions.")("print-temporary,T", po::value<bool>()->default_value(true)->implicit_value(true),
+                                 "Print backtraces to top allocators, sorted by number of temporary "
+                                 "allocations.")("print-leaks,l",
+                                                 po::value<bool>()->default_value(false)->implicit_value(true),
+                                                 "Print backtraces to leaked memory allocations.")(
+        "print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
+        "Print top overall allocators, ignoring memory frees.")(
+        "peak-limit,n", po::value<size_t>()->default_value(10)->implicit_value(10),
+        "Limit the number of reported peaks.")("sub-peak-limit,s",
+                                               po::value<size_t>()->default_value(5)->implicit_value(5),
+                                               "Limit the number of reported backtraces of merged peak locations.")(
+        "print-histogram,H", po::value<string>()->default_value(string()),
+        "Path to output file where an allocation size histogram will be written "
+        "to.")("print-flamegraph,F", po::value<string>()->default_value(string()),
+               "Path to output file where a flame-graph compatible stack file will be "
+               "written to.\n"
+               "To visualize the resulting file, use flamegraph.pl from "
+               "https://github.com/brendangregg/FlameGraph:\n"
+               "  heaptrack_print heaptrack.someapp.PID.gz -F stacks.txt\n"
+               "  # optionally pass --reverse to flamegraph.pl\n"
+               "  flamegraph.pl --title \"heaptrack: allocations\" --colors mem \\\n"
+               "    --countname allocations < stacks.txt > heaptrack.someapp.PID.svg\n"
+               "  [firefox|chromium] heaptrack.someapp.PID.svg\n")(
+        "print-massif,M", po::value<string>()->default_value(string()),
+        "Path to output file where a massif compatible data file will be written "
+        "to.")("massif-threshold", po::value<double>()->default_value(1.),
+               "Percentage of current memory usage, below which allocations are "
+               "aggregated into a 'below threshold' entry.\n"
+               "This is only used in the massif output file so far.\n")(
+        "massif-detailed-freq", po::value<size_t>()->default_value(2),
+        "Frequency of detailed snapshots in the massif output file. Increase "
+        "this to reduce the file size.\n"
+        "You can set the value to zero to disable detailed snapshots.\n")(
+        "filter-bt-function", po::value<string>()->default_value(string()),
+        "Only print allocations where the backtrace contains the given "
+        "function.")("help,h", "Show this help message.")("version,v", "Displays version information.");
     po::positional_options_description p;
     p.add("file", -1);
 
     po::variables_map vm;
     try {
-        po::store(po::command_line_parser(argc, argv)
-                    .options(desc).positional(p).run(), vm);
+        po::store(po::command_line_parser(argc, argv).options(desc).positional(p).run(), vm);
         if (vm.count("help")) {
             cout << "heaptrack_print - analyze heaptrack data files.\n"
-                << "\n"
-                << "heaptrack is a heap memory profiler which records information\n"
-                << "about calls to heap allocation functions such as malloc, operator new etc. pp.\n"
-                << "This print utility can then be used to analyze the generated data files.\n\n"
-                << desc << endl;
+                 << "\n"
+                 << "heaptrack is a heap memory profiler which records information\n"
+                 << "about calls to heap allocation functions such as malloc, "
+                    "operator new etc. pp.\n"
+                 << "This print utility can then be used to analyze the generated "
+                    "data files.\n\n"
+                 << desc << endl;
             return 0;
         } else if (vm.count("version")) {
             cout << "heaptrack_print " << HEAPTRACK_VERSION_STRING << endl;
@@ -564,8 +560,7 @@ int main(int argc, char** argv)
         }
         po::notify(vm);
     } catch (const po::error& error) {
-        cerr << "ERROR: " << error.what() << endl
-             << endl << desc << endl;
+        cerr << "ERROR: " << error.what() << endl << endl << desc << endl;
         return 1;
     }
 
@@ -592,7 +587,7 @@ int main(int argc, char** argv)
     const string printMassif = vm["print-massif"].as<string>();
     if (!printMassif.empty()) {
         data.massifOut.open(printMassif, ios_base::out);
-        if (!data.massifOut.is_open())  {
+        if (!data.massifOut.is_open()) {
             cerr << "Failed to open massif output file \"" << printMassif << "\"." << endl;
             return 1;
         }
@@ -610,9 +605,7 @@ int main(int argc, char** argv)
     if (!diffFile.empty()) {
         cout << "reading diff file \"" << diffFile << "\" - please wait, this might take some time..." << endl;
         Printer diffData;
-        auto diffRead = async(launch::async, [&diffData, diffFile] () {
-            return diffData.read(diffFile);
-        });
+        auto diffRead = async(launch::async, [&diffData, diffFile]() { return diffData.read(diffFile); });
 
         if (!data.read(inputFile) || !diffRead.get()) {
             return 1;
@@ -630,26 +623,34 @@ int main(int argc, char** argv)
     if (printAllocs) {
         // sort by amount of allocations
         cout << "MOST CALLS TO ALLOCATION FUNCTIONS\n";
-        data.printAllocations(&AllocationData::allocations, [] (const AllocationData& data) {
-            cout << data.allocations << " calls to allocation functions with " << formatBytes(data.peak) << " peak consumption from\n";
-        }, [] (const AllocationData& data) {
-            cout << data.allocations << " calls with " << formatBytes(data.peak) << " peak consumption from:\n";
-        });
+        data.printAllocations(&AllocationData::allocations,
+                              [](const AllocationData& data) {
+                                  cout << data.allocations << " calls to allocation functions with "
+                                       << formatBytes(data.peak) << " peak consumption from\n";
+                              },
+                              [](const AllocationData& data) {
+                                  cout << data.allocations << " calls with " << formatBytes(data.peak)
+                                       << " peak consumption from:\n";
+                              });
         cout << endl;
     }
 
     if (printOverallAlloc) {
         cout << "MOST BYTES ALLOCATED OVER TIME (ignoring deallocations)\n";
-        data.printAllocations(&AllocationData::allocated, [] (const AllocationData& data) {
-            cout << formatBytes(data.allocated) << " allocated over " << data.allocations << " calls from\n";
-        }, [] (const AllocationData& data) {
-            cout << formatBytes(data.allocated) << " allocated over " << data.allocations << " calls from:\n";
-        });
+        data.printAllocations(&AllocationData::allocated,
+                              [](const AllocationData& data) {
+                                  cout << formatBytes(data.allocated) << " allocated over " << data.allocations
+                                       << " calls from\n";
+                              },
+                              [](const AllocationData& data) {
+                                  cout << formatBytes(data.allocated) << " allocated over " << data.allocations
+                                       << " calls from:\n";
+                              });
         cout << endl;
     }
 
     if (printPeaks) {
-        ///FIXME: find a way to merge this without breaking temporal dependency.
+        /// FIXME: find a way to merge this without breaking temporal dependency.
         /// I.e. a given function could be called N times from different places
         /// and allocate M bytes each, but free it thereafter.
         /// Then the below would give a wrong total peak size of N * M instead
@@ -661,45 +662,57 @@ int main(int argc, char** argv)
                     " For an accurate overview, disable backtrace merging.\n";
         }
 
-        data.printAllocations(&AllocationData::peak, [] (const AllocationData& data) {
-            cout << formatBytes(data.peak) << " peak memory consumed over " << data.allocations << " calls from\n";
-        }, [] (const AllocationData& data) {
-            cout << formatBytes(data.peak) << " consumed over " << data.allocations << " calls from:\n";
-        });
+        data.printAllocations(&AllocationData::peak,
+                              [](const AllocationData& data) {
+                                  cout << formatBytes(data.peak) << " peak memory consumed over " << data.allocations
+                                       << " calls from\n";
+                              },
+                              [](const AllocationData& data) {
+                                  cout << formatBytes(data.peak) << " consumed over " << data.allocations
+                                       << " calls from:\n";
+                              });
     }
 
     if (printLeaks) {
         // sort by amount of leaks
         cout << "MEMORY LEAKS\n";
-        data.printAllocations(&AllocationData::leaked, [] (const AllocationData& data) {
-            cout << formatBytes(data.leaked) << " leaked over " << data.allocations << " calls from\n";
-        }, [] (const AllocationData& data) {
-            cout << formatBytes(data.leaked) << " leaked over " << data.allocations << " calls from:\n";
-        });
+        data.printAllocations(&AllocationData::leaked,
+                              [](const AllocationData& data) {
+                                  cout << formatBytes(data.leaked) << " leaked over " << data.allocations
+                                       << " calls from\n";
+                              },
+                              [](const AllocationData& data) {
+                                  cout << formatBytes(data.leaked) << " leaked over " << data.allocations
+                                       << " calls from:\n";
+                              });
         cout << endl;
     }
 
     if (printTemporary) {
         // sort by amount of temporary allocations
         cout << "MOST TEMPORARY ALLOCATIONS\n";
-        data.printAllocations(&AllocationData::temporary, [] (const AllocationData& data) {
-            cout << data.temporary << " temporary allocations of " << data.allocations << " allocations in total ("
-                 << setprecision(2) << (float(data.temporary)  * 100.f / data.allocations) << "%) from\n";
-        }, [] (const AllocationData& data) {
-            cout << data.temporary << " temporary allocations of " << data.allocations << " allocations in total ("
-                 << setprecision(2) << (float(data.temporary)  * 100.f / data.allocations) << "%) from:\n";
-        });
+        data.printAllocations(&AllocationData::temporary,
+                              [](const AllocationData& data) {
+                                  cout << data.temporary << " temporary allocations of " << data.allocations
+                                       << " allocations in total (" << setprecision(2)
+                                       << (float(data.temporary) * 100.f / data.allocations) << "%) from\n";
+                              },
+                              [](const AllocationData& data) {
+                                  cout << data.temporary << " temporary allocations of " << data.allocations
+                                       << " allocations in total (" << setprecision(2)
+                                       << (float(data.temporary) * 100.f / data.allocations) << "%) from:\n";
+                              });
         cout << endl;
     }
 
     const double totalTimeS = 0.001 * data.totalTime;
     cout << "total runtime: " << fixed << totalTimeS << "s.\n"
-         << "bytes allocated in total (ignoring deallocations): " << formatBytes(data.totalCost.allocated)
-            << " (" << formatBytes(data.totalCost.allocated / totalTimeS) << "/s)" << '\n'
-         << "calls to allocation functions: " << data.totalCost.allocations
-            << " (" << int64_t(data.totalCost.allocations / totalTimeS) << "/s)\n"
-         << "temporary memory allocations: " << data.totalCost.temporary
-            << " (" << int64_t(data.totalCost.temporary / totalTimeS) << "/s)\n"
+         << "bytes allocated in total (ignoring deallocations): " << formatBytes(data.totalCost.allocated) << " ("
+         << formatBytes(data.totalCost.allocated / totalTimeS) << "/s)" << '\n'
+         << "calls to allocation functions: " << data.totalCost.allocations << " ("
+         << int64_t(data.totalCost.allocations / totalTimeS) << "/s)\n"
+         << "temporary memory allocations: " << data.totalCost.temporary << " ("
+         << int64_t(data.totalCost.temporary / totalTimeS) << "/s)\n"
          << "peak heap memory consumption: " << formatBytes(data.totalCost.peak) << '\n'
          << "peak RSS (including heaptrack overhead): " << formatBytes(data.peakRSS * data.systemInfo.pageSize) << '\n'
          << "total memory leaked: " << formatBytes(data.totalCost.leaked) << '\n';

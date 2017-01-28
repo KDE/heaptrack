@@ -23,33 +23,33 @@
 
 #include <cmath>
 
-#include <KRecursiveFilterProxyModel>
-#include <KLocalizedString>
 #include <KConfigGroup>
+#include <KLocalizedString>
+#include <KRecursiveFilterProxyModel>
 
-#include <QFileDialog>
-#include <QStatusBar>
-#include <QDebug>
-#include <QMenu>
 #include <QAction>
+#include <QDebug>
 #include <QDesktopServices>
+#include <QFileDialog>
+#include <QMenu>
+#include <QStatusBar>
 
-#include "treemodel.h"
-#include "treeproxy.h"
-#include "topproxy.h"
+#include "callercalleemodel.h"
 #include "costdelegate.h"
 #include "parser.h"
 #include "stacksmodel.h"
-#include "callercalleemodel.h"
+#include "topproxy.h"
+#include "treemodel.h"
+#include "treeproxy.h"
 
 #include "gui_config.h"
 
 #if KChart_FOUND
-#include "chartwidget.h"
 #include "chartmodel.h"
 #include "chartproxy.h"
-#include "histogramwidget.h"
+#include "chartwidget.h"
 #include "histogrammodel.h"
+#include "histogramwidget.h"
 #endif
 
 using namespace std;
@@ -69,29 +69,27 @@ const char State[] = "State";
 void addContextMenu(QTreeView* treeView, int role)
 {
     treeView->setContextMenuPolicy(Qt::CustomContextMenu);
-    QObject::connect(treeView, &QTreeView::customContextMenuRequested,
-        treeView, [treeView, role] (const QPoint& pos) {
-            auto index = treeView->indexAt(pos);
-            if (!index.isValid()) {
-                return;
-            }
-            const auto location = index.data(role).value<LocationData::Ptr>();
-            if (!location || !QFile::exists(location->file)) {
-                return;
-            }
-            auto menu = new QMenu(treeView);
-            auto openFile = new QAction(QIcon::fromTheme(QStringLiteral("document-open")),
-                                        QObject::tr("Open file in editor"));
-            QObject::connect(openFile, &QAction::triggered,
-                openFile, [location] {
-                    /// FIXME: add settings to let user configure this
-                    auto url = QUrl::fromLocalFile(location->file);
-                    url.setFragment(QString::number(location->line));
-                    QDesktopServices::openUrl(url);
-                });
-            menu->addAction(openFile);
-            menu->popup(treeView->mapToGlobal(pos));
+    QObject::connect(treeView, &QTreeView::customContextMenuRequested, treeView, [treeView, role](const QPoint& pos) {
+        auto index = treeView->indexAt(pos);
+        if (!index.isValid()) {
+            return;
+        }
+        const auto location = index.data(role).value<LocationData::Ptr>();
+        if (!location || !QFile::exists(location->file)) {
+            return;
+        }
+        auto menu = new QMenu(treeView);
+        auto openFile =
+            new QAction(QIcon::fromTheme(QStringLiteral("document-open")), QObject::tr("Open file in editor"));
+        QObject::connect(openFile, &QAction::triggered, openFile, [location] {
+            /// FIXME: add settings to let user configure this
+            auto url = QUrl::fromLocalFile(location->file);
+            url.setFragment(QString::number(location->line));
+            QDesktopServices::openUrl(url);
         });
+        menu->addAction(openFile);
+        menu->popup(treeView->mapToGlobal(pos));
+    });
 }
 
 void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type)
@@ -108,30 +106,25 @@ void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type)
 }
 
 #if KChart_FOUND
-void addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel::Type type,
-                 const Parser* parser, void (Parser::*dataReady)(const ChartData&))
+void addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel::Type type, const Parser* parser,
+                 void (Parser::*dataReady)(const ChartData&))
 {
     auto tab = new ChartWidget(tabWidget->parentWidget());
     tabWidget->addTab(tab, title);
     tabWidget->setTabEnabled(tabWidget->indexOf(tab), false);
     auto model = new ChartModel(type, tab);
     tab->setModel(model);
-    QObject::connect(parser, dataReady,
-        tab, [=] (const ChartData& data) {
-            model->resetData(data);
-            tabWidget->setTabEnabled(tabWidget->indexOf(tab), true);
-        });
+    QObject::connect(parser, dataReady, tab, [=](const ChartData& data) {
+        model->resetData(data);
+        tabWidget->setTabEnabled(tabWidget->indexOf(tab), true);
+    });
 }
 #endif
 
-void setupTreeModel(TreeModel* model, QTreeView* view,
-                    CostDelegate* costDelegate, QLineEdit* filterFunction,
+void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegate, QLineEdit* filterFunction,
                     QLineEdit* filterFile, QLineEdit* filterModule)
 {
-    auto proxy = new TreeProxy(TreeModel::FunctionColumn,
-                               TreeModel::FileColumn,
-                               TreeModel::ModuleColumn,
-                               model);
+    auto proxy = new TreeProxy(TreeModel::FunctionColumn, TreeModel::FileColumn, TreeModel::ModuleColumn, model);
     proxy->setSourceModel(model);
     proxy->setSortRole(TreeModel::SortRole);
 
@@ -146,23 +139,17 @@ void setupTreeModel(TreeModel* model, QTreeView* view,
     view->hideColumn(TreeModel::LineColumn);
     view->hideColumn(TreeModel::ModuleColumn);
 
-    QObject::connect(filterFunction, &QLineEdit::textChanged,
-                     proxy, &TreeProxy::setFunctionFilter);
-    QObject::connect(filterFile, &QLineEdit::textChanged,
-                     proxy, &TreeProxy::setFileFilter);
-    QObject::connect(filterModule, &QLineEdit::textChanged,
-                     proxy, &TreeProxy::setModuleFilter);
+    QObject::connect(filterFunction, &QLineEdit::textChanged, proxy, &TreeProxy::setFunctionFilter);
+    QObject::connect(filterFile, &QLineEdit::textChanged, proxy, &TreeProxy::setFileFilter);
+    QObject::connect(filterModule, &QLineEdit::textChanged, proxy, &TreeProxy::setModuleFilter);
     addContextMenu(view, TreeModel::LocationRole);
 }
 
-void setupCallerCalle(CallerCalleeModel* model, QTreeView* view,
-                      CostDelegate* costDelegate, QLineEdit* filterFunction,
+void setupCallerCalle(CallerCalleeModel* model, QTreeView* view, CostDelegate* costDelegate, QLineEdit* filterFunction,
                       QLineEdit* filterFile, QLineEdit* filterModule)
 {
-    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::FunctionColumn,
-                                           CallerCalleeModel::FileColumn,
-                                           CallerCalleeModel::ModuleColumn,
-                                           model);
+    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::FunctionColumn, CallerCalleeModel::FileColumn,
+                                           CallerCalleeModel::ModuleColumn, model);
     callerCalleeProxy->setSourceModel(model);
     callerCalleeProxy->setSortRole(CallerCalleeModel::SortRole);
     view->setModel(callerCalleeProxy);
@@ -181,15 +168,11 @@ void setupCallerCalle(CallerCalleeModel* model, QTreeView* view,
     view->hideColumn(CallerCalleeModel::FileColumn);
     view->hideColumn(CallerCalleeModel::LineColumn);
     view->hideColumn(CallerCalleeModel::ModuleColumn);
-    QObject::connect(filterFunction, &QLineEdit::textChanged,
-                     callerCalleeProxy, &TreeProxy::setFunctionFilter);
-    QObject::connect(filterFile, &QLineEdit::textChanged,
-                     callerCalleeProxy, &TreeProxy::setFileFilter);
-    QObject::connect(filterModule, &QLineEdit::textChanged,
-                     callerCalleeProxy, &TreeProxy::setModuleFilter);
+    QObject::connect(filterFunction, &QLineEdit::textChanged, callerCalleeProxy, &TreeProxy::setFunctionFilter);
+    QObject::connect(filterFile, &QLineEdit::textChanged, callerCalleeProxy, &TreeProxy::setFileFilter);
+    QObject::connect(filterModule, &QLineEdit::textChanged, callerCalleeProxy, &TreeProxy::setModuleFilter);
     addContextMenu(view, CallerCalleeModel::LocationRole);
 }
-
 }
 
 MainWindow::MainWindow(QWidget* parent)
@@ -217,8 +200,7 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->topDownTab), false);
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->flameGraphTab), false);
 
-    connect(m_parser, &Parser::bottomUpDataAvailable,
-            this, [=] (const TreeData& data) {
+    connect(m_parser, &Parser::bottomUpDataAvailable, this, [=](const TreeData& data) {
         bottomUpModel->resetData(data);
         if (!m_diffMode) {
             m_ui->flameGraphTab->setBottomUpData(data);
@@ -228,75 +210,78 @@ MainWindow::MainWindow(QWidget* parent)
         statusBar()->addWidget(m_ui->loadingProgress);
         m_ui->pages->setCurrentWidget(m_ui->resultsPage);
     });
-    connect(m_parser, &Parser::callerCalleeDataAvailable,
-            this, [=] (const CallerCalleeRows& data) {
-                callerCalleeModel->resetData(data);
-                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->callerCalleeTab), true);
-            });
-    connect(m_parser, &Parser::topDownDataAvailable,
-            this, [=] (const TreeData& data) {
-                topDownModel->resetData(data);
-                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->topDownTab), true);
-                if (!m_diffMode) {
-                    m_ui->flameGraphTab->setTopDownData(data);
-                }
-                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->flameGraphTab), !m_diffMode);
-            });
-    connect(m_parser, &Parser::summaryAvailable,
-            this, [=] (const SummaryData& data) {
-                bottomUpModel->setSummary(data);
-                topDownModel->setSummary(data);
-                callerCalleeModel->setSummary(data);
-                KFormat format;
-                QString textLeft;
-                QString textCenter;
-                QString textRight;
-                const double totalTimeS = 0.001 * data.totalTime;
-                const double peakTimeS = 0.001 * data.peakTime;
-                {
-                    QTextStream stream(&textLeft);
-                    stream << "<qt><dl>"
-                           << i18n("<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>", data.debuggee)
-                           // xgettext:no-c-format
-                           << i18n("<dt><b>total runtime</b>:</dt><dd>%1s</dd>", totalTimeS)
-                           << i18n("<dt><b>total system memory</b>:</dt><dd>%1</dd>", format.formatByteSize(data.totalSystemMemory))
-                           << "</dl></qt>";
-                }
-                {
-                    QTextStream stream(&textCenter);
-                    stream << "<qt><dl>"
-                           << i18n("<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>",
-                                   data.cost.allocations, qint64(data.cost.allocations / totalTimeS))
-                           << i18n("<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>",
-                                   data.cost.temporary, std::round(float(data.cost.temporary) * 100.f * 100.f / data.cost.allocations) / 100.f,
-                                   qint64(data.cost.temporary / totalTimeS))
-                           << i18n("<dt><b>bytes allocated in total</b> (ignoring deallocations):</dt><dd>%1 (%2/s)</dd>",
-                                   format.formatByteSize(data.cost.allocated, 2), format.formatByteSize(data.cost.allocated / totalTimeS))
-                           << "</dl></qt>";
-                }
-                {
-                    QTextStream stream(&textRight);
-                    stream << "<qt><dl>"
-                           << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2s</dd>", format.formatByteSize(data.cost.peak), peakTimeS)
-                           << i18n("<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>", format.formatByteSize(data.peakRSS))
-                           << i18n("<dt><b>total memory leaked</b>:</dt><dd>%1</dd>", format.formatByteSize(data.cost.leaked))
-                           << "</dl></qt>";
-                }
+    connect(m_parser, &Parser::callerCalleeDataAvailable, this, [=](const CallerCalleeRows& data) {
+        callerCalleeModel->resetData(data);
+        m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->callerCalleeTab), true);
+    });
+    connect(m_parser, &Parser::topDownDataAvailable, this, [=](const TreeData& data) {
+        topDownModel->resetData(data);
+        m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->topDownTab), true);
+        if (!m_diffMode) {
+            m_ui->flameGraphTab->setTopDownData(data);
+        }
+        m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->flameGraphTab), !m_diffMode);
+    });
+    connect(m_parser, &Parser::summaryAvailable, this, [=](const SummaryData& data) {
+        bottomUpModel->setSummary(data);
+        topDownModel->setSummary(data);
+        callerCalleeModel->setSummary(data);
+        KFormat format;
+        QString textLeft;
+        QString textCenter;
+        QString textRight;
+        const double totalTimeS = 0.001 * data.totalTime;
+        const double peakTimeS = 0.001 * data.peakTime;
+        {
+            QTextStream stream(&textLeft);
+            stream << "<qt><dl>" << i18n("<dt><b>debuggee</b>:</dt><dd "
+                                         "style='font-family:monospace;'>%1</dd>",
+                                         data.debuggee)
+                   // xgettext:no-c-format
+                   << i18n("<dt><b>total runtime</b>:</dt><dd>%1s</dd>", totalTimeS)
+                   << i18n("<dt><b>total system memory</b>:</dt><dd>%1</dd>",
+                           format.formatByteSize(data.totalSystemMemory))
+                   << "</dl></qt>";
+        }
+        {
+            QTextStream stream(&textCenter);
+            stream << "<qt><dl>" << i18n("<dt><b>calls to allocation functions</b>:</dt><dd>%1 "
+                                         "(%2/s)</dd>",
+                                         data.cost.allocations, qint64(data.cost.allocations / totalTimeS))
+                   << i18n("<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, "
+                           "%3/s)</dd>",
+                           data.cost.temporary,
+                           std::round(float(data.cost.temporary) * 100.f * 100.f / data.cost.allocations) / 100.f,
+                           qint64(data.cost.temporary / totalTimeS))
+                   << i18n("<dt><b>bytes allocated in total</b> (ignoring "
+                           "deallocations):</dt><dd>%1 (%2/s)</dd>",
+                           format.formatByteSize(data.cost.allocated, 2),
+                           format.formatByteSize(data.cost.allocated / totalTimeS))
+                   << "</dl></qt>";
+        }
+        {
+            QTextStream stream(&textRight);
+            stream << "<qt><dl>" << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1 "
+                                         "after %2s</dd>",
+                                         format.formatByteSize(data.cost.peak), peakTimeS)
+                   << i18n("<dt><b>peak RSS</b> (including heaptrack "
+                           "overhead):</dt><dd>%1</dd>",
+                           format.formatByteSize(data.peakRSS))
+                   << i18n("<dt><b>total memory leaked</b>:</dt><dd>%1</dd>", format.formatByteSize(data.cost.leaked))
+                   << "</dl></qt>";
+        }
 
-                m_ui->summaryLeft->setText(textLeft);
-                m_ui->summaryCenter->setText(textCenter);
-                m_ui->summaryRight->setText(textRight);
-            });
-    connect(m_parser, &Parser::progressMessageAvailable,
-            m_ui->progressLabel, &QLabel::setText);
+        m_ui->summaryLeft->setText(textLeft);
+        m_ui->summaryCenter->setText(textCenter);
+        m_ui->summaryRight->setText(textRight);
+    });
+    connect(m_parser, &Parser::progressMessageAvailable, m_ui->progressLabel, &QLabel::setText);
     auto removeProgress = [this] {
         statusBar()->removeWidget(m_ui->progressLabel);
         statusBar()->removeWidget(m_ui->loadingProgress);
     };
-    connect(m_parser, &Parser::finished,
-            this, removeProgress);
-    connect(m_parser, &Parser::failedToOpen,
-            this, [this, removeProgress] (const QString& failedFile) {
+    connect(m_parser, &Parser::finished, this, removeProgress);
+    connect(m_parser, &Parser::failedToOpen, this, [this, removeProgress](const QString& failedFile) {
         removeProgress();
         m_ui->pages->setCurrentWidget(m_ui->openPage);
         showError(i18n("Failed to parse file %1.", failedFile));
@@ -304,14 +289,13 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->messages->hide();
 
 #if KChart_FOUND
-    addChartTab(m_ui->tabWidget, tr("Consumed"), ChartModel::Consumed,
-                m_parser, &Parser::consumedChartDataAvailable);
-    addChartTab(m_ui->tabWidget, tr("Allocations"), ChartModel::Allocations,
-                m_parser, &Parser::allocationsChartDataAvailable);
-    addChartTab(m_ui->tabWidget, tr("Temporary Allocations"), ChartModel::Temporary,
-                m_parser, &Parser::temporaryChartDataAvailable);
-    addChartTab(m_ui->tabWidget, tr("Allocated"), ChartModel::Allocated,
-                m_parser, &Parser::allocatedChartDataAvailable);
+    addChartTab(m_ui->tabWidget, tr("Consumed"), ChartModel::Consumed, m_parser, &Parser::consumedChartDataAvailable);
+    addChartTab(m_ui->tabWidget, tr("Allocations"), ChartModel::Allocations, m_parser,
+                &Parser::allocationsChartDataAvailable);
+    addChartTab(m_ui->tabWidget, tr("Temporary Allocations"), ChartModel::Temporary, m_parser,
+                &Parser::temporaryChartDataAvailable);
+    addChartTab(m_ui->tabWidget, tr("Allocated"), ChartModel::Allocated, m_parser,
+                &Parser::allocatedChartDataAvailable);
 
     auto sizesTab = new HistogramWidget(this);
     m_ui->tabWidget->addTab(sizesTab, tr("Sizes"));
@@ -319,29 +303,24 @@ MainWindow::MainWindow(QWidget* parent)
     auto sizeHistogramModel = new HistogramModel(this);
     sizesTab->setModel(sizeHistogramModel);
 
-    connect(m_parser, &Parser::sizeHistogramDataAvailable,
-            this, [=] (const HistogramData& data) {
-                sizeHistogramModel->resetData(data);
-                m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(sizesTab), true);
-            });
+    connect(m_parser, &Parser::sizeHistogramDataAvailable, this, [=](const HistogramData& data) {
+        sizeHistogramModel->resetData(data);
+        m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(sizesTab), true);
+    });
 #endif
 
     auto costDelegate = new CostDelegate(this);
 
-    setupTreeModel(bottomUpModel, m_ui->bottomUpResults, costDelegate,
-                   m_ui->bottomUpFilterFunction, m_ui->bottomUpFilterFile,
-                   m_ui->bottomUpFilterModule);
+    setupTreeModel(bottomUpModel, m_ui->bottomUpResults, costDelegate, m_ui->bottomUpFilterFunction,
+                   m_ui->bottomUpFilterFile, m_ui->bottomUpFilterModule);
 
-    setupTreeModel(topDownModel, m_ui->topDownResults, costDelegate,
-                   m_ui->topDownFilterFunction, m_ui->topDownFilterFile,
-                   m_ui->topDownFilterModule);
+    setupTreeModel(topDownModel, m_ui->topDownResults, costDelegate, m_ui->topDownFilterFunction,
+                   m_ui->topDownFilterFile, m_ui->topDownFilterModule);
 
-    setupCallerCalle(callerCalleeModel, m_ui->callerCalleeResults, costDelegate,
-                     m_ui->callerCalleeFilterFunction,
-                     m_ui->callerCalleeFilterFile,
-                     m_ui->callerCalleeFilterModule);
+    setupCallerCalle(callerCalleeModel, m_ui->callerCalleeResults, costDelegate, m_ui->callerCalleeFilterFunction,
+                     m_ui->callerCalleeFilterFile, m_ui->callerCalleeFilterModule);
 
-    auto validateInputFile = [this] (const QString &path, bool allowEmpty) -> bool {
+    auto validateInputFile = [this](const QString& path, bool allowEmpty) -> bool {
         if (path.isEmpty()) {
             return allowEmpty;
         }
@@ -359,25 +338,20 @@ MainWindow::MainWindow(QWidget* parent)
         return false;
     };
 
-    auto validateInput = [this, validateInputFile] () {
+    auto validateInput = [this, validateInputFile]() {
         m_ui->messages->hide();
-        m_ui->buttonBox->setEnabled(
-            validateInputFile(m_ui->openFile->url().toLocalFile(), false)
-            && validateInputFile(m_ui->compareTo->url().toLocalFile(), true)
-        );
+        m_ui->buttonBox->setEnabled(validateInputFile(m_ui->openFile->url().toLocalFile(), false)
+                                    && validateInputFile(m_ui->compareTo->url().toLocalFile(), true));
     };
 
-    connect(m_ui->openFile, &KUrlRequester::textChanged,
-            this, validateInput);
-    connect(m_ui->compareTo, &KUrlRequester::textChanged,
-            this, validateInput);
-    connect(m_ui->buttonBox, &QDialogButtonBox::accepted,
-            this, [this] () {
-                const auto path = m_ui->openFile->url().toLocalFile();
-                Q_ASSERT(!path.isEmpty());
-                const auto base = m_ui->compareTo->url().toLocalFile();
-                loadFile(path, base);
-            });
+    connect(m_ui->openFile, &KUrlRequester::textChanged, this, validateInput);
+    connect(m_ui->compareTo, &KUrlRequester::textChanged, this, validateInput);
+    connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, [this]() {
+        const auto path = m_ui->openFile->url().toLocalFile();
+        Q_ASSERT(!path.isEmpty());
+        const auto base = m_ui->compareTo->url().toLocalFile();
+        loadFile(path, base);
+    });
 
     setupStacks();
 
@@ -406,8 +380,7 @@ void MainWindow::loadFile(const QString& file, const QString& diffBase)
 {
     m_ui->loadingLabel->setText(i18n("Loading file %1, please wait...", file));
     if (diffBase.isEmpty()) {
-        setWindowTitle(i18nc("%1: file name that is open", "Heaptrack - %1",
-                             QFileInfo(file).fileName()));
+        setWindowTitle(i18nc("%1: file name that is open", "Heaptrack - %1", QFileInfo(file).fileName()));
         m_diffMode = false;
     } else {
         setWindowTitle(i18nc("%1, %2: file names that are open", "Heaptrack - %1 compared to %2",
@@ -420,17 +393,15 @@ void MainWindow::loadFile(const QString& file, const QString& diffBase)
 
 void MainWindow::openFile()
 {
-    auto dialog = new QFileDialog(this, i18n("Open Heaptrack Output File"), {}, i18n("Heaptrack data files (heaptrack.*)"));
+    auto dialog =
+        new QFileDialog(this, i18n("Open Heaptrack Output File"), {}, i18n("Heaptrack data files (heaptrack.*)"));
     dialog->setAttribute(Qt::WA_DeleteOnClose, true);
     dialog->setFileMode(QFileDialog::ExistingFile);
-    connect(dialog, &QFileDialog::fileSelected,
-            this, [this] (const QString& file) {
-                loadFile(file);
-            });
+    connect(dialog, &QFileDialog::fileSelected, this, [this](const QString& file) { loadFile(file); });
     dialog->show();
 }
 
-void MainWindow::showError(const QString &message)
+void MainWindow::showError(const QString& message)
 {
     m_ui->messages->setText(message);
     m_ui->messages->show();
@@ -442,18 +413,17 @@ void MainWindow::setupStacks()
     m_ui->stacksTree->setModel(stacksModel);
     m_ui->stacksTree->setRootIsDecorated(false);
 
-    auto updateStackSpinner = [this] (int stacks) {
+    auto updateStackSpinner = [this](int stacks) {
         m_ui->stackSpinner->setMinimum(min(stacks, 1));
         m_ui->stackSpinner->setSuffix(i18n(" / %1", stacks));
         m_ui->stackSpinner->setMaximum(stacks);
     };
     updateStackSpinner(0);
-    connect(stacksModel, &StacksModel::stacksFound,
-            this, updateStackSpinner);
-    connect(m_ui->stackSpinner, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            stacksModel, &StacksModel::setStackIndex);
+    connect(stacksModel, &StacksModel::stacksFound, this, updateStackSpinner);
+    connect(m_ui->stackSpinner, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), stacksModel,
+            &StacksModel::setStackIndex);
 
-    auto fillFromIndex = [stacksModel] (const QModelIndex& current) {
+    auto fillFromIndex = [stacksModel](const QModelIndex& current) {
         if (!current.isValid()) {
             stacksModel->clear();
         } else {
@@ -463,12 +433,10 @@ void MainWindow::setupStacks()
             stacksModel->fillFromIndex(leaf);
         }
     };
-    connect(m_ui->bottomUpResults->selectionModel(), &QItemSelectionModel::currentChanged,
-            this, fillFromIndex);
-    connect(m_ui->topDownResults->selectionModel(), &QItemSelectionModel::currentChanged,
-            this, fillFromIndex);
+    connect(m_ui->bottomUpResults->selectionModel(), &QItemSelectionModel::currentChanged, this, fillFromIndex);
+    connect(m_ui->topDownResults->selectionModel(), &QItemSelectionModel::currentChanged, this, fillFromIndex);
 
-    auto tabChanged = [this, fillFromIndex] (int tabIndex) {
+    auto tabChanged = [this, fillFromIndex](int tabIndex) {
         const auto widget = m_ui->tabWidget->widget(tabIndex);
         const bool showDocks = (widget == m_ui->topDownTab || widget == m_ui->bottomUpTab);
         m_ui->stacksDock->setVisible(showDocks);
@@ -477,10 +445,8 @@ void MainWindow::setupStacks()
             fillFromIndex(tree->selectionModel()->currentIndex());
         }
     };
-    connect(m_ui->tabWidget, &QTabWidget::currentChanged,
-            this, tabChanged);
-    connect(m_parser, &Parser::bottomUpDataAvailable,
-            this, [tabChanged] () { tabChanged(0); });
+    connect(m_ui->tabWidget, &QTabWidget::currentChanged, this, tabChanged);
+    connect(m_parser, &Parser::bottomUpDataAvailable, this, [tabChanged]() { tabChanged(0); });
 
     m_ui->stacksDock->setVisible(false);
 }

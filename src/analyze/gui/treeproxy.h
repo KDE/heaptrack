@@ -46,4 +46,4 @@ private:
     QString m_moduleFilter;
 };
 
-#endif //TREEPROXY_H
+#endif // TREEPROXY_H

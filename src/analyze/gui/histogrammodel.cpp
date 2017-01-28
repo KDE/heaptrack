@@ -24,8 +24,8 @@
 #include <KFormat>
 #include <KLocalizedString>
 
-#include <QColor>
 #include <QBrush>
+#include <QColor>
 #include <QPen>
 
 #include <limits>
@@ -58,9 +58,9 @@ QVariant HistogramModel::data(const QModelIndex& index, int role) const
     if (!hasIndex(index.row(), index.column(), index.parent())) {
         return {};
     }
-    if ( role == KChart::DatasetBrushRole ) {
+    if (role == KChart::DatasetBrushRole) {
         return QVariant::fromValue(QBrush(colorForColumn(index.column(), columnCount())));
-    } else if ( role == KChart::DatasetPenRole ) {
+    } else if (role == KChart::DatasetPenRole) {
         return QVariant::fromValue(QPen(Qt::black));
     }
 
@@ -75,12 +75,11 @@ QVariant HistogramModel::data(const QModelIndex& index, int role) const
             return i18n("%1 allocations in total", column.allocations);
         }
         if (!column.location->file.isEmpty()) {
-            return i18n("%1 allocations from %2 at %3:%4 in %5", column.allocations,
-                        column.location->function, column.location->file, column.location->line,
-                        column.location->module);
+            return i18n("%1 allocations from %2 at %3:%4 in %5", column.allocations, column.location->function,
+                        column.location->file, column.location->line, column.location->module);
         }
-        return i18n("%1 allocations from %2 in %3", column.allocations,
-                    column.location->function, column.location->module);
+        return i18n("%1 allocations from %2 in %3", column.allocations, column.location->function,
+                    column.location->module);
     }
     return column.allocations;
 }

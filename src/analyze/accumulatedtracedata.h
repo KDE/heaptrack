@@ -25,13 +25,14 @@
 #include <vector>
 
 #include <fstream>
+#include <map>
 #include <unordered_map>
 #include <unordered_set>
-#include <map>
+
 #include <boost/functional/hash.hpp>
 
-#include "util/indices.h"
 #include "allocationdata.h"
+#include "util/indices.h"
 
 struct InstructionPointer
 {
@@ -41,13 +42,13 @@ struct InstructionPointer
     FileIndex fileIndex;
     int line = 0;
 
-    bool compareWithoutAddress(const InstructionPointer &other) const
+    bool compareWithoutAddress(const InstructionPointer& other) const
     {
         return std::tie(moduleIndex, functionIndex, fileIndex, line)
-             < std::tie(other.moduleIndex, other.functionIndex, other.fileIndex, other.line);
+            < std::tie(other.moduleIndex, other.functionIndex, other.fileIndex, other.line);
     }
 
-    bool equalWithoutAddress(const InstructionPointer &other) const
+    bool equalWithoutAddress(const InstructionPointer& other) const
     {
         return std::tie(moduleIndex, functionIndex, fileIndex, line)
             == std::tie(other.moduleIndex, other.functionIndex, other.fileIndex, other.line);
@@ -106,7 +107,8 @@ struct AccumulatedTraceData
     int64_t peakTime = 0;
     int64_t peakRSS = 0;
 
-    struct SystemInfo {
+    struct SystemInfo
+    {
         int64_t pages = 0;
         int64_t pageSize = 0;
     };
@@ -125,7 +127,8 @@ struct AccumulatedTraceData
 
     bool isStopIndex(const StringIndex index) const;
 
-    // indices of functions that should stop the backtrace, e.g. main or static initialization
+    // indices of functions that should stop the backtrace, e.g. main or static
+    // initialization
     std::vector<StringIndex> stopIndices;
     std::vector<InstructionPointer> instructionPointers;
     std::vector<TraceNode> traces;

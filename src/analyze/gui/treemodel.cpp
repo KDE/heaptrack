@@ -53,7 +53,6 @@ QString basename(const QString& path)
     int idx = path.lastIndexOf(QLatin1Char('/'));
     return path.mid(idx + 1);
 }
-
 }
 
 TreeModel::TreeModel(QObject* parent)
@@ -72,67 +71,76 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
         return {};
     }
     if (role == Qt::InitialSortOrderRole) {
-        if (section == AllocatedColumn || section == AllocationsColumn
-            || section == PeakColumn || section == LeakedColumn
-            || section == TemporaryColumn)
-        {
+        if (section == AllocatedColumn || section == AllocationsColumn || section == PeakColumn
+            || section == LeakedColumn || section == TemporaryColumn) {
             return Qt::DescendingOrder;
         }
     }
     if (role == Qt::DisplayRole) {
         switch (static_cast<Columns>(section)) {
-            case FileColumn:
-                return i18n("File");
-            case LineColumn:
-                return i18n("Line");
-            case FunctionColumn:
-                return i18n("Function");
-            case ModuleColumn:
-                return i18n("Module");
-            case AllocationsColumn:
-                return i18n("Allocations");
-            case TemporaryColumn:
-                return i18n("Temporary");
-            case PeakColumn:
-                return i18n("Peak");
-            case LeakedColumn:
-                return i18n("Leaked");
-            case AllocatedColumn:
-                return i18n("Allocated");
-            case LocationColumn:
-                return i18n("Location");
-            case NUM_COLUMNS:
-                break;
+        case FileColumn:
+            return i18n("File");
+        case LineColumn:
+            return i18n("Line");
+        case FunctionColumn:
+            return i18n("Function");
+        case ModuleColumn:
+            return i18n("Module");
+        case AllocationsColumn:
+            return i18n("Allocations");
+        case TemporaryColumn:
+            return i18n("Temporary");
+        case PeakColumn:
+            return i18n("Peak");
+        case LeakedColumn:
+            return i18n("Leaked");
+        case AllocatedColumn:
+            return i18n("Allocated");
+        case LocationColumn:
+            return i18n("Location");
+        case NUM_COLUMNS:
+            break;
         }
     } else if (role == Qt::ToolTipRole) {
         switch (static_cast<Columns>(section)) {
-            case FileColumn:
-                return i18n("<qt>The file where the allocation function was called from. "
-                            "May be empty when debug information is missing.</qt>");
-            case LineColumn:
-                return i18n("<qt>The line number where the allocation function was called from. "
-                            "May be empty when debug information is missing.</qt>");
-            case FunctionColumn:
-                return i18n("<qt>The parent function that called an allocation function. "
-                            "May be unknown when debug information is missing.</qt>");
-            case ModuleColumn:
-                return i18n("<qt>The module, i.e. executable or shared library, from which an allocation function was called.</qt>");
-            case AllocationsColumn:
-                return i18n("<qt>The number of times an allocation function was called from this location.</qt>");
-            case TemporaryColumn:
-                return i18n("<qt>The number of temporary allocations. These allocations are directly followed by a free without any other allocations in-between.</qt>");
-            case PeakColumn:
-                return i18n("<qt>The maximum heap memory in bytes consumed from allocations originating at this location. "
-                            "This takes deallocations into account.</qt>");
-            case LeakedColumn:
-                return i18n("<qt>The bytes allocated at this location that have not been deallocated.</qt>");
-            case AllocatedColumn:
-                return i18n("<qt>The sum of all bytes allocated from this location, ignoring deallocations.</qt>");
-            case LocationColumn:
-                return i18n("<qt>The location from which an allocation function was called. Function symbol and file information "
-                            "may be unknown when debug information was missing when heaptrack was run.</qt>");
-            case NUM_COLUMNS:
-                break;
+        case FileColumn:
+            return i18n("<qt>The file where the allocation function was called from. "
+                        "May be empty when debug information is missing.</qt>");
+        case LineColumn:
+            return i18n("<qt>The line number where the allocation function was called from. "
+                        "May be empty when debug information is missing.</qt>");
+        case FunctionColumn:
+            return i18n("<qt>The parent function that called an allocation function. "
+                        "May be unknown when debug information is missing.</qt>");
+        case ModuleColumn:
+            return i18n("<qt>The module, i.e. executable or shared library, from "
+                        "which an allocation function was "
+                        "called.</qt>");
+        case AllocationsColumn:
+            return i18n("<qt>The number of times an allocation function was called "
+                        "from this location.</qt>");
+        case TemporaryColumn:
+            return i18n("<qt>The number of temporary allocations. These allocations "
+                        "are directly followed by a free "
+                        "without any other allocations in-between.</qt>");
+        case PeakColumn:
+            return i18n("<qt>The maximum heap memory in bytes consumed from "
+                        "allocations originating at this location. "
+                        "This takes deallocations into account.</qt>");
+        case LeakedColumn:
+            return i18n("<qt>The bytes allocated at this location that have not been "
+                        "deallocated.</qt>");
+        case AllocatedColumn:
+            return i18n("<qt>The sum of all bytes allocated from this location, "
+                        "ignoring deallocations.</qt>");
+        case LocationColumn:
+            return i18n("<qt>The location from which an allocation function was "
+                        "called. Function symbol and file "
+                        "information "
+                        "may be unknown when debug information was missing when "
+                        "heaptrack was run.</qt>");
+        case NUM_COLUMNS:
+            break;
         }
     }
     return {};
@@ -185,13 +193,10 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             return row->location->line;
         case LocationColumn:
             if (row->location->file.isEmpty()) {
-                return i18n("%1 in ?? (%2)",
-                            basename(row->location->function),
-                            basename(row->location->module));
+                return i18n("%1 in ?? (%2)", basename(row->location->function), basename(row->location->module));
             } else {
-                return i18n("%1 in %2:%3 (%4)", row->location->function,
-                            basename(row->location->file), row->location->line,
-                            basename(row->location->module));
+                return i18n("%1 in %2:%3 (%4)", row->location->function, basename(row->location->file),
+                            row->location->line, basename(row->location->module));
             }
         case NUM_COLUMNS:
             break;
@@ -202,28 +207,31 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         stream << "<qt><pre style='font-family:monospace;'>";
         if (row->location->line > 0) {
             stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                            row->location->function.toHtmlEscaped(),
-                            row->location->file.toHtmlEscaped(), row->location->line, row->location->module.toHtmlEscaped());
+                            row->location->function.toHtmlEscaped(), row->location->file.toHtmlEscaped(),
+                            row->location->line, row->location->module.toHtmlEscaped());
         } else {
-            stream << i18nc("1: function, 2: module", "%1\n  in %2",
-                            row->location->function.toHtmlEscaped(), row->location->module.toHtmlEscaped());
+            stream << i18nc("1: function, 2: module", "%1\n  in %2", row->location->function.toHtmlEscaped(),
+                            row->location->module.toHtmlEscaped());
         }
         stream << '\n';
         stream << '\n';
         KFormat format;
-        const auto allocatedFraction = QString::number(double(row->cost.allocated)  * 100. / m_maxCost.cost.allocated, 'g', 3);
-        const auto peakFraction = QString::number(double(row->cost.peak)  * 100. / m_maxCost.cost.peak, 'g', 3);
-        const auto leakedFraction = QString::number(double(row->cost.leaked)  * 100. / m_maxCost.cost.leaked, 'g', 3);
-        const auto allocationsFraction = QString::number(double(row->cost.allocations)  * 100. / m_maxCost.cost.allocations, 'g', 3);
-        const auto temporaryFraction = QString::number(double(row->cost.temporary)  * 100. / row->cost.allocations, 'g', 3);
-        const auto temporaryFractionTotal = QString::number(double(row->cost.temporary)  * 100. / m_maxCost.cost.temporary, 'g', 3);
-        stream << i18n("allocated: %1 (%2% of total)\n",
-                       format.formatByteSize(row->cost.allocated), allocatedFraction);
+        const auto allocatedFraction =
+            QString::number(double(row->cost.allocated) * 100. / m_maxCost.cost.allocated, 'g', 3);
+        const auto peakFraction = QString::number(double(row->cost.peak) * 100. / m_maxCost.cost.peak, 'g', 3);
+        const auto leakedFraction = QString::number(double(row->cost.leaked) * 100. / m_maxCost.cost.leaked, 'g', 3);
+        const auto allocationsFraction =
+            QString::number(double(row->cost.allocations) * 100. / m_maxCost.cost.allocations, 'g', 3);
+        const auto temporaryFraction =
+            QString::number(double(row->cost.temporary) * 100. / row->cost.allocations, 'g', 3);
+        const auto temporaryFractionTotal =
+            QString::number(double(row->cost.temporary) * 100. / m_maxCost.cost.temporary, 'g', 3);
+        stream << i18n("allocated: %1 (%2% of total)\n", format.formatByteSize(row->cost.allocated), allocatedFraction);
         stream << i18n("peak: %1 (%2% of total)\n", format.formatByteSize(row->cost.peak), peakFraction);
         stream << i18n("leaked: %1 (%2% of total)\n", format.formatByteSize(row->cost.leaked), leakedFraction);
         stream << i18n("allocations: %1 (%2% of total)\n", row->cost.allocations, allocationsFraction);
-        stream << i18n("temporary: %1 (%2% of allocations, %3% of total)\n",
-                       row->cost.temporary, temporaryFraction, temporaryFractionTotal);
+        stream << i18n("temporary: %1 (%2% of allocations, %3% of total)\n", row->cost.temporary, temporaryFraction,
+                       temporaryFractionTotal);
         if (!row->children.isEmpty()) {
             auto child = row;
             int max = 5;
@@ -234,12 +242,11 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
                 stream << "\n";
                 if (child->location->line > 0) {
                     stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                                    child->location->function.toHtmlEscaped(),
-                                    child->location->file.toHtmlEscaped(), child->location->line,
-                                    child->location->module.toHtmlEscaped());
+                                    child->location->function.toHtmlEscaped(), child->location->file.toHtmlEscaped(),
+                                    child->location->line, child->location->module.toHtmlEscaped());
                 } else {
-                    stream << i18nc("1: function, 2: module", "%1\n  in %2",
-                                    child->location->function.toHtmlEscaped(), child->location->module.toHtmlEscaped());
+                    stream << i18nc("1: function, 2: module", "%1\n  in %2", child->location->function.toHtmlEscaped(),
+                                    child->location->module.toHtmlEscaped());
                 }
                 child = child->children.data();
             }
@@ -258,7 +265,7 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
 
 QModelIndex TreeModel::index(int row, int column, const QModelIndex& parent) const
 {
-    if (row < 0 || column  < 0 || column >= NUM_COLUMNS || row >= rowCount(parent)) {
+    if (row < 0 || column < 0 || column >= NUM_COLUMNS || row >= rowCount(parent)) {
         return QModelIndex();
     }
     return createIndex(row, column, const_cast<void*>(reinterpret_cast<const void*>(toRow(parent))));
