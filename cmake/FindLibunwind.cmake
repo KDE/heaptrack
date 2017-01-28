@@ -15,7 +15,6 @@
 #   LIBUNWIND_HAS_UNW_INIT_LOCAL        - True if unw_init_local() is found (optional).
 #   LIBUNWIND_HAS_UNW_BACKTRACE         - True if unw_backtrace() is found (required).
 #   LIBUNWIND_HAS_UNW_BACKTRACE_SKIP    - True if unw_backtrace_skip() is found (optional).
-#   LIBUNWIND_HAS_UNW_SET_CACHE_SIZE    - True if unw_set_cache_size() is found (optional).
 #   LIBUNWIND_VERSION_STRING            - version number as a string (ex: "5.0.3")
 
 #=============================================================================
@@ -63,8 +62,6 @@ if (LIBUNWIND_LIBRARY)
   check_library_exists(${LIBUNWIND_LIBRARY} unw_init_local "" LIBUNWIND_HAS_UNW_INIT_LOCAL)
   check_library_exists(${LIBUNWIND_LIBRARY} unw_backtrace "" LIBUNWIND_HAS_UNW_BACKTRACE)
   check_library_exists (${LIBUNWIND_LIBRARY} unw_backtrace_skip "" LIBUNWIND_HAS_UNW_BACKTRACE_SKIP)
-  # TODO: find the symbol name on 32bit/arm platforms
-  check_library_exists (${LIBUNWIND_LIBRARY} _ULx86_64_set_cache_size "" LIBUNWIND_HAS_UNW_SET_CACHE_SIZE)
   set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
 endif ()
 
