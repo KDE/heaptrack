@@ -114,7 +114,7 @@ thread_local bool RecursionGuard::isActive = false;
 
 void writeVersion(FILE* out)
 {
-    fprintf(out, "v %x\n", HEAPTRACK_VERSION);
+    fprintf(out, "v %x %x\n", HEAPTRACK_VERSION, HEAPTRACK_FILE_FORMAT_VERSION);
 }
 
 void writeExe(FILE* out)

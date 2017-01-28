@@ -228,7 +228,7 @@ bool AccumulatedTraceData::read(istream& in)
         } else if (reader.mode() == '+') {
             AllocationInfo info;
             AllocationIndex allocationIndex;
-            if (fileVersion >= 0x010000) {
+            if (fileVersion >= 1) {
                 if (!(reader >> allocationIndex.index)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     continue;
@@ -271,7 +271,7 @@ bool AccumulatedTraceData::read(istream& in)
         } else if (reader.mode() == '-') {
             AllocationIndex allocationInfoIndex;
             bool temporary = false;
-            if (fileVersion >= 0x010000) {
+            if (fileVersion >= 1) {
                 if (!(reader >> allocationInfoIndex.index)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     continue;
@@ -334,10 +334,20 @@ bool AccumulatedTraceData::read(istream& in)
             totalCost = {};
             fromAttached = true;
         } else if (reader.mode() == 'v') {
-            reader >> fileVersion;
-            if (fileVersion > HEAPTRACK_VERSION) {
-                cerr << "The data file was written by a newer heaptrack of version " << hex << fileVersion
-                     << " and is thus not compatible with this build of heaptrack version " << hex << HEAPTRACK_VERSION << '.' << endl;
+            uint heaptrackVersion = 0;
+            reader >> heaptrackVersion;
+            if (!(reader >> fileVersion) && heaptrackVersion == 0x010200) {
+                // backwards compatibility: before the 1.0.0, I actually
+                // bumped the version to 0x010200 already and used that
+                // as file version. This is what we now consider v1 of the
+                // file format
+                fileVersion = 1;
+            }
+            if (fileVersion > HEAPTRACK_FILE_FORMAT_VERSION) {
+                cerr << "The data file has version " << hex << fileVersion
+                     << " (written by heaptrack version " << hex << heaptrackVersion << ")\n"
+                     << "This is not compatible with this build of heaptrack (version " << hex << HEAPTRACK_VERSION << ")"
+                     << ", which can read file format version " << hex << HEAPTRACK_FILE_FORMAT_VERSION << " and below" << endl;
                 return false;
             }
         } else if (reader.mode() == 'I') { // system information
