@@ -124,6 +124,37 @@ void addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel::Type t
 }
 #endif
 
+void setupTreeModel(TreeModel* model, QTreeView* view,
+                    CostDelegate* costDelegate, QLineEdit* filterFunction,
+                    QLineEdit* filterFile, QLineEdit* filterModule)
+{
+    auto proxy = new TreeProxy(TreeModel::FunctionColumn,
+                               TreeModel::FileColumn,
+                               TreeModel::ModuleColumn,
+                               model);
+    proxy->setSourceModel(model);
+    proxy->setSortRole(TreeModel::SortRole);
+
+    view->setModel(proxy);
+    view->setItemDelegateForColumn(TreeModel::PeakColumn, costDelegate);
+    view->setItemDelegateForColumn(TreeModel::AllocatedColumn, costDelegate);
+    view->setItemDelegateForColumn(TreeModel::LeakedColumn, costDelegate);
+    view->setItemDelegateForColumn(TreeModel::AllocationsColumn, costDelegate);
+    view->setItemDelegateForColumn(TreeModel::TemporaryColumn, costDelegate);
+    view->hideColumn(TreeModel::FunctionColumn);
+    view->hideColumn(TreeModel::FileColumn);
+    view->hideColumn(TreeModel::LineColumn);
+    view->hideColumn(TreeModel::ModuleColumn);
+
+    QObject::connect(filterFunction, &QLineEdit::textChanged,
+                     proxy, &TreeProxy::setFunctionFilter);
+    QObject::connect(filterFile, &QLineEdit::textChanged,
+                     proxy, &TreeProxy::setFileFilter);
+    QObject::connect(filterModule, &QLineEdit::textChanged,
+                     proxy, &TreeProxy::setModuleFilter);
+    addContextMenu(view, TreeModel::LocationRole);
+}
+
 }
 
 MainWindow::MainWindow(QWidget* parent)
@@ -260,54 +291,15 @@ MainWindow::MainWindow(QWidget* parent)
             });
 #endif
 
-    auto bottomUpProxy = new TreeProxy(TreeModel::FunctionColumn,
-                                       TreeModel::FileColumn,
-                                       TreeModel::ModuleColumn,
-                                       bottomUpModel);
-    bottomUpProxy->setSourceModel(bottomUpModel);
-    bottomUpProxy->setSortRole(TreeModel::SortRole);
-    m_ui->bottomUpResults->setModel(bottomUpProxy);
     auto costDelegate = new CostDelegate(this);
-    m_ui->bottomUpResults->setItemDelegateForColumn(TreeModel::PeakColumn, costDelegate);
-    m_ui->bottomUpResults->setItemDelegateForColumn(TreeModel::AllocatedColumn, costDelegate);
-    m_ui->bottomUpResults->setItemDelegateForColumn(TreeModel::LeakedColumn, costDelegate);
-    m_ui->bottomUpResults->setItemDelegateForColumn(TreeModel::AllocationsColumn, costDelegate);
-    m_ui->bottomUpResults->setItemDelegateForColumn(TreeModel::TemporaryColumn, costDelegate);
-    m_ui->bottomUpResults->hideColumn(TreeModel::FunctionColumn);
-    m_ui->bottomUpResults->hideColumn(TreeModel::FileColumn);
-    m_ui->bottomUpResults->hideColumn(TreeModel::LineColumn);
-    m_ui->bottomUpResults->hideColumn(TreeModel::ModuleColumn);
-    connect(m_ui->bottomUpFilterFunction, &QLineEdit::textChanged,
-            bottomUpProxy, &TreeProxy::setFunctionFilter);
-    connect(m_ui->bottomUpFilterFile, &QLineEdit::textChanged,
-            bottomUpProxy, &TreeProxy::setFileFilter);
-    connect(m_ui->bottomUpFilterModule, &QLineEdit::textChanged,
-            bottomUpProxy, &TreeProxy::setModuleFilter);
-    addContextMenu(m_ui->bottomUpResults, TreeModel::LocationRole);
 
-    auto topDownProxy = new TreeProxy(TreeModel::FunctionColumn,
-                                      TreeModel::FileColumn,
-                                      TreeModel::ModuleColumn,
-                                      topDownModel);
-    topDownProxy->setSourceModel(topDownModel);
-    topDownProxy->setSortRole(TreeModel::SortRole);
-    m_ui->topDownResults->setModel(topDownProxy);
-    m_ui->topDownResults->setItemDelegateForColumn(TreeModel::PeakColumn, costDelegate);
-    m_ui->topDownResults->setItemDelegateForColumn(TreeModel::AllocatedColumn, costDelegate);
-    m_ui->topDownResults->setItemDelegateForColumn(TreeModel::LeakedColumn, costDelegate);
-    m_ui->topDownResults->setItemDelegateForColumn(TreeModel::AllocationsColumn, costDelegate);
-    m_ui->topDownResults->setItemDelegateForColumn(TreeModel::TemporaryColumn, costDelegate);
-    m_ui->topDownResults->hideColumn(TreeModel::FunctionColumn);
-    m_ui->topDownResults->hideColumn(TreeModel::FileColumn);
-    m_ui->topDownResults->hideColumn(TreeModel::LineColumn);
-    m_ui->topDownResults->hideColumn(TreeModel::ModuleColumn);
-    connect(m_ui->topDownFilterFunction, &QLineEdit::textChanged,
-            topDownProxy, &TreeProxy::setFunctionFilter);
-    connect(m_ui->topDownFilterFile, &QLineEdit::textChanged,
-            topDownProxy, &TreeProxy::setFileFilter);
-    connect(m_ui->topDownFilterModule, &QLineEdit::textChanged,
-            topDownProxy, &TreeProxy::setModuleFilter);
-    addContextMenu(m_ui->topDownResults, TreeModel::LocationRole);
+    setupTreeModel(bottomUpModel, m_ui->bottomUpResults, costDelegate,
+                   m_ui->bottomUpFilterFunction, m_ui->bottomUpFilterFile,
+                   m_ui->bottomUpFilterModule);
+
+    setupTreeModel(topDownModel, m_ui->topDownResults, costDelegate,
+                   m_ui->topDownFilterFunction, m_ui->topDownFilterFile,
+                   m_ui->topDownFilterModule);
 
     auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::FunctionColumn,
                                            CallerCalleeModel::FileColumn,
