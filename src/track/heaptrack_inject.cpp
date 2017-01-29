@@ -287,7 +287,6 @@ void overwrite_symbols() noexcept
 }
 
 extern "C" {
-
 void heaptrack_inject(const char* outputFileName) noexcept
 {
     heaptrack_init(outputFileName, []() { overwrite_symbols(); }, [](FILE* out) { fprintf(out, "A\n"); },
