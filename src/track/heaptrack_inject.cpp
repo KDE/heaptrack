@@ -43,7 +43,6 @@
 #error unsupported word size
 #endif
 
-#define HAVE_ALIGNED_ALLOC defined(_ISOC11_SOURCE)
 #define HAVE_CFREE (defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(__USE_MISC))
 
 namespace {
