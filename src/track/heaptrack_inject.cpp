@@ -43,7 +43,11 @@
 #error unsupported word size
 #endif
 
-#define HAVE_CFREE (defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(__USE_MISC))
+#if defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(__USE_MISC)
+#define HAVE_CFREE 1
+#else
+#define HAVE_CFREE 0
+#endif
 
 namespace {
 
