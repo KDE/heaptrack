@@ -1,0 +1,7 @@
+# clang-format's assume-filename seems to be broken
+# we must not specify the path to $TMPFILE directly, as clang-format would then
+# look in that folder for the config file. Instead, we want it to use the current
+# CWD which can be achieved by piping in the file. But then we need to overwrite
+# the original file again, which can be done with sponge easily
+src/*.cpp src/*.h tests/*.h tests/*.cpp : clang-format < $TMPFILE | sponge $TMPFILE
+
