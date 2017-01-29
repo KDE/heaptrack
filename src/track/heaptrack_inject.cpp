@@ -51,6 +51,15 @@
 
 namespace {
 
+namespace Elf {
+using Addr = ElfW(Addr);
+using Dyn = ElfW(Dyn);
+using Rela = ElfW(Rela);
+using Sym = ElfW(Sym);
+using Sxword = ElfW(Sxword);
+using Xword = ElfW(Xword);
+}
+
 void overwrite_symbols() noexcept;
 
 namespace hooks {
@@ -167,7 +176,7 @@ struct posix_memalign
 };
 
 template <typename Hook>
-bool hook(const char* symname, ElfW(Addr) addr, bool restore)
+bool hook(const char* symname, Elf::Addr addr, bool restore)
 {
     static_assert(std::is_convertible<decltype(&Hook::hook), decltype(Hook::original)>::value,
                   "hook is not compatible to original function");
@@ -194,7 +203,7 @@ bool hook(const char* symname, ElfW(Addr) addr, bool restore)
     return true;
 }
 
-void apply(const char* symname, ElfW(Addr) addr, bool restore)
+void apply(const char* symname, Elf::Addr addr, bool restore)
 {
     // TODO: use std::apply once we can rely on C++17
     hook<malloc>(symname, addr, restore) || hook<free>(symname, addr, restore) || hook<realloc>(symname, addr, restore)
@@ -207,13 +216,13 @@ void apply(const char* symname, ElfW(Addr) addr, bool restore)
 }
 }
 
-template <typename T, ElfW(Sxword) AddrTag, ElfW(Sxword) SizeTag>
+template <typename T, Elf::Sxword AddrTag, Elf::Sxword SizeTag>
 struct elftable
 {
     T* table = nullptr;
-    ElfW(Xword) size = ElfW(Xword)();
+    Elf::Xword size = {};
 
-    bool consume(const ElfW(Dyn) * dyn) noexcept
+    bool consume(const Elf::Dyn* dyn) noexcept
     {
         if (dyn->d_tag == AddrTag) {
             table = reinterpret_cast<T*>(dyn->d_un.d_ptr);
@@ -227,10 +236,10 @@ struct elftable
 };
 
 using elf_string_table = elftable<const char, DT_STRTAB, DT_STRSZ>;
-using elf_jmprel_table = elftable<ElfW(Rela), DT_JMPREL, DT_PLTRELSZ>;
-using elf_symbol_table = elftable<ElfW(Sym), DT_SYMTAB, DT_SYMENT>;
+using elf_jmprel_table = elftable<Elf::Rela, DT_JMPREL, DT_PLTRELSZ>;
+using elf_symbol_table = elftable<Elf::Sym, DT_SYMTAB, DT_SYMENT>;
 
-void try_overwrite_symbols(const ElfW(Dyn) * dyn, const ElfW(Addr) base, const bool restore) noexcept
+void try_overwrite_symbols(const Elf::Dyn* dyn, const Elf::Addr base, const bool restore) noexcept
 {
     elf_symbol_table symbols;
     elf_jmprel_table jmprels;
@@ -242,7 +251,7 @@ void try_overwrite_symbols(const ElfW(Dyn) * dyn, const ElfW(Addr) base, const b
     }
 
     // find symbols to overwrite
-    const auto rela_end = reinterpret_cast<ElfW(Rela)*>(reinterpret_cast<char*>(jmprels.table) + jmprels.size);
+    const auto rela_end = reinterpret_cast<Elf::Rela*>(reinterpret_cast<char*>(jmprels.table) + jmprels.size);
     for (auto rela = jmprels.table; rela < rela_end; rela++) {
         const auto index = ELF_R_SYM(rela->r_info);
         const char* symname = strings.table + symbols.table[index].st_name;
@@ -264,7 +273,7 @@ int iterate_phdrs(dl_phdr_info* info, size_t /*size*/, void* data) noexcept
 
     for (auto phdr = info->dlpi_phdr, end = phdr + info->dlpi_phnum; phdr != end; ++phdr) {
         if (phdr->p_type == PT_DYNAMIC) {
-            try_overwrite_symbols(reinterpret_cast<const ElfW(Dyn)*>(phdr->p_vaddr + info->dlpi_addr), info->dlpi_addr,
+            try_overwrite_symbols(reinterpret_cast<const Elf::Dyn*>(phdr->p_vaddr + info->dlpi_addr), info->dlpi_addr,
                                   data != nullptr);
         }
     }
