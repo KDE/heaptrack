@@ -32,6 +32,7 @@ struct SummaryData
     int64_t peakTime;
     int64_t peakRSS;
     int64_t totalSystemMemory;
+    bool fromAttached;
 };
 Q_DECLARE_METATYPE(SummaryData)
 

@@ -523,7 +523,7 @@ void Parser::parse(const QString& path, const QString& diffBase)
 
         emit summaryAvailable({QString::fromStdString(data->debuggee), data->totalCost, data->totalTime, data->peakTime,
                                data->peakRSS * data->systemInfo.pageSize,
-                               data->systemInfo.pages * data->systemInfo.pageSize});
+                               data->systemInfo.pages * data->systemInfo.pageSize, data->fromAttached});
 
         emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again

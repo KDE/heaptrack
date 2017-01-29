@@ -234,9 +234,12 @@ MainWindow::MainWindow(QWidget* parent)
         const double peakTimeS = 0.001 * data.peakTime;
         {
             QTextStream stream(&textLeft);
-            stream << "<qt><dl>" << i18n("<dt><b>debuggee</b>:</dt><dd "
-                                         "style='font-family:monospace;'>%1</dd>",
-                                         data.debuggee)
+            stream << "<qt><dl>" << (data.fromAttached ? i18n("<dt><b>debuggee</b>:</dt><dd "
+                                                              "style='font-family:monospace;'>%1 <i>(attached)</i></dd>",
+                                                              data.debuggee)
+                                                       : i18n("<dt><b>debuggee</b>:</dt><dd "
+                                                              "style='font-family:monospace;'>%1</dd>",
+                                                              data.debuggee))
                    // xgettext:no-c-format
                    << i18n("<dt><b>total runtime</b>:</dt><dd>%1s</dd>", totalTimeS)
                    << i18n("<dt><b>total system memory</b>:</dt><dd>%1</dd>",
