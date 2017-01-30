@@ -24,6 +24,8 @@
 
 #include <memory>
 
+#include <boost/functional/hash.hpp>
+
 struct LocationData
 {
     using Ptr = std::shared_ptr<LocationData>;
@@ -59,6 +61,21 @@ Q_DECLARE_METATYPE(LocationData::Ptr)
 inline bool operator<(const LocationData::Ptr& lhs, const LocationData& rhs)
 {
     return *lhs < rhs;
+}
+
+inline uint qHash(const LocationData& location, uint seed_ = 0)
+{
+    size_t seed = seed_;
+    boost::hash_combine(seed, qHash(location.function));
+    boost::hash_combine(seed, qHash(location.file));
+    boost::hash_combine(seed, qHash(location.module));
+    boost::hash_combine(seed, location.line);
+    return seed;
+}
+
+inline uint qHash(const LocationData::Ptr& location, uint seed = 0)
+{
+    return location ? qHash(*location, seed) : seed;
 }
 
 #endif // LOCATIONDATA_H

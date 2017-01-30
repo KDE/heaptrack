@@ -306,36 +306,17 @@ void setParents(QVector<RowData>& children, const RowData* parent)
     }
 }
 
-QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
+TreeData mergeAllocations(const ParserData& data)
 {
     TreeData topRows;
-    CallerCalleeRows callerCalleeRows;
-    callerCalleeRows.reserve(data.instructionPointers.size());
-    // merge allocations, leave parent pointers invalid (their location may
-    // change)
+    // merge allocations, leave parent pointers invalid (their location may change)
     for (const auto& allocation : data.allocations) {
         auto traceIndex = allocation.traceIndex;
         auto rows = &topRows;
-        // we must not count locations more than once in the caller-callee data
-        QSet<IpIndex> recursionGuard;
         while (traceIndex) {
             const auto& trace = data.findTrace(traceIndex);
             const auto& ip = data.findIp(trace.ipIndex);
             auto location = data.stringCache.location(trace.ipIndex, ip);
-
-            if (!recursionGuard.contains(trace.ipIndex)) { // aggregate caller-callee data
-                auto it = lower_bound(
-                    callerCalleeRows.begin(), callerCalleeRows.end(), location,
-                    [](const CallerCalleeData& lhs, const LocationData::Ptr& rhs) { return lhs.location < rhs; });
-                if (it == callerCalleeRows.end() || it->location != location) {
-                    it = callerCalleeRows.insert(it, {{}, {}, location});
-                }
-                it->inclusiveCost += allocation;
-                if (traceIndex == allocation.traceIndex) {
-                    it->selfCost += allocation;
-                }
-                recursionGuard.insert(trace.ipIndex);
-            }
 
             auto it = lower_bound(rows->begin(), rows->end(), location);
             if (it != rows->end() && it->location == location) {
@@ -353,17 +334,7 @@ QPair<TreeData, CallerCalleeRows> mergeAllocations(const ParserData& data)
     // now set the parents, the data is constant from here on
     setParents(topRows, nullptr);
 
-    if (data.stringCache.diffMode) {
-        // remove rows without cost
-        callerCalleeRows.erase(remove_if(callerCalleeRows.begin(), callerCalleeRows.end(),
-                                         [](const CallerCalleeData& data) -> bool {
-                                             return data.inclusiveCost == AllocationData()
-                                                 && data.selfCost == AllocationData();
-                                         }),
-                               callerCalleeRows.end());
-    }
-
-    return qMakePair(topRows, callerCalleeRows);
+    return topRows;
 }
 
 RowData* findByLocation(const RowData& row, QVector<RowData>* data)
@@ -410,6 +381,59 @@ QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
     // now set the parents, the data is constant from here on
     setParents(topRows, nullptr);
     return topRows;
+}
+
+
+void buildCallerCallee(const TreeData& bottomUpData, CallerCalleeRows* callerCalleeData)
+{
+    foreach (const auto& row, bottomUpData) {
+        if (row.children.isEmpty()) {
+            // leaf node found, bubble up the parent chain to add cost for all frames
+            // to the caller/callee data. this is done top-down since we must not count
+            // locations more than once in the caller-callee data
+            QSet<LocationData::Ptr> recursionGuard;
+
+            auto node = &row;
+            while (node) {
+                const auto& location = node->location;
+                if (!recursionGuard.contains(location)) { // aggregate caller-callee data
+                    auto it = lower_bound(callerCalleeData->begin(), callerCalleeData->end(), location,
+                        [](const CallerCalleeData& lhs, const LocationData::Ptr& rhs) { return lhs.location < rhs; });
+                    if (it == callerCalleeData->end() || it->location != location) {
+                        it = callerCalleeData->insert(it, {{}, {}, location});
+                    }
+                    it->inclusiveCost += row.cost;
+                    if (!node->parent) {
+                        it->selfCost += row.cost;
+                    }
+                    recursionGuard.insert(location);
+                }
+                node = node->parent;
+            }
+        } else {
+            // recurse to find a leaf
+            buildCallerCallee(row.children, callerCalleeData);
+        }
+    }
+}
+
+CallerCalleeRows toCallerCalleeData(const QVector<RowData>& bottomUpData, bool diffMode)
+{
+    CallerCalleeRows callerCalleeRows;
+
+    buildCallerCallee(bottomUpData, &callerCalleeRows);
+
+    if (diffMode) {
+        // remove rows without cost
+        callerCalleeRows.erase(remove_if(callerCalleeRows.begin(), callerCalleeRows.end(),
+                                         [](const CallerCalleeData& data) -> bool {
+                                             return data.inclusiveCost == AllocationData()
+                                                 && data.selfCost == AllocationData();
+                                         }),
+                               callerCalleeRows.end());
+    }
+
+    return callerCalleeRows;
 }
 
 struct MergedHistogramColumnData
@@ -528,8 +552,7 @@ void Parser::parse(const QString& path, const QString& diffBase)
         emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again
         const auto mergedAllocations = mergeAllocations(*data);
-        emit bottomUpDataAvailable(mergedAllocations.first);
-        emit callerCalleeDataAvailable(mergedAllocations.second);
+        emit bottomUpDataAvailable(mergedAllocations);
 
         // also calculate the size histogram
         emit progressMessageAvailable(i18n("building size histogram..."));
@@ -537,11 +560,15 @@ void Parser::parse(const QString& path, const QString& diffBase)
         emit sizeHistogramDataAvailable(sizeHistogram);
         // now data can be modified again for the chart data evaluation
 
+        const auto diffMode = data->stringCache.diffMode;
         emit progressMessageAvailable(i18n("building charts..."));
         auto parallel = new Collection;
-        *parallel << make_job([this, mergedAllocations, sizeHistogram]() {
-            const auto topDownData = toTopDownData(mergedAllocations.first);
+        *parallel << make_job([this, mergedAllocations]() {
+            const auto topDownData = toTopDownData(mergedAllocations);
             emit topDownDataAvailable(topDownData);
+        }) << make_job([this, mergedAllocations, diffMode]() {
+            const auto callerCalleeData = toCallerCalleeData(mergedAllocations, diffMode);
+            emit callerCalleeDataAvailable(callerCalleeData);
         });
         if (!data->stringCache.diffMode) {
             // only build charts when we are not diffing
