@@ -80,7 +80,7 @@ void addContextMenu(QTreeView* treeView, int role)
         }
         auto menu = new QMenu(treeView);
         auto openFile =
-            new QAction(QIcon::fromTheme(QStringLiteral("document-open")), QObject::tr("Open file in editor"));
+            new QAction(QIcon::fromTheme(QStringLiteral("document-open")), QObject::tr("Open file in editor"), menu);
         QObject::connect(openFile, &QAction::triggered, openFile, [location] {
             /// FIXME: add settings to let user configure this
             auto url = QUrl::fromLocalFile(location->file);
