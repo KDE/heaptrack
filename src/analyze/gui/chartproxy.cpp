@@ -18,6 +18,7 @@
  */
 
 #include "chartproxy.h"
+
 #include "chartmodel.h"
 
 ChartProxy::ChartProxy(bool showTotal, QObject* parent)
