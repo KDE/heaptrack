@@ -1,0 +1,14 @@
+# KDE Config File
+[Desktop Entry]
+Type=Application
+Exec=heaptrack_gui %u
+MimeType=application/x-heaptrack;
+# FIXME: get an icon!
+Icon=office-chart-area
+# FIXME: write docs!
+# X-DocPath=kcachegrind/index.html
+Terminal=false
+Name=Heaptrack
+GenericName=Profiler Frontend
+Comment=Visualization of Memory Profiling Data
+Categories=Qt;KDE;Development;

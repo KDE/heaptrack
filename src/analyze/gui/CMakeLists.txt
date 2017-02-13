@@ -79,3 +79,11 @@ install(TARGETS heaptrack_gui
 set_target_properties(heaptrack_gui PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}"
 )
+
+install(PROGRAMS org.kde.heaptrack.desktop
+    DESTINATION ${XDG_APPS_INSTALL_DIR}
+)
+
+install(FILES org.kde.heaptrack.appdata.xml
+    DESTINATION ${KDE_INSTALL_METAINFODIR}
+)

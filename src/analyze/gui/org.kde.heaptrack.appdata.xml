@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop">
+  <id>org.kde.heaptrack.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0+</project_license>
+  <name>Heaptrack</name>
+  <summary>A heap memory profiler for Linux.</summary>
+  <description>
+    <p>
+      Heaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:
+    </p>
+    <ul>
+      <li>find hotspots that need to be optimized to reduce the memory footprint of your application</li>
+      <li>find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
+      <li>find allocation hotspots, i.e. code locations that trigger a lot of memory allocation calls</li>
+      <li>find temporary allocations, which are allocations that are directly followed by their deallocation</li>
+    </ul>
+  </description>
+  <url type="homepage">https://phabricator.kde.org/dashboard/view/28/</url>
+  <url type="bugtracker">https://bugs.kde.org/enter_bug.cgi?format=guided&amp;product=heaptrack</url>
+  <url type="help">https://mail.kde.org/mailman/listinfo/heaptrack</url>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://phabricator.kde.org/file/data/did3ip2xf6nut4srxany/PHID-FILE-lst6maof7cehaosav3e7/gui_summary.png</image>
+      <caption>Summary of tracked heap memory allocation data.</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://phabricator.kde.org/file/data/6bvirx372il3w7kb624f/PHID-FILE-ix5t2beiyiwu3dorfx2s/gui_flamegraph.png</image>
+      <caption>Flamegraph visualization of number of heap memory allocations.</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://phabricator.kde.org/file/data/p7ormvxkfsqjbdstoxzv/PHID-FILE-qezpni4nsr3kstv3x6at/gui_allocations_chart.png</image>
+      <caption>Chart of heap memory allocations over time.</caption>
+    </screenshot>
+  </screenshots>
+  <project_group>KDE</project_group>
+  <provides>
+    <binary>heaptrack</binary>
+    <binary>heaptrack_gui</binary>
+    <binary>heaptrack_print</binary>
+  </provides>
+</component>
