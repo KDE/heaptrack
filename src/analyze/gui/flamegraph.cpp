@@ -385,7 +385,6 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     m_view->viewport()->installEventFilter(this);
     m_view->viewport()->setMouseTracking(true);
     m_view->setFont(QFont(QStringLiteral("monospace")));
-    m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     auto bottomUpCheckbox = new QCheckBox(i18n("Bottom-Down View"), this);
     bottomUpCheckbox->setToolTip(i18n("Enable the bottom-down flame graph view. When this is unchecked, "
@@ -441,6 +440,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
 
     addAction(KStandardAction::back(this, &FlameGraph::navigateBack, this));
     addAction(KStandardAction::forward(this, &FlameGraph::navigateForward, this));
+    setContextMenuPolicy(Qt::ActionsContextMenu);
 }
 
 FlameGraph::~FlameGraph() = default;
