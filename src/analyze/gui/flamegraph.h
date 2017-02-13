@@ -42,6 +42,8 @@ public:
     void setTopDownData(const TreeData& topDownData);
     void setBottomUpData(const TreeData& bottomUpData);
 
+    void clearData();
+
 protected:
     bool eventFilter(QObject* object, QEvent* event) override;
 

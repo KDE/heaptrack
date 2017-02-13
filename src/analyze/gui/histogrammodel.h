@@ -63,6 +63,7 @@ public:
     int columnCount(const QModelIndex& parent = {}) const override;
 
     void resetData(const HistogramData& data);
+    void clearData();
 
 private:
     HistogramData m_data;

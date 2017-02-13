@@ -84,6 +84,7 @@ public:
 public slots:
     void resetData(const TreeData& data);
     void setSummary(const SummaryData& data);
+    void clearData();
 
 private:
     /// @return the row resembled by @p index

@@ -314,6 +314,14 @@ void TreeModel::setSummary(const SummaryData& data)
     endResetModel();
 }
 
+void TreeModel::clearData()
+{
+    beginResetModel();
+    m_data = {};
+    m_maxCost = {};
+    endResetModel();
+}
+
 const RowData* TreeModel::toRow(const QModelIndex& index) const
 {
     if (!index.isValid()) {

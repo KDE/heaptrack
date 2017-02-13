@@ -41,7 +41,11 @@ public:
 
 public slots:
     void loadFile(const QString& path, const QString& diffBase = {});
-    void openFile();
+    void openNewFile();
+    void closeFile();
+
+signals:
+    void clearData();
 
 private:
     void showError(const QString& message);
@@ -51,6 +55,11 @@ private:
     Parser* m_parser;
     KSharedConfig::Ptr m_config;
     bool m_diffMode = false;
+
+    QAction* m_openAction = nullptr;
+    QAction* m_openNewAction = nullptr;
+    QAction* m_closeAction = nullptr;
+    QAction* m_quitAction = nullptr;
 };
 
 #endif // MAINWINDOW_H

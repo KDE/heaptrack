@@ -26,6 +26,7 @@
 #include <KConfigGroup>
 #include <KLocalizedString>
 #include <KRecursiveFilterProxyModel>
+#include <KStandardAction>
 
 #include <QAction>
 #include <QDebug>
@@ -107,7 +108,7 @@ void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type)
 
 #if KChart_FOUND
 void addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel::Type type, const Parser* parser,
-                 void (Parser::*dataReady)(const ChartData&))
+                 void (Parser::*dataReady)(const ChartData&), MainWindow* window)
 {
     auto tab = new ChartWidget(tabWidget->parentWidget());
     tabWidget->addTab(tab, title);
@@ -118,6 +119,7 @@ void addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel::Type t
         model->resetData(data);
         tabWidget->setTabEnabled(tabWidget->indexOf(tab), true);
     });
+    QObject::connect(window, &MainWindow::clearData, model, &ChartModel::clearData);
 }
 #endif
 
@@ -195,6 +197,10 @@ MainWindow::MainWindow(QWidget* parent)
     auto bottomUpModel = new TreeModel(this);
     auto topDownModel = new TreeModel(this);
     auto callerCalleeModel = new CallerCalleeModel(this);
+    connect(this, &MainWindow::clearData, bottomUpModel, &TreeModel::clearData);
+    connect(this, &MainWindow::clearData, topDownModel, &TreeModel::clearData);
+    connect(this, &MainWindow::clearData, callerCalleeModel, &CallerCalleeModel::clearData);
+    connect(this, &MainWindow::clearData, m_ui->flameGraphTab, &FlameGraph::clearData);
 
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->callerCalleeTab), false);
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->topDownTab), false);
@@ -209,6 +215,7 @@ MainWindow::MainWindow(QWidget* parent)
         statusBar()->addWidget(m_ui->progressLabel, 1);
         statusBar()->addWidget(m_ui->loadingProgress);
         m_ui->pages->setCurrentWidget(m_ui->resultsPage);
+        m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->bottomUpTab), true);
     });
     connect(m_parser, &Parser::callerCalleeDataAvailable, this, [=](const CallerCalleeRows& data) {
         callerCalleeModel->resetData(data);
@@ -277,11 +284,18 @@ MainWindow::MainWindow(QWidget* parent)
         m_ui->summaryLeft->setText(textLeft);
         m_ui->summaryCenter->setText(textCenter);
         m_ui->summaryRight->setText(textRight);
+        m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->summaryTab), true);
     });
     connect(m_parser, &Parser::progressMessageAvailable, m_ui->progressLabel, &QLabel::setText);
     auto removeProgress = [this] {
-        statusBar()->removeWidget(m_ui->progressLabel);
-        statusBar()->removeWidget(m_ui->loadingProgress);
+        auto layout = qobject_cast<QVBoxLayout*>(m_ui->loadingPage->layout());
+        Q_ASSERT(layout);
+        const auto idx = layout->indexOf(m_ui->loadingLabel) + 1;
+        layout->insertWidget(idx, m_ui->loadingProgress);
+        layout->insertWidget(idx + 1, m_ui->progressLabel);
+        m_ui->progressLabel->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+        m_closeAction->setEnabled(true);
+        m_openAction->setEnabled(true);
     };
     connect(m_parser, &Parser::finished, this, removeProgress);
     connect(m_parser, &Parser::failedToOpen, this, [this, removeProgress](const QString& failedFile) {
@@ -292,19 +306,21 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->messages->hide();
 
 #if KChart_FOUND
-    addChartTab(m_ui->tabWidget, tr("Consumed"), ChartModel::Consumed, m_parser, &Parser::consumedChartDataAvailable);
+    addChartTab(m_ui->tabWidget, tr("Consumed"), ChartModel::Consumed, m_parser, &Parser::consumedChartDataAvailable,
+                this);
     addChartTab(m_ui->tabWidget, tr("Allocations"), ChartModel::Allocations, m_parser,
-                &Parser::allocationsChartDataAvailable);
+                &Parser::allocationsChartDataAvailable, this);
     addChartTab(m_ui->tabWidget, tr("Temporary Allocations"), ChartModel::Temporary, m_parser,
-                &Parser::temporaryChartDataAvailable);
-    addChartTab(m_ui->tabWidget, tr("Allocated"), ChartModel::Allocated, m_parser,
-                &Parser::allocatedChartDataAvailable);
+                &Parser::temporaryChartDataAvailable, this);
+    addChartTab(m_ui->tabWidget, tr("Allocated"), ChartModel::Allocated, m_parser, &Parser::allocatedChartDataAvailable,
+                this);
 
     auto sizesTab = new HistogramWidget(this);
     m_ui->tabWidget->addTab(sizesTab, tr("Sizes"));
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(sizesTab), false);
     auto sizeHistogramModel = new HistogramModel(this);
     sizesTab->setModel(sizeHistogramModel);
+    connect(this, &MainWindow::clearData, sizeHistogramModel, &HistogramModel::clearData);
 
     connect(m_parser, &Parser::sizeHistogramDataAvailable, this, [=](const HistogramData& data) {
         sizeHistogramModel->resetData(data);
@@ -370,6 +386,16 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->topAllocated->setItemDelegate(costDelegate);
 
     setWindowTitle(i18n("Heaptrack"));
+    // closing the current file shows the stack page to open a new one
+    m_openAction = KStandardAction::open(this, &MainWindow::closeFile, this);
+    m_ui->menu_File->addAction(m_openAction);
+    m_openNewAction = KStandardAction::openNew(this, &MainWindow::openNewFile, this);
+    m_ui->menu_File->addAction(m_openNewAction);
+    m_closeAction = KStandardAction::close(this, &MainWindow::close, this);
+    m_closeAction->setEnabled(false); // TODO: support canceling of ongoing parse jobs
+    m_ui->menu_File->addAction(m_closeAction);
+    m_quitAction = KStandardAction::quit(qApp, &QCoreApplication::quit, this);
+    m_ui->menu_File->addAction(m_quitAction);
 }
 
 MainWindow::~MainWindow()
@@ -381,6 +407,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::loadFile(const QString& file, const QString& diffBase)
 {
+    m_openAction->setEnabled(false);
     m_ui->loadingLabel->setText(i18n("Loading file %1, please wait...", file));
     if (diffBase.isEmpty()) {
         setWindowTitle(i18nc("%1: file name that is open", "Heaptrack - %1", QFileInfo(file).fileName()));
@@ -394,14 +421,24 @@ void MainWindow::loadFile(const QString& file, const QString& diffBase)
     m_parser->parse(file, diffBase);
 }
 
-void MainWindow::openFile()
+void MainWindow::openNewFile()
 {
-    auto dialog =
-        new QFileDialog(this, i18n("Open Heaptrack Output File"), {}, i18n("Heaptrack data files (heaptrack.*)"));
-    dialog->setAttribute(Qt::WA_DeleteOnClose, true);
-    dialog->setFileMode(QFileDialog::ExistingFile);
-    connect(dialog, &QFileDialog::fileSelected, this, [this](const QString& file) { loadFile(file); });
-    dialog->show();
+    auto window = new MainWindow;
+    window->setAttribute(Qt::WA_DeleteOnClose, true);
+    window->show();
+}
+
+void MainWindow::closeFile()
+{
+    m_ui->pages->setCurrentWidget(m_ui->openPage);
+
+    m_ui->tabWidget->setCurrentIndex(m_ui->tabWidget->indexOf(m_ui->summaryTab));
+    for (int i = 0, c = m_ui->tabWidget->count(); i < c; ++i) {
+        m_ui->tabWidget->setTabEnabled(i, false);
+    }
+
+    m_closeAction->setEnabled(false);
+    emit clearData();
 }
 
 void MainWindow::showError(const QString& message)

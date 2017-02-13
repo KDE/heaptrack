@@ -83,6 +83,7 @@ public:
 
     void resetData(const QVector<CallerCalleeData>& rows);
     void setSummary(const SummaryData& data);
+    void clearData();
 
 private:
     QVector<CallerCalleeData> m_rows;

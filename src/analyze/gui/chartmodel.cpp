@@ -190,3 +190,12 @@ void ChartModel::resetData(const ChartData& data)
     }
     endResetModel();
 }
+
+void ChartModel::clearData()
+{
+    beginResetModel();
+    m_data = {};
+    m_columnDataSetBrushes = {};
+    m_columnDataSetPens = {};
+    endResetModel();
+}

@@ -290,3 +290,11 @@ void CallerCalleeModel::setSummary(const SummaryData& data)
     m_maxCost.selfCost = data.cost;
     endResetModel();
 }
+
+void CallerCalleeModel::clearData()
+{
+    beginResetModel();
+    m_rows = {};
+    m_maxCost = {};
+    endResetModel();
+}

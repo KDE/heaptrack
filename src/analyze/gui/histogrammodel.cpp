@@ -106,3 +106,10 @@ void HistogramModel::resetData(const HistogramData& data)
     m_data = data;
     endResetModel();
 }
+
+void HistogramModel::clearData()
+{
+    beginResetModel();
+    m_data = {};
+    endResetModel();
+}

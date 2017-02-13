@@ -504,6 +504,14 @@ void FlameGraph::setBottomUpData(const TreeData& bottomUpData)
     m_bottomUpData = bottomUpData;
 }
 
+void FlameGraph::clearData()
+{
+    m_topDownData = {};
+    m_bottomUpData = {};
+
+    setData(nullptr);
+}
+
 void FlameGraph::showData()
 {
     setData(nullptr);

@@ -73,6 +73,7 @@ public:
 
 public slots:
     void resetData(const ChartData& data);
+    void clearData();
 
 private:
     ChartData m_data;
