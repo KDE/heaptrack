@@ -39,6 +39,7 @@
 
 #include <KColorScheme>
 #include <KLocalizedString>
+#include <KStandardAction>
 #include <ThreadWeaver/ThreadWeaver>
 
 enum CostType
@@ -217,12 +218,13 @@ QBrush brush()
     // intern the brushes, to reuse them across items which can be thousands
     // otherwise we'd end up with dozens of allocations and higher memory
     // consumption
-    static QVector<QBrush> brushes;
-    if (brushes.isEmpty()) {
+    static const QVector<QBrush> brushes = []() -> QVector<QBrush> {
+        QVector<QBrush> brushes;
         std::generate_n(std::back_inserter(brushes), 100, []() {
             return QColor(0, 190 + 50 * qreal(rand()) / RAND_MAX, 210 * qreal(rand()) / RAND_MAX, 125);
         });
-    }
+        return brushes;
+    }();
     return brushes.at(rand() % brushes.size());
 }
 
@@ -384,7 +386,6 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     m_view->viewport()->installEventFilter(this);
     m_view->viewport()->setMouseTracking(true);
     m_view->setFont(QFont(QStringLiteral("monospace")));
-    m_view->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     auto bottomUpCheckbox = new QCheckBox(i18n("Bottom-Down View"), this);
     bottomUpCheckbox->setToolTip(i18n("Enable the bottom-down flame graph view. When this is unchecked, "
@@ -438,18 +439,9 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     layout()->addWidget(m_view);
     layout()->addWidget(m_displayLabel);
 
-    {
-        auto action = new QAction(tr("back"), this);
-        action->setShortcuts({QKeySequence::Back, Qt::Key_Backspace});
-        connect(action, &QAction::triggered, this, &FlameGraph::navigateBack);
-        addAction(action);
-    }
-    {
-        auto action = new QAction(tr("forward"), this);
-        action->setShortcuts(QKeySequence::Forward);
-        connect(action, &QAction::triggered, this, &FlameGraph::navigateForward);
-        addAction(action);
-    }
+    addAction(KStandardAction::back(this, &FlameGraph::navigateBack, this));
+    addAction(KStandardAction::forward(this, &FlameGraph::navigateForward, this));
+    setContextMenuPolicy(Qt::ActionsContextMenu);
 }
 
 FlameGraph::~FlameGraph() = default;
@@ -479,7 +471,9 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
         setTooltipItem(nullptr);
     } else if (event->type() == QEvent::Resize || event->type() == QEvent::Show) {
         if (!m_rootItem) {
-            showData();
+            if (!m_buildingScene) {
+                showData();
+            }
         } else {
             selectItem(m_selectionHistory.at(m_selectedItem));
         }
@@ -516,6 +510,7 @@ void FlameGraph::showData()
 {
     setData(nullptr);
 
+    m_buildingScene = true;
     using namespace ThreadWeaver;
     auto data = m_showBottomUpData ? m_bottomUpData : m_topDownData;
     bool collapseRecursion = m_collapseRecursion;
@@ -552,6 +547,7 @@ void FlameGraph::updateTooltip()
 void FlameGraph::setData(FrameGraphicsItem* rootItem)
 {
     m_scene->clear();
+    m_buildingScene = false;
     m_rootItem = rootItem;
     m_selectionHistory.clear();
     m_selectionHistory.push_back(rootItem);

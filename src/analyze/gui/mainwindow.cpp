@@ -81,7 +81,7 @@ void addContextMenu(QTreeView* treeView, int role)
         }
         auto menu = new QMenu(treeView);
         auto openFile =
-            new QAction(QIcon::fromTheme(QStringLiteral("document-open")), QObject::tr("Open file in editor"), menu);
+            new QAction(QIcon::fromTheme(QStringLiteral("document-open")), i18n("Open file in editor"), menu);
         QObject::connect(openFile, &QAction::triggered, openFile, [location] {
             /// FIXME: add settings to let user configure this
             auto url = QUrl::fromLocalFile(location->file);
@@ -307,17 +307,17 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->messages->hide();
 
 #if KChart_FOUND
-    addChartTab(m_ui->tabWidget, tr("Consumed"), ChartModel::Consumed, m_parser, &Parser::consumedChartDataAvailable,
+    addChartTab(m_ui->tabWidget, i18n("Consumed"), ChartModel::Consumed, m_parser, &Parser::consumedChartDataAvailable,
                 this);
-    addChartTab(m_ui->tabWidget, tr("Allocations"), ChartModel::Allocations, m_parser,
+    addChartTab(m_ui->tabWidget, i18n("Allocations"), ChartModel::Allocations, m_parser,
                 &Parser::allocationsChartDataAvailable, this);
-    addChartTab(m_ui->tabWidget, tr("Temporary Allocations"), ChartModel::Temporary, m_parser,
+    addChartTab(m_ui->tabWidget, i18n("Temporary Allocations"), ChartModel::Temporary, m_parser,
                 &Parser::temporaryChartDataAvailable, this);
-    addChartTab(m_ui->tabWidget, tr("Allocated"), ChartModel::Allocated, m_parser, &Parser::allocatedChartDataAvailable,
+    addChartTab(m_ui->tabWidget, i18n("Allocated"), ChartModel::Allocated, m_parser, &Parser::allocatedChartDataAvailable,
                 this);
 
     auto sizesTab = new HistogramWidget(this);
-    m_ui->tabWidget->addTab(sizesTab, tr("Sizes"));
+    m_ui->tabWidget->addTab(sizesTab, i18n("Sizes"));
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(sizesTab), false);
     auto sizeHistogramModel = new HistogramModel(this);
     sizesTab->setModel(sizeHistogramModel);
