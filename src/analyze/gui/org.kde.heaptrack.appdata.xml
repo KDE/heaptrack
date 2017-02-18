@@ -5,6 +5,7 @@
   <project_license>GPL-2.0+</project_license>
   <name>Heaptrack</name>
   <name xml:lang="ca">Heaptrack</name>
+  <name xml:lang="es">Heaptrack</name>
   <name xml:lang="nl">Heaptrack</name>
   <name xml:lang="pt">Heaptrack</name>
   <name xml:lang="sk">Heaptrack</name>
@@ -12,6 +13,7 @@
   <name xml:lang="x-test">xxHeaptrackxx</name>
   <summary>A heap memory profiler for Linux.</summary>
   <summary xml:lang="ca">Un perfilador de memòria en monticles per a Linux.</summary>
+  <summary xml:lang="es">Un analizador de rendimiento de la memoria de almacenamiento libre para Linux.</summary>
   <summary xml:lang="nl">Een profiler van heap-geheugen voor Linux.</summary>
   <summary xml:lang="pt">Um analisador da memória de dados para o Linux.</summary>
   <summary xml:lang="uk">Засіб профілювання «купи» пам’яті для Linux.</summary>
@@ -21,6 +23,7 @@
       Heaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:
     </p>
     <p xml:lang="ca">El «heaptrack» rastreja totes les assignacions de memòria i anota aquests esdeveniments amb seguiments de pila. Les eines d'anàlisi dedicades que hi ha a continuació, us permetran interpretar el perfil de memòria en monticles:</p>
+    <p xml:lang="es">Heaptrack rastrea todas las asignaciones de memoria y anota estos eventos con trazas de la pila para poder usar herramientas de dedicadas que le permitan interpretar el análisis de rendimiento de la memoria de almacenamiento libre para:</p>
     <p xml:lang="nl">Heaptrack traceert alle toewijzigingen van geheugen en annoteert deze gebeurtenissen met stacktraces. Specifieke hulpmiddelen voor analyse bieden u de mogelijkheid om het geheugenprofiel van de heap te interpreteren:</p>
     <p xml:lang="pt">O Heaptrack faz uma análise de todas as alocações de memória e anota esses eventos com os registos de chamadas. As ferramentas de análise dedicadas permitem-lhe então interpretar o perfil da memória de dados para:</p>
     <p xml:lang="uk">Heaptrack трасує усі запити щодо розміщення даних у пам’яті і анотує ці події за допомогою трасування стека. Далі, спеціалізовані інструменти для аналізу надають вам змогу обробляти дані профілювання пам’яті з такою метою:</p>
@@ -28,24 +31,28 @@
     <ul>
       <li>find hotspots that need to be optimized to reduce the memory footprint of your application</li>
       <li xml:lang="ca">troba els punts d'accés que necessiten optimitzar-se per a reduir el consum de memòria de la vostra aplicació</li>
+      <li xml:lang="es">encontrar cuellos de botella que es necesario optimizar para reducir el impacto de su aplicación en la memoria</li>
       <li xml:lang="nl">zoek hotspots die het nodig hebben om geoptimaliseerd te worden om de voetafdruk van het geheugen van uw toepassing te verminderen</li>
       <li xml:lang="pt">descobrir pontos críticos que precisam de optimização para reduzir a 'pegada' de memória da sua aplicação</li>
       <li xml:lang="uk">Виявлення проблемних місць, які має бути оптимізовано з метою зменшення споживання пам’яті вашою програмою.</li>
       <li xml:lang="x-test">xxfind hotspots that need to be optimized to reduce the memory footprint of your applicationxx</li>
       <li>find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
       <li xml:lang="ca">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai és desassignarà</li>
+      <li xml:lang="es">encontrar fugas de memoria (es decir, lugares donde se asigna memoria que no se llega a liberar)</li>
       <li xml:lang="nl">zoek naar lekken in het geheugen, d.w.z. locaties die geheugen toewijzen die nooit wordt vrijgegeven</li>
       <li xml:lang="pt">descobrir fugas de memória, i.e. localizações que alocam memória que nunca é libertada</li>
       <li xml:lang="uk">Виявлення витоків пам’яті, тобто розміщень даних у пам’яті без відповідних вивільнень, коли дані стають непотрібними.</li>
       <li xml:lang="x-test">xxfind memory leaks, i.e. locations that allocate memory which is never deallocatedxx</li>
       <li>find allocation hotspots, i.e. code locations that trigger a lot of memory allocation calls</li>
       <li xml:lang="ca">troba els punts d'accés d'assignació, és a dir, les ubicacions al codi que desencadenen un munt de crides d'assignació de memòria</li>
+      <li xml:lang="es">encontrar cuellos de botella de asignaciones (es decir, lugares del código fuente que desencadenan numerosas llamadas de asignación de memoria)</li>
       <li xml:lang="nl">zoek naar hotspots voor toewijzingen, d.w.z. locaties in de code die veel aanroepen van geheugen toewijzen doen</li>
       <li xml:lang="pt">descobrir pontos críticos de alocação, i.e. localizações de memória que despoletam bastantes chamadas de alocação de memória</li>
       <li xml:lang="uk">Виявлення проблемних місць розміщення, тобто місць у програмному коді, які призводять до багатьох викликів щодо розміщення у пам’яті.</li>
       <li xml:lang="x-test">xxfind allocation hotspots, i.e. code locations that trigger a lot of memory allocation callsxx</li>
       <li>find temporary allocations, which are allocations that are directly followed by their deallocation</li>
       <li xml:lang="ca">troba les assignacions temporals, són les assignacions que són seguides directament per la cancel·lació de la seva assignació</li>
+      <li xml:lang="es">encontrar asignaciones de memoria temporales, que son asignaciones que son inmediatamente seguidas por sus correspondientes liberaciones</li>
       <li xml:lang="nl">zoek naar tijdelijke toewijzingen, die toewijzingen zijn die direct gevolgd worden door hun vrijgave</li>
       <li xml:lang="pt">descobrir alocações temporárias, que são alocações que são directamente seguidas da sua libertação</li>
       <li xml:lang="uk">Виявлення тимчасових розміщень, тобто розміщень даних у пам’яті, за якими одразу ж слідують вивільнення відповідних ділянок пам’яті.</li>
@@ -60,6 +67,7 @@
       <image>https://phabricator.kde.org/file/data/did3ip2xf6nut4srxany/PHID-FILE-lst6maof7cehaosav3e7/gui_summary.png</image>
       <caption>Summary of tracked heap memory allocation data.</caption>
       <caption xml:lang="ca">Resum del seguiment de les dades d'assignació de la memòria en monticles.</caption>
+      <caption xml:lang="es">Sumario de datos de asignación de memoria de almacenamiento libre rastreada.</caption>
       <caption xml:lang="nl">Samenvatting van gevolgde gegevens voor heap-geheugen toewijzen.</caption>
       <caption xml:lang="pt">Um resumo dos dados de alocação de memória registados.</caption>
       <caption xml:lang="uk">Резюме щодо стеження за розміщенням даних у «купі» пам’яті.</caption>
@@ -69,6 +77,7 @@
       <image>https://phabricator.kde.org/file/data/6bvirx372il3w7kb624f/PHID-FILE-ix5t2beiyiwu3dorfx2s/gui_flamegraph.png</image>
       <caption>Flamegraph visualization of number of heap memory allocations.</caption>
       <caption xml:lang="ca">Visualització del gràfic de flames del nombre d'assignacions de memòria en monticles.</caption>
+      <caption xml:lang="es">Visualización de gráfico de llamas del número de asignaciones de memoria de almacenamiento libre.</caption>
       <caption xml:lang="nl">Flamegraph visualisatie van het aantal toewijzingen van heap-geheugen.</caption>
       <caption xml:lang="pt">Uma visualização em mapa de calor das alocações de memória de dados.</caption>
       <caption xml:lang="uk">Інтерактивна гістограма кількості розміщень у «купі» пам’яті.</caption>
@@ -78,6 +87,7 @@
       <image>https://phabricator.kde.org/file/data/p7ormvxkfsqjbdstoxzv/PHID-FILE-qezpni4nsr3kstv3x6at/gui_allocations_chart.png</image>
       <caption>Chart of heap memory allocations over time.</caption>
       <caption xml:lang="ca">Gràfic de les assignacions de memòria en monticles al llarg del temps.</caption>
+      <caption xml:lang="es">Gráfico de asignaciones de memoria del almacenamiento libre a lo largo del tiempo.</caption>
       <caption xml:lang="nl">Grafiek van toewijzingen van heap-geheugen in de tijd.</caption>
       <caption xml:lang="pt">Gráfico das alocações de memória de dados ao longo do tempo.</caption>
       <caption xml:lang="uk">Діаграма розміщення даних у «купі» пам’яті за часом.</caption>
