@@ -183,3 +183,12 @@ needed for a simple heap profiler.
 - *ability to profile stack allocations*
 
   This is inherently impossible to implement efficiently in heaptrack as far as I know.
+
+## Contributing to heaptrack
+
+As a FOSS project, we welcome contributions of any form. You can help improve the project by:
+
+- submitting bug reports at https://bugs.kde.org/enter_bug.cgi?product=Heaptrack
+- contributing patches via https://phabricator.kde.org/dashboard/view/28/
+- translating the GUI with the help of https://l10n.kde.org/
+- writing documentation on https://userbase.kde.org/Heaptrack
