@@ -175,6 +175,13 @@ void setupCallerCalle(CallerCalleeModel* model, QTreeView* view, CostDelegate* c
     QObject::connect(filterModule, &QLineEdit::textChanged, callerCalleeProxy, &TreeProxy::setModuleFilter);
     addContextMenu(view, CallerCalleeModel::LocationRole);
 }
+
+QString insertWordWrapMarkers(QString text)
+{
+    // insert zero-width spaces after every 50 word characters to enable word wrap in the middle of words
+    static const QRegularExpression pattern(QStringLiteral("(\\w{50})"));
+    return text.replace(pattern, QStringLiteral("\\1\u200B"));
+}
 }
 
 MainWindow::MainWindow(QWidget* parent)
@@ -241,13 +248,14 @@ MainWindow::MainWindow(QWidget* parent)
         const double peakTimeS = 0.001 * data.peakTime;
         {
             QTextStream stream(&textLeft);
+            const auto debuggee = insertWordWrapMarkers(data.debuggee);
             stream << "<qt><dl>"
                    << (data.fromAttached ? i18n("<dt><b>debuggee</b>:</dt><dd "
                                                 "style='font-family:monospace;'>%1 <i>(attached)</i></dd>",
-                                                data.debuggee)
+                                                debuggee)
                                          : i18n("<dt><b>debuggee</b>:</dt><dd "
                                                 "style='font-family:monospace;'>%1</dd>",
-                                                data.debuggee))
+                                                debuggee))
                    // xgettext:no-c-format
                    << i18n("<dt><b>total runtime</b>:</dt><dd>%1s</dd>", totalTimeS)
                    << i18n("<dt><b>total system memory</b>:</dt><dd>%1</dd>",
