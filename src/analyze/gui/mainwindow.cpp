@@ -397,11 +397,11 @@ MainWindow::MainWindow(QWidget* parent)
     setWindowTitle(i18n("Heaptrack"));
     // closing the current file shows the stack page to open a new one
     m_openAction = KStandardAction::open(this, SLOT(closeFile()), this);
+    m_openAction->setEnabled(false);
     m_ui->menu_File->addAction(m_openAction);
     m_openNewAction = KStandardAction::openNew(this, SLOT(openNewFile()), this);
     m_ui->menu_File->addAction(m_openNewAction);
     m_closeAction = KStandardAction::close(this, SLOT(close()), this);
-    m_closeAction->setEnabled(false); // TODO: support canceling of ongoing parse jobs
     m_ui->menu_File->addAction(m_closeAction);
     m_quitAction = KStandardAction::quit(qApp, SLOT(quit()), this);
     m_ui->menu_File->addAction(m_quitAction);
@@ -416,7 +416,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::loadFile(const QString& file, const QString& diffBase)
 {
-    m_openAction->setEnabled(false);
+    // TODO: support canceling of ongoing parse jobs
+    m_closeAction->setEnabled(false);
     m_ui->loadingLabel->setText(i18n("Loading file %1, please wait...", file));
     if (diffBase.isEmpty()) {
         setWindowTitle(i18nc("%1: file name that is open", "Heaptrack - %1", QFileInfo(file).fileName()));
@@ -446,7 +447,7 @@ void MainWindow::closeFile()
         m_ui->tabWidget->setTabEnabled(i, false);
     }
 
-    m_closeAction->setEnabled(false);
+    m_openAction->setEnabled(false);
     emit clearData();
 }
 
