@@ -439,8 +439,8 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     layout()->addWidget(m_view);
     layout()->addWidget(m_displayLabel);
 
-    addAction(KStandardAction::back(this, &FlameGraph::navigateBack, this));
-    addAction(KStandardAction::forward(this, &FlameGraph::navigateForward, this));
+    addAction(KStandardAction::back(this, SLOT(navigateBack()), this));
+    addAction(KStandardAction::forward(this, SLOT(navigateForward()), this));
     setContextMenuPolicy(Qt::ActionsContextMenu);
 }
 

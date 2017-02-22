@@ -49,12 +49,12 @@ protected:
 
 private slots:
     void setData(FrameGraphicsItem* rootItem);
+    void navigateBack();
+    void navigateForward();
 
 private:
     void setTooltipItem(const FrameGraphicsItem* item);
     void updateTooltip();
-    void navigateBack();
-    void navigateForward();
     void showData();
     void selectItem(FrameGraphicsItem* item);
 
