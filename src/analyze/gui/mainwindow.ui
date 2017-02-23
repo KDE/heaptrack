@@ -329,6 +329,15 @@
                      <property name="toolTip">
                       <string>List of functions that allocated the most memory at a given time.</string>
                      </property>
+                     <property name="alternatingRowColors">
+                      <bool>true</bool>
+                     </property>
+                     <property name="rootIsDecorated">
+                      <bool>false</bool>
+                     </property>
+                     <property name="uniformRowHeights">
+                      <bool>true</bool>
+                     </property>
                     </widget>
                    </item>
                   </layout>
@@ -358,6 +367,15 @@
                     <widget class="QTreeView" name="topLeaked">
                      <property name="toolTip">
                       <string>List of functions that leak the most memory.</string>
+                     </property>
+                     <property name="alternatingRowColors">
+                      <bool>true</bool>
+                     </property>
+                     <property name="rootIsDecorated">
+                      <bool>false</bool>
+                     </property>
+                     <property name="uniformRowHeights">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
@@ -389,6 +407,15 @@
                      <property name="toolTip">
                       <string>List of functions that allocate memory most often.</string>
                      </property>
+                     <property name="alternatingRowColors">
+                      <bool>true</bool>
+                     </property>
+                     <property name="rootIsDecorated">
+                      <bool>false</bool>
+                     </property>
+                     <property name="uniformRowHeights">
+                      <bool>true</bool>
+                     </property>
                     </widget>
                    </item>
                   </layout>
@@ -419,6 +446,15 @@
                      <property name="toolTip">
                       <string>List of functions that produced the most temporary memory allocations.</string>
                      </property>
+                     <property name="alternatingRowColors">
+                      <bool>true</bool>
+                     </property>
+                     <property name="rootIsDecorated">
+                      <bool>false</bool>
+                     </property>
+                     <property name="uniformRowHeights">
+                      <bool>true</bool>
+                     </property>
                     </widget>
                    </item>
                   </layout>
@@ -448,6 +484,15 @@
                     <widget class="QTreeView" name="topAllocated">
                      <property name="toolTip">
                       <string>List of functions that allocated the most memory overall, ignoring deallocations.</string>
+                     </property>
+                     <property name="alternatingRowColors">
+                      <bool>true</bool>
+                     </property>
+                     <property name="rootIsDecorated">
+                      <bool>false</bool>
+                     </property>
+                     <property name="uniformRowHeights">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>

@@ -99,8 +99,6 @@ void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type)
     proxy->setSourceModel(source);
     proxy->setSortRole(TreeModel::SortRole);
     view->setModel(proxy);
-    view->setRootIsDecorated(false);
-    view->setUniformRowHeights(true);
     view->sortByColumn(0);
     view->header()->setStretchLastSection(true);
     addContextMenu(view, TreeModel::LocationRole);
