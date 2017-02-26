@@ -388,39 +388,6 @@ QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
     return topRows;
 }
 
-void buildCallerCallee2(const TreeData& bottomUpData, CallerCalleeRows* callerCalleeData)
-{
-    foreach (const auto& row, bottomUpData) {
-        if (row.children.isEmpty()) {
-            // leaf node found, bubble up the parent chain to add cost for all frames
-            // to the caller/callee data. this is done top-down since we must not count
-            // locations more than once in the caller-callee data
-            QSet<LocationData::Ptr> recursionGuard;
-
-            auto node = &row;
-            while (node) {
-                const auto& location = node->location;
-                if (!recursionGuard.contains(location)) { // aggregate caller-callee data
-                    auto it = lower_bound(callerCalleeData->begin(), callerCalleeData->end(), location,
-                        [](const CallerCalleeData& lhs, const LocationData::Ptr& rhs) { return lhs.location < rhs; });
-                    if (it == callerCalleeData->end() || it->location != location) {
-                        it = callerCalleeData->insert(it, {{}, {}, location});
-                    }
-                    it->inclusiveCost += row.cost;
-                    if (!node->parent) {
-                        it->selfCost += row.cost;
-                    }
-                    recursionGuard.insert(location);
-                }
-                node = node->parent;
-            }
-        } else {
-            // recurse to find a leaf
-            buildCallerCallee2(row.children, callerCalleeData);
-        }
-    }
-}
-
 AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeRows* callerCalleeData)
 {
     AllocationData totalCost;
