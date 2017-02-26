@@ -347,11 +347,17 @@ RowData* findByLocation(const RowData& row, QVector<RowData>* data)
     return nullptr;
 }
 
-void buildTopDown(const TreeData& bottomUpData, TreeData* topDownData)
+AllocationData buildTopDown(const TreeData& bottomUpData, TreeData* topDownData)
 {
-    foreach (const auto& row, bottomUpData) {
-        if (row.children.isEmpty()) {
-            // leaf node found, bubble up the parent chain to build a top-down tree
+    AllocationData totalCost;
+    for (const auto& row : bottomUpData) {
+        // recurse and find the cost attributed to children
+        const auto childCost = buildTopDown(row.children, topDownData);
+        if (childCost != row.cost) {
+            // this row is (partially) a leaf
+            const auto cost = row.cost - childCost;
+
+            // bubble up the parent chain to build a top-down tree
             auto node = &row;
             auto stack = topDownData;
             while (node) {
@@ -363,15 +369,14 @@ void buildTopDown(const TreeData& bottomUpData, TreeData* topDownData)
                 }
                 // always use the leaf node's cost and propagate that one up the chain
                 // otherwise we'd count the cost of some nodes multiple times
-                data->cost += row.cost;
+                data->cost += cost;
                 stack = &data->children;
                 node = node->parent;
             }
-        } else {
-            // recurse to find a leaf
-            buildTopDown(row.children, topDownData);
         }
+        totalCost += row.cost;
     }
+    return totalCost;
 }
 
 QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
@@ -383,8 +388,7 @@ QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
     return topRows;
 }
 
-
-void buildCallerCallee(const TreeData& bottomUpData, CallerCalleeRows* callerCalleeData)
+void buildCallerCallee2(const TreeData& bottomUpData, CallerCalleeRows* callerCalleeData)
 {
     foreach (const auto& row, bottomUpData) {
         if (row.children.isEmpty()) {
@@ -412,9 +416,47 @@ void buildCallerCallee(const TreeData& bottomUpData, CallerCalleeRows* callerCal
             }
         } else {
             // recurse to find a leaf
-            buildCallerCallee(row.children, callerCalleeData);
+            buildCallerCallee2(row.children, callerCalleeData);
         }
     }
+}
+
+AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeRows* callerCalleeData)
+{
+    AllocationData totalCost;
+    for (const auto& row : bottomUpData) {
+        // recurse to find a leaf
+        const auto childCost = buildCallerCallee(row.children, callerCalleeData);
+        if (childCost != row.cost) {
+            // this row is (partially) a leaf
+            const auto cost = row.cost - childCost;
+
+            // leaf node found, bubble up the parent chain to add cost for all frames
+            // to the caller/callee data. this is done top-down since we must not count
+            // symbols more than once in the caller-callee data
+            QSet<LocationData::Ptr> recursionGuard;
+
+            auto node = &row;
+            while (node) {
+                const auto& location = node->location;
+                if (!recursionGuard.contains(location)) { // aggregate caller-callee data
+                    auto it = lower_bound(callerCalleeData->begin(), callerCalleeData->end(), location,
+                        [](const CallerCalleeData& lhs, const LocationData::Ptr& rhs) { return lhs.location < rhs; });
+                    if (it == callerCalleeData->end() || it->location != location) {
+                        it = callerCalleeData->insert(it, {{}, {}, location});
+                    }
+                    it->inclusiveCost += cost;
+                    if (!node->parent) {
+                        it->selfCost += cost;
+                    }
+                    recursionGuard.insert(location);
+                }
+                node = node->parent;
+            }
+        }
+        totalCost += row.cost;
+    }
+    return totalCost;
 }
 
 CallerCalleeRows toCallerCalleeData(const QVector<RowData>& bottomUpData, bool diffMode)
