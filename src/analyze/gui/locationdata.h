@@ -26,6 +26,8 @@
 
 #include <boost/functional/hash.hpp>
 
+#include <KLocalizedString>
+
 struct LocationData
 {
     using Ptr = std::shared_ptr<LocationData>;
@@ -57,6 +59,11 @@ struct LocationData
 };
 Q_DECLARE_TYPEINFO(LocationData, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(LocationData::Ptr)
+
+inline QString unresolvedFunctionName()
+{
+    return i18n("<unresolved function>");
+}
 
 inline bool operator<(const LocationData::Ptr& lhs, const LocationData& rhs)
 {

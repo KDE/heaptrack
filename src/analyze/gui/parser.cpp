@@ -43,7 +43,7 @@ struct StringCache
             // TODO: support removal of template arguments
             return stringify(ip.functionIndex);
         } else {
-            return i18n("<unresolved function>");
+            return unresolvedFunctionName();
         }
     }
 
