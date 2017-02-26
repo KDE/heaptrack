@@ -10,3 +10,5 @@ add_executable(callgraph callgraph.cpp)
 add_library(testlib SHARED lib.cpp)
 add_executable(test_lib test_lib.cpp)
 target_link_libraries(test_lib testlib)
+
+add_executable(test_aggregation test_aggregation.cpp)

@@ -42,6 +42,11 @@ inline bool operator==(const AllocationData& lhs, const AllocationData& rhs)
         && lhs.leaked == rhs.leaked && lhs.peak == rhs.peak;
 }
 
+inline bool operator!=(const AllocationData& lhs, const AllocationData& rhs)
+{
+    return !(lhs == rhs);
+}
+
 inline AllocationData& operator+=(AllocationData& lhs, const AllocationData& rhs)
 {
     lhs.allocations += rhs.allocations;
