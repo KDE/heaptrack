@@ -117,7 +117,7 @@ to use either `heaptrack_print` or `heaptrack_gui` to interpret the results.
 
 ![heaptrack_gui allocations chart page](screenshots/gui_allocations_chart.png?raw=true "heaptrack_gui allocations chart page")
 
-The highly recommended way to analyze a heap prfile is by using the `heaptrack_gui` tool.
+The highly recommended way to analyze a heap profile is by using the `heaptrack_gui` tool.
 It depends on Qt 5 and KF 5 to graphically visualize the recorded data. It features:
 
 - a summary page of the data
