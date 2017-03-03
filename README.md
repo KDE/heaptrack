@@ -74,7 +74,7 @@ Both parts require the following tools and libraries:
 The heaptrack data collector and the simplistic `heaptrack_print` analyzer depend on the
 following libraries:
 
-- boost 1.41 or higher: iostream, program_options
+- boost 1.41 or higher: iostreams, program_options
 - libunwind
 - elfutils: libdwarf
 
