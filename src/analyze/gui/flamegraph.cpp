@@ -271,7 +271,9 @@ void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem* parent, in
                      const double costThreshold, bool collapseRecursion)
 {
     foreach (const auto& row, data) {
-        if (collapseRecursion && row.location->function == parent->function()) {
+        if (collapseRecursion && row.location->function != unresolvedFunctionName()
+            && row.location->function == parent->function())
+        {
             continue;
         }
         auto item = findItemByFunction(parent->childItems(), row.location->function);

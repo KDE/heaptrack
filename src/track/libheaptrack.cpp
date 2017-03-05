@@ -90,6 +90,12 @@ inline void debugLog(const char fmt[], Args... args)
 atomic<bool> s_atexit{false};
 
 /**
+ * Set to true in heaptrack_stop, when s_atexit was not yet set. In such conditions,
+ * we always fully unload and cleanup behind ourselves
+ */
+atomic<bool> s_forceCleanup{false};
+
+/**
  * A per-thread handle guard to prevent infinite recursion, which should be
  * acquired before doing any special symbol handling.
  */
@@ -241,6 +247,9 @@ public:
             pthread_atfork(&prepare_fork, &parent_fork, &child_fork);
 
             atexit([]() {
+                if (s_forceCleanup) {
+                    return;
+                }
                 debugLog<MinimalOutput>("%s", "atexit()");
                 s_atexit.store(true);
                 heaptrack_stop();
@@ -286,7 +295,7 @@ public:
 
         // NOTE: we leak heaptrack data on exit, intentionally
         // This way, we can be sure to get all static deallocations.
-        if (!s_atexit) {
+        if (!s_atexit || s_forceCleanup) {
             delete s_data;
             s_data = nullptr;
         }
@@ -512,7 +521,7 @@ private:
                 fclose(procStatm);
             }
 
-            if (stopCallback && !s_atexit) {
+            if (stopCallback && (!s_atexit || s_forceCleanup)) {
                 stopCallback();
             }
             debugLog<MinimalOutput>("%s", "done destroying LockedData");
@@ -577,6 +586,11 @@ void heaptrack_stop()
     debugLog<MinimalOutput>("%s", "heaptrack_stop()");
 
     HeapTrack heaptrack(guard);
+
+    if (!s_atexit) {
+        s_forceCleanup.store(true);
+    }
+
     heaptrack.shutdown();
 }
 

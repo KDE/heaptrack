@@ -398,7 +398,6 @@ int main(int /*argc*/, char** /*argv*/)
             lastPtr = ptr;
             fprintf(stdout, "+ %x\n", index.index);
         } else if (reader.mode() == '-') {
-            --leakedAllocations;
             uint64_t ptr = 0;
             if (!(reader >> ptr)) {
                 cerr << "failed to parse line: " << reader.line() << endl;
@@ -414,6 +413,7 @@ int main(int /*argc*/, char** /*argv*/)
             if (temporary) {
                 ++temporaryAllocations;
             }
+            --leakedAllocations;
         } else {
             fputs(reader.line().c_str(), stdout);
             fputc('\n', stdout);
