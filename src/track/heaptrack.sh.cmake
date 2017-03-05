@@ -42,6 +42,9 @@ usage() {
     echo "  -p, --pid PID  The process ID of a running process into which"
     echo "                 heaptrack will be injected. This only works with"
     echo "                 applications that already link against libdl."
+    echo "  WARNING: Runtime-attaching heaptrack is UNSTABLE and can lead to CRASHES"
+    echo "           in your application, especially after you detach heaptrack again."
+    echo "           You are hereby warned, use it at your own risk!"
     echo
     echo "Optional arguments to heaptrack:"
     echo "  -d, --debug    Run the debuggee in GDB and heaptrack."
@@ -146,6 +149,15 @@ output="$output.gz"
 debuggee=$!
 
 cleanup() {
+    if [ ! -z "$pid" ]; then
+        echo "removing heaptrack injection via GDB, this might take some time..."
+        gdb --batch-silent -n -iex="set auto-solib-add off" -p $pid \
+            --eval-command="sharedlibrary libheaptrack_inject" \
+            --eval-command="call heaptrack_stop()" \
+            --eval-command="detach"
+        # NOTE: we do not call dlclose here, as that has the tendency to trigger
+        #       crashes in the debuggee. So instead, we keep heaptrack loaded.
+    fi
     rm -f "$pipe"
     kill "$debuggee" 2> /dev/null
 
