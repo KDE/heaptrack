@@ -72,7 +72,7 @@ struct Allocation : public AllocationData
  */
 struct AllocationInfo
 {
-    uint64_t size;
+    uint64_t size = 0;
     TraceIndex traceIndex;
     bool operator==(const AllocationInfo& rhs) const
     {
