@@ -1,7 +1,11 @@
 #include <cstdio>
 #include <cstdlib>
 
-#define HAVE_ALIGNED_ALLOC defined(_ISOC11_SOURCE)
+#if defined(_ISOC11_SOURCE)
+#  define HAVE_ALIGNED_ALLOC 1
+#else
+#  define HAVE_ALIGNED_ALLOC 0
+#endif
 
 struct Foo
 {
