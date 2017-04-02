@@ -47,6 +47,8 @@ public:
         m_it = m_line.cbegin();
         if (m_line.length() > 2) {
             m_it += 2;
+        } else {
+            m_it = m_line.cend();
         }
         return true;
     }
