@@ -41,6 +41,8 @@
 #include "util/linereader.h"
 #include "util/pointermap.h"
 
+#include <unistd.h>
+
 using namespace std;
 
 namespace {
@@ -200,7 +202,7 @@ struct AccumulatedTraceData
         return data;
     }
 
-    size_t intern(const string& str, const char** internedString = nullptr)
+    size_t intern(const string& str, std::string* internedString = nullptr)
     {
         if (str.empty()) {
             return 0;
@@ -209,14 +211,14 @@ struct AccumulatedTraceData
         auto it = m_internedData.find(str);
         if (it != m_internedData.end()) {
             if (internedString) {
-                *internedString = it->first.c_str();
+                *internedString = it->first;
             }
             return it->second;
         }
         const size_t id = m_internedData.size() + 1;
         it = m_internedData.insert(it, make_pair(str, id));
         if (internedString) {
-            *internedString = it->first.c_str();
+            *internedString = it->first;
         }
         fprintf(stdout, "s %s\n", str.c_str());
         return id;
@@ -262,27 +264,41 @@ struct AccumulatedTraceData
         return ipId;
     }
 
+    std::string findDebugFile(const std::string& input) const
+    {
+        // TODO: also try to find a debug file by build-id
+        // TODO: also lookup in (user-configurable) debug path
+        std::string file = input + ".debug";
+        if (access(file.c_str(), R_OK) == 0) {
+            return file;
+        } else {
+            return input;
+        }
+    }
+
     /**
      * Prevent the same file from being initialized multiple times.
      * This drastically cuts the memory consumption down
      */
-    backtrace_state* findBacktraceState(const char* fileName, uintptr_t addressStart)
+    backtrace_state* findBacktraceState(const std::string& originalFileName, uintptr_t addressStart)
     {
-        if (boost::algorithm::starts_with(fileName, "linux-vdso.so")) {
+        if (boost::algorithm::starts_with(originalFileName, "linux-vdso.so")) {
             // prevent warning, since this will always fail
             return nullptr;
         }
 
-        auto it = m_backtraceStates.find(fileName);
+        auto it = m_backtraceStates.find(originalFileName);
         if (it != m_backtraceStates.end()) {
             return it->second;
         }
+
+        const auto fileName = findDebugFile(originalFileName);
 
         struct CallbackData
         {
             const char* fileName;
         };
-        CallbackData data = {fileName};
+        CallbackData data = {fileName.c_str()};
 
         auto errorHandler = [](void* rawData, const char* msg, int errnum) {
             auto data = reinterpret_cast<const CallbackData*>(rawData);
@@ -290,11 +306,11 @@ struct AccumulatedTraceData
                  << strerror(errnum) << " (error code " << errnum << ")" << endl;
         };
 
-        auto state = backtrace_create_state(fileName, /* we are single threaded, so: not thread safe */ false,
+        auto state = backtrace_create_state(data.fileName, /* we are single threaded, so: not thread safe */ false,
                                             errorHandler, &data);
 
         if (state) {
-            const int descriptor = backtrace_open(fileName, errorHandler, &data, nullptr);
+            const int descriptor = backtrace_open(data.fileName, errorHandler, &data, nullptr);
             if (descriptor >= 1) {
                 int foundSym = 0;
                 int foundDwarf = 0;
@@ -306,14 +322,14 @@ struct AccumulatedTraceData
             }
         }
 
-        m_backtraceStates.insert(it, make_pair(fileName, state));
+        m_backtraceStates.insert(it, make_pair(originalFileName, state));
 
         return state;
     }
 
 private:
     vector<Module> m_modules;
-    unordered_map<const char*, backtrace_state*> m_backtraceStates;
+    unordered_map<std::string, backtrace_state*> m_backtraceStates;
     bool m_modulesDirty = false;
 
     unordered_map<string, size_t> m_internedData;
@@ -354,7 +370,7 @@ int main(int /*argc*/, char** /*argv*/)
                 if (fileName == "x") {
                     fileName = exe;
                 }
-                const char* internedString = nullptr;
+                std::string internedString;
                 const auto moduleIndex = data.intern(fileName, &internedString);
                 uintptr_t addressStart = 0;
                 if (!(reader >> addressStart)) {
