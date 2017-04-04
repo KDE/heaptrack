@@ -25,6 +25,7 @@
 
 #include "libheaptrack.h"
 
+#include <cstring>
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
@@ -396,7 +397,53 @@ private:
 
         debugLog<VerboseOutput>("dlopen_notify_callback: %s %zx", fileName, info->dlpi_addr);
 
-        if (fprintf(heaptrack->s_data->out, "m %s %zx", fileName, info->dlpi_addr) < 0) {
+        const auto MAX_BUILD_ID_SIZE = 20u;
+        unsigned raw_build_id_size = 0;
+        unsigned char raw_build_id[MAX_BUILD_ID_SIZE] = {};
+
+        for (int i = 0; i < info->dlpi_phnum; i++) {
+            const auto& phdr = info->dlpi_phdr[i];
+            if (raw_build_id_size == 0 && phdr.p_type == PT_NOTE) {
+                auto segmentAddr = phdr.p_vaddr + info->dlpi_addr;
+                const auto segmentEnd = segmentAddr + phdr.p_memsz;
+                const ElfW(Nhdr)* nhdr = nullptr;
+                while (segmentAddr < segmentEnd) {
+                    nhdr = reinterpret_cast<ElfW(Nhdr)*>(segmentAddr);
+                    if (nhdr->n_type == NT_GNU_BUILD_ID) {
+                        break;
+                    }
+                    segmentAddr += sizeof(ElfW(Nhdr)) + nhdr->n_namesz + nhdr->n_descsz;
+                }
+                if (nhdr->n_type == NT_GNU_BUILD_ID) {
+                    const auto buildIdAddr = segmentAddr + sizeof(ElfW(Nhdr)) + nhdr->n_namesz;
+                    if (buildIdAddr + nhdr->n_descsz <= segmentEnd && nhdr->n_descsz <= MAX_BUILD_ID_SIZE) {
+                        const auto* buildId = reinterpret_cast<const unsigned char*>(buildIdAddr);
+                        raw_build_id_size = nhdr->n_descsz;
+                        std::memcpy(raw_build_id, buildId, raw_build_id_size);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (fprintf(heaptrack->s_data->out, "m %s ", fileName) < 0) {
+            heaptrack->writeError();
+            return 1;
+        }
+        if (raw_build_id_size == 0) {
+            if (fprintf(heaptrack->s_data->out, "- ") < 0) {
+                heaptrack->writeError();
+                return 1;
+            }
+        } else {
+            for (unsigned i = 0; i < raw_build_id_size; ++i) {
+                if (fprintf(heaptrack->s_data->out, "%02x", raw_build_id[i]) < 0) {
+                    heaptrack->writeError();
+                    return 1;
+                }
+            }
+        }
+        if (fprintf(heaptrack->s_data->out, " %zx", info->dlpi_addr) < 0) {
             heaptrack->writeError();
             return 1;
         }

@@ -65,6 +65,11 @@ string demangle(const char* function)
     return ret;
 }
 
+bool fileIsReadable(const string& path)
+{
+    return access(path.c_str(), R_OK) == 0;
+}
+
 struct AddressInformation
 {
     string function;
@@ -269,18 +274,25 @@ struct AccumulatedTraceData
         // TODO: also try to find a debug file by build-id
         // TODO: also lookup in (user-configurable) debug path
         std::string file = input + ".debug";
-        if (access(file.c_str(), R_OK) == 0) {
-            return file;
-        } else {
-            return input;
+        return fileIsReadable(file) ? file : input;
+    }
+
+    std::string findBuildIdFile(const string& buildId) const
+    {
+        if (buildId.empty()) {
+            return {};
         }
+        // TODO: also lookup in (user-configurable) debug path
+        const auto path = "/usr/lib/debug/.build-id/" + buildId.substr(0, 2) + '/' + buildId.substr(2) + ".debug";
+        cerr << path << endl;
+        return fileIsReadable(path) ? path : string();
     }
 
     /**
      * Prevent the same file from being initialized multiple times.
      * This drastically cuts the memory consumption down
      */
-    backtrace_state* findBacktraceState(const std::string& originalFileName, uintptr_t addressStart)
+    backtrace_state* findBacktraceState(const std::string& originalFileName, const string& buildId, uintptr_t addressStart)
     {
         if (boost::algorithm::starts_with(originalFileName, "linux-vdso.so")) {
             // prevent warning, since this will always fail
@@ -292,7 +304,9 @@ struct AccumulatedTraceData
             return it->second;
         }
 
-        const auto fileName = findDebugFile(originalFileName);
+        // TODO: also lookup in (user-configurable) sysroot path
+        const auto buildIdFile = findBuildIdFile(buildId);
+        const auto fileName = buildIdFile.empty() ? findDebugFile(originalFileName) : buildIdFile;
 
         struct CallbackData
         {
@@ -367,17 +381,22 @@ int main(int /*argc*/, char** /*argv*/)
             if (fileName == "-") {
                 data.clearModules();
             } else {
-                if (fileName == "x") {
-                    fileName = exe;
-                }
-                std::string internedString;
-                const auto moduleIndex = data.intern(fileName, &internedString);
+                string buildId;
+                reader >> buildId;
+
                 uintptr_t addressStart = 0;
                 if (!(reader >> addressStart)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     return 1;
                 }
-                auto state = data.findBacktraceState(internedString, addressStart);
+
+                if (fileName == "x") {
+                    fileName = exe;
+                }
+                std::string internedString;
+                const auto moduleIndex = data.intern(fileName, &internedString);
+
+                auto state = data.findBacktraceState(internedString, buildId, addressStart);
                 uintptr_t vAddr = 0;
                 uintptr_t memSize = 0;
                 while ((reader >> vAddr) && (reader >> memSize)) {
