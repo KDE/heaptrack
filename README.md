@@ -192,3 +192,7 @@ As a FOSS project, we welcome contributions of any form. You can help improve th
 - contributing patches via https://phabricator.kde.org/dashboard/view/28/
 - translating the GUI with the help of https://l10n.kde.org/
 - writing documentation on https://userbase.kde.org/Heaptrack
+
+When submitting bug reports, you can anonymize your data with the `tools/anonymize` script:
+
+    tools/anonymize heaptrack.APP.PID.gz heaptrack.bug_report_data.gz
