@@ -1,4 +1,6 @@
 include_directories(../..)
+include_directories(${Boost_INCLUDE_DIRS})
+
 
 include (CheckCXXSourceCompiles)
 check_cxx_source_compiles(
