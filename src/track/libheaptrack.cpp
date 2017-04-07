@@ -30,6 +30,8 @@
 #include <fcntl.h>
 #include <link.h>
 #include <stdio_ext.h>
+#include <pthread.h>
+#include <signal.h>
 
 #include <atomic>
 #include <cinttypes>
@@ -486,9 +488,26 @@ private:
             if (!procStatm) {
                 fprintf(stderr, "WARNING: Failed to open /proc/self/statm for reading.\n");
             }
+
+            // ensure this utility thread is not handling any signals
+            // our host application may assume only one specific thread
+            // will handle the threads, if that's not the case things
+            // seemingly break in non-obvious ways.
+            // see also: https://bugs.kde.org/show_bug.cgi?id=378494
+            sigset_t previousMask;
+            sigset_t newMask;
+            sigfillset(&newMask);
+            if (pthread_sigmask(SIG_SETMASK, &newMask, &previousMask) != 0) {
+                fprintf(stderr, "WARNING: Failed to block signals, disabling timer thread.\n");
+                return;
+            }
+
+            // the mask we set above will be inherited by the thread that we spawn below
             timerThread = thread([&]() {
                 RecursionGuard::isActive = true;
                 debugLog<MinimalOutput>("%s", "timer thread started");
+
+                // now loop and repeatedly print the timestamp and RSS usage to the data stream
                 while (!stopTimerThread) {
                     // TODO: make interval customizable
                     this_thread::sleep_for(chrono::milliseconds(10));
@@ -500,6 +519,11 @@ private:
                     }
                 }
             });
+
+            // now restore the previous mask as if nothing ever happened
+            if (pthread_sigmask(SIG_SETMASK, &previousMask, nullptr) != 0) {
+                fprintf(stderr, "WARNING: Failed to restore the signal mask.\n");
+            }
         }
 
         ~LockedData()
