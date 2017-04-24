@@ -657,7 +657,7 @@ int main(int argc, char** argv)
         /// of just N!
         cout << "PEAK MEMORY CONSUMERS\n";
         if (data.mergeBacktraces) {
-            cout << "\nWARNING - the data below is not an accurate calcuation of"
+            cout << "\nWARNING - the data below is not an accurate calculation of"
                     " the total peak consumption and can easily be wrong.\n"
                     " For an accurate overview, disable backtrace merging.\n";
         }
