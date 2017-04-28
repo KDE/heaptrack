@@ -120,7 +120,17 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
     const auto cost = data.cost[column];
     if (role == Qt::ToolTipRole) {
         const QString time = QString::number(double(data.timeStamp) / 1000, 'g', 3) + QLatin1Char('s');
-        KFormat format;
+        auto byteCost = [cost]() -> QString
+        {
+            KFormat format;
+            const auto formatted = format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect);
+            if (cost > 1024) {
+                return i18nc("%1: the formatted byte size, e.g. \"1.2KB\", %2: the raw byte size, e.g. \"1300\"",
+                             "%1 (%2 bytes)", formatted, cost);
+            } else {
+                return formatted;
+            }
+        };
         if (column == 0) {
             switch (m_type) {
             case Allocations:
@@ -129,10 +139,10 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
                 return i18n("<qt>%1 temporary allocations in total after %2</qt>", cost, time);
             case Consumed:
                 return i18n("<qt>%1 consumed in total after %2</qt>",
-                            format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
+                            byteCost(), time);
             case Allocated:
                 return i18n("<qt>%1 allocated in total after %2</qt>",
-                            format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
+                            byteCost(), time);
             }
         } else {
             const auto label = m_data.labels.value(column).toHtmlEscaped();
@@ -148,11 +158,11 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
             case Consumed:
                 return i18n("<qt>%2 consumed after %3 from:<p "
                             "style='margin-left:10px'>%1</p></qt>",
-                            label, format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
+                            label, byteCost(), time);
             case Allocated:
                 return i18n("<qt>%2 allocated after %3 from:<p "
                             "style='margin-left:10px'>%1</p></qt>",
-                            label, format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
+                            label, byteCost(), time);
             }
         }
         return {};
