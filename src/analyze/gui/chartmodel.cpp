@@ -131,7 +131,7 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
                 return i18n("<qt>%1 consumed in total after %2</qt>",
                             format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
             case Allocated:
-                return i18n("<qt>%2 allocated in total after %2</qt>",
+                return i18n("<qt>%1 allocated in total after %2</qt>",
                             format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect), time);
             }
         } else {
