@@ -585,7 +585,7 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
 
     for (const auto& rhsAllocation : base.allocations) {
         const auto lhsTrace = remapTrace(rhsAllocation.traceIndex);
-        assert(base.findIp(base.findTrace(rhsAllocation.traceIndex).ipIndex)
+        assert(remapIp(base.findIp(base.findTrace(rhsAllocation.traceIndex).ipIndex))
                    .equalWithoutAddress(findIp(findTrace(lhsTrace).ipIndex)));
         findAllocation(lhsTrace) -= rhsAllocation;
     }
