@@ -35,6 +35,7 @@
 #include <QToolTip>
 #include <QVBoxLayout>
 #include <QWheelEvent>
+#include <QLineEdit>
 
 #include <KColorScheme>
 #include <KLocalizedString>
@@ -51,6 +52,21 @@ enum CostType
 };
 Q_DECLARE_METATYPE(CostType)
 
+namespace {
+QString fraction(qint64 cost, qint64 totalCost)
+{
+    return QString::number(double(cost)  * 100. / totalCost, 'g', 3);
+}
+
+enum SearchMatchType
+{
+    NoSearch,
+    NoMatch,
+    DirectMatch,
+    ChildMatch
+};
+}
+
 class FrameGraphicsItem : public QGraphicsRectItem
 {
 public:
@@ -65,6 +81,7 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
     QString description() const;
+    void setSearchMatchType(SearchMatchType matchType);
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
@@ -75,6 +92,7 @@ private:
     QString m_function;
     CostType m_costType;
     bool m_isHovered;
+    SearchMatchType m_searchMatch = NoSearch;
 };
 
 Q_DECLARE_METATYPE(FrameGraphicsItem*)
@@ -113,23 +131,29 @@ QString FrameGraphicsItem::function() const
 
 void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* /*widget*/)
 {
-    if (isSelected() || m_isHovered) {
+    if (isSelected() || m_isHovered || m_searchMatch == DirectMatch) {
         auto selectedColor = brush().color();
         selectedColor.setAlpha(255);
         painter->fillRect(rect(), selectedColor);
-    } else {
+    } else if (m_searchMatch == NoMatch) {
+        auto noMatchColor = brush().color();
+        noMatchColor.setAlpha(50);
+        painter->fillRect(rect(), noMatchColor);
+    } else { // default, when no search is running, or a sub-item is matched
         painter->fillRect(rect(), brush());
     }
 
     const QPen oldPen = painter->pen();
     auto pen = oldPen;
-    pen.setColor(brush().color());
-    if (isSelected()) {
-        pen.setWidth(2);
+    if (m_searchMatch != NoMatch) {
+        pen.setColor(brush().color());
+        if (isSelected()) {
+            pen.setWidth(2);
+        }
+        painter->setPen(pen);
+        painter->drawRect(rect());
+        painter->setPen(oldPen);
     }
-    painter->setPen(pen);
-    painter->drawRect(rect());
-    painter->setPen(oldPen);
 
     const int margin = 4;
     const int width = rect().width() - 2 * margin;
@@ -138,17 +162,34 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
         return;
     }
 
-    const int height = rect().height();
+    if (m_searchMatch == NoMatch) {
+        auto color = oldPen.color();
+        color.setAlpha(125);
+        pen.setColor(color);
+        painter->setPen(pen);
+    }
 
-    painter->drawText(margin + rect().x(), rect().y(), width, height,
-                      Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
+    const int height = rect().height();
+    painter->drawText(margin + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
                       option->fontMetrics.elidedText(m_function, Qt::ElideRight, width));
+
+    if (m_searchMatch == NoMatch) {
+        painter->setPen(oldPen);
+    }
 }
 
 void FrameGraphicsItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event)
 {
     QGraphicsRectItem::hoverEnterEvent(event);
     m_isHovered = true;
+    update();
+}
+
+void FrameGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+{
+    QGraphicsRectItem::hoverLeaveEvent(event);
+    m_isHovered = false;
+    update();
 }
 
 QString FrameGraphicsItem::description() const
@@ -201,10 +242,12 @@ QString FrameGraphicsItem::description() const
     return tooltip;
 }
 
-void FrameGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
+void FrameGraphicsItem::setSearchMatchType(SearchMatchType matchType)
 {
-    QGraphicsRectItem::hoverLeaveEvent(event);
-    m_isHovered = false;
+    if (m_searchMatch != matchType) {
+        m_searchMatch = matchType;
+        update();
+    }
 }
 
 namespace {
@@ -344,6 +387,39 @@ FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type,
     toGraphicsItems(topDownData, rootItem, member, totalCost * costThreshold / 100., collapseRecursion);
     return rootItem;
 }
+
+struct SearchResults
+{
+    SearchMatchType matchType = NoMatch;
+    qint64 directCost = 0;
+};
+
+SearchResults applySearch(FrameGraphicsItem* item, const QString& searchValue)
+{
+    SearchResults result;
+    if (searchValue.isEmpty()) {
+        result.matchType = NoSearch;
+    } else if (item->function().contains(searchValue, Qt::CaseInsensitive)) {
+        result.directCost += item->cost();
+        result.matchType = DirectMatch;
+    }
+
+    // recurse into the child items, we always need to update all items
+    for (auto* child : item->childItems()) {
+        auto* childFrame = static_cast<FrameGraphicsItem*>(child);
+        auto childMatch = applySearch(childFrame, searchValue);
+        if (result.matchType != DirectMatch &&
+            (childMatch.matchType == DirectMatch || childMatch.matchType == ChildMatch))
+        {
+            result.matchType = ChildMatch;
+            result.directCost += childMatch.directCost;
+        }
+    }
+
+    item->setSearchMatchType(result.matchType);
+    return result;
+}
+
 }
 
 FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
@@ -352,6 +428,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     , m_scene(new QGraphicsScene(this))
     , m_view(new QGraphicsView(this))
     , m_displayLabel(new QLabel)
+    , m_searchResultsLabel(new QLabel)
 {
     qRegisterMetaType<FrameGraphicsItem*>();
 
@@ -391,6 +468,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     auto bottomUpCheckbox = new QCheckBox(i18n("Bottom-Down View"), this);
     bottomUpCheckbox->setToolTip(i18n("Enable the bottom-down flame graph view. When this is unchecked, "
                                       "the top-down view is enabled by default."));
+    bottomUpCheckbox->setChecked(m_showBottomUpData);
     connect(bottomUpCheckbox, &QCheckBox::toggled, this, [this, bottomUpCheckbox] {
         m_showBottomUpData = bottomUpCheckbox->isChecked();
         showData();
@@ -425,8 +503,12 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
                 showData();
             });
 
-    m_displayLabel->setWordWrap(true);
-    m_displayLabel->setTextInteractionFlags(m_displayLabel->textInteractionFlags() | Qt::TextSelectableByMouse);
+    m_searchInput = new QLineEdit(this);
+    m_searchInput->setPlaceholderText(i18n("Search..."));
+    m_searchInput->setToolTip(i18n("<qt>Search the flame graph for a symbol.</qt>"));
+    m_searchInput->setClearButtonEnabled(true);
+    connect(m_searchInput, &QLineEdit::textChanged,
+            this, &FlameGraph::setSearchValue);
 
     auto controls = new QWidget(this);
     controls->setLayout(new QHBoxLayout);
@@ -434,11 +516,20 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     controls->layout()->addWidget(bottomUpCheckbox);
     controls->layout()->addWidget(collapseRecursionCheckbox);
     controls->layout()->addWidget(costThreshold);
+    controls->layout()->addWidget(m_searchInput);
+
+    m_displayLabel->setWordWrap(true);
+    m_displayLabel->setTextInteractionFlags(m_displayLabel->textInteractionFlags() | Qt::TextSelectableByMouse);
+
+    m_searchResultsLabel->setWordWrap(true);
+    m_searchResultsLabel->setTextInteractionFlags(m_searchResultsLabel->textInteractionFlags() | Qt::TextSelectableByMouse);
+    m_searchResultsLabel->hide();
 
     setLayout(new QVBoxLayout);
     layout()->addWidget(controls);
     layout()->addWidget(m_view);
     layout()->addWidget(m_displayLabel);
+    layout()->addWidget(m_searchResultsLabel);
 
     addAction(KStandardAction::back(this, SLOT(navigateBack()), this));
     addAction(KStandardAction::forward(this, SLOT(navigateForward()), this));
@@ -566,6 +657,10 @@ void FlameGraph::setData(FrameGraphicsItem* rootItem)
     rootItem->setRect(0, 0, 800, m_view->fontMetrics().height() + 4);
     m_scene->addItem(rootItem);
 
+    if (!m_searchInput->text().isEmpty()) {
+        setSearchValue(m_searchInput->text());
+    }
+
     if (isVisible()) {
         selectItem(m_rootItem);
     }
@@ -601,6 +696,39 @@ void FlameGraph::selectItem(FrameGraphicsItem* item)
     m_view->centerOn(item);
 
     setTooltipItem(item);
+}
+
+void FlameGraph::setSearchValue(const QString& value)
+{
+    if (!m_rootItem) {
+        return;
+    }
+
+    auto match = applySearch(m_rootItem, value);
+
+    if (value.isEmpty()) {
+        m_searchResultsLabel->hide();
+    } else {
+        QString label;
+        KFormat format;
+        const auto costFraction = fraction(match.directCost, m_rootItem->cost());
+        switch (m_costSource->currentData().value<CostType>()) {
+        case Allocations:
+        case Temporary:
+            label = i18n("%1 (%2% of total of %3) allocations matched by search.",
+                         match.directCost, costFraction, m_rootItem->cost());
+            break;
+        case Peak:
+        case Leaked:
+        case Allocated:
+            label = i18n("%1 (%2% of total of %3) matched by search.",
+                         format.formatByteSize(match.directCost), costFraction,
+                         format.formatByteSize(m_rootItem->cost()));
+            break;
+        }
+        m_searchResultsLabel->setText(label);
+        m_searchResultsLabel->show();
+    }
 }
 
 void FlameGraph::navigateBack()
