@@ -23,7 +23,6 @@ set(SRCFILES
     treemodel.cpp
     treeproxy.cpp
     costdelegate.cpp
-    modeltest.cpp
     parser.cpp
     flamegraph.cpp
     stacksmodel.cpp
