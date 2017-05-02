@@ -207,8 +207,7 @@ QString FrameGraphicsItem::description() const
         totalCost = item->cost();
     }
     const auto fraction = QString::number(double(m_cost) * 100. / totalCost, 'g', 3);
-    const auto function = QString(QLatin1String("<span style='font-family:monospace'>") + m_function.toHtmlEscaped()
-                                  + QLatin1String("</span>"));
+    const auto function = m_function;
     if (!parentItem()) {
         return function;
     }
@@ -572,6 +571,16 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
         updateTooltip();
     } else if (event->type() == QEvent::Hide) {
         setData(nullptr);
+    } else if (event->type() == QEvent::ToolTip) {
+        const auto& tooltip = m_displayLabel->toolTip();
+        if (tooltip.isEmpty()) {
+            QToolTip::hideText();
+        } else {
+            QToolTip::showText(QCursor::pos(), QLatin1String("<qt>")
+                + tooltip.toHtmlEscaped() + QLatin1String("</qt>"), this);
+        }
+        event->accept();
+        return true;
     }
     return ret;
 }
@@ -631,8 +640,6 @@ void FlameGraph::updateTooltip()
     const auto text = m_tooltipItem ? m_tooltipItem->description() : QString();
     m_displayLabel->setToolTip(text);
     const auto metrics = m_displayLabel->fontMetrics();
-    // FIXME: the HTML text has tons of stuff that is not printed,
-    //        which lets the text get cut-off too soon...
     m_displayLabel->setText(metrics.elidedText(text, Qt::ElideRight, m_displayLabel->width()));
 }
 
