@@ -530,8 +530,11 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     layout()->addWidget(m_displayLabel);
     layout()->addWidget(m_searchResultsLabel);
 
-    addAction(KStandardAction::back(this, SLOT(navigateBack()), this));
-    addAction(KStandardAction::forward(this, SLOT(navigateForward()), this));
+    m_backAction = KStandardAction::back(this, SLOT(navigateBack()), this);
+    addAction(m_backAction);
+    m_forwardAction = KStandardAction::forward(this, SLOT(navigateForward()), this);
+    addAction(m_forwardAction);
+    updateNavigationActions();
     setContextMenuPolicy(Qt::ActionsContextMenu);
 }
 
@@ -552,6 +555,7 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
                 }
                 m_selectedItem = m_selectionHistory.size();
                 m_selectionHistory.push_back(item);
+                updateNavigationActions();
             }
         }
     } else if (event->type() == QEvent::MouseMove) {
@@ -647,10 +651,12 @@ void FlameGraph::setData(FrameGraphicsItem* rootItem)
 {
     m_scene->clear();
     m_buildingScene = false;
+    m_tooltipItem = nullptr;
     m_rootItem = rootItem;
     m_selectionHistory.clear();
     m_selectionHistory.push_back(rootItem);
     m_selectedItem = 0;
+    updateNavigationActions();
     if (!rootItem) {
         auto text = m_scene->addText(i18n("generating flame graph..."));
         m_view->centerOn(text);
@@ -743,6 +749,7 @@ void FlameGraph::navigateBack()
     if (m_selectedItem > 0) {
         --m_selectedItem;
     }
+    updateNavigationActions();
     selectItem(m_selectionHistory.at(m_selectedItem));
 }
 
@@ -751,5 +758,12 @@ void FlameGraph::navigateForward()
     if ((m_selectedItem + 1) < m_selectionHistory.size()) {
         ++m_selectedItem;
     }
+    updateNavigationActions();
     selectItem(m_selectionHistory.at(m_selectedItem));
+}
+
+void FlameGraph::updateNavigationActions()
+{
+    m_backAction->setEnabled(m_selectedItem > 0);
+    m_forwardAction->setEnabled(m_selectedItem + 1 < m_selectionHistory.size());
 }

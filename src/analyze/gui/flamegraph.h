@@ -58,6 +58,7 @@ private:
     void updateTooltip();
     void showData();
     void selectItem(FrameGraphicsItem* item);
+    void updateNavigationActions();
 
     TreeData m_topDownData;
     TreeData m_bottomUpData;
@@ -68,6 +69,8 @@ private:
     QLabel* m_displayLabel;
     QLabel* m_searchResultsLabel;
     QLineEdit* m_searchInput = nullptr;
+    QAction* m_forwardAction = nullptr;
+    QAction* m_backAction = nullptr;
     const FrameGraphicsItem* m_tooltipItem = nullptr;
     FrameGraphicsItem* m_rootItem = nullptr;
     QVector<FrameGraphicsItem*> m_selectionHistory;
