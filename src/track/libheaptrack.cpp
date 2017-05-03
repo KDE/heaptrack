@@ -336,7 +336,12 @@ public:
 
         // read RSS in pages from statm, then rewind for next read
         size_t rss = 0;
-        fscanf(s_data->procStatm, "%*x %zx", &rss);
+        if (fscanf(s_data->procStatm, "%*x %zx", &rss) != 1) {
+            fprintf(stderr, "WARNING: Failed to read RSS value from /proc/self/statm.\n");
+            fclose(s_data->procStatm);
+            s_data->procStatm = nullptr;
+            return;
+        }
         rewind(s_data->procStatm);
         // TODO: compare to rusage.ru_maxrss (getrusage) to find "real" peak?
         // TODO: use custom allocators with known page sizes to prevent tainting
