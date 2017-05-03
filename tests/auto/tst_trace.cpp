@@ -24,7 +24,7 @@
 using namespace std;
 
 namespace {
-bool fill(Trace& trace, int depth, int skip)
+bool __attribute__((noinline)) fill(Trace& trace, int depth, int skip)
 {
     if (!depth) {
         return trace.fill(skip);
