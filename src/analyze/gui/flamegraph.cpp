@@ -573,8 +573,6 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
             selectItem(m_selectionHistory.at(m_selectedItem));
         }
         updateTooltip();
-    } else if (event->type() == QEvent::Hide) {
-        setData(nullptr);
     } else if (event->type() == QEvent::ToolTip) {
         const auto& tooltip = m_displayLabel->toolTip();
         if (tooltip.isEmpty()) {
