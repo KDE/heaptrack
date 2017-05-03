@@ -36,7 +36,7 @@ struct TraceEdge
     // the evaluation process can then reverse-map the index to the parent ip
     // to rebuild the backtrace from the bottom-up
     uint32_t index;
-    // Unsorted list of children, assumed to be small
+    // sorted list of children, assumed to be small
     std::vector<TraceEdge> children;
 };
 
