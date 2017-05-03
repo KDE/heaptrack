@@ -59,6 +59,11 @@ struct Trace
     bool fill(int skip)
     {
         int size = unw_backtrace(m_data, MAX_SIZE);
+        // filter bogus frames at the end, which sometimes get returned by libunwind
+        // cf.: https://bugs.kde.org/show_bug.cgi?id=379082
+        while (size > 0 && !m_data[size - 1]) {
+            --size;
+        }
         m_size = size > skip ? size - skip : 0;
         m_skip = skip;
         return m_size > 0;
