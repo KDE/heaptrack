@@ -39,16 +39,11 @@ int main(int argc, char** argv)
                         QStringLiteral("http://milianw.de"));
 
     aboutData.setOrganizationDomain("kde.org");
-    KAboutData::setApplicationData(aboutData);
 
-    app.setApplicationName(aboutData.componentName());
-    app.setApplicationDisplayName(aboutData.displayName());
-    app.setOrganizationDomain(aboutData.organizationDomain());
+    KAboutData::setApplicationData(aboutData);
     app.setWindowIcon(QIcon::fromTheme(QStringLiteral("office-chart-area")));
-    app.setApplicationVersion(aboutData.version());
 
     QCommandLineParser parser;
-    KAboutData::setApplicationData(aboutData);
     parser.addVersionOption();
     parser.addHelpOption();
     aboutData.setupCommandLine(&parser);
