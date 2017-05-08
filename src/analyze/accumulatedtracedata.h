@@ -33,24 +33,42 @@
 #include "allocationdata.h"
 #include "util/indices.h"
 
-struct InstructionPointer
+struct Frame
 {
-    uint64_t instructionPointer = 0;
-    ModuleIndex moduleIndex;
     FunctionIndex functionIndex;
     FileIndex fileIndex;
     int line = 0;
 
+    bool operator==(const Frame& rhs) const
+    {
+        return std::tie(functionIndex, fileIndex, line)
+            == std::tie(rhs.functionIndex, rhs.fileIndex, rhs.line);
+    }
+
+    bool operator<(const Frame& rhs) const
+    {
+        return std::tie(functionIndex, fileIndex, line)
+             < std::tie(rhs.functionIndex, rhs.fileIndex, rhs.line);
+    }
+};
+
+struct InstructionPointer
+{
+    uint64_t instructionPointer = 0;
+    ModuleIndex moduleIndex;
+    Frame frame;
+    std::vector<Frame> inlined;
+
     bool compareWithoutAddress(const InstructionPointer& other) const
     {
-        return std::tie(moduleIndex, functionIndex, fileIndex, line)
-            < std::tie(other.moduleIndex, other.functionIndex, other.fileIndex, other.line);
+        return std::tie(moduleIndex, frame)
+             < std::tie(other.moduleIndex, other.frame);
     }
 
     bool equalWithoutAddress(const InstructionPointer& other) const
     {
-        return std::tie(moduleIndex, functionIndex, fileIndex, line)
-            == std::tie(other.moduleIndex, other.functionIndex, other.fileIndex, other.line);
+        return std::tie(moduleIndex, frame)
+            == std::tie(other.moduleIndex, other.frame);
     }
 };
 

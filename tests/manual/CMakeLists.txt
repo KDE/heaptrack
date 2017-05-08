@@ -17,3 +17,7 @@ add_executable(signals signals.cpp)
 target_link_libraries(signals ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(libc_leaks libc_leaks.c)
+
+set(CMAKE_BUILD_TYPE RelWithDebInfo)
+
+add_executable(inlining inlining.cpp)

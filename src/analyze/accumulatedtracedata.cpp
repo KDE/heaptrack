@@ -208,11 +208,20 @@ bool AccumulatedTraceData::read(istream& in)
             InstructionPointer ip;
             reader >> ip.instructionPointer;
             reader >> ip.moduleIndex;
-            reader >> ip.functionIndex;
-            reader >> ip.fileIndex;
-            reader >> ip.line;
+            auto readFrame = [&reader](Frame* frame) {
+                return (reader >> frame->functionIndex)
+                    && (reader >> frame->fileIndex)
+                    && (reader >> frame->line);
+            };
+            if (readFrame(&ip.frame)) {
+                Frame inlinedFrame;
+                while (readFrame(&inlinedFrame)) {
+                    ip.inlined.push_back(inlinedFrame);
+                }
+            }
+
             instructionPointers.push_back(ip);
-            if (find(opNewStrIndices.begin(), opNewStrIndices.end(), ip.functionIndex) != opNewStrIndices.end()) {
+            if (find(opNewStrIndices.begin(), opNewStrIndices.end(), ip.frame.functionIndex) != opNewStrIndices.end()) {
                 IpIndex index;
                 index.index = instructionPointers.size();
                 opNewIpIndices.push_back(index);
@@ -449,8 +458,12 @@ POTENTIALLY_UNUSED void printTrace(const AccumulatedTraceData& data, TraceIndex 
         const auto trace = data.findTrace(index);
         const auto& ip = data.findIp(trace.ipIndex);
         cerr << index << " (" << trace.ipIndex << ", " << trace.parentIndex << ")" << '\t'
-             << data.stringify(ip.functionIndex) << " in " << data.stringify(ip.moduleIndex) << " at "
-             << data.stringify(ip.fileIndex) << ':' << ip.line << '\n';
+             << data.stringify(ip.frame.functionIndex) << " in " << data.stringify(ip.moduleIndex) << " at "
+             << data.stringify(ip.frame.fileIndex) << ':' << ip.frame.line << '\n';
+        for (const auto& inlined : ip.inlined) {
+            cerr << '\t' << data.stringify(inlined.functionIndex) << " at "
+                 << data.stringify(inlined.fileIndex) << ':' << inlined.line << '\n';
+        }
         index = trace.parentIndex;
     } while (index);
     cerr << "---\n";
@@ -496,10 +509,17 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
             index.index = stringMap[index.index].index;
         }
     };
-    auto remapIp = [&remapString](InstructionPointer ip) -> InstructionPointer {
+    auto remapFrame = [&remapString](Frame frame) -> Frame {
+        remapString(frame.functionIndex);
+        remapString(frame.fileIndex);
+        return frame;
+    };
+    auto remapIp = [&remapString, &remapFrame](InstructionPointer ip) -> InstructionPointer {
         remapString(ip.moduleIndex);
-        remapString(ip.functionIndex);
-        remapString(ip.fileIndex);
+        remapFrame(ip.frame);
+        for (auto& inlined : ip.inlined) {
+            inlined = remapFrame(inlined);
+        }
         return ip;
     };
 

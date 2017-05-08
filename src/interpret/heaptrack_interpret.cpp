@@ -64,11 +64,47 @@ string demangle(const char* function)
     return ret;
 }
 
-struct AddressInformation
+struct Frame
 {
+    Frame(string function = {}, string file = {}, int line = 0)
+        : function(function)
+        , file(file)
+        , line(line)
+    {}
+
+    bool isValid() const
+    {
+        return !function.empty();
+    }
+
     string function;
     string file;
-    int line = 0;
+    int line;
+};
+
+struct AddressInformation
+{
+    Frame frame;
+    vector<Frame> inlined;
+};
+
+struct ResolvedFrame
+{
+    ResolvedFrame(size_t functionIndex = 0, size_t fileIndex = 0, int line = 0)
+        : functionIndex(functionIndex)
+        , fileIndex(fileIndex)
+        , line(line)
+    {}
+    size_t functionIndex;
+    size_t fileIndex;
+    int line;
+};
+
+struct ResolvedIP
+{
+    size_t moduleIndex = 0;
+    ResolvedFrame frame;
+    vector<ResolvedFrame> inlined;
 };
 
 struct Module
@@ -88,22 +124,27 @@ struct Module
             return info;
         }
 
+        // try to find frame information from debug information
         backtrace_pcinfo(backtraceState, address,
                          [](void* data, uintptr_t /*addr*/, const char* file, int line, const char* function) -> int {
+                             Frame frame(demangle(function), file ? file : "", line);
                              auto info = reinterpret_cast<AddressInformation*>(data);
-                             info->function = demangle(function);
-                             info->file = file ? file : "";
-                             info->line = line;
+                             if (!info->frame.isValid()) {
+                                info->frame = frame;
+                             } else {
+                                info->inlined.push_back(frame);
+                             }
                              return 0;
                          },
                          [](void* /*data*/, const char* /*msg*/, int /*errnum*/) {}, &info);
 
-        if (info.function.empty()) {
+        // no debug information available? try to fallback on the symbol table information
+        if (!info.frame.isValid()) {
             backtrace_syminfo(
                 backtraceState, address,
                 [](void* data, uintptr_t /*pc*/, const char* symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
                     if (symname) {
-                        reinterpret_cast<AddressInformation*>(data)->function = demangle(symname);
+                        reinterpret_cast<AddressInformation*>(data)->frame.function = demangle(symname);
                     }
                 },
                 [](void* /*data*/, const char* msg, int errnum) {
@@ -131,14 +172,6 @@ struct Module
     uintptr_t addressEnd;
     size_t moduleIndex;
     backtrace_state* backtraceState;
-};
-
-struct ResolvedIP
-{
-    size_t moduleIndex = 0;
-    size_t fileIndex = 0;
-    size_t functionIndex = 0;
-    int line = 0;
 };
 
 struct AccumulatedTraceData
@@ -186,6 +219,11 @@ struct AccumulatedTraceData
             m_modulesDirty = false;
         }
 
+        auto resolveFrame = [this](const Frame& frame)
+        {
+            return ResolvedFrame{intern(frame.function), intern(frame.file), frame.line};
+        };
+
         ResolvedIP data;
         // find module for this instruction pointer
         auto module =
@@ -194,9 +232,9 @@ struct AccumulatedTraceData
         if (module != m_modules.end() && module->addressStart <= ip && module->addressEnd >= ip) {
             data.moduleIndex = module->moduleIndex;
             const auto info = module->resolveAddress(ip);
-            data.fileIndex = intern(info.file);
-            data.functionIndex = intern(info.function);
-            data.line = info.line;
+            data.frame = resolveFrame(info.frame);
+            std::transform(info.inlined.begin(), info.inlined.end(), std::back_inserter(data.inlined),
+                           resolveFrame);
         }
         return data;
     }
@@ -253,10 +291,13 @@ struct AccumulatedTraceData
 
         const auto ip = resolve(instructionPointer);
         fprintf(stdout, "i %zx %zx", instructionPointer, ip.moduleIndex);
-        if (ip.functionIndex || ip.fileIndex) {
-            fprintf(stdout, " %zx", ip.functionIndex);
-            if (ip.fileIndex) {
-                fprintf(stdout, " %zx %x", ip.fileIndex, ip.line);
+        if (ip.frame.functionIndex || ip.frame.fileIndex) {
+            fprintf(stdout, " %zx", ip.frame.functionIndex);
+            if (ip.frame.fileIndex) {
+                fprintf(stdout, " %zx %x", ip.frame.fileIndex, ip.frame.line);
+                for (const auto& inlined : ip.inlined) {
+                    fprintf(stdout, " %zx %zx %x", inlined.functionIndex, inlined.fileIndex, inlined.line);
+                }
             }
         }
         fputc('\n', stdout);

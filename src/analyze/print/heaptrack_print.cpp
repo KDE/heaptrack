@@ -152,11 +152,19 @@ struct Printer final : public AccumulatedTraceData
                                         auto node = findTrace(allocation.traceIndex);
                                         while (node.ipIndex) {
                                             const auto& ip = findIp(node.ipIndex);
-                                            if (isStopIndex(ip.functionIndex)) {
+                                            if (isStopIndex(ip.frame.functionIndex)) {
                                                 break;
                                             }
-                                            if (stringify(ip.functionIndex).find(filterBtFunction) != string::npos) {
+                                            auto matchFunction = [this](const Frame& frame) {
+                                                return stringify(frame.functionIndex).find(filterBtFunction) != string::npos;
+                                            };
+                                            if (matchFunction(ip.frame)) {
                                                 return false;
+                                            }
+                                            for (const auto& inlined : ip.inlined) {
+                                                if (matchFunction(inlined)) {
+                                                    return false;
+                                                }
                                             }
                                             node = findTrace(node.parentIndex);
                                         };
@@ -181,28 +189,36 @@ struct Printer final : public AccumulatedTraceData
     {
         printIndent(out, indent);
 
-        if (ip.functionIndex) {
-            out << prettyFunction(stringify(ip.functionIndex));
+        if (ip.frame.functionIndex) {
+            out << prettyFunction(stringify(ip.frame.functionIndex));
         } else {
             out << "0x" << hex << ip.instructionPointer << dec;
         }
 
         if (flameGraph) {
             // only print the file name but nothing else
-            if (ip.fileIndex) {
-                const auto& file = stringify(ip.fileIndex);
+            auto printFile = [this, &out](FileIndex fileIndex) {
+                const auto& file = stringify(fileIndex);
                 auto idx = file.find_last_of('/') + 1;
                 out << " (" << file.substr(idx) << ")";
+            };
+            if (ip.frame.fileIndex) {
+                printFile(ip.frame.fileIndex);
             }
             out << ';';
+            for (const auto& inlined : ip.inlined) {
+                out << prettyFunction(stringify(inlined.functionIndex));
+                printFile(inlined.fileIndex);
+                out << ';';
+            }
             return;
         }
 
         out << '\n';
         printIndent(out, indent + 1);
 
-        if (ip.fileIndex) {
-            out << "at " << stringify(ip.fileIndex) << ':' << ip.line << '\n';
+        if (ip.frame.fileIndex) {
+            out << "at " << stringify(ip.frame.fileIndex) << ':' << ip.frame.line << '\n';
             printIndent(out, indent + 1);
         }
 
@@ -212,6 +228,13 @@ struct Printer final : public AccumulatedTraceData
             out << "in ??";
         }
         out << '\n';
+
+        for (const auto& inlined : ip.inlined) {
+            printIndent(out, indent);
+            out << prettyFunction(stringify(inlined.functionIndex)) << '\n';
+            printIndent(out, indent + 1);
+            out << "at " << stringify(inlined.fileIndex) << ':' << inlined.line << '\n';
+        }
     }
 
     void printBacktrace(const TraceIndex traceIndex, ostream& out, const size_t indent = 0,
@@ -233,7 +256,7 @@ struct Printer final : public AccumulatedTraceData
             }
             skipFirst = false;
 
-            if (isStopIndex(ip.functionIndex)) {
+            if (isStopIndex(ip.frame.functionIndex)) {
                 break;
             }
 
@@ -254,7 +277,7 @@ struct Printer final : public AccumulatedTraceData
 
         const auto& ip = findIp(node.ipIndex);
 
-        if (!isStopIndex(ip.functionIndex)) {
+        if (!isStopIndex(ip.frame.functionIndex)) {
             printFlamegraph(findTrace(node.parentIndex), out);
         }
         printIp(ip, out, 0, true);
@@ -370,7 +393,7 @@ struct Printer final : public AccumulatedTraceData
         const auto ip = findIp(location);
 
         // skip anything below main
-        const bool shouldStop = isStopIndex(ip.functionIndex);
+        const bool shouldStop = isStopIndex(ip.frame.functionIndex);
         if (!shouldStop) {
             for (auto& merged : mergedAllocations) {
                 if (merged.leaked < 0) {
@@ -394,6 +417,7 @@ struct Printer final : public AccumulatedTraceData
             }
         }
 
+        // TODO: write inlined frames out to massif files
         printIndent(massifOut, depth, " ");
         massifOut << 'n' << (numAllocs + (skipped ? 1 : 0)) << ": " << heapSize;
         if (!depth) {
@@ -401,15 +425,15 @@ struct Printer final : public AccumulatedTraceData
                          "--alloc-fns, etc.\n";
         } else {
             massifOut << " 0x" << hex << ip.instructionPointer << dec << ": ";
-            if (ip.functionIndex) {
-                massifOut << stringify(ip.functionIndex);
+            if (ip.frame.functionIndex) {
+                massifOut << stringify(ip.frame.functionIndex);
             } else {
                 massifOut << "???";
             }
 
             massifOut << " (";
-            if (ip.fileIndex) {
-                massifOut << stringify(ip.fileIndex) << ':' << ip.line;
+            if (ip.frame.fileIndex) {
+                massifOut << stringify(ip.frame.fileIndex) << ':' << ip.frame.line;
             } else if (ip.moduleIndex) {
                 massifOut << stringify(ip.moduleIndex);
             } else {

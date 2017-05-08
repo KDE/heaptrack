@@ -36,20 +36,20 @@ namespace {
 // TODO: use QString directly
 struct StringCache
 {
-    QString func(const InstructionPointer& ip) const
+    QString func(const Frame& frame) const
     {
-        if (ip.functionIndex) {
+        if (frame.functionIndex) {
             // TODO: support removal of template arguments
-            return stringify(ip.functionIndex);
+            return stringify(frame.functionIndex);
         } else {
             return unresolvedFunctionName();
         }
     }
 
-    QString file(const InstructionPointer& ip) const
+    QString file(const Frame& frame) const
     {
-        if (ip.fileIndex) {
-            return stringify(ip.fileIndex);
+        if (frame.fileIndex) {
+            return stringify(frame.fileIndex);
         } else {
             return {};
         }
@@ -74,19 +74,26 @@ struct StringCache
         // first try a fast index-based lookup
         auto& location = m_locationsMap[index];
         if (!location) {
-            // slow-path, look for interned location
-            // note that we can get the same locatoin for different IPs
-            LocationData data = {func(ip), file(ip), module(ip), ip.line};
-            auto it = lower_bound(m_locations.begin(), m_locations.end(), data);
-            if (it != m_locations.end() && **it == data) {
-                // we got the location already from a different ip, cache it
-                location = *it;
-            } else {
-                // completely new location, cache it in both containers
-                auto interned = make_shared<LocationData>(data);
-                m_locations.insert(it, interned);
-                location = interned;
-            }
+            return frameLocation(ip.frame, ip.moduleIndex);
+        }
+        return location;
+    }
+
+    LocationData::Ptr frameLocation(const Frame& frame, const ModuleIndex& moduleIndex) const
+    {
+        LocationData::Ptr location;
+        // slow-path, look for interned location
+        // note that we can get the same location for different IPs
+        LocationData data = {func(frame), file(frame), stringify(moduleIndex), frame.line};
+        auto it = lower_bound(m_locations.begin(), m_locations.end(), data);
+        if (it != m_locations.end() && **it == data) {
+            // we got the location already from a different ip, cache it
+            location = *it;
+        } else {
+            // completely new location, cache it in both containers
+            auto interned = make_shared<LocationData>(data);
+            m_locations.insert(it, interned);
+            location = interned;
         }
         return location;
     }
@@ -180,7 +187,7 @@ struct ParserData final : public AccumulatedTraceData
                 }
                 const auto ip = alloc.ip;
                 (labelIds[ip].*label) = i + 1;
-                const auto function = stringCache.func(findIp(ip));
+                const auto function = stringCache.func(findIp(ip).frame);
                 data->labels[i + 1] = function;
             }
         };
@@ -308,6 +315,15 @@ void setParents(QVector<RowData>& children, const RowData* parent)
 TreeData mergeAllocations(const ParserData& data)
 {
     TreeData topRows;
+    auto addRow = [](TreeData* rows, const LocationData::Ptr& location, const Allocation& cost) -> TreeData* {
+        auto it = lower_bound(rows->begin(), rows->end(), location);
+        if (it != rows->end() && it->location == location) {
+            it->cost += cost;
+        } else {
+            it = rows->insert(it, {cost, location, nullptr, {}});
+        }
+        return &it->children;
+    };
     // merge allocations, leave parent pointers invalid (their location may change)
     for (const auto& allocation : data.allocations) {
         auto traceIndex = allocation.traceIndex;
@@ -316,18 +332,15 @@ TreeData mergeAllocations(const ParserData& data)
             const auto& trace = data.findTrace(traceIndex);
             const auto& ip = data.findIp(trace.ipIndex);
             auto location = data.stringCache.location(trace.ipIndex, ip);
-
-            auto it = lower_bound(rows->begin(), rows->end(), location);
-            if (it != rows->end() && it->location == location) {
-                it->cost += allocation;
-            } else {
-                it = rows->insert(it, {allocation, location, nullptr, {}});
+            rows = addRow(rows, location, allocation);
+            for (const auto& inlined : ip.inlined) {
+                auto inlinedLocation = data.stringCache.frameLocation(inlined, ip.moduleIndex);
+                rows = addRow(rows, inlinedLocation, allocation);
             }
-            if (data.isStopIndex(ip.functionIndex)) {
+            if (data.isStopIndex(ip.frame.functionIndex)) {
                 break;
             }
             traceIndex = trace.parentIndex;
-            rows = &it->children;
         }
     }
     // now set the parents, the data is constant from here on
