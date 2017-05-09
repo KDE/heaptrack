@@ -312,6 +312,9 @@ struct Printer final : public AccumulatedTraceData
             int64_t handled = 0;
             for (size_t j = 0; j < min(subPeakLimit, allocation.traces.size()); ++j) {
                 const auto& trace = allocation.traces[j];
+                if (!(trace.*member)) {
+                    break;
+                }
                 sublabel(trace);
                 handled += trace.*member;
                 printBacktrace(trace.traceIndex, cout, 2, true);
