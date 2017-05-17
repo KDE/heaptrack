@@ -58,10 +58,28 @@ bool TopProxy::filterAcceptsRow(int source_row, const QModelIndex& source_parent
         // only show top rows
         return false;
     }
-    if (!sourceModel()->index(source_row, toSource(m_type)).data(TreeModel::SortRole).toULongLong()) {
+    const auto index = sourceModel()->index(source_row, toSource(m_type));
+    const auto cost = index.data(TreeModel::SortRole).toLongLong();
+    if (cost < m_costThreshold) {
         // don't show rows that didn't leak anything, or didn't trigger any
         // temporary allocations
+        // in general, hide anything that's not really interesting
         return false;
     }
     return true;
+}
+
+void TopProxy::setSourceModel(QAbstractItemModel* sourceModel)
+{
+    QSortFilterProxyModel::setSourceModel(sourceModel);
+    connect(sourceModel, &QAbstractItemModel::modelReset,
+            this, &TopProxy::updateCostThreshold, Qt::UniqueConnection);
+    updateCostThreshold();
+}
+
+void TopProxy::updateCostThreshold()
+{
+    // hide anything below 1% of the max cost
+    m_costThreshold = sourceModel()->index(0, toSource(m_type)).data(TreeModel::MaxCostRole).toLongLong() * 0.01;
+    invalidate();
 }
