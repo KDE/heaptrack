@@ -720,12 +720,12 @@ int main(int argc, char** argv)
         data.printAllocations(&AllocationData::temporary,
                               [](const AllocationData& data) {
                                   cout << data.temporary << " temporary allocations of " << data.allocations
-                                       << " allocations in total (" << setprecision(2)
+                                       << " allocations in total (" << fixed << setprecision(2)
                                        << (float(data.temporary) * 100.f / data.allocations) << "%) from\n";
                               },
                               [](const AllocationData& data) {
                                   cout << data.temporary << " temporary allocations of " << data.allocations
-                                       << " allocations in total (" << setprecision(2)
+                                       << " allocations in total (" << fixed << setprecision(2)
                                        << (float(data.temporary) * 100.f / data.allocations) << "%) from:\n";
                               });
         cout << endl;
