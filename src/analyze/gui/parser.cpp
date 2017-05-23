@@ -74,7 +74,7 @@ struct StringCache
         // first try a fast index-based lookup
         auto& location = m_locationsMap[index];
         if (!location) {
-            return frameLocation(ip.frame, ip.moduleIndex);
+            location = frameLocation(ip.frame, ip.moduleIndex);
         }
         return location;
     }
