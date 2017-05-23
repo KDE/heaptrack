@@ -22,5 +22,11 @@
 
 QString Util::formatTime(qint64 ms)
 {
-    return QString::number(double(ms) / 1000, 'g', 3) + QLatin1Char('s');
+    if (ms > 60000) {
+        // minutes
+        return QString::number(double(ms) / 60000, 'g', 3) + QLatin1String("min");
+    } else {
+        // seconds
+        return QString::number(double(ms) / 1000, 'g', 3) + QLatin1Char('s');
+    }
 }
