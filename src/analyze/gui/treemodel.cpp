@@ -123,9 +123,9 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
                         "are directly followed by a free "
                         "without any other allocations in-between.</qt>");
         case PeakColumn:
-            return i18n("<qt>The maximum heap memory in bytes consumed from "
-                        "allocations originating at this location. "
-                        "This takes deallocations into account.</qt>");
+            return i18n("<qt>The contributions from a given location to the maximum heap "
+                        "memory consumption in bytes. This takes deallocations "
+                        "into account.</qt>");
         case LeakedColumn:
             return i18n("<qt>The bytes allocated at this location that have not been "
                         "deallocated.</qt>");
@@ -227,7 +227,7 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             QString::number(double(row->cost.temporary) * 100. / m_maxCost.cost.temporary, 'g', 3);
         stream << i18n("allocated: %1 (%2% of total)\n",
                        format.formatByteSize(row->cost.allocated, 1, KFormat::MetricBinaryDialect), allocatedFraction);
-        stream << i18n("peak: %1 (%2% of total)\n",
+        stream << i18n("peak contribution: %1 (%2% of total)\n",
                        format.formatByteSize(row->cost.peak, 1, KFormat::MetricBinaryDialect), peakFraction);
         stream << i18n("leaked: %1 (%2% of total)\n",
                        format.formatByteSize(row->cost.leaked, 1, KFormat::MetricBinaryDialect), leakedFraction);

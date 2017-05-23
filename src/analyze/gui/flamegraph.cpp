@@ -226,7 +226,7 @@ QString FrameGraphicsItem::description() const
         tooltip =
             i18nc("%1: peak consumption in bytes, %2: relative number, %3: "
                   "function label",
-                  "%1 (%2%) peak consumption in %3 and below.",
+                  "%1 (%2%) contribution to peak consumption in %3 and below.",
                   format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, function);
         break;
     case Leaked:
@@ -373,7 +373,7 @@ FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type,
         label = i18n("%1 temporary allocations in total", totalCost);
         break;
     case Peak:
-        label = i18n("%1 peak consumption in total", format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
+        label = i18n("%1 contribution to peak consumption", format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
         break;
     case Leaked:
         label = i18n("%1 leaked in total", format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
@@ -443,8 +443,8 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
                                       "Allocations are marked as temporary when they are immediately "
                                       "followed by their deallocation."),
                               Qt::ToolTipRole);
-    m_costSource->addItem(i18n("Peak Consumption"), QVariant::fromValue(Peak));
-    m_costSource->setItemData(2, i18n("Show a flame graph over the peak heap "
+    m_costSource->addItem(i18n("Memory Peak"), QVariant::fromValue(Peak));
+    m_costSource->setItemData(2, i18n("Show a flame graph over the contributions to the peak heap "
                                       "memory consumption of your application."),
                               Qt::ToolTipRole);
     m_costSource->addItem(i18n("Leaked"), QVariant::fromValue(Leaked));

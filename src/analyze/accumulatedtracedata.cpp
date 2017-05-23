@@ -257,9 +257,6 @@ bool AccumulatedTraceData::read(istream& in)
             allocation.leaked += info.size;
             allocation.allocated += info.size;
             ++allocation.allocations;
-            if (allocation.leaked > allocation.peak) {
-                allocation.peak = allocation.leaked;
-            }
 
             ++totalCost.allocations;
             totalCost.allocated += info.size;
@@ -267,6 +264,9 @@ bool AccumulatedTraceData::read(istream& in)
             if (totalCost.leaked > totalCost.peak) {
                 totalCost.peak = totalCost.leaked;
                 peakTime = timeStamp;
+                for (auto& allocation : allocations) {
+                    allocation.peak = allocation.leaked;
+                }
             }
 
             handleAllocation(info, allocationIndex);

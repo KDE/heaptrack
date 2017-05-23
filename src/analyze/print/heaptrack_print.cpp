@@ -676,18 +676,7 @@ int main(int argc, char** argv)
     }
 
     if (printPeaks) {
-        /// FIXME: find a way to merge this without breaking temporal dependency.
-        /// I.e. a given function could be called N times from different places
-        /// and allocate M bytes each, but free it thereafter.
-        /// Then the below would give a wrong total peak size of N * M instead
-        /// of just N!
         cout << "PEAK MEMORY CONSUMERS\n";
-        if (data.mergeBacktraces) {
-            cout << "\nWARNING - the data below is not an accurate calculation of"
-                    " the total peak consumption and can easily be wrong.\n"
-                    " For an accurate overview, disable backtrace merging.\n";
-        }
-
         data.printAllocations(&AllocationData::peak,
                               [](const AllocationData& data) {
                                   cout << formatBytes(data.peak) << " peak memory consumed over " << data.allocations
@@ -697,6 +686,7 @@ int main(int argc, char** argv)
                                   cout << formatBytes(data.peak) << " consumed over " << data.allocations
                                        << " calls from:\n";
                               });
+        cout << endl;
     }
 
     if (printLeaks) {

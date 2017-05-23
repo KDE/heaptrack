@@ -18,6 +18,11 @@ target_link_libraries(signals ${CMAKE_THREAD_LIBS_INIT})
 
 add_executable(libc_leaks libc_leaks.c)
 
+add_executable(peak peak.c)
+set_target_properties(peak PROPERTIES
+    COMPILE_FLAGS "-g3 -O0"
+)
+
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 add_executable(inlining inlining.cpp)

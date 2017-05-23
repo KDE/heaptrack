@@ -317,7 +317,7 @@
                       <string>List of functions that allocated the most memory at a given time.</string>
                      </property>
                      <property name="text">
-                      <string>Highest Memory Peaks</string>
+                      <string>Peak Contributions</string>
                      </property>
                      <property name="alignment">
                       <set>Qt::AlignCenter</set>
