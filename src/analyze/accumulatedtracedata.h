@@ -119,6 +119,7 @@ struct AccumulatedTraceData
     bool fromAttached = false;
 
     std::vector<Allocation> allocations;
+    std::vector<uint64_t> peakCosts;
     AllocationData totalCost;
     int64_t totalTime = 0;
     int64_t peakTime = 0;

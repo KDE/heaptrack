@@ -264,8 +264,12 @@ bool AccumulatedTraceData::read(istream& in)
             if (totalCost.leaked > totalCost.peak) {
                 totalCost.peak = totalCost.leaked;
                 peakTime = timeStamp;
+                peakCosts.reserve(allocations.capacity());
+                peakCosts.resize(allocations.size(), 0);
+                auto peakIt = peakCosts.begin();
                 for (auto& allocation : allocations) {
-                    allocation.peak = allocation.leaked;
+                    *peakIt = allocation.leaked;
+                    ++peakIt;
                 }
             }
 
@@ -366,6 +370,12 @@ bool AccumulatedTraceData::read(istream& in)
     }
 
     handleTimeStamp(timeStamp, totalTime);
+
+    auto allocationIt = allocations.begin();
+    for (const auto peak : peakCosts) {
+        allocationIt->peak = peak;
+        ++allocationIt;
+    }
 
     return true;
 }
