@@ -169,6 +169,19 @@ bool AccumulatedTraceData::read(istream& in)
     // allocations, i.e. when a deallocation follows with the same data
     uint64_t lastAllocationPtr = 0;
 
+    bool lastAllocationWasPeak = false;
+    auto updatePeakCosts = [this, reparsing, &lastAllocationWasPeak]() {
+        if (!reparsing && lastAllocationWasPeak) {
+            peakCosts.reserve(allocations.capacity());
+            peakCosts.resize(allocations.size(), 0);
+            auto peakIt = peakCosts.begin();
+            for (auto& allocation : allocations) {
+                *peakIt = allocation.leaked;
+                ++peakIt;
+            }
+        }
+        lastAllocationWasPeak = false;
+    };
     while (reader.getLine(in)) {
         if (reader.mode() == 's') {
             if (reparsing) {
@@ -264,19 +277,13 @@ bool AccumulatedTraceData::read(istream& in)
             if (totalCost.leaked > totalCost.peak) {
                 totalCost.peak = totalCost.leaked;
                 peakTime = timeStamp;
-                if (!reparsing) {
-                    peakCosts.reserve(allocations.capacity());
-                    peakCosts.resize(allocations.size(), 0);
-                    auto peakIt = peakCosts.begin();
-                    for (auto& allocation : allocations) {
-                        *peakIt = allocation.leaked;
-                        ++peakIt;
-                    }
-                }
+                lastAllocationWasPeak = true;
             }
 
             handleAllocation(info, allocationIndex);
         } else if (reader.mode() == '-') {
+            updatePeakCosts();
+
             AllocationIndex allocationInfoIndex;
             bool temporary = false;
             if (fileVersion >= 1) {
@@ -367,6 +374,7 @@ bool AccumulatedTraceData::read(istream& in)
         }
     }
 
+    updatePeakCosts();
     if (!reparsing) {
         totalTime = timeStamp + 1;
     }
