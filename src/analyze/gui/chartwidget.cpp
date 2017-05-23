@@ -37,6 +37,7 @@
 
 #include "chartmodel.h"
 #include "chartproxy.h"
+#include "util.h"
 
 using namespace KChart;
 
@@ -52,8 +53,7 @@ public:
 
     const QString customizedLabel(const QString& label) const override
     {
-        // squeeze large numbers here
-        return QString::number(label.toDouble() / 1000, 'g', 2) + QLatin1Char('s');
+        return Util::formatTime(label.toLongLong());
     }
 };
 

@@ -28,6 +28,7 @@ set(SRCFILES
     stacksmodel.cpp
     topproxy.cpp
     callercalleemodel.cpp
+    util.cpp
 )
 
 set(LIBRARIES
