@@ -111,7 +111,13 @@ struct AccumulatedTraceData
     std::string prettyFunction(const std::string& function) const;
 
     bool read(const std::string& inputFile);
-    bool read(std::istream& in);
+    enum ParsePass {
+        FirstPass,
+        SecondPass,
+        ThirdPass
+    };
+    bool read(const std::string& inputFile, const ParsePass pass);
+    bool read(std::istream& in, const ParsePass pass);
 
     void diff(const AccumulatedTraceData& base);
 
@@ -119,7 +125,6 @@ struct AccumulatedTraceData
     bool fromAttached = false;
 
     std::vector<Allocation> allocations;
-    std::vector<uint64_t> peakCosts;
     AllocationData totalCost;
     int64_t totalTime = 0;
     int64_t peakTime = 0;

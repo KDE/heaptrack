@@ -119,6 +119,15 @@ string AccumulatedTraceData::prettyFunction(const string& function) const
 
 bool AccumulatedTraceData::read(const string& inputFile)
 {
+    if (totalTime == 0) {
+        return read(inputFile, FirstPass) && read(inputFile, SecondPass);
+    } else {
+        return read(inputFile, ThirdPass);
+    }
+}
+
+bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass)
+{
     const bool isCompressed = boost::algorithm::ends_with(inputFile, ".gz");
     ifstream file(inputFile, isCompressed ? ios_base::in | ios_base::binary : ios_base::in);
 
@@ -132,10 +141,11 @@ bool AccumulatedTraceData::read(const string& inputFile)
         in.push(boost::iostreams::gzip_decompressor());
     }
     in.push(file);
-    return read(in);
+
+    return read(in, pass);
 }
 
-bool AccumulatedTraceData::read(istream& in)
+bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
 {
     LineReader reader;
     int64_t timeStamp = 0;
@@ -151,7 +161,9 @@ bool AccumulatedTraceData::read(istream& in)
 
     vector<string> stopStrings = {"main", "__libc_start_main", "__static_initialization_and_destruction_0"};
 
-    const bool reparsing = totalTime != 0;
+    const auto lastPeakCost = pass != FirstPass ? totalCost.peak : 0;
+    const auto lastPeakTime = pass != FirstPass ? peakTime : 0;
+
     m_maxAllocationTraceIndex.index = 0;
     totalCost = {};
     peakTime = 0;
@@ -169,22 +181,9 @@ bool AccumulatedTraceData::read(istream& in)
     // allocations, i.e. when a deallocation follows with the same data
     uint64_t lastAllocationPtr = 0;
 
-    bool lastAllocationWasPeak = false;
-    auto updatePeakCosts = [this, reparsing, &lastAllocationWasPeak]() {
-        if (!reparsing && lastAllocationWasPeak) {
-            peakCosts.reserve(allocations.capacity());
-            peakCosts.resize(allocations.size(), 0);
-            auto peakIt = peakCosts.begin();
-            for (auto& allocation : allocations) {
-                *peakIt = allocation.leaked;
-                ++peakIt;
-            }
-        }
-        lastAllocationWasPeak = false;
-    };
     while (reader.getLine(in)) {
         if (reader.mode() == 's') {
-            if (reparsing) {
+            if (pass != FirstPass) {
                 continue;
             }
             strings.push_back(reader.line().substr(2));
@@ -203,7 +202,7 @@ bool AccumulatedTraceData::read(istream& in)
                 }
             }
         } else if (reader.mode() == 't') {
-            if (reparsing) {
+            if (pass != FirstPass) {
                 continue;
             }
             TraceNode node;
@@ -215,7 +214,7 @@ bool AccumulatedTraceData::read(istream& in)
             }
             traces.push_back(node);
         } else if (reader.mode() == 'i') {
-            if (reparsing) {
+            if (pass != FirstPass) {
                 continue;
             }
             InstructionPointer ip;
@@ -266,10 +265,14 @@ bool AccumulatedTraceData::read(istream& in)
                 lastAllocationPtr = ptr;
             }
 
-            auto& allocation = findAllocation(info.traceIndex);
-            allocation.leaked += info.size;
-            allocation.allocated += info.size;
-            ++allocation.allocations;
+            if (pass != FirstPass) {
+                auto& allocation = findAllocation(info.traceIndex);
+                allocation.leaked += info.size;
+                allocation.allocated += info.size;
+                ++allocation.allocations;
+
+                handleAllocation(info, allocationIndex);
+            }
 
             ++totalCost.allocations;
             totalCost.allocated += info.size;
@@ -277,13 +280,14 @@ bool AccumulatedTraceData::read(istream& in)
             if (totalCost.leaked > totalCost.peak) {
                 totalCost.peak = totalCost.leaked;
                 peakTime = timeStamp;
-                lastAllocationWasPeak = true;
+
+                if (pass == SecondPass && totalCost.peak == lastPeakCost && peakTime == lastPeakTime) {
+                    for (auto& allocation : allocations) {
+                        allocation.peak = allocation.leaked;
+                    }
+                }
             }
-
-            handleAllocation(info, allocationIndex);
         } else if (reader.mode() == '-') {
-            updatePeakCosts();
-
             AllocationIndex allocationInfoIndex;
             bool temporary = false;
             if (fileVersion >= 1) {
@@ -309,15 +313,20 @@ bool AccumulatedTraceData::read(istream& in)
             lastAllocationPtr = 0;
 
             const auto& info = allocationInfos[allocationInfoIndex.index];
-            auto& allocation = findAllocation(info.traceIndex);
-            allocation.leaked -= info.size;
             totalCost.leaked -= info.size;
             if (temporary) {
-                ++allocation.temporary;
                 ++totalCost.temporary;
             }
+
+            if (pass != FirstPass) {
+                auto& allocation = findAllocation(info.traceIndex);
+                allocation.leaked -= info.size;
+                if (temporary) {
+                    ++allocation.temporary;
+                }
+            }
         } else if (reader.mode() == 'a') {
-            if (reparsing) {
+            if (pass != FirstPass) {
                 continue;
             }
             AllocationInfo info;
@@ -335,7 +344,9 @@ bool AccumulatedTraceData::read(istream& in)
                 cerr << "Failed to read time stamp: " << reader.line() << endl;
                 continue;
             }
-            handleTimeStamp(timeStamp, newStamp);
+            if (pass != FirstPass) {
+                handleTimeStamp(timeStamp, newStamp);
+            }
             timeStamp = newStamp;
         } else if (reader.mode() == 'R') { // RSS timestamp
             int64_t rss = 0;
@@ -344,7 +355,9 @@ bool AccumulatedTraceData::read(istream& in)
                 peakRSS = rss;
             }
         } else if (reader.mode() == 'X') {
-            handleDebuggee(reader.line().c_str() + 2);
+            if (pass != FirstPass) {
+                handleDebuggee(reader.line().c_str() + 2);
+            }
         } else if (reader.mode() == 'A') {
             totalCost = {};
             fromAttached = true;
@@ -374,17 +387,10 @@ bool AccumulatedTraceData::read(istream& in)
         }
     }
 
-    updatePeakCosts();
-    if (!reparsing) {
+    if (pass == FirstPass) {
         totalTime = timeStamp + 1;
-    }
-
-    handleTimeStamp(timeStamp, totalTime);
-
-    auto allocationIt = allocations.begin();
-    for (const auto peak : peakCosts) {
-        allocationIt->peak = peak;
-        ++allocationIt;
+    } else {
+        handleTimeStamp(timeStamp, totalTime);
     }
 
     return true;
