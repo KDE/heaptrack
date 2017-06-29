@@ -536,7 +536,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     addAction(m_backAction);
     m_forwardAction = KStandardAction::forward(this, SLOT(navigateForward()), this);
     addAction(m_forwardAction);
-    m_resetAction = new QAction(QIcon::fromTheme(QStringLiteral("go-first")), tr("Reset View"), this);
+    m_resetAction = new QAction(QIcon::fromTheme(QStringLiteral("go-first")), i18n("Reset View"), this);
     m_resetAction->setShortcut(Qt::Key_Escape);
     connect(m_resetAction, &QAction::triggered, this, [this]() {
         selectItem(0);
