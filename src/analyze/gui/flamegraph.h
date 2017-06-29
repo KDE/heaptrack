@@ -57,6 +57,7 @@ private:
     void setTooltipItem(const FrameGraphicsItem* item);
     void updateTooltip();
     void showData();
+    void selectItem(int item);
     void selectItem(FrameGraphicsItem* item);
     void updateNavigationActions();
 
@@ -71,6 +72,7 @@ private:
     QLineEdit* m_searchInput = nullptr;
     QAction* m_forwardAction = nullptr;
     QAction* m_backAction = nullptr;
+    QAction* m_resetAction = nullptr;
     const FrameGraphicsItem* m_tooltipItem = nullptr;
     FrameGraphicsItem* m_rootItem = nullptr;
     QVector<FrameGraphicsItem*> m_selectionHistory;
