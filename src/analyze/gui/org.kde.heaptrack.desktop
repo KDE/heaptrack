@@ -4,7 +4,7 @@ Type=Application
 Exec=heaptrack_gui %u
 MimeType=application/x-heaptrack;
 # FIXME: get an icon!
-Icon=office-chart-area
+Icon=heaptrack
 # FIXME: write docs!
 # X-DocPath=kcachegrind/index.html
 Terminal=false

@@ -87,3 +87,16 @@ install(PROGRAMS org.kde.heaptrack.desktop
 install(FILES org.kde.heaptrack.appdata.xml
     DESTINATION ${KDE_INSTALL_METAINFODIR}
 )
+
+include(ECMInstallIcons)
+ecm_install_icons(ICONS
+  16-apps-heaptrack.png
+  22-apps-heaptrack.png
+  32-apps-heaptrack.png
+  48-apps-heaptrack.png
+  64-apps-heaptrack.png
+  128-apps-heaptrack.png
+  sc-apps-heaptrack.svg
+  DESTINATION ${KDE_INSTALL_ICONDIR}
+  THEME hicolor
+)
