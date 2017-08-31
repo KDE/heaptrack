@@ -29,4 +29,8 @@
 
 #define HEAPTRACK_DEBUG_BUILD @HEAPTRACK_DEBUG_BUILD@
 
+// cfree() does not exist in glibc 2.26+.
+// See: https://bugs.kde.org/show_bug.cgi?id=383889
+#cmakedefine01 HAVE_CFREE
+
 #endif // HEAPTRACK_CONFIG_H

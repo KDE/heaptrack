@@ -73,6 +73,11 @@ if (NOT HAVE_LINUX_HEADERS)
     message(FATAL_ERROR "You are missing some Linux headers required to compile heaptrack.")
 endif()
 
+# cfree() does not exist in glibc 2.26+.
+# See: https://bugs.kde.org/show_bug.cgi?id=383889
+include(CheckSymbolExists)
+check_symbol_exists(cfree malloc.h HAVE_CFREE)
+
 set(BIN_INSTALL_DIR "bin")
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
 set(LIB_INSTALL_DIR "lib${LIB_SUFFIX}")

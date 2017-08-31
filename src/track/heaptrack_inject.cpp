@@ -17,6 +17,7 @@
  */
 
 #include "libheaptrack.h"
+#include "util/config.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -40,12 +41,6 @@
 #define ELF_R_SYM(i) ELF32_R_SYM(i)
 #else
 #error unsupported word size
-#endif
-
-#if defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(__USE_MISC)
-#define HAVE_CFREE 1
-#else
-#define HAVE_CFREE 0
 #endif
 
 namespace {

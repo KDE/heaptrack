@@ -17,6 +17,7 @@
  */
 
 #include "libheaptrack.h"
+#include "util/config.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -32,11 +33,6 @@ using namespace std;
 #  define HAVE_ALIGNED_ALLOC 1
 #else
 #  define HAVE_ALIGNED_ALLOC 0
-#endif
-#if defined(_BSD_SOURCE) || defined(_SVID_SOURCE) || defined(__USE_MISC)
-#  define HAVE_CFREE 1
-#else
-#  define HAVE_CFREE 0
 #endif
 
 extern "C" {

@@ -2,6 +2,10 @@ set(CMAKE_BUILD_TYPE Debug)
 
 add_executable(test_c test.c)
 add_executable(test_cpp test.cpp)
+set_target_properties(test_cpp PROPERTIES
+  INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR}/../../src/
+)
+
 add_executable(threaded threaded.cpp)
 target_link_libraries(threaded ${CMAKE_THREAD_LIBS_INIT})
 

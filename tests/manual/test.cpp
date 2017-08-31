@@ -19,6 +19,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+#include "util/config.h"
+
 #if defined(_ISOC11_SOURCE)
 #  define HAVE_ALIGNED_ALLOC 1
 #else
@@ -82,7 +84,11 @@ int main()
 
     buf = calloc(5, 5);
     printf("calloc: %p\n", buf);
+#if HAVE_CFREE
     cfree(buf);
+#else
+    free(buf);
+#endif
 
 #if HAVE_ALIGNED_ALLOC
     buf = aligned_alloc(16, 160);
