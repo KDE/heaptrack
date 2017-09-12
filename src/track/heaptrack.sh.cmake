@@ -103,7 +103,7 @@ while true; do
             ;;
         "-a" | "--analyze")
             shift 1
-            if [ "$(which heaptrack_gui 2> /dev/null)" != "" ]; then
+            if [ -x "$EXE_PATH/heaptrack_gui" ]; then
                 $EXE_PATH/heaptrack_gui $@
                 exit
             else
