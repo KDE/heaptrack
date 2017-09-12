@@ -21,6 +21,7 @@
 usage() {
     echo "Usage: $0 [--debug|-d] DEBUGGEE [ARGUMENT]..."
     echo "or:    $0 [--debug|-d] -p PID"
+    echo "or:    $0 -a FILE"
     echo
     echo "A heap memory usage profiler. It uses LD_PRELOAD to track all"
     echo "calls to the core memory allocation functions and logs these"
@@ -52,12 +53,20 @@ usage() {
     echo "  -h, --help     Show this help message and exit."
     echo "  -v, --version  Displays version information."
     echo
+    echo "Alternatively, to analyze a recorded heaptrack data file:"
+    echo "  -a, --analyze FILE    Open the heaptrack data file in heaptrack_gui, if available,"
+    echo "                        or fallback to heaptrack_print otherwise."
+    echo "                        Any options passed after --analyze will be passed along."
+    echo
     exit 0
 }
 
 debug=
 pid=
 client=
+
+# path to current heaptrack.sh executable
+EXE_PATH=$(readlink -f $(dirname $(readlink -f $0)))
 
 while true; do
     case "$1" in
@@ -92,6 +101,18 @@ while true; do
             echo "heaptrack @HEAPTRACK_VERSION_MAJOR@.@HEAPTRACK_VERSION_MINOR@.@HEAPTRACK_VERSION_PATCH@"
             exit 0
             ;;
+        "-a" | "--analyze")
+            shift 1
+            # ensure the current EXE_DIR is in the PATH
+            PATH=$PATH:$EXE_PATH
+            if [ "$(which heaptrack_gui 2> /dev/null)" != "" ]; then
+                heaptrack_gui $@
+                exit
+            else
+                heaptrack_print $@
+                exit
+            fi
+            ;;
         *)
             if [ "$1" = "--" ]; then
                 shift 1
@@ -113,7 +134,6 @@ done
 output=$(pwd)/heaptrack.$(basename "$client").$$
 
 # find preload library and interpreter executable using relative paths
-EXE_PATH=$(readlink -f $(dirname $(readlink -f $0)))
 LIB_REL_PATH="@LIB_REL_PATH@"
 LIBEXEC_REL_PATH="@LIBEXEC_REL_PATH@"
 
@@ -162,11 +182,7 @@ cleanup() {
 
     echo "Heaptrack finished! Now run the following to investigate the data:"
     echo
-    if [ "$(which heaptrack_gui 2> /dev/null)" != "" ]; then
-        echo "  heaptrack_gui \"$output\""
-    else
-        echo "  heaptrack_print \"$output\" | less"
-    fi
+    echo "  heaptrack --analyze \"$output\""
 }
 trap cleanup EXIT
 
