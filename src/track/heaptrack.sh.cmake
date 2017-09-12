@@ -24,7 +24,7 @@ usage() {
     echo
     echo "A heap memory usage profiler. It uses LD_PRELOAD to track all"
     echo "calls to the core memory allocation functions and logs these"
-    echo "occurrances. Additionally, backtraces are obtained and logged."
+    echo "occurrences. Additionally, backtraces are obtained and logged."
     echo "Combined this can give interesting answers to questions such as:"
     echo
     echo "  * How much heap memory is my application using?"
