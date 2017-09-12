@@ -103,13 +103,11 @@ while true; do
             ;;
         "-a" | "--analyze")
             shift 1
-            # ensure the current EXE_DIR is in the PATH
-            PATH=$PATH:$EXE_PATH
             if [ "$(which heaptrack_gui 2> /dev/null)" != "" ]; then
-                heaptrack_gui $@
+                $EXE_PATH/heaptrack_gui $@
                 exit
             else
-                heaptrack_print $@
+                $EXE_PATH/heaptrack_print $@
                 exit
             fi
             ;;
