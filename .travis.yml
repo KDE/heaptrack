@@ -1,0 +1,59 @@
+language: cpp
+compiler: gcc
+sudo: require
+dist: trusty
+
+before_install:
+  - sudo add-apt-repository ppa:beineri/opt-qt59-trusty -y
+  - sudo apt-get update -qq
+
+install:
+  - sudo apt-get -y install qt59base qt59svg qt59x11extras libdwarf-dev libboost-iostreams-dev libboost-program-options-dev
+  - source /opt/qt*/bin/qt*-env.sh
+  - git clone git://anongit.kde.org/extra-cmake-modules
+  - cd extra-cmake-modules
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - sudo make install
+  - cd ../..
+  - # Precompiled KF5
+  - wget -c "https://github.com/chigraph/precompiled-kf5-linux/releases/download/precompiled/kf5-gcc6-linux64-release.tar.xz"
+  - tar xf kf5-gcc6-linux64-release.tar.xz
+  - sudo cp -Rf root/kf5-release/* /opt/qt*/
+  - # Precompiled kdiagram
+  - wget -c "https://swanson.kdab.com/owncloud/index.php/s/bZmRRXAKd54ROKd/download" -O kdiagram.tar.bz2
+  - tar xf kdiagram.tar.bz2
+  - sudo cp -Rf kdiagram-*/opt/qt* /opt/
+  - # Precompiled version of libunwind in newer version (1.)2
+  - wget -c "https://swanson.kdab.com/owncloud/index.php/s/ZETvRRZ7J5Nllo5/download" -O libunwind.tar.bz2
+  - tar xf libunwind.tar.bz2
+  - sudo cp -Rf libunwind-*/usr/* /usr/
+  - # Get AppImage tools
+  - wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+  - chmod a+x linuxdeployqt*.AppImage
+  - sudo mv linuxdeployqt*.AppImage /usr/bin/linuxdeployqt
+  - wget -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+  - chmod a+x appimagetool-*.AppImage
+  - sudo mv appimagetool-*.AppImage /usr/bin/appimagetool
+
+script:
+  - set -e # Exit immediately if anything fails
+  - mkdir build
+  - cd build
+  - cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+  - make -j$(nproc)
+  - make DESTDIR=appdir install
+  - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
+  - linuxdeployqt ./appdir/usr/share/applications/org.kde.heaptrack.desktop -executable=./appdir/usr/lib/heaptrack/libexec/heaptrack_interpret -executable=./appdir/usr/lib/heaptrack/libheaptrack_preload.so -executable=./appdir/usr/lib/heaptrack/libheaptrack_inject.so -bundle-non-qt-libs
+  - # Ensure we prefer the bundled libs also when calling dlopen, cf.: https://github.com/KDAB/hotspot/issues/89
+  - mv ./appdir/usr/bin/heaptrack_gui{,_bin}
+  - echo -e '#!/bin/bash\nd="$(dirname "$(readlink -f "${0}")")"\nLD_LIBRARY_PATH="$d/../lib":$LD_LIBRARY_PATH "$d/heaptrack_gui_bin" $@' > ./appdir/usr/bin/heaptrack_gui
+  - chmod +x ./appdir/usr/bin/heaptrack_gui
+  - # use the shell script as AppRun entry point
+  - rm ./appdir/AppRun
+  - ln -sr ./appdir/usr/bin/heaptrack ./appdir/AppRun
+  - # Actually create the final image
+  - appimagetool ./appdir/
+  - curl --upload-file ./Heaptrack-*.AppImage https://transfer.sh/heaptrack-git.$(git rev-parse --short HEAD)-x86_64.AppImage
