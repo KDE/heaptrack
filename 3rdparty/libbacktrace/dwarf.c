@@ -1,5 +1,5 @@
 /* dwarf.c -- Get file/line information from DWARF for backtraces.
-   Copyright (C) 2012-2016 Free Software Foundation, Inc.
+   Copyright (C) 2012-2017 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Google.
 
 Redistribution and use in source and binary forms, with or without
@@ -7,13 +7,13 @@ modification, are permitted provided that the following conditions are
 met:
 
     (1) Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer. 
+    notice, this list of conditions and the following disclaimer.
 
     (2) Redistributions in binary form must reproduce the above copyright
     notice, this list of conditions and the following disclaimer in
     the documentation and/or other materials provided with the
-    distribution.  
-    
+    distribution.
+
     (3) The name of the author may not be used to
     endorse or promote products derived from this software without
     specific prior written permission.
@@ -42,19 +42,6 @@ POSSIBILITY OF SUCH DAMAGE.  */
 
 #include "backtrace.h"
 #include "internal.h"
-
-// silence warnings arising from the stub dwarf2.h
-// see also: https://gcc.gnu.org/ml/gcc-patches/2013-05/msg00412.html
-// esp. https://gcc.gnu.org/ml/gcc-patches/2013-05/msg01095.html
-//$$$ mikesart added
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wswitch"
-#if defined(__clang__)
-#pragma GCC diagnostic ignored "-Wtautological-constant-out-of-range-compare"
-#endif
-#endif
-//$$$
 
 #if !defined(HAVE_DECL_STRNLEN) || !HAVE_DECL_STRNLEN
 
@@ -1259,7 +1246,7 @@ add_unit_ranges (struct backtrace_state *state, uintptr_t base_address,
 
 static int
 find_address_ranges (struct backtrace_state *state, uintptr_t base_address,
-		     struct dwarf_buf *unit_buf, 
+		     struct dwarf_buf *unit_buf,
 		     const unsigned char *dwarf_str, size_t dwarf_str_size,
 		     const unsigned char *dwarf_ranges,
 		     size_t dwarf_ranges_size,
@@ -1576,16 +1563,15 @@ add_line (struct backtrace_state *state, struct dwarf_data *ddata,
   return 1;
 }
 
-/* Free the line header information.  If FREE_FILENAMES is true we
-   free the file names themselves, otherwise we leave them, as there
-   may be line structures pointing to them.  */
+/* Free the line header information.  */
 
 static void
 free_line_header (struct backtrace_state *state, struct line_header *hdr,
 		  backtrace_error_callback error_callback, void *data)
 {
-  backtrace_free (state, hdr->dirs, hdr->dirs_count * sizeof (const char *),
-		  error_callback, data);
+  if (hdr->dirs_count != 0)
+    backtrace_free (state, hdr->dirs, hdr->dirs_count * sizeof (const char *),
+		    error_callback, data);
   backtrace_free (state, hdr->filenames,
 		  hdr->filenames_count * sizeof (char *),
 		  error_callback, data);
@@ -1618,7 +1604,7 @@ read_line_header (struct backtrace_state *state, struct unit *u,
 
   if (!advance (line_buf, hdrlen))
     return 0;
-  
+
   hdr->min_insn_len = read_byte (&hdr_buf);
   if (hdr->version < 4)
     hdr->max_ops_per_insn = 1;
@@ -1627,7 +1613,7 @@ read_line_header (struct backtrace_state *state, struct unit *u,
 
   /* We don't care about default_is_stmt.  */
   read_byte (&hdr_buf);
-  
+
   hdr->line_base = read_sbyte (&hdr_buf);
   hdr->line_range = read_byte (&hdr_buf);
 
@@ -1646,12 +1632,16 @@ read_line_header (struct backtrace_state *state, struct unit *u,
       ++hdr->dirs_count;
     }
 
-  hdr->dirs = ((const char **)
-	       backtrace_alloc (state,
-				hdr->dirs_count * sizeof (const char *),
-				line_buf->error_callback, line_buf->data));
-  if (hdr->dirs == NULL)
-    return 0;
+  hdr->dirs = NULL;
+  if (hdr->dirs_count != 0)
+    {
+      hdr->dirs = ((const char **)
+		   backtrace_alloc (state,
+				    hdr->dirs_count * sizeof (const char *),
+				    line_buf->error_callback, line_buf->data));
+      if (hdr->dirs == NULL)
+	return 0;
+    }
 
   i = 0;
   while (*hdr_buf.buf != '\0')

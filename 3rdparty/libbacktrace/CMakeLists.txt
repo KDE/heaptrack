@@ -120,6 +120,8 @@ else ()
 endif ()
 
 check_symbol_exists (mmap sys/mman.h HAVE_MMAP)
+check_symbol_exists(lstat sys/stat.h HAVE_LSTAT)
+check_symbol_exists(readlink unistd.h HAVE_READLINK)
 
 # NOTE: For the use-case of heaptrack, we want to use malloc for allocating
 # the tiny fragments required for reading a backtrace as we are doing this

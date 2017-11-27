@@ -1,3 +1,423 @@
+2017-11-17  Igor Tsimbalist  <igor.v.tsimbalist@intel.com>
+
+	* configure.ac: Add CET_FLAGS to EXTRA_FLAGS.
+	* aclocal.m4: Regenerate.
+	* Makefile.in: Likewise.
+	* configure: Likewise.
+
+2017-10-06  Ian Lance Taylor  <iant@golang.org>
+
+	* ztest.c (test_large): Pass unsigned long *, not size_t *, to
+	zlib uncompress function.
+
+2017-10-05  Ian Lance Taylor  <iant@golang.org>
+
+	* elf.c (elf_zlib_fetch): Change pval argument to uint64_t *.
+	Read a four byte integer.
+	(elf_zlib_inflate): Change val to uint64_t.  Align pin to a 32-bit
+	boundary before ever calling elf_zlib_fetch.
+	* ztest.c (test_large): Simplify print statements a bit.
+
+2017-10-02  Ian Lance Taylor  <iant@golang.org>
+
+	* ztest.c: #include <errno.h>.
+	(TEST_TIMING): Don't define, don't test.
+	(xclock_gettime, xclockid_t): Define if !HAVE_CLOCK_GETTIME.
+	(clockid_t, clock_gettime, CLOCK_REALTIME): Likewise.
+	(ZLIB_CLOCK_GETTIME_ARG): Define.
+	* configure.ac: Change clock_gettime_link to CLOCK_GETTIME_LINK.
+	* Makefile.am: Likewise.
+	* configure, Makefile.in: Rebuild.
+
+2017-10-02  Thomas Schwinge  <thomas@codesourcery.com>
+
+	PR other/67165
+	* Makefile.am: Append the content of clock_gettime_link to
+	ztest_LDADD.
+	* configure.ac: Test for the case that clock_gettime is in librt.
+	* Makefile.in: Regenerate.
+	* configure: Likewise.
+
+	PR other/67165
+	* configure.ac: Check for clock_gettime.
+	* config.h.in: Regenerate.
+	* configure: Likewise.
+	* ztest.c (average_time, test_large): Conditionalize test timing
+	on clock_gettime availability.
+
+2017-09-29  Tony Reix  <tony.reix@atos.net>
+
+	* xcoff.c: Initial support for DWARF debug sections in XCOFF.
+	(STYP_DWARF, SSUBTYP_DW*): Define.
+	(enum dwarf_section): Define.
+	(struct dwsect_info): Define.
+	(xcoff_add): Look for DWARF sections, pass them to
+	backtrace_dwarf_add.
+
+2017-09-28  Ian Lance Taylor  <iant@golang.org>
+
+	PR other/67165
+	* elf.c (__builtin_prefetch): Define if not __GNUC__.
+	(unlikely): Define.
+	(SHF_UNCOMPRESSED, ELFCOMPRESS_ZLIB): Define.
+	(b_elf_chdr): Define type.
+	(enum debug_section): Add ZDEBUG_xxx values.
+	(debug_section_names): Add names for new sections.
+	(struct debug_section_info): Add compressed field.
+	(elf_zlib_failed, elf_zlib_fetch): New static functions.
+	(HUFFMAN_TABLE_SIZE, HUFFMAN_VALUE_MASK): Define.
+	(HUFFMAN_BITS_SHIFT, HUFFMAN_BITS_MASK): Define.
+	(HUFFMAN_SECONDARY_SHIFT): Define.
+	(ZDEBUG_TABLE_SIZE): Define.
+	(ZDEBUG_TABLE_CODELEN_OFFSET, ZDEBUG_TABLE_WORK_OFFSET): Define.
+	(final_next_secondary): New static variable if
+	BACKTRACE_GENERATE_FIXED_HUFFMAN_TABLE.
+	(elf_zlib_inflate_table): New static function.
+	(BACKTRACE_GENERATE_FIXED_HUFFMAN_TABLE): If define, define main
+	function to produce fixed Huffman table.
+	(elf_zlib_default_table): New static variable.
+	(elf_zlib_inflate): New static function.
+	(elf_zlib_verify_checksum): Likewise.
+	(elf_zlib_inflate_and_verify): Likewise.
+	(elf_uncompress_zdebug): Likewise.
+	(elf_uncompress_chdr): Likewise.
+	(backtrace_uncompress_zdebug): New extern function.
+	(elf_add): Look for .zdebug sections and SHF_COMPRESSED debug
+	sections, and uncompress them.
+	* internal.h (backtrace_compress_zdebug): Declare.
+	* ztest.c: New file.
+	* configure.ac: Check for -lz and check whether the linker
+	supports --compress-debug-sections.
+	* Makefile.am (ztest_SOURCES): New variable.
+	(ztest_CFLAGS, ztest_LDADD): New variables.
+	(check_PROGRAMS): Add ztest.
+	(ctestg_SOURCES): New variable.
+	(ctestg_CFLAGS, ctestg_LDFLAGS, ctestg_LDADD): New variables.
+	(ctesta_SOURCES): New variable.
+	(ctesta_CFLAGS, ctesta_LDFLAGS, ctesta_LDADD): New variables.
+	(check_PROGRAMS): Add ctestg and ctesta.
+	* configure, config.h.in, Makefile.in: Rebuild.
+
+2017-09-22  Ian Lance Taylor  <iant@golang.org>
+
+	PR sanitizer/77631
+	* configure.ac: Check for lstat and readlink.
+	* elf.c (lstat, readlink): Provide dummy versions if real versions
+	are not available.
+	* configure, config.h.in: Rebuild.
+
+2017-09-21  Ian Lance Taylor  <iant@google.com>
+
+	PR go/82284
+	* elf.c (backtrace_initialize): Set pd.exe_filename.
+
+2017-09-20  Ian Lance Taylor  <iant@golang.org>
+	    Denis Khalikov  <d.khalikov@partner.samsung.com>
+
+	PR sanitizer/77631
+	Support for external debug info.
+	* elf.c: Include <errno.h>, <sys/stat.h>, <unistd.h>.
+	(S_ISLNK): Define if not defined.
+	(xstrnlen): Define if strnlen is not available.
+	(b_elf_note): Define type.
+	(NT_GNU_BUILD_ID): Define macro.
+	(elf_crc32, elf_crc32_file): New static functions.
+	(elf_is_symlink, elf_readlink): New static functions.
+	(elf_open_debugfile_by_buildid): New static function.
+	(elf_try_debugfile): New static function.
+	(elf_find_debugfile_by_debuglink): New static function.
+	(elf_open_debugfile_by_debuglink): New static function.
+	(elf_add): Add filename and debuginfo parameters.  Adjust all
+	callers.  Look for external debug info notes, and try to fetch
+	debug info from external file.
+	(struct phdr_data): Add exe_filename field.
+	(phdr_callback): Pass filename to elf_add.
+	(backtrace_initialize): Add filename parameter.
+	* internal.h (backtrace_initialize): Add filename parameter.
+	* fileline.c (fileline_initialize): Pass filename to
+	backtrace_initialize.
+	* pecoff.c (fileline_initialize): Add unused filename parameter.
+	* unknown.c (fileline_initialize): Likewise.
+	* xcoff.c (fileline_initialize): Likewise.
+	* configure.ac: Check for objcopy --add-gnu-debuglink.
+	* Makefile.am (dtest): New test target.
+	* configure, Makefile.in: Rebuild.
+
+2017-09-12  Steve Ellcey  <sellcey@cavium.com>
+
+	PR other/81096
+	* Makefile.am (ttest_CFLAGS): Add $(AM_CFLAGS)
+	* Makefile.in: Regenerate.
+
+2017-09-12  Steve Ellcey  <sellcey@cavium.com>
+
+	PR other/81096
+	* libbacktrace/Makefile.in
+	(HAVE_PTHREAD_TRUE@@NATIVE_TRUE@ttest_CFLAGS): Add $(AM_CFLAGS)
+
+2017-08-02  David Edelsohn  <dje.gcc@gmail.com>
+
+	PR bootstrap/81638
+	* xcoff.c (xcoff_process_linenos): Initialize incl to NULL.
+
+2017-07-28  Tony Reix  <tony.reix@atos.net>
+
+	* xcoff.c: Don't leak a file descriptor if an archive is malformed.
+
+2017-07-28  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* fileline.c (fileline_initialize): Print pid_t as long.
+
+2017-07-26  Tony Reix  <tony.reix@atos.net>
+
+	* configure.ac: Check for XCOFF32/XCOFF64.  Check for loadquery.
+	* filetype.awk: Separate AIX XCOFF32 and XCOFF64.
+	* xcoff.c: Add support for AIX XCOFF32 and XCOFF64 formats.
+	* configure, config.h.in: Regenerate.
+
+2017-07-21  Tony Reix  <tony.reix@atos.net>
+
+	* filetype.awk: Add AIX XCOFF type detection.
+	* configure.ac: Recognize xcoff format.
+	* Makefile.am (FORMAT_FILES): Add xcoff.c.
+	* fileline.c: Include <unistd.h>.
+	(fileline_initialize): Add case for AIX procfs.
+	* xcoff.c: New file.
+	* configure, Makefile.in: Rebuild.
+
+2017-06-21  Richard Biener  <rguenther@suse.de>
+
+	* configure.ac: Add AC_SYS_LARGEFILE.
+	* config.h.in: Regenerate.
+	* configure: Likewise.
+
+2017-06-11  Ian Lance Taylor  <iant@golang.org>
+
+	* elf.c (backtrace_initialize): Always set *fileline_fn.
+	* ttest.c: New file.
+	* btest.c: Move support functions into testlib.c.  Change calls to
+	check to pass file name.
+	* testlib.c: New file, copied from (part of) btest.c.
+	* testlib.h: New file, declarations for testlib.c.
+	* edtest.c: Use testlib.h and testlib.c.
+	* configure.ac: Test for -pthread, set HAVE_PTHREAD conditional.
+	* Makefile.am (btest_SOURCES): Add testlib.c.
+	(edtest_SOURCES): Likewise.
+	(CHECK_PROGRAMS): Add ttest if HAVE_PTHREAD.
+	(ttest_SOURCES, ttest_CFLAGS, ttest_LDADD): Define.
+	* configure, Makefile.in: Rebuild.
+
+2017-05-19  Than McIntosh  <thanm@google.com>
+
+	* dwarf.c (free_line_header): Don't free dirs if dirs_count == 0.
+	(read_line_header): Don't allocate dirs if dirs_count == 0.
+	* edtest.c: New file.
+	* edtest2.c: New file.
+	* Makefile.am (edtest_SOURCES, edtest_LDADD): Define.
+	(check_PROGRAMS): Add edtest.
+	(edtest2_build.c, gen_edtest2_build): New targets.
+	* Makefile.in: Rebuild.
+
+2017-03-08  Sam Thursfield  <sam.thursfield@codethink.co.uk>
+
+	* btest.c (test5): Replace #ifdef guard with 'unused' attribute
+	to fix compile warning when BACKTRACE_SUPPORTED isn't defined.
+
+2017-01-01  Jakub Jelinek  <jakub@redhat.com>
+
+	Update copyright years.
+
+2016-11-15  Matthias Klose  <doko@ubuntu.com>
+
+	* configure: Regenerate.
+
+2016-09-11  Carlos Liam  <carlos@aarzee.me>
+
+	* all: Remove meaningless trailing whitespace.
+
+2016-05-18  Uros Bizjak  <ubizjak@gmail.com>
+
+	PR target/71161
+	* elf.c (phdr_callback) [__i386__]: Add
+	__attribute__((__force_align_arg_pointer__)).
+
+2016-03-02  Maxim Ostapenko  <m.ostapenko@partner.samsung.com>
+
+	* elf.c (backtrace_initialize): Properly initialize elf_fileline_fn to
+	avoid possible crash.
+	(elf_add): Don't set *fileline_fn to elf_nodebug value in case of
+	missing debug info anymore.
+
+2016-02-06  John David Anglin  <danglin@gcc.gnu.org>
+
+	* mmap.c (MAP_FAILED): Define if not defined.
+
+2016-01-04  Jakub Jelinek  <jakub@redhat.com>
+
+	Update copyright years.
+
+2015-12-18  Andris Pavenis  <andris.pavenis@iki.fi>
+
+	* configure.ac: Specify that DJGPP do not have mmap
+	even when sys/mman.h exists.
+	* configure: Regenerate
+
+2015-12-09  John David Anglin  <danglin@gcc.gnu.org>
+
+	PR libgfortran/68115
+	* configure.ac: Set libbacktrace_cv_sys_sync to no on hppa*-*-hpux*.
+	* configure: Regenerate.
+	* elf.c (backtrace_initialize): Cast __sync_bool_compare_and_swap call
+	to void.
+
+2015-09-17  Ian Lance Taylor  <iant@google.com>
+
+	* posix.c (backtrace_open): Cast second argument of open() to int.
+
+2015-09-11  Ian Lance Taylor  <iant@google.com>
+
+	* Makefile.am (backtrace.lo): Depend on internal.h.
+	(sort.lo, stest.lo): Add explicit dependencies.
+	* Makefile.in: Rebuild.
+
+2015-09-09  Hans-Peter Nilsson  <hp@axis.com>
+
+	* backtrace.c: #include <sys/types.h>.
+
+2015-09-08  Ian Lance Taylor  <iant@google.com>
+
+	PR other/67457
+	* backtrace.c: #include "internal.h".
+	(struct backtrace_data): Add can_alloc field.
+	(unwind): If can_alloc is false, don't try to get file/line
+	information.
+	(backtrace_full): Set can_alloc field in bdata.
+	* alloc.c (backtrace_alloc): Don't call error_callback if it is
+	NULL.
+	* mmap.c (backtrace_alloc): Likewise.
+	* internal.h: Update comments for backtrace_alloc and
+	backtrace_free.
+
+2015-09-08  Ian Lance Taylor  <iant@google.com>
+
+	PR other/67457
+	* mmap.c (backtrace_alloc): Correct test for mmap failure.
+
+2015-08-31  Ulrich Weigand  <Ulrich.Weigand@de.ibm.com>
+
+	* configure.ac: For spu-*-* targets, set have_fcntl to no.
+	* configure: Regenerate.
+
+2015-08-27  Ulrich Weigand  <Ulrich.Weigand@de.ibm.com>
+
+	* configure.ac: Remove [disable-shared] argument to LT_INIT.
+	Remove setting PIC_FLAG when building as target library.
+	* configure: Regenerate.
+
+2015-08-26  Hans-Peter Nilsson  <hp@axis.com>
+
+	* configure.ac: Only compile with -fPIC if the target
+	supports it.
+	* configure: Regenerate.
+
+2015-08-24  Ulrich Weigand  <Ulrich.Weigand@de.ibm.com>
+
+	* configure.ac: Set have_mmap to no on spu-*-* targets.
+	* configure: Regenerate.
+
+2015-08-13  Ian Lance Taylor  <iant@google.com>
+
+	* dwarf.c (read_function_entry): Add vec_inlined parameter.
+	Change all callers.
+
+2015-06-11  Martin Sebor  <msebor@redhat.com>
+
+	PR sanitizer/65479
+	* dwarf.c (struct line): Add new field idx.
+	(line_compare): Use it.
+	(add_line): Set it.
+	(read_line_info): Reset it.
+
+2015-05-29  Tristan Gingold  <gingold@adacore.com>
+
+	* pecoff.c: New file.
+	* Makefile.am (FORMAT_FILES): Add pecoff.c and dependencies.
+	* Makefile.in: Regenerate.
+	* filetype.awk: Detect pecoff.
+	* configure.ac: Define BACKTRACE_SUPPORTS_DATA on elf platforms.
+	Add pecoff.
+	* btest.c (test5): Test enabled only if BACKTRACE_SUPPORTS_DATA is
+	true.
+	* backtrace-supported.h.in (BACKTRACE_SUPPORTS_DATA): Define.
+	* configure: Regenerate.
+	* pecoff.c: New file.
+
+2015-05-13  Michael Haubenwallner  <michael.haubenwallner@ssi-schaefer.com>
+
+	* Makefile.in: Regenerated with automake-1.11.6.
+	* aclocal.m4: Likewise.
+	* configure: Likewise.
+
+2015-01-24  Matthias Klose  <doko@ubuntu.com>
+
+	* configure.ac: Move AM_ENABLE_MULTILIB before AC_PROG_CC.
+	* configure: Regenerate.
+
+2015-01-05  Jakub Jelinek  <jakub@redhat.com>
+
+	Update copyright years.
+
+2014-11-21  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR bootstrap/63784
+	* configure: Regenerated.
+
+2014-11-11  David Malcolm  <dmalcolm@redhat.com>
+
+	* ChangeLog.jit: New.
+
+2014-11-11  Francois-Xavier Coudert  <fxcoudert@gcc.gnu.org>
+
+	PR target/63610
+	* configure: Regenerate.
+
+2014-10-23  Ian Lance Taylor  <iant@google.com>
+
+	* internal.h (backtrace_atomic_load_pointer) [no atomic or sync]:
+	Fix to return void *.
+
+2014-05-08  Ian Lance Taylor  <iant@google.com>
+
+	* mmap.c (backtrace_free): If freeing a large aligned block of
+	memory, call munmap rather than holding onto it.
+	(backtrace_vector_grow): When growing a vector, double the number
+	of pages requested.  When releasing the old version of a grown
+	vector, pass the correct size to backtrace_free.
+
+2014-03-07  Ian Lance Taylor  <iant@google.com>
+
+	* sort.c (backtrace_qsort): Use middle element as pivot.
+
+2014-03-06  Ian Lance Taylor  <iant@google.com>
+
+	* sort.c: New file.
+	* stest.c: New file.
+	* internal.h (backtrace_qsort): Declare.
+	* dwarf.c (read_abbrevs): Call backtrace_qsort instead of qsort.
+	(read_line_info, read_function_entry): Likewise.
+	(read_function_info, build_dwarf_data): Likewise.
+	* elf.c (elf_initialize_syminfo): Likewise.
+	* Makefile.am (libbacktrace_la_SOURCES): Add sort.c.
+	(stest_SOURCES, stest_LDADD): Define.
+	(check_PROGRAMS): Add stest.
+
+2014-02-07  Misty De Meo  <misty@brew.sh>
+
+	PR target/58710
+	* configure.ac: Use AC_LINK_IFELSE in check for
+	_Unwind_GetIPInfo.
+	* configure: Regenerate.
+
 2014-01-02  Richard Sandiford  <rdsandiford@googlemail.com>
 
 	Update copyright years
@@ -399,3 +819,9 @@
 2012-09-17  Ian Lance Taylor  <iant@google.com>
 
 	* Initial implementation.
+
+Copyright (C) 2012-2017 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.

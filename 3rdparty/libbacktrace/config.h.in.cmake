@@ -22,3 +22,7 @@
 
 /* Define to 1 if you have the __atomic functions */
 #cmakedefine HAVE_ATOMIC_FUNCTION 1
+
+#cmakedefine HAVE_READLINK 1
+
+#cmakedefine HAVE_LSTAT 1

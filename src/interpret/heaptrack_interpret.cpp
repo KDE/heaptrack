@@ -304,35 +304,21 @@ struct AccumulatedTraceData
         return ipId;
     }
 
-    std::string findDebugFile(const std::string& input) const
-    {
-        // TODO: also try to find a debug file by build-id
-        // TODO: also lookup in (user-configurable) debug path
-        std::string file = input + ".debug";
-        if (access(file.c_str(), R_OK) == 0) {
-            return file;
-        } else {
-            return input;
-        }
-    }
-
     /**
      * Prevent the same file from being initialized multiple times.
      * This drastically cuts the memory consumption down
      */
-    backtrace_state* findBacktraceState(const std::string& originalFileName, uintptr_t addressStart)
+    backtrace_state* findBacktraceState(const std::string& fileName, uintptr_t addressStart)
     {
-        if (boost::algorithm::starts_with(originalFileName, "linux-vdso.so")) {
+        if (boost::algorithm::starts_with(fileName, "linux-vdso.so")) {
             // prevent warning, since this will always fail
             return nullptr;
         }
 
-        auto it = m_backtraceStates.find(originalFileName);
+        auto it = m_backtraceStates.find(fileName);
         if (it != m_backtraceStates.end()) {
             return it->second;
         }
-
-        const auto fileName = findDebugFile(originalFileName);
 
         struct CallbackData
         {
@@ -354,15 +340,15 @@ struct AccumulatedTraceData
             if (descriptor >= 1) {
                 int foundSym = 0;
                 int foundDwarf = 0;
-                auto ret = elf_add(state, descriptor, addressStart, errorHandler, &data, &state->fileline_fn, &foundSym,
-                                   &foundDwarf, false);
+                auto ret = elf_add(state, data.fileName, descriptor, addressStart, errorHandler, &data, &state->fileline_fn, &foundSym,
+                                   &foundDwarf, false, false);
                 if (ret && foundSym) {
                     state->syminfo_fn = &elf_syminfo;
                 }
             }
         }
 
-        m_backtraceStates.insert(it, make_pair(originalFileName, state));
+        m_backtraceStates.insert(it, make_pair(fileName, state));
 
         return state;
     }
