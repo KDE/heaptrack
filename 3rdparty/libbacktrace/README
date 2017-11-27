@@ -1,5 +1,3 @@
-https://github.com/mirrors/gcc/tree/master/libbacktrace
-
 The libbacktrace library
 Initially written by Ian Lance Taylor <iant@google.com>
 
