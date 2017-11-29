@@ -184,7 +184,14 @@ FILE* createFile(const char* fileName)
     auto out = fopen(outputFileName.c_str(), "w");
     debugLog<VerboseOutput>("will write to %s/%p\n", outputFileName.c_str(), out);
     // we do our own locking, this speeds up the writing significantly
-    __fsetlocking(out, FSETLOCKING_BYCALLER);
+    if(out) {
+        __fsetlocking(out, FSETLOCKING_BYCALLER);
+    }
+    else {
+        debugLog<MinimalOutput>("failure in opening %sp\n", outputFileName.c_str(), out);
+        debugLog<MinimalOutput>("write error %d/%s", errno, strerror(errno));
+    }
+
     return out;
 }
 
