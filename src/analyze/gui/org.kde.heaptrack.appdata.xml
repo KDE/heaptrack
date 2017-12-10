@@ -67,7 +67,7 @@
       <li xml:lang="uk">Виявлення проблемних місць, які має бути оптимізовано з метою зменшення споживання пам’яті вашою програмою.</li>
       <li xml:lang="x-test">xxfind hotspots that need to be optimized to reduce the memory footprint of your applicationxx</li>
       <li>find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
-      <li xml:lang="ca">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai és desassignarà</li>
+      <li xml:lang="ca">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai es desassignarà</li>
       <li xml:lang="ca-valencia">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai és desassignarà</li>
       <li xml:lang="en-GB">find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
       <li xml:lang="es">encontrar fugas de memoria (es decir, lugares donde se asigna memoria que no se llega a liberar)</li>
