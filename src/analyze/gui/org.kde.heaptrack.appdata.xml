@@ -34,6 +34,7 @@
   <summary xml:lang="tr">Linux için yığın bellek profili</summary>
   <summary xml:lang="uk">Засіб профілювання «купи» пам’яті для Linux</summary>
   <summary xml:lang="x-test">xxA heap memory profiler for Linuxxx</summary>
+  <summary xml:lang="zh-CN">用于 Linux 的堆内存分析器</summary>
   <description>
     <p>
       Heaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:
