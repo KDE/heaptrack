@@ -1,3 +1,0 @@
-REPOSITORY = "heaptrack"
-REVIEWBOARD_URL = "https://git.reviewboard.kde.org"
-TARGET_PEOPLE = "mwolff"
