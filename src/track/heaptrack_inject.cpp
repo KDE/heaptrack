@@ -230,29 +230,38 @@ struct elftable
 };
 
 using elf_string_table = elftable<const char, DT_STRTAB, DT_STRSZ>;
+using elf_rela_table = elftable<Elf::Rela, DT_RELA, DT_RELASZ>;
 using elf_jmprel_table = elftable<Elf::Rela, DT_JMPREL, DT_PLTRELSZ>;
 using elf_symbol_table = elftable<Elf::Sym, DT_SYMTAB, DT_SYMENT>;
+
+template <typename T>
+void try_overwrite_elftable(const T& jumps, const elf_string_table& strings, const elf_symbol_table& symbols,
+                            const Elf::Addr base, const bool restore) noexcept
+{
+    const auto rela_end = reinterpret_cast<Elf::Rela*>(reinterpret_cast<char*>(jumps.table) + jumps.size);
+    for (auto rela = jumps.table; rela < rela_end; rela++) {
+        const auto index = ELF_R_SYM(rela->r_info);
+        const char* symname = strings.table + symbols.table[index].st_name;
+        auto addr = rela->r_offset + base;
+        hooks::apply(symname, addr, restore);
+    }
+}
 
 void try_overwrite_symbols(const Elf::Dyn* dyn, const Elf::Addr base, const bool restore) noexcept
 {
     elf_symbol_table symbols;
+    elf_rela_table relas;
     elf_jmprel_table jmprels;
     elf_string_table strings;
 
     // initialize the elf tables
     for (; dyn->d_tag != DT_NULL; ++dyn) {
-        symbols.consume(dyn) || jmprels.consume(dyn) || strings.consume(dyn);
+        symbols.consume(dyn) || relas.consume(dyn) || jmprels.consume(dyn) || strings.consume(dyn);
     }
 
     // find symbols to overwrite
-    const auto rela_end = reinterpret_cast<Elf::Rela*>(reinterpret_cast<char*>(jmprels.table) + jmprels.size);
-    for (auto rela = jmprels.table; rela < rela_end; rela++) {
-        const auto index = ELF_R_SYM(rela->r_info);
-        const char* symname = strings.table + symbols.table[index].st_name;
-        auto addr = rela->r_offset + base;
-
-        hooks::apply(symname, addr, restore);
-    }
+    try_overwrite_elftable(relas, strings, symbols, base, restore);
+    try_overwrite_elftable(jmprels, strings, symbols, base, restore);
 }
 
 int iterate_phdrs(dl_phdr_info* info, size_t /*size*/, void* data) noexcept
