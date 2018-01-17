@@ -76,19 +76,21 @@ void escape(void *p)
 
 int main()
 {
+    // NOTE: if we'd read the free ptr here, then we would not catch/override the value by heaptrack
     int i = 0;
-
-#if defined(TAKE_ADDR) || defined(USE_FREEPTR)
-    void (*freePtr)(void*) = &free;
-
-    escape(freePtr);
-#endif
 
     sleep(1);
 
     for (i = 0; i < 10; ++i) {
         void* foo = malloc(256);
         escape(foo);
+
+#if defined(TAKE_ADDR) || defined(USE_FREEPTR)
+    // but when we read it here, heaptrack may have rewritten the value properly
+    void (*freePtr)(void*) = &free;
+
+    escape(freePtr);
+#endif
 
         usleep(200);
 #if defined(USE_FREEPTR)
