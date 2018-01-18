@@ -241,7 +241,7 @@ void try_overwrite_elftable(const T& jumps, const elf_string_table& strings, con
     const auto rela_end = reinterpret_cast<Elf::Rela*>(reinterpret_cast<char*>(jumps.table) + jumps.size);
     for (auto rela = jumps.table; rela < rela_end; rela++) {
         const auto index = ELF_R_SYM(rela->r_info);
-        if (index > 0 && index < symbols.size) {
+        if (index >= 0 && index < symbols.size) {
             const char* symname = strings.table + symbols.table[index].st_name;
             auto addr = rela->r_offset + base;
             hooks::apply(symname, addr, restore);
