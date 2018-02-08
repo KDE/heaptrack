@@ -516,7 +516,7 @@ elf_nodebug (struct backtrace_state *state ATTRIBUTE_UNUSED,
 /* A dummy callback function used when we can't find a symbol
    table.  */
 
-static void
+void
 elf_nosyms (struct backtrace_state *state ATTRIBUTE_UNUSED,
 	    uintptr_t addr ATTRIBUTE_UNUSED,
 	    backtrace_syminfo_callback callback ATTRIBUTE_UNUSED,
