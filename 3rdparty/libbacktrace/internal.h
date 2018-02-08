@@ -315,6 +315,11 @@ extern void elf_syminfo (struct backtrace_state *state, uintptr_t addr,
 			 backtrace_syminfo_callback callback,
 			 backtrace_error_callback error_callback ATTRIBUTE_UNUSED,
 			 void *data);
+extern void elf_nosyms (struct backtrace_state *state ATTRIBUTE_UNUSED,
+			uintptr_t addr ATTRIBUTE_UNUSED,
+			backtrace_syminfo_callback callback ATTRIBUTE_UNUSED,
+			backtrace_error_callback error_callback, void *data);
+
 //END HEAPTRACK
 
 #ifdef __cplusplus

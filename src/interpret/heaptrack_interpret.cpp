@@ -344,6 +344,8 @@ struct AccumulatedTraceData
                                    &foundDwarf, false, false);
                 if (ret && foundSym) {
                     state->syminfo_fn = &elf_syminfo;
+                } else {
+                    state->syminfo_fn = &elf_nosyms;
                 }
             }
         }
