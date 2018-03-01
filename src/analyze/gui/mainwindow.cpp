@@ -28,10 +28,12 @@
 #include <KStandardAction>
 
 #include <QAction>
+#include <QClipboard>
 #include <QDebug>
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QMenu>
+#include <QShortcut>
 #include <QStatusBar>
 
 #include "callercalleemodel.h"
@@ -404,6 +406,24 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->menu_File->addAction(m_closeAction);
     m_quitAction = KStandardAction::quit(qApp, SLOT(quit()), this);
     m_ui->menu_File->addAction(m_quitAction);
+    QShortcut* shortcut = new QShortcut(QKeySequence(QKeySequence::Copy), m_ui->stacksTree);
+    connect(shortcut, &QShortcut::activated,
+            this, [this]()
+    {
+      QTreeView* view = m_ui->stacksTree;
+      if (view->selectionModel()->hasSelection()) {
+          QString text;
+          const auto range = view->selectionModel()->selection().first();
+          for (auto i = range.top(); i <= range.bottom(); ++i) {
+              QStringList rowContents;
+              for (auto j = range.left(); j <= range.right(); ++j)
+                  rowContents << view->model()->index(i,j).data().toString();
+              text += rowContents.join(QLatin1Char('\t'));
+              text += QLatin1Char('\n');
+          }
+          QApplication::clipboard()->setText(text);
+      }
+    });
 }
 
 MainWindow::~MainWindow()
