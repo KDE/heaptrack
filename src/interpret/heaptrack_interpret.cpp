@@ -109,8 +109,9 @@ struct ResolvedIP
 
 struct Module
 {
-    Module(uintptr_t addressStart, uintptr_t addressEnd, backtrace_state* backtraceState, size_t moduleIndex)
-        : addressStart(addressStart)
+    Module(string fileName, uintptr_t addressStart, uintptr_t addressEnd, backtrace_state* backtraceState, size_t moduleIndex)
+        : fileName(fileName)
+        , addressStart(addressStart)
         , addressEnd(addressEnd)
         , moduleIndex(moduleIndex)
         , backtraceState(backtraceState)
@@ -140,17 +141,26 @@ struct Module
 
         // no debug information available? try to fallback on the symbol table information
         if (!info.frame.isValid()) {
+            struct Data {
+                AddressInformation* info;
+                const Module* module;
+                uintptr_t address;
+            };
+            Data data = {&info, this, address};
             backtrace_syminfo(
                 backtraceState, address,
                 [](void* data, uintptr_t /*pc*/, const char* symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
                     if (symname) {
-                        reinterpret_cast<AddressInformation*>(data)->frame.function = demangle(symname);
+                        reinterpret_cast<Data*>(data)->info->frame.function = demangle(symname);
                     }
                 },
-                [](void* /*data*/, const char* msg, int errnum) {
-                    cerr << "Module backtrace error (code " << errnum << "): " << msg << endl;
+                [](void* _data, const char* msg, int errnum) {
+                    auto* data = reinterpret_cast<const Data*>(_data);
+                    cerr << "Module backtrace error for address " << hex << data->address << dec
+                         << " in module " << data->module->fileName
+                         << " (code " << errnum << "): " << msg << endl;
                 },
-                &info);
+                &data);
         }
 
         return info;
@@ -168,6 +178,7 @@ struct Module
             != tie(module.addressStart, module.addressEnd, module.moduleIndex);
     }
 
+    string fileName;
     uintptr_t addressStart;
     uintptr_t addressEnd;
     size_t moduleIndex;
@@ -261,10 +272,11 @@ struct AccumulatedTraceData
         return id;
     }
 
-    void addModule(backtrace_state* backtraceState, const size_t moduleIndex, const uintptr_t addressStart,
+    void addModule(string fileName, backtrace_state* backtraceState,
+                   const size_t moduleIndex, const uintptr_t addressStart,
                    const uintptr_t addressEnd)
     {
-        m_modules.emplace_back(addressStart, addressEnd, backtraceState, moduleIndex);
+        m_modules.emplace_back(fileName, addressStart, addressEnd, backtraceState, moduleIndex);
         m_modulesDirty = true;
     }
 
@@ -409,7 +421,7 @@ int main(int /*argc*/, char** /*argv*/)
                 uintptr_t vAddr = 0;
                 uintptr_t memSize = 0;
                 while ((reader >> vAddr) && (reader >> memSize)) {
-                    data.addModule(state, moduleIndex, addressStart + vAddr, addressStart + vAddr + memSize);
+                    data.addModule(fileName, state, moduleIndex, addressStart + vAddr, addressStart + vAddr + memSize);
                 }
             }
         } else if (reader.mode() == 't') {
