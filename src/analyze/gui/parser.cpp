@@ -328,6 +328,8 @@ TreeData mergeAllocations(const ParserData& data)
     for (const auto& allocation : data.allocations) {
         auto traceIndex = allocation.traceIndex;
         auto rows = &topRows;
+        unordered_set<uint32_t> recursionGuard;
+        recursionGuard.insert(traceIndex.index);
         while (traceIndex) {
             const auto& trace = data.findTrace(traceIndex);
             const auto& ip = data.findIp(trace.ipIndex);
@@ -341,6 +343,10 @@ TreeData mergeAllocations(const ParserData& data)
                 break;
             }
             traceIndex = trace.parentIndex;
+            if (!recursionGuard.insert(traceIndex.index).second) {
+                qWarning() << "Trace recursion detected - corrupt data file?";
+                break;
+            }
         }
     }
     // now set the parents, the data is constant from here on

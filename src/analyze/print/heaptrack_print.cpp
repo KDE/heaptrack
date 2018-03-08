@@ -249,6 +249,8 @@ struct Printer final : public AccumulatedTraceData
 
     void printBacktrace(TraceNode node, ostream& out, const size_t indent = 0, bool skipFirst = false) const
     {
+        unordered_set<uint32_t> recursionGuard;
+        recursionGuard.insert(node.ipIndex.index);
         while (node.ipIndex) {
             const auto& ip = findIp(node.ipIndex);
             if (!skipFirst) {
@@ -257,6 +259,11 @@ struct Printer final : public AccumulatedTraceData
             skipFirst = false;
 
             if (isStopIndex(ip.frame.functionIndex)) {
+                break;
+            }
+
+            if (!recursionGuard.insert(node.parentIndex.index).second) {
+                cerr << "Trace recursion detected - corrupt data file?" << endl;
                 break;
             }
 
