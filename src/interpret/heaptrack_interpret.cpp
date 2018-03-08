@@ -250,7 +250,7 @@ struct AccumulatedTraceData
         return data;
     }
 
-    size_t intern(const string& str, std::string* internedString = nullptr)
+    size_t intern(const string& str, const char** internedString = nullptr)
     {
         if (str.empty()) {
             return 0;
@@ -259,14 +259,14 @@ struct AccumulatedTraceData
         auto it = m_internedData.find(str);
         if (it != m_internedData.end()) {
             if (internedString) {
-                *internedString = it->first;
+                *internedString = it->first.data();
             }
             return it->second;
         }
         const size_t id = m_internedData.size() + 1;
         it = m_internedData.insert(it, make_pair(str, id));
         if (internedString) {
-            *internedString = it->first;
+            *internedString = it->first.data();
         }
         fprintf(stdout, "s %s\n", str.c_str());
         return id;
@@ -320,7 +320,7 @@ struct AccumulatedTraceData
      * Prevent the same file from being initialized multiple times.
      * This drastically cuts the memory consumption down
      */
-    backtrace_state* findBacktraceState(const std::string& fileName, uintptr_t addressStart)
+    backtrace_state* findBacktraceState(const char* fileName, uintptr_t addressStart)
     {
         if (boost::algorithm::starts_with(fileName, "linux-vdso.so")) {
             // prevent warning, since this will always fail
@@ -336,7 +336,7 @@ struct AccumulatedTraceData
         {
             const char* fileName;
         };
-        CallbackData data = {fileName.c_str()};
+        CallbackData data = {fileName};
 
         auto errorHandler = [](void* rawData, const char* msg, int errnum) {
             auto data = reinterpret_cast<const CallbackData*>(rawData);
@@ -410,7 +410,7 @@ int main(int /*argc*/, char** /*argv*/)
                 if (fileName == "x") {
                     fileName = exe;
                 }
-                std::string internedString;
+                const char* internedString = nullptr;
                 const auto moduleIndex = data.intern(fileName, &internedString);
                 uintptr_t addressStart = 0;
                 if (!(reader >> addressStart)) {
