@@ -21,3 +21,6 @@ callgrind.out.*
 *.BASE.*
 *.LOCAL.*
 *.REMOTE.*
+
+# from Qt Creator
+CMakeLists.txt.user
