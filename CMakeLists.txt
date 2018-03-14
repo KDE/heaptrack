@@ -91,6 +91,8 @@ file(RELATIVE_PATH LIB_REL_PATH
     "${CMAKE_INSTALL_PREFIX}/${BIN_INSTALL_DIR}"
     "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/heaptrack")
 
+set(ECM_ENABLE_SANITIZERS "" CACHE STRING "semicolon-separated list of sanitizers to enable for code that is not injected into client applications")
+
 add_subdirectory(3rdparty)
 add_subdirectory(src)
 add_subdirectory(tests)

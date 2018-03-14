@@ -1,3 +1,5 @@
+include(ECMEnableSanitizers)
+
 include_directories(
     ${Boost_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}

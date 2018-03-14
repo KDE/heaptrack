@@ -1,1 +1,3 @@
-add_subdirectory(libbacktrace/)
+include(ECMEnableSanitizers)
+
+add_subdirectory(libbacktrace)
