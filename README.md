@@ -65,6 +65,7 @@ Both parts require the following tools and libraries:
 - cmake 2.8.9 or higher
 - a C\+\+11 enabled compiler like g\+\+ or clang\+\+
 - zlib
+- optionally: zstd for faster (de)compression
 - libdl
 - pthread
 - libc
