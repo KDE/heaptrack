@@ -69,17 +69,6 @@ uint qHash(const Index<Base> index, uint seed = 0) noexcept
     return qHash(index.index, seed);
 }
 
-namespace std {
-template <typename Base>
-struct hash<Index<Base>>
-{
-    std::size_t operator()(const Index<Base> index) const
-    {
-        return std::hash<uint32_t>()(index.index);
-    }
-};
-}
-
 struct StringIndex : public Index<StringIndex>
 {
 };
@@ -101,5 +90,21 @@ struct TraceIndex : public Index<TraceIndex>
 struct AllocationIndex : public Index<AllocationIndex>
 {
 };
+
+struct IndexHasher
+{
+    template<typename Base>
+    std::size_t operator()(const Index<Base> index) const
+    {
+        return std::hash<uint32_t>()(index.index);
+    }
+};
+
+namespace std {
+template <>
+struct hash<TraceIndex> : IndexHasher
+{
+};
+}
 
 #endif // INDICES_H
