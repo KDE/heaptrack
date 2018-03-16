@@ -519,7 +519,8 @@ HistogramData buildSizeHistogram(ParserData& data)
         } else {
             row.columns[0].allocations += info.allocations;
         }
-        const auto ipIndex = data.findTrace(info.info.traceIndex).ipIndex;
+        const auto& allocation = data.allocations[info.info.allocationIndex.index];
+        const auto ipIndex = data.findTrace(allocation.traceIndex).ipIndex;
         const auto ip = data.findIp(ipIndex);
         const auto location = data.stringCache.location(ipIndex, ip);
         auto it = lower_bound(columnData.begin(), columnData.end(), location);

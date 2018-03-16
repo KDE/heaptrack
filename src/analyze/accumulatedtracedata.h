@@ -90,10 +90,11 @@ struct Allocation : public AllocationData
 struct AllocationInfo
 {
     uint64_t size = 0;
-    TraceIndex traceIndex;
+    // index into AccumulatedTraceData::allocations
+    AllocationIndex allocationIndex;
     bool operator==(const AllocationInfo& rhs) const
     {
-        return rhs.traceIndex == traceIndex && rhs.size == size;
+        return rhs.allocationIndex == allocationIndex && rhs.size == size;
     }
 };
 
@@ -148,6 +149,11 @@ struct AccumulatedTraceData
     // vector around for efficient index lookup
     std::vector<std::pair<TraceIndex, AllocationIndex>> traceIndexToAllocationIndex;
 
+    /// find and return the index into the @c allocations vector for the given trace index.
+    /// if the trace index wasn't mapped before, an empty Allocation will be added
+    /// and its index returned.
+    AllocationIndex mapToAllocationIndex(const TraceIndex traceIndex);
+    /// map the trace index to an allocation and return a reference to it
     Allocation& findAllocation(const TraceIndex traceIndex);
 
     InstructionPointer findIp(const IpIndex ipIndex) const;

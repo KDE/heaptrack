@@ -268,11 +268,13 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 lastAllocationPtr = allocationIndex.index;
             } else { // backwards compatibility
                 uint64_t ptr = 0;
-                if (!(reader >> info.size) || !(reader >> info.traceIndex) || !(reader >> ptr)) {
+                TraceIndex traceIndex;
+                if (!(reader >> info.size) || !(reader >> traceIndex) || !(reader >> ptr)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     continue;
                 }
-                if (allocationInfoSet.add(info.size, info.traceIndex, &allocationIndex)) {
+                info.allocationIndex = mapToAllocationIndex(traceIndex);
+                if (allocationInfoSet.add(info.size, traceIndex, &allocationIndex)) {
                     allocationInfos.push_back(info);
                 }
                 pointers.addPointer(ptr, allocationIndex);
@@ -280,7 +282,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
             }
 
             if (pass != FirstPass) {
-                auto& allocation = findAllocation(info.traceIndex);
+                auto& allocation = allocations[info.allocationIndex.index];
                 allocation.leaked += info.size;
                 allocation.allocated += info.size;
                 ++allocation.allocations;
@@ -333,7 +335,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
             }
 
             if (pass != FirstPass) {
-                auto& allocation = findAllocation(info.traceIndex);
+                auto& allocation = allocations[info.allocationIndex.index];
                 allocation.leaked -= info.size;
                 if (temporary) {
                     ++allocation.temporary;
@@ -344,11 +346,14 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 continue;
             }
             AllocationInfo info;
-            if (!(reader >> info.size) || !(reader >> info.traceIndex)) {
+            TraceIndex traceIndex;
+            if (!(reader >> info.size) || !(reader >> traceIndex)) {
                 cerr << "failed to parse line: " << reader.line() << endl;
                 continue;
             }
+            info.allocationIndex = mapToAllocationIndex(traceIndex);
             allocationInfos.push_back(info);
+
         } else if (reader.mode() == '#') {
             // comment or empty line
             continue;
@@ -658,8 +663,9 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
                       allocations.end());
 }
 
-Allocation& AccumulatedTraceData::findAllocation(const TraceIndex traceIndex)
+AllocationIndex AccumulatedTraceData::mapToAllocationIndex(const TraceIndex traceIndex)
 {
+    AllocationIndex allocationIndex;
     if (traceIndex < m_maxAllocationTraceIndex) {
         // only need to search when the trace index is previously known
         auto it = lower_bound(traceIndexToAllocationIndex.begin(), traceIndexToAllocationIndex.end(), traceIndex,
@@ -667,10 +673,9 @@ Allocation& AccumulatedTraceData::findAllocation(const TraceIndex traceIndex)
                                   return indexMap.first < traceIndex;
                               });
         if (it != traceIndexToAllocationIndex.end() && it->first == traceIndex) {
-            return allocations[it->second.index];
+            return it->second;
         }
         // new allocation
-        AllocationIndex allocationIndex;
         allocationIndex.index = allocations.size();
         traceIndexToAllocationIndex.insert(it, make_pair(traceIndex, allocationIndex));
         Allocation allocation;
@@ -679,9 +684,9 @@ Allocation& AccumulatedTraceData::findAllocation(const TraceIndex traceIndex)
     } else if (traceIndex == m_maxAllocationTraceIndex && !allocations.empty()) {
         // reuse the last allocation
         assert(allocations.back().traceIndex == traceIndex);
+        allocationIndex.index = allocations.size() - 1;
     } else {
         // new allocation
-        AllocationIndex allocationIndex;
         allocationIndex.index = allocations.size();
         traceIndexToAllocationIndex.push_back(make_pair(traceIndex, allocationIndex));
         Allocation allocation;
@@ -689,7 +694,12 @@ Allocation& AccumulatedTraceData::findAllocation(const TraceIndex traceIndex)
         allocations.push_back(allocation);
         m_maxAllocationTraceIndex = traceIndex;
     }
-    return allocations.back();
+    return allocationIndex;
+}
+
+Allocation& AccumulatedTraceData::findAllocation(const TraceIndex traceIndex)
+{
+    return allocations[mapToAllocationIndex(traceIndex).index];
 }
 
 InstructionPointer AccumulatedTraceData::findIp(const IpIndex ipIndex) const
