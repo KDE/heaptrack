@@ -26,10 +26,13 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
+#include <boost-zstd/zstd.hpp>
 
 #include "util/config.h"
 #include "util/linereader.h"
 #include "util/pointermap.h"
+
+#include "analyze_config.h"
 
 #ifdef __GNUC__
 #define POTENTIALLY_UNUSED __attribute__((unused))
@@ -128,7 +131,9 @@ bool AccumulatedTraceData::read(const string& inputFile)
 
 bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass)
 {
-    const bool isCompressed = boost::algorithm::ends_with(inputFile, ".gz");
+    const bool isGzCompressed = boost::algorithm::ends_with(inputFile, ".gz");
+    const bool isZstdCompressed = boost::algorithm::ends_with(inputFile, ".zst");
+    const bool isCompressed = isGzCompressed || isZstdCompressed;
     ifstream file(inputFile, isCompressed ? ios_base::in | ios_base::binary : ios_base::in);
 
     if (!file.is_open()) {
@@ -137,8 +142,15 @@ bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass)
     }
 
     boost::iostreams::filtering_istream in;
-    if (isCompressed) {
+    if (isGzCompressed) {
         in.push(boost::iostreams::gzip_decompressor());
+    } else if (isZstdCompressed) {
+#if ZSTD_FOUND
+        in.push(boost::iostreams::zstd_decompressor());
+#else
+        cerr << "Heaptrack was built without zstd support, cannot decompressed data file: " << inputFile << endl;
+        return false;
+#endif
     }
     in.push(file);
 

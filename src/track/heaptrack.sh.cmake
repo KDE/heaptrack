@@ -160,9 +160,17 @@ LIBHEAPTRACK_INJECT=$(readlink -f "$LIBHEAPTRACK_INJECT")
 pipe=/tmp/heaptrack_fifo$$
 mkfifo $pipe
 
+output_suffix="gz"
+COMPRESSOR="gzip -c"
+
+if [ "@ZSTD_FOUND@" == "TRUE" ] && [ ! -z "$(which zstd)" ]; then
+    output_suffix="zst"
+    COMPRESSOR="zstd -c"
+fi
+
 # interpret the data and compress the output on the fly
-output="$output.gz"
-"$INTERPRETER" < $pipe | gzip -c > "$output" &
+output="$output.$output_suffix"
+"$INTERPRETER" < $pipe | $COMPRESSOR > "$output" &
 debuggee=$!
 
 cleanup() {
