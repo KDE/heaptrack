@@ -23,12 +23,12 @@
 
 struct PointerHashMap
 {
-    void addPointer(const uint64_t ptr, const AllocationIndex index)
+    void addPointer(const uint64_t ptr, const AllocationInfoIndex index)
     {
         map[ptr] = index;
     }
 
-    std::pair<AllocationIndex, bool> takePointer(const uint64_t ptr)
+    std::pair<AllocationInfoIndex, bool> takePointer(const uint64_t ptr)
     {
         auto it = map.find(ptr);
         if (it == map.end()) {
@@ -39,7 +39,7 @@ struct PointerHashMap
         return ret;
     }
 
-    google::sparse_hash_map<uint64_t, AllocationIndex> map;
+    google::sparse_hash_map<uint64_t, AllocationInfoIndex> map;
 };
 
 int main()

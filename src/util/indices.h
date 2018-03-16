@@ -90,6 +90,9 @@ struct TraceIndex : public Index<TraceIndex>
 struct AllocationIndex : public Index<AllocationIndex>
 {
 };
+struct AllocationInfoIndex : public Index<AllocationInfoIndex>
+{
+};
 
 struct IndexHasher
 {

@@ -251,7 +251,7 @@ struct ParserData final : public AccumulatedTraceData
         temporaryChartData.rows << temporary;
     }
 
-    void handleAllocation(const AllocationInfo& info, const AllocationIndex index)
+    void handleAllocation(const AllocationInfo& info, const AllocationInfoIndex index)
     {
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, totalCost.leaked);
 

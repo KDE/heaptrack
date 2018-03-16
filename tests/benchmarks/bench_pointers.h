@@ -54,7 +54,7 @@ void benchPointers()
         {
             Map map;
             for (auto ptr : pointers) {
-                AllocationIndex index;
+                AllocationInfoIndex index;
                 index.index = static_cast<uint32_t>(ptr);
                 map.addPointer(ptr, index);
             }
@@ -65,7 +65,7 @@ void benchPointers()
 
             std::random_shuffle(pointers.begin(), pointers.end());
             for (auto ptr : pointers) {
-                AllocationIndex index;
+                AllocationInfoIndex index;
                 index.index = static_cast<uint32_t>(ptr);
                 auto allocation = map.takePointer(ptr);
                 if (allocation.second && allocation.first == index) {

@@ -475,7 +475,7 @@ struct Printer final : public AccumulatedTraceData
         }
     }
 
-    void handleAllocation(const AllocationInfo& info, const AllocationIndex /*index*/) override
+    void handleAllocation(const AllocationInfo& info, const AllocationInfoIndex /*index*/) override
     {
         if (printHistogram) {
             ++sizeHistogram[info.size];

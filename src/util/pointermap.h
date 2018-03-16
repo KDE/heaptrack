@@ -38,7 +38,7 @@ struct IndexedAllocationInfo
 {
     uint64_t size;
     TraceIndex traceIndex;
-    AllocationIndex allocationIndex;
+    AllocationInfoIndex allocationIndex;
     bool operator==(const IndexedAllocationInfo& rhs) const
     {
         return rhs.traceIndex == traceIndex && rhs.size == size;
@@ -68,7 +68,7 @@ struct AllocationInfoSet
         set.reserve(625000);
     }
 
-    bool add(uint64_t size, TraceIndex traceIndex, AllocationIndex* allocationIndex)
+    bool add(uint64_t size, TraceIndex traceIndex, AllocationInfoIndex* allocationIndex)
     {
         allocationIndex->index = set.size();
         IndexedAllocationInfo info = {size, traceIndex, *allocationIndex};
@@ -121,7 +121,7 @@ public:
         map.reserve(1024);
     }
 
-    void addPointer(const uint64_t ptr, const AllocationIndex allocationIndex)
+    void addPointer(const uint64_t ptr, const AllocationInfoIndex allocationIndex)
     {
         const SplitPointer pointer(ptr);
 
@@ -140,7 +140,7 @@ public:
         }
     }
 
-    std::pair<AllocationIndex, bool> takePointer(const uint64_t ptr)
+    std::pair<AllocationInfoIndex, bool> takePointer(const uint64_t ptr)
     {
         const SplitPointer pointer(ptr);
 
@@ -167,7 +167,7 @@ private:
     struct Indices
     {
         std::vector<uint16_t> smallPtrParts;
-        std::vector<AllocationIndex> allocationIndices;
+        std::vector<AllocationInfoIndex> allocationIndices;
     };
     std::unordered_map<uint64_t, Indices> map;
 };

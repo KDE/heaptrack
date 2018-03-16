@@ -254,7 +254,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
             }
         } else if (reader.mode() == '+') {
             AllocationInfo info;
-            AllocationIndex allocationIndex;
+            AllocationInfoIndex allocationIndex;
             if (fileVersion >= 1) {
                 if (!(reader >> allocationIndex.index)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
@@ -302,7 +302,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 }
             }
         } else if (reader.mode() == '-') {
-            AllocationIndex allocationInfoIndex;
+            AllocationInfoIndex allocationInfoIndex;
             bool temporary = false;
             if (fileVersion >= 1) {
                 if (!(reader >> allocationInfoIndex.index)) {

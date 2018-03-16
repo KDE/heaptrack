@@ -446,7 +446,7 @@ int main(int /*argc*/, char** /*argv*/)
                 continue;
             }
 
-            AllocationIndex index;
+            AllocationInfoIndex index;
             if (allocationInfos.add(size, traceId, &index)) {
                 fprintf(stdout, "a %" PRIx64 " %x\n", size, traceId.index);
             }
