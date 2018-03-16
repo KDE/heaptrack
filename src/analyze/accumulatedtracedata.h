@@ -112,8 +112,11 @@ struct AccumulatedTraceData
 
     bool read(const std::string& inputFile);
     enum ParsePass {
+        // find time of total peak cost
         FirstPass,
+        // parse individual allocations
         SecondPass,
+        // GUI only: graph-building
         ThirdPass
     };
     bool read(const std::string& inputFile, const ParsePass pass);
