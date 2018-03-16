@@ -256,11 +256,11 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
             AllocationInfo info;
             AllocationInfoIndex allocationIndex;
             if (fileVersion >= 1) {
-                if (!(reader >> allocationIndex.index)) {
+                if (!(reader >> allocationIndex)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     continue;
                 } else if (allocationIndex.index >= allocationInfos.size()) {
-                    cerr << "allocation index out of bounds: " << allocationIndex.index
+                    cerr << "allocation index out of bounds: " << allocationIndex
                          << ", maximum is: " << allocationInfos.size() << endl;
                     continue;
                 }
@@ -305,7 +305,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
             AllocationInfoIndex allocationInfoIndex;
             bool temporary = false;
             if (fileVersion >= 1) {
-                if (!(reader >> allocationInfoIndex.index)) {
+                if (!(reader >> allocationInfoIndex)) {
                     cerr << "failed to parse line: " << reader.line() << endl;
                     continue;
                 }
