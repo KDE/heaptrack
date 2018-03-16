@@ -64,6 +64,7 @@ AccumulatedTraceData::AccumulatedTraceData()
     traces.reserve(65536);
     strings.reserve(4096);
     allocations.reserve(16384);
+    traceIndexToAllocationIndex.reserve(16384);
     stopIndices.reserve(4);
     opNewIpIndices.reserve(16);
 }
@@ -176,12 +177,13 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
     const auto lastPeakCost = pass != FirstPass ? totalCost.peak : 0;
     const auto lastPeakTime = pass != FirstPass ? peakTime : 0;
 
-    m_maxAllocationTraceIndex.index = 0;
     totalCost = {};
     peakTime = 0;
     systemInfo = {};
     peakRSS = 0;
-    allocations.clear();
+    for (auto& allocation : allocations) {
+        allocation.clearCost();
+    }
     uint fileVersion = 0;
 
     // required for backwards compatibility
@@ -660,21 +662,28 @@ Allocation& AccumulatedTraceData::findAllocation(const TraceIndex traceIndex)
 {
     if (traceIndex < m_maxAllocationTraceIndex) {
         // only need to search when the trace index is previously known
-        auto it = lower_bound(allocations.begin(), allocations.end(), traceIndex,
-                              [](const Allocation& allocation, const TraceIndex traceIndex) -> bool {
-                                  return allocation.traceIndex < traceIndex;
+        auto it = lower_bound(traceIndexToAllocationIndex.begin(), traceIndexToAllocationIndex.end(), traceIndex,
+                              [](const pair<TraceIndex, AllocationIndex>& indexMap, const TraceIndex traceIndex) -> bool {
+                                  return indexMap.first < traceIndex;
                               });
-        if (it == allocations.end() || it->traceIndex != traceIndex) {
-            Allocation allocation;
-            allocation.traceIndex = traceIndex;
-            it = allocations.insert(it, allocation);
+        if (it != traceIndexToAllocationIndex.end() && it->first == traceIndex) {
+            return allocations[it->second.index];
         }
-        return *it;
+        // new allocation
+        AllocationIndex allocationIndex;
+        allocationIndex.index = allocations.size();
+        traceIndexToAllocationIndex.insert(it, make_pair(traceIndex, allocationIndex));
+        Allocation allocation;
+        allocation.traceIndex = traceIndex;
+        allocations.push_back(allocation);
     } else if (traceIndex == m_maxAllocationTraceIndex && !allocations.empty()) {
         // reuse the last allocation
         assert(allocations.back().traceIndex == traceIndex);
     } else {
-        // actually a new allocation
+        // new allocation
+        AllocationIndex allocationIndex;
+        allocationIndex.index = allocations.size();
+        traceIndexToAllocationIndex.push_back(make_pair(traceIndex, allocationIndex));
         Allocation allocation;
         allocation.traceIndex = traceIndex;
         allocations.push_back(allocation);

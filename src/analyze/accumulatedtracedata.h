@@ -144,6 +144,9 @@ struct AccumulatedTraceData
     // occur with an index larger than any other we encountered so far
     // this can be used to our advantage in speeding up the findAllocation calls.
     TraceIndex m_maxAllocationTraceIndex;
+    // we don't want to shuffle allocations around, so instead keep a secondary
+    // vector around for efficient index lookup
+    std::vector<std::pair<TraceIndex, AllocationIndex>> traceIndexToAllocationIndex;
 
     Allocation& findAllocation(const TraceIndex traceIndex);
 

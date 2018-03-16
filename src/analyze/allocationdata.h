@@ -33,6 +33,11 @@ struct AllocationData
     int64_t leaked = 0;
     // largest amount of bytes allocated
     int64_t peak = 0;
+
+    void clearCost()
+    {
+        *this = {};
+    }
 };
 
 inline bool operator==(const AllocationData& lhs, const AllocationData& rhs)
