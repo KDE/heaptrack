@@ -71,6 +71,10 @@ EXE_PATH=$(readlink -f $(dirname $(readlink -f $0)))
 while true; do
     case "$1" in
         "-d" | "--debug")
+            if [ -z "$(which gdb 2> /dev/null)" ]; then
+                echo "GDB is not installed, cannot debug heaptrack."
+                exit 1
+            fi
             debug=1
             shift 1
             ;;
@@ -79,6 +83,10 @@ while true; do
             exit 0
             ;;
         "-p" | "--pid")
+            if [ -z "$(which gdb 2> /dev/null)" ]; then
+                echo "GDB is not installed, cannot attach to running process."
+                exit 1
+            fi
             pid=$2
             if [ -z "$pid" ]; then
                 echo "Missing PID argument."
