@@ -526,52 +526,54 @@ struct Printer final : public AccumulatedTraceData
 int main(int argc, char** argv)
 {
     po::options_description desc("Options", 120, 60);
-    desc.add_options()("file,f", po::value<string>(), "The heaptrack data file to print.")(
-        "diff,d", po::value<string>()->default_value({}), "Find the differences to this file.")(
-        "shorten-templates,t", po::value<bool>()->default_value(true)->implicit_value(true),
-        "Shorten template identifiers.")("merge-backtraces,m",
-                                         po::value<bool>()->default_value(true)->implicit_value(true),
-                                         "Merge backtraces.\nNOTE: the merged peak consumption is not correct.")(
-        "print-peaks,p", po::value<bool>()->default_value(true)->implicit_value(true),
-        "Print backtraces to top allocators, sorted by peak consumption.")(
-        "print-allocators,a", po::value<bool>()->default_value(true)->implicit_value(true),
-        "Print backtraces to top allocators, sorted by number of calls to "
-        "allocation functions.")("print-temporary,T", po::value<bool>()->default_value(true)->implicit_value(true),
-                                 "Print backtraces to top allocators, sorted by number of temporary "
-                                 "allocations.")("print-leaks,l",
-                                                 po::value<bool>()->default_value(false)->implicit_value(true),
-                                                 "Print backtraces to leaked memory allocations.")(
-        "print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
-        "Print top overall allocators, ignoring memory frees.")(
-        "peak-limit,n", po::value<size_t>()->default_value(10)->implicit_value(10),
-        "Limit the number of reported peaks.")("sub-peak-limit,s",
-                                               po::value<size_t>()->default_value(5)->implicit_value(5),
-                                               "Limit the number of reported backtraces of merged peak locations.")(
-        "print-histogram,H", po::value<string>()->default_value(string()),
-        "Path to output file where an allocation size histogram will be written "
-        "to.")("print-flamegraph,F", po::value<string>()->default_value(string()),
-               "Path to output file where a flame-graph compatible stack file will be "
-               "written to.\n"
-               "To visualize the resulting file, use flamegraph.pl from "
-               "https://github.com/brendangregg/FlameGraph:\n"
-               "  heaptrack_print heaptrack.someapp.PID.gz -F stacks.txt\n"
-               "  # optionally pass --reverse to flamegraph.pl\n"
-               "  flamegraph.pl --title \"heaptrack: allocations\" --colors mem \\\n"
-               "    --countname allocations < stacks.txt > heaptrack.someapp.PID.svg\n"
-               "  [firefox|chromium] heaptrack.someapp.PID.svg\n")(
-        "print-massif,M", po::value<string>()->default_value(string()),
-        "Path to output file where a massif compatible data file will be written "
-        "to.")("massif-threshold", po::value<double>()->default_value(1.),
-               "Percentage of current memory usage, below which allocations are "
-               "aggregated into a 'below threshold' entry.\n"
-               "This is only used in the massif output file so far.\n")(
-        "massif-detailed-freq", po::value<size_t>()->default_value(2),
-        "Frequency of detailed snapshots in the massif output file. Increase "
-        "this to reduce the file size.\n"
-        "You can set the value to zero to disable detailed snapshots.\n")(
-        "filter-bt-function", po::value<string>()->default_value(string()),
-        "Only print allocations where the backtrace contains the given "
-        "function.")("help,h", "Show this help message.")("version,v", "Displays version information.");
+    // clang-format off
+    desc.add_options()
+        ("file,f", po::value<string>(),
+            "The heaptrack data file to print.")
+        ("diff,d", po::value<string>()->default_value({}),
+            "Find the differences to this file.")
+        ("shorten-templates,t", po::value<bool>()->default_value(true)->implicit_value(true),
+            "Shorten template identifiers.")
+        ("merge-backtraces,m", po::value<bool>()->default_value(true)->implicit_value(true),
+            "Merge backtraces.\nNOTE: the merged peak consumption is not correct.")
+        ("print-peaks,p", po::value<bool>()->default_value(true)->implicit_value(true),
+            "Print backtraces to top allocators, sorted by peak consumption.")
+        ("print-allocators,a", po::value<bool>()->default_value(true)->implicit_value(true),
+            "Print backtraces to top allocators, sorted by number of calls to allocation functions.")
+        ("print-temporary,T", po::value<bool>()->default_value(true)->implicit_value(true),
+            "Print backtraces to top allocators, sorted by number of temporary allocations.")
+        ("print-leaks,l", po::value<bool>()->default_value(false)->implicit_value(true),
+            "Print backtraces to leaked memory allocations.")
+        ("print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
+            "Print top overall allocators, ignoring memory frees.")
+        ("peak-limit,n", po::value<size_t>()->default_value(10)->implicit_value(10),
+            "Limit the number of reported peaks.")
+        ("sub-peak-limit,s", po::value<size_t>()->default_value(5)->implicit_value(5),
+            "Limit the number of reported backtraces of merged peak locations.")
+        ("print-histogram,H", po::value<string>()->default_value(string()),
+            "Path to output file where an allocation size histogram will be written to.")
+        ("print-flamegraph,F", po::value<string>()->default_value(string()),
+            "Path to output file where a flame-graph compatible stack file will be written to.\n"
+            "To visualize the resulting file, use flamegraph.pl from "
+            "https://github.com/brendangregg/FlameGraph:\n"
+            "  heaptrack_print heaptrack.someapp.PID.gz -F stacks.txt\n"
+            "  # optionally pass --reverse to flamegraph.pl\n"
+            "  flamegraph.pl --title \"heaptrack: allocations\" --colors mem \\\n"
+            "    --countname allocations < stacks.txt > heaptrack.someapp.PID.svg\n"
+            "  [firefox|chromium] heaptrack.someapp.PID.svg\n")
+        ("print-massif,M", po::value<string>()->default_value(string()),
+            "Path to output file where a massif compatible data file will be written to.")
+        ("massif-threshold", po::value<double>()->default_value(1.),
+            "Percentage of current memory usage, below which allocations are aggregated into a 'below threshold' entry.\n"
+            "This is only used in the massif output file so far.\n")
+        ("massif-detailed-freq", po::value<size_t>()->default_value(2),
+            "Frequency of detailed snapshots in the massif output file. Increase  this to reduce the file size.\n"
+            "You can set the value to zero to disable detailed snapshots.\n")
+        ("filter-bt-function", po::value<string>()->default_value(string()),
+            "Only print allocations where the backtrace contains the given function.")
+        ("help,h", "Show this help message.")
+        ("version,v", "Displays version information.");
+    // clang-format on
     po::positional_options_description p;
     p.add("file", -1);
 
