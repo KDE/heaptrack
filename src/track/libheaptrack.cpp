@@ -496,6 +496,9 @@ private:
             procStatm = fopen("/proc/self/statm", "r");
             if (!procStatm) {
                 fprintf(stderr, "WARNING: Failed to open /proc/self/statm for reading: %s.\n", strerror(errno));
+            } else if (setvbuf(procStatm, nullptr, _IONBF, 0)) {
+                // disable buffering to ensure we read the latest values
+                fprintf(stderr, "WARNING: Failed to disable buffering for reading of /proc/self/statm: %s.\n", strerror(errno));
             }
 
             // ensure this utility thread is not handling any signals
