@@ -55,11 +55,6 @@ struct StringCache
         }
     }
 
-    QString module(const InstructionPointer& ip) const
-    {
-        return stringify(ip.moduleIndex);
-    }
-
     QString stringify(const StringIndex index) const
     {
         if (!index || index.index > m_strings.size()) {
