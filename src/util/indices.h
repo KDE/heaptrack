@@ -96,7 +96,7 @@ struct AllocationInfoIndex : public Index<AllocationInfoIndex>
 
 struct IndexHasher
 {
-    template<typename Base>
+    template <typename Base>
     std::size_t operator()(const Index<Base> index) const
     {
         return std::hash<uint32_t>()(index.index);

@@ -263,9 +263,10 @@ MainWindow::MainWindow(QWidget* parent)
         }
         {
             QTextStream stream(&textCenter);
-            stream << "<qt><dl>" << i18n("<dt><b>calls to allocation functions</b>:</dt><dd>%1 "
-                                         "(%2/s)</dd>",
-                                         data.cost.allocations, qint64(data.cost.allocations / totalTimeS))
+            stream << "<qt><dl>"
+                   << i18n("<dt><b>calls to allocation functions</b>:</dt><dd>%1 "
+                           "(%2/s)</dd>",
+                           data.cost.allocations, qint64(data.cost.allocations / totalTimeS))
                    << i18n("<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, "
                            "%3/s)</dd>",
                            data.cost.temporary,
@@ -279,10 +280,10 @@ MainWindow::MainWindow(QWidget* parent)
         }
         {
             QTextStream stream(&textRight);
-            stream << "<qt><dl>" << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1 "
-                                         "after %2s</dd>",
-                                         format.formatByteSize(data.cost.peak, 1, KFormat::MetricBinaryDialect),
-                                         peakTimeS)
+            stream << "<qt><dl>"
+                   << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1 "
+                           "after %2s</dd>",
+                           format.formatByteSize(data.cost.peak, 1, KFormat::MetricBinaryDialect), peakTimeS)
                    << i18n("<dt><b>peak RSS</b> (including heaptrack "
                            "overhead):</dt><dd>%1</dd>",
                            format.formatByteSize(data.peakRSS, 1, KFormat::MetricBinaryDialect))
@@ -322,8 +323,8 @@ MainWindow::MainWindow(QWidget* parent)
                 &Parser::allocationsChartDataAvailable, this);
     addChartTab(m_ui->tabWidget, i18n("Temporary Allocations"), ChartModel::Temporary, m_parser,
                 &Parser::temporaryChartDataAvailable, this);
-    addChartTab(m_ui->tabWidget, i18n("Allocated"), ChartModel::Allocated, m_parser, &Parser::allocatedChartDataAvailable,
-                this);
+    addChartTab(m_ui->tabWidget, i18n("Allocated"), ChartModel::Allocated, m_parser,
+                &Parser::allocatedChartDataAvailable, this);
 
     auto sizesTab = new HistogramWidget(this);
     m_ui->tabWidget->addTab(sizesTab, i18n("Sizes"));
@@ -407,22 +408,20 @@ MainWindow::MainWindow(QWidget* parent)
     m_quitAction = KStandardAction::quit(qApp, SLOT(quit()), this);
     m_ui->menu_File->addAction(m_quitAction);
     QShortcut* shortcut = new QShortcut(QKeySequence(QKeySequence::Copy), m_ui->stacksTree);
-    connect(shortcut, &QShortcut::activated,
-            this, [this]()
-    {
-      QTreeView* view = m_ui->stacksTree;
-      if (view->selectionModel()->hasSelection()) {
-          QString text;
-          const auto range = view->selectionModel()->selection().first();
-          for (auto i = range.top(); i <= range.bottom(); ++i) {
-              QStringList rowContents;
-              for (auto j = range.left(); j <= range.right(); ++j)
-                  rowContents << view->model()->index(i,j).data().toString();
-              text += rowContents.join(QLatin1Char('\t'));
-              text += QLatin1Char('\n');
-          }
-          QApplication::clipboard()->setText(text);
-      }
+    connect(shortcut, &QShortcut::activated, this, [this]() {
+        QTreeView* view = m_ui->stacksTree;
+        if (view->selectionModel()->hasSelection()) {
+            QString text;
+            const auto range = view->selectionModel()->selection().first();
+            for (auto i = range.top(); i <= range.bottom(); ++i) {
+                QStringList rowContents;
+                for (auto j = range.left(); j <= range.right(); ++j)
+                    rowContents << view->model()->index(i, j).data().toString();
+                text += rowContents.join(QLatin1Char('\t'));
+                text += QLatin1Char('\n');
+            }
+            QApplication::clipboard()->setText(text);
+        }
     });
 }
 

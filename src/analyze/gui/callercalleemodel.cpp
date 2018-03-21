@@ -243,9 +243,9 @@ QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
         stream << i18n("inclusive: allocated %1 over %2 calls (%3 temporary, i.e. "
                        "%4%), peak at %5, leaked %6",
                        m_format.formatByteSize(row.inclusiveCost.allocated, 1, KFormat::MetricBinaryDialect),
-                       row.inclusiveCost.allocations,
-                       row.inclusiveCost.temporary, round(float(row.inclusiveCost.temporary) * 100.f * 100.f
-                                                          / std::max(int64_t(1), row.inclusiveCost.allocations))
+                       row.inclusiveCost.allocations, row.inclusiveCost.temporary,
+                       round(float(row.inclusiveCost.temporary) * 100.f * 100.f
+                             / std::max(int64_t(1), row.inclusiveCost.allocations))
                            / 100.f,
                        m_format.formatByteSize(row.inclusiveCost.peak, 1, KFormat::MetricBinaryDialect),
                        m_format.formatByteSize(row.inclusiveCost.leaked, 1, KFormat::MetricBinaryDialect));
@@ -253,8 +253,8 @@ QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
         stream << i18n(
             "self: allocated %1 over %2 calls (%3 temporary, i.e. %4%), "
             "peak at %5, leaked %6",
-            m_format.formatByteSize(row.selfCost.allocated, 1, KFormat::MetricBinaryDialect),
-            row.selfCost.allocations, row.selfCost.temporary,
+            m_format.formatByteSize(row.selfCost.allocated, 1, KFormat::MetricBinaryDialect), row.selfCost.allocations,
+            row.selfCost.temporary,
             round(float(row.selfCost.temporary) * 100.f * 100.f / std::max(int64_t(1), row.selfCost.allocations))
                 / 100.f,
             m_format.formatByteSize(row.selfCost.peak, 1, KFormat::MetricBinaryDialect),

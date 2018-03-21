@@ -26,7 +26,6 @@ class QString;
 namespace Util {
 
 QString formatTime(qint64 ms);
-
 }
 
 #endif // UTIL_H

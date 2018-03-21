@@ -156,7 +156,8 @@ struct Printer final : public AccumulatedTraceData
                                                 break;
                                             }
                                             auto matchFunction = [this](const Frame& frame) {
-                                                return stringify(frame.functionIndex).find(filterBtFunction) != string::npos;
+                                                return stringify(frame.functionIndex).find(filterBtFunction)
+                                                    != string::npos;
                                             };
                                             if (matchFunction(ip.frame)) {
                                                 return false;

@@ -22,9 +22,9 @@
 #include "util/config.h"
 
 #if defined(_ISOC11_SOURCE)
-#  define HAVE_ALIGNED_ALLOC 1
+#define HAVE_ALIGNED_ALLOC 1
 #else
-#  define HAVE_ALIGNED_ALLOC 0
+#define HAVE_ALIGNED_ALLOC 0
 #endif
 
 struct Foo

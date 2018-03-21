@@ -31,11 +31,11 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QLabel>
+#include <QLineEdit>
 #include <QStyleOption>
 #include <QToolTip>
 #include <QVBoxLayout>
 #include <QWheelEvent>
-#include <QLineEdit>
 
 #include <KColorScheme>
 #include <KLocalizedString>
@@ -55,7 +55,7 @@ Q_DECLARE_METATYPE(CostType)
 namespace {
 QString fraction(qint64 cost, qint64 totalCost)
 {
-    return QString::number(double(cost)  * 100. / totalCost, 'g', 3);
+    return QString::number(double(cost) * 100. / totalCost, 'g', 3);
 }
 
 enum SearchMatchType
@@ -170,7 +170,8 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     }
 
     const int height = rect().height();
-    painter->drawText(margin + rect().x(), rect().y(), width, height, Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
+    painter->drawText(margin + rect().x(), rect().y(), width, height,
+                      Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
                       option->fontMetrics.elidedText(m_function, Qt::ElideRight, width));
 
     if (m_searchMatch == NoMatch) {
@@ -223,20 +224,19 @@ QString FrameGraphicsItem::description() const
                         "%1 (%2%) temporary allocations in %3 and below.", m_cost, fraction, function);
         break;
     case Peak:
-        tooltip =
-            i18nc("%1: peak consumption in bytes, %2: relative number, %3: "
-                  "function label",
-                  "%1 (%2%) contribution to peak consumption in %3 and below.",
-                  format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, function);
+        tooltip = i18nc("%1: peak consumption in bytes, %2: relative number, %3: "
+                        "function label",
+                        "%1 (%2%) contribution to peak consumption in %3 and below.",
+                        format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, function);
         break;
     case Leaked:
         tooltip = i18nc("%1: leaked bytes, %2: relative number, %3: function label", "%1 (%2%) leaked in %3 and below.",
                         format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, function);
         break;
     case Allocated:
-        tooltip = i18nc("%1: allocated bytes, %2: relative number, %3: function label",
-                        "%1 (%2%) allocated in %3 and below.",
-                        format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, function);
+        tooltip =
+            i18nc("%1: allocated bytes, %2: relative number, %3: function label", "%1 (%2%) allocated in %3 and below.",
+                  format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, function);
         break;
     }
 
@@ -315,8 +315,7 @@ void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem* parent, in
 {
     foreach (const auto& row, data) {
         if (collapseRecursion && row.location->function != unresolvedFunctionName()
-            && row.location->function == parent->function())
-        {
+            && row.location->function == parent->function()) {
             continue;
         }
         auto item = findItemByFunction(parent->childItems(), row.location->function);
@@ -373,7 +372,8 @@ FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type,
         label = i18n("%1 temporary allocations in total", totalCost);
         break;
     case Peak:
-        label = i18n("%1 contribution to peak consumption", format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
+        label = i18n("%1 contribution to peak consumption",
+                     format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
         break;
     case Leaked:
         label = i18n("%1 leaked in total", format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
@@ -409,9 +409,8 @@ SearchResults applySearch(FrameGraphicsItem* item, const QString& searchValue)
     for (auto* child : item->childItems()) {
         auto* childFrame = static_cast<FrameGraphicsItem*>(child);
         auto childMatch = applySearch(childFrame, searchValue);
-        if (result.matchType != DirectMatch &&
-            (childMatch.matchType == DirectMatch || childMatch.matchType == ChildMatch))
-        {
+        if (result.matchType != DirectMatch
+            && (childMatch.matchType == DirectMatch || childMatch.matchType == ChildMatch)) {
             result.matchType = ChildMatch;
             result.directCost += childMatch.directCost;
         }
@@ -420,7 +419,6 @@ SearchResults applySearch(FrameGraphicsItem* item, const QString& searchValue)
     item->setSearchMatchType(result.matchType);
     return result;
 }
-
 }
 
 FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
@@ -434,27 +432,32 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     qRegisterMetaType<FrameGraphicsItem*>();
 
     m_costSource->addItem(i18n("Allocations"), QVariant::fromValue(Allocations));
-    m_costSource->setItemData(0, i18n("Show a flame graph over the number of allocations triggered by "
-                                      "functions in your code."),
+    m_costSource->setItemData(0,
+                              i18n("Show a flame graph over the number of allocations triggered by "
+                                   "functions in your code."),
                               Qt::ToolTipRole);
     m_costSource->addItem(i18n("Temporary Allocations"), QVariant::fromValue(Temporary));
-    m_costSource->setItemData(1, i18n("Show a flame graph over the number of temporary allocations "
-                                      "triggered by functions in your code. "
-                                      "Allocations are marked as temporary when they are immediately "
-                                      "followed by their deallocation."),
+    m_costSource->setItemData(1,
+                              i18n("Show a flame graph over the number of temporary allocations "
+                                   "triggered by functions in your code. "
+                                   "Allocations are marked as temporary when they are immediately "
+                                   "followed by their deallocation."),
                               Qt::ToolTipRole);
     m_costSource->addItem(i18n("Memory Peak"), QVariant::fromValue(Peak));
-    m_costSource->setItemData(2, i18n("Show a flame graph over the contributions to the peak heap "
-                                      "memory consumption of your application."),
+    m_costSource->setItemData(2,
+                              i18n("Show a flame graph over the contributions to the peak heap "
+                                   "memory consumption of your application."),
                               Qt::ToolTipRole);
     m_costSource->addItem(i18n("Leaked"), QVariant::fromValue(Leaked));
-    m_costSource->setItemData(3, i18n("Show a flame graph over the leaked heap memory of your application. "
-                                      "Memory is considered to be leaked when it never got deallocated. "),
+    m_costSource->setItemData(3,
+                              i18n("Show a flame graph over the leaked heap memory of your application. "
+                                   "Memory is considered to be leaked when it never got deallocated. "),
                               Qt::ToolTipRole);
     m_costSource->addItem(i18n("Allocated"), QVariant::fromValue(Allocated));
-    m_costSource->setItemData(4, i18n("Show a flame graph over the total memory allocated by functions in "
-                                      "your code. "
-                                      "This aggregates all memory allocations and ignores deallocations."),
+    m_costSource->setItemData(4,
+                              i18n("Show a flame graph over the total memory allocated by functions in "
+                                   "your code. "
+                                   "This aggregates all memory allocations and ignores deallocations."),
                               Qt::ToolTipRole);
     connect(m_costSource, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
             &FlameGraph::showData);
@@ -508,8 +511,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     m_searchInput->setPlaceholderText(i18n("Search..."));
     m_searchInput->setToolTip(i18n("<qt>Search the flame graph for a symbol.</qt>"));
     m_searchInput->setClearButtonEnabled(true);
-    connect(m_searchInput, &QLineEdit::textChanged,
-            this, &FlameGraph::setSearchValue);
+    connect(m_searchInput, &QLineEdit::textChanged, this, &FlameGraph::setSearchValue);
 
     auto controls = new QWidget(this);
     controls->setLayout(new QHBoxLayout);
@@ -523,7 +525,8 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     m_displayLabel->setTextInteractionFlags(m_displayLabel->textInteractionFlags() | Qt::TextSelectableByMouse);
 
     m_searchResultsLabel->setWordWrap(true);
-    m_searchResultsLabel->setTextInteractionFlags(m_searchResultsLabel->textInteractionFlags() | Qt::TextSelectableByMouse);
+    m_searchResultsLabel->setTextInteractionFlags(m_searchResultsLabel->textInteractionFlags()
+                                                  | Qt::TextSelectableByMouse);
     m_searchResultsLabel->hide();
 
     setLayout(new QVBoxLayout);
@@ -538,9 +541,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     addAction(m_forwardAction);
     m_resetAction = new QAction(QIcon::fromTheme(QStringLiteral("go-first")), i18n("Reset View"), this);
     m_resetAction->setShortcut(Qt::Key_Escape);
-    connect(m_resetAction, &QAction::triggered, this, [this]() {
-        selectItem(0);
-    });
+    connect(m_resetAction, &QAction::triggered, this, [this]() { selectItem(0); });
     addAction(m_resetAction);
     updateNavigationActions();
     setContextMenuPolicy(Qt::ActionsContextMenu);
@@ -586,8 +587,8 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
         if (tooltip.isEmpty()) {
             QToolTip::hideText();
         } else {
-            QToolTip::showText(QCursor::pos(), QLatin1String("<qt>")
-                + tooltip.toHtmlEscaped() + QLatin1String("</qt>"), this);
+            QToolTip::showText(QCursor::pos(), QLatin1String("<qt>") + tooltip.toHtmlEscaped() + QLatin1String("</qt>"),
+                               this);
         }
         event->accept();
         return true;
@@ -741,8 +742,8 @@ void FlameGraph::setSearchValue(const QString& value)
         switch (m_costSource->currentData().value<CostType>()) {
         case Allocations:
         case Temporary:
-            label = i18n("%1 (%2% of total of %3) allocations matched by search.",
-                         match.directCost, costFraction, m_rootItem->cost());
+            label = i18n("%1 (%2% of total of %3) allocations matched by search.", match.directCost, costFraction,
+                         m_rootItem->cost());
             break;
         case Peak:
         case Leaked:

@@ -28,9 +28,9 @@
 #include <cstdlib>
 #include <fcntl.h>
 #include <link.h>
-#include <stdio_ext.h>
 #include <pthread.h>
 #include <signal.h>
+#include <stdio_ext.h>
 
 #include <atomic>
 #include <cinttypes>
@@ -187,8 +187,8 @@ FILE* createFile(const char* fileName)
     if (out) {
         __fsetlocking(out, FSETLOCKING_BYCALLER);
     } else {
-        fprintf(stderr, "ERROR: failed to open heaptrack output file %s: %s (%d)\n",
-                outputFileName.c_str(), strerror(errno), errno);
+        fprintf(stderr, "ERROR: failed to open heaptrack output file %s: %s (%d)\n", outputFileName.c_str(),
+                strerror(errno), errno);
     }
 
     return out;
@@ -498,7 +498,8 @@ private:
                 fprintf(stderr, "WARNING: Failed to open /proc/self/statm for reading: %s.\n", strerror(errno));
             } else if (setvbuf(procStatm, nullptr, _IONBF, 0)) {
                 // disable buffering to ensure we read the latest values
-                fprintf(stderr, "WARNING: Failed to disable buffering for reading of /proc/self/statm: %s.\n", strerror(errno));
+                fprintf(stderr, "WARNING: Failed to disable buffering for reading of /proc/self/statm: %s.\n",
+                        strerror(errno));
             }
 
             // ensure this utility thread is not handling any signals

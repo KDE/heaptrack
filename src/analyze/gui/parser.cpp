@@ -416,7 +416,8 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeRows*
             while (node) {
                 const auto& location = node->location;
                 if (!recursionGuard.contains(location)) { // aggregate caller-callee data
-                    auto it = lower_bound(callerCalleeData->begin(), callerCalleeData->end(), location,
+                    auto it = lower_bound(
+                        callerCalleeData->begin(), callerCalleeData->end(), location,
                         [](const CallerCalleeData& lhs, const LocationData::Ptr& rhs) { return lhs.location < rhs; });
                     if (it == callerCalleeData->end() || it->location != location) {
                         it = callerCalleeData->insert(it, {{}, {}, location});

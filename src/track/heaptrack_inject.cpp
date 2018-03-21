@@ -262,8 +262,7 @@ void try_overwrite_symbols(const Elf::Dyn* dyn, const Elf::Addr base, const bool
 
     // initialize the elf tables
     for (; dyn->d_tag != DT_NULL; ++dyn) {
-        symbols.consume(dyn) || strings.consume(dyn)
-            || rels.consume(dyn) || relas.consume(dyn) || jmprels.consume(dyn);
+        symbols.consume(dyn) || strings.consume(dyn) || rels.consume(dyn) || relas.consume(dyn) || jmprels.consume(dyn);
     }
 
     // find symbols to overwrite

@@ -74,8 +74,7 @@ bool TopProxy::filterAcceptsRow(int source_row, const QModelIndex& source_parent
 void TopProxy::setSourceModel(QAbstractItemModel* sourceModel)
 {
     QSortFilterProxyModel::setSourceModel(sourceModel);
-    connect(sourceModel, &QAbstractItemModel::modelReset,
-            this, &TopProxy::updateCostThreshold, Qt::UniqueConnection);
+    connect(sourceModel, &QAbstractItemModel::modelReset, this, &TopProxy::updateCostThreshold, Qt::UniqueConnection);
     updateCostThreshold();
 }
 

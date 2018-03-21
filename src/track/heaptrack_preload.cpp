@@ -30,9 +30,9 @@
 using namespace std;
 
 #if defined(_ISOC11_SOURCE)
-#  define HAVE_ALIGNED_ALLOC 1
+#define HAVE_ALIGNED_ALLOC 1
 #else
-#  define HAVE_ALIGNED_ALLOC 0
+#define HAVE_ALIGNED_ALLOC 0
 #endif
 
 extern "C" {
@@ -112,8 +112,9 @@ void* dummy_calloc(size_t num, size_t size) noexcept
     size_t oldOffset = offset;
     offset += num * size;
     if (offset >= MAX_SIZE) {
-        fprintf(stderr, "failed to initialize, dummy calloc buf size exhausted: "
-                        "%zu requested, %zu available\n",
+        fprintf(stderr,
+                "failed to initialize, dummy calloc buf size exhausted: "
+                "%zu requested, %zu available\n",
                 offset, MAX_SIZE);
         abort();
     }

@@ -70,7 +70,8 @@ struct Frame
         : function(function)
         , file(file)
         , line(line)
-    {}
+    {
+    }
 
     bool isValid() const
     {
@@ -94,7 +95,8 @@ struct ResolvedFrame
         : functionIndex(functionIndex)
         , fileIndex(fileIndex)
         , line(line)
-    {}
+    {
+    }
     size_t functionIndex;
     size_t fileIndex;
     int line;
@@ -109,7 +111,8 @@ struct ResolvedIP
 
 struct Module
 {
-    Module(string fileName, uintptr_t addressStart, uintptr_t addressEnd, backtrace_state* backtraceState, size_t moduleIndex)
+    Module(string fileName, uintptr_t addressStart, uintptr_t addressEnd, backtrace_state* backtraceState,
+           size_t moduleIndex)
         : fileName(fileName)
         , addressStart(addressStart)
         , addressEnd(addressEnd)
@@ -131,9 +134,9 @@ struct Module
                              Frame frame(demangle(function), file ? file : "", line);
                              auto info = reinterpret_cast<AddressInformation*>(data);
                              if (!info->frame.isValid()) {
-                                info->frame = frame;
+                                 info->frame = frame;
                              } else {
-                                info->inlined.push_back(frame);
+                                 info->inlined.push_back(frame);
                              }
                              return 0;
                          },
@@ -141,7 +144,8 @@ struct Module
 
         // no debug information available? try to fallback on the symbol table information
         if (!info.frame.isValid()) {
-            struct Data {
+            struct Data
+            {
                 AddressInformation* info;
                 const Module* module;
                 uintptr_t address;
@@ -156,9 +160,8 @@ struct Module
                 },
                 [](void* _data, const char* msg, int errnum) {
                     auto* data = reinterpret_cast<const Data*>(_data);
-                    cerr << "Module backtrace error for address " << hex << data->address << dec
-                         << " in module " << data->module->fileName
-                         << " (code " << errnum << "): " << msg << endl;
+                    cerr << "Module backtrace error for address " << hex << data->address << dec << " in module "
+                         << data->module->fileName << " (code " << errnum << "): " << msg << endl;
                 },
                 &data);
         }
@@ -230,8 +233,7 @@ struct AccumulatedTraceData
             m_modulesDirty = false;
         }
 
-        auto resolveFrame = [this](const Frame& frame)
-        {
+        auto resolveFrame = [this](const Frame& frame) {
             return ResolvedFrame{intern(frame.function), intern(frame.file), frame.line};
         };
 
@@ -244,8 +246,7 @@ struct AccumulatedTraceData
             data.moduleIndex = module->moduleIndex;
             const auto info = module->resolveAddress(ip);
             data.frame = resolveFrame(info.frame);
-            std::transform(info.inlined.begin(), info.inlined.end(), std::back_inserter(data.inlined),
-                           resolveFrame);
+            std::transform(info.inlined.begin(), info.inlined.end(), std::back_inserter(data.inlined), resolveFrame);
         }
         return data;
     }
@@ -272,9 +273,8 @@ struct AccumulatedTraceData
         return id;
     }
 
-    void addModule(string fileName, backtrace_state* backtraceState,
-                   const size_t moduleIndex, const uintptr_t addressStart,
-                   const uintptr_t addressEnd)
+    void addModule(string fileName, backtrace_state* backtraceState, const size_t moduleIndex,
+                   const uintptr_t addressStart, const uintptr_t addressEnd)
     {
         m_modules.emplace_back(fileName, addressStart, addressEnd, backtraceState, moduleIndex);
         m_modulesDirty = true;
@@ -352,8 +352,8 @@ struct AccumulatedTraceData
             if (descriptor >= 1) {
                 int foundSym = 0;
                 int foundDwarf = 0;
-                auto ret = elf_add(state, data.fileName, descriptor, addressStart, errorHandler, &data, &state->fileline_fn, &foundSym,
-                                   &foundDwarf, false, false);
+                auto ret = elf_add(state, data.fileName, descriptor, addressStart, errorHandler, &data,
+                                   &state->fileline_fn, &foundSym, &foundDwarf, false, false);
                 if (ret && foundSym) {
                     state->syminfo_fn = &elf_syminfo;
                 } else {
@@ -476,10 +476,11 @@ int main(int /*argc*/, char** /*argv*/)
         }
     }
 
-    fprintf(stderr, "heaptrack stats:\n"
-                    "\tallocations:          \t%" PRIu64 "\n"
-                    "\tleaked allocations:   \t%" PRIu64 "\n"
-                    "\ttemporary allocations:\t%" PRIu64 "\n",
+    fprintf(stderr,
+            "heaptrack stats:\n"
+            "\tallocations:          \t%" PRIu64 "\n"
+            "\tleaked allocations:   \t%" PRIu64 "\n"
+            "\ttemporary allocations:\t%" PRIu64 "\n",
             allocations, leakedAllocations, temporaryAllocations);
 
     return 0;

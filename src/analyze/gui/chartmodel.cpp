@@ -121,8 +121,7 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
     const auto cost = data.cost[column];
     if (role == Qt::ToolTipRole) {
         const QString time = Util::formatTime(data.timeStamp);
-        auto byteCost = [cost]() -> QString
-        {
+        auto byteCost = [cost]() -> QString {
             KFormat format;
             const auto formatted = format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect);
             if (cost > 1024) {
@@ -139,11 +138,9 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
             case Temporary:
                 return i18n("<qt>%1 temporary allocations in total after %2</qt>", cost, time);
             case Consumed:
-                return i18n("<qt>%1 consumed in total after %2</qt>",
-                            byteCost(), time);
+                return i18n("<qt>%1 consumed in total after %2</qt>", byteCost(), time);
             case Allocated:
-                return i18n("<qt>%1 allocated in total after %2</qt>",
-                            byteCost(), time);
+                return i18n("<qt>%1 allocated in total after %2</qt>", byteCost(), time);
             }
         } else {
             const auto label = m_data.labels.value(column).toHtmlEscaped();

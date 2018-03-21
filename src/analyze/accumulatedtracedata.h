@@ -41,14 +41,12 @@ struct Frame
 
     bool operator==(const Frame& rhs) const
     {
-        return std::tie(functionIndex, fileIndex, line)
-            == std::tie(rhs.functionIndex, rhs.fileIndex, rhs.line);
+        return std::tie(functionIndex, fileIndex, line) == std::tie(rhs.functionIndex, rhs.fileIndex, rhs.line);
     }
 
     bool operator<(const Frame& rhs) const
     {
-        return std::tie(functionIndex, fileIndex, line)
-             < std::tie(rhs.functionIndex, rhs.fileIndex, rhs.line);
+        return std::tie(functionIndex, fileIndex, line) < std::tie(rhs.functionIndex, rhs.fileIndex, rhs.line);
     }
 };
 
@@ -61,14 +59,12 @@ struct InstructionPointer
 
     bool compareWithoutAddress(const InstructionPointer& other) const
     {
-        return std::tie(moduleIndex, frame)
-             < std::tie(other.moduleIndex, other.frame);
+        return std::tie(moduleIndex, frame) < std::tie(other.moduleIndex, other.frame);
     }
 
     bool equalWithoutAddress(const InstructionPointer& other) const
     {
-        return std::tie(moduleIndex, frame)
-            == std::tie(other.moduleIndex, other.frame);
+        return std::tie(moduleIndex, frame) == std::tie(other.moduleIndex, other.frame);
     }
 };
 
@@ -112,7 +108,8 @@ struct AccumulatedTraceData
     std::string prettyFunction(const std::string& function) const;
 
     bool read(const std::string& inputFile);
-    enum ParsePass {
+    enum ParsePass
+    {
         // find time of total peak cost
         FirstPass,
         // parse individual allocations

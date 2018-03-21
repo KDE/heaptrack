@@ -23,10 +23,10 @@
 #include <iostream>
 #include <memory>
 
+#include <boost-zstd/zstd.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
-#include <boost-zstd/zstd.hpp>
 
 #include "util/config.h"
 #include "util/linereader.h"
@@ -165,9 +165,11 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
 
     vector<string> opNewStrings = {
         // 64 bit
-        "operator new(unsigned long)", "operator new[](unsigned long)",
+        "operator new(unsigned long)",
+        "operator new[](unsigned long)",
         // 32 bit
-        "operator new(unsigned int)", "operator new[](unsigned int)",
+        "operator new(unsigned int)",
+        "operator new[](unsigned int)",
     };
     vector<StringIndex> opNewStrIndices;
     opNewStrIndices.reserve(opNewStrings.size());
@@ -235,9 +237,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
             reader >> ip.instructionPointer;
             reader >> ip.moduleIndex;
             auto readFrame = [&reader](Frame* frame) {
-                return (reader >> frame->functionIndex)
-                    && (reader >> frame->fileIndex)
-                    && (reader >> frame->line);
+                return (reader >> frame->functionIndex) && (reader >> frame->fileIndex) && (reader >> frame->line);
             };
             if (readFrame(&ip.frame)) {
                 Frame inlinedFrame;
@@ -506,8 +506,8 @@ POTENTIALLY_UNUSED void printTrace(const AccumulatedTraceData& data, TraceIndex 
              << data.stringify(ip.frame.functionIndex) << " in " << data.stringify(ip.moduleIndex) << " at "
              << data.stringify(ip.frame.fileIndex) << ':' << ip.frame.line << '\n';
         for (const auto& inlined : ip.inlined) {
-            cerr << '\t' << data.stringify(inlined.functionIndex) << " at "
-                 << data.stringify(inlined.fileIndex) << ':' << inlined.line << '\n';
+            cerr << '\t' << data.stringify(inlined.functionIndex) << " at " << data.stringify(inlined.fileIndex) << ':'
+                 << inlined.line << '\n';
         }
         index = trace.parentIndex;
     } while (index);
@@ -669,9 +669,8 @@ AllocationIndex AccumulatedTraceData::mapToAllocationIndex(const TraceIndex trac
     if (traceIndex < m_maxAllocationTraceIndex) {
         // only need to search when the trace index is previously known
         auto it = lower_bound(traceIndexToAllocationIndex.begin(), traceIndexToAllocationIndex.end(), traceIndex,
-                              [](const pair<TraceIndex, AllocationIndex>& indexMap, const TraceIndex traceIndex) -> bool {
-                                  return indexMap.first < traceIndex;
-                              });
+                              [](const pair<TraceIndex, AllocationIndex>& indexMap,
+                                 const TraceIndex traceIndex) -> bool { return indexMap.first < traceIndex; });
         if (it != traceIndexToAllocationIndex.end() && it->first == traceIndex) {
             return it->second;
         }

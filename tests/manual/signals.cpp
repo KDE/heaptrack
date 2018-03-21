@@ -17,16 +17,17 @@
  */
 
 #include <atomic>
+#include <errno.h>
+#include <pthread.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <errno.h>
-#include <signal.h>
-#include <pthread.h>
 
 std::atomic<bool> g_exit(false);
 
-void* run_signal_thread(void*) {
+void* run_signal_thread(void*)
+{
     // Unblock interesting signals for this thread only
     sigset_t mask;
     sigemptyset(&mask);
@@ -48,28 +49,26 @@ void* run_signal_thread(void*) {
         if (sig < 0) {
             if (errno == EINTR || errno == EAGAIN) {
                 continue;
-            }
-            else {
+            } else {
                 perror("signal wait failed");
                 abort();
             }
-        }
-        else if (sig == SIGQUIT || sig == SIGINT || sig == SIGTERM) {
+        } else if (sig == SIGQUIT || sig == SIGINT || sig == SIGTERM) {
             g_exit = true;
         }
-    }
-    while (!g_exit);
+    } while (!g_exit);
 
     return nullptr;
 }
 
-int main() {
+int main()
+{
     pthread_t signal_thread;
 
     // when tracked by heaptrack, this will initialize our background thread
     // without the signal mask set. thus this thread will handle the signal
     // and kill the whole application then
-    char *p = new char[1000];
+    char* p = new char[1000];
 
     // block all signals for this thread
     sigset_t mask;

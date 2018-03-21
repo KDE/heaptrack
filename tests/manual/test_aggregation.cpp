@@ -23,21 +23,26 @@ void foo()
 
 void bar()
 {
-    foo(); new char[2];
+    foo();
+    new char[2];
 }
 
 void asdf()
 {
-    bar(); new char[3];
+    bar();
+    new char[3];
 }
 
 void foobar()
 {
-    asdf(); new char[5];
+    asdf();
+    new char[5];
 }
 
 int main()
 {
-    asdf(); new char[4]; foobar();
+    asdf();
+    new char[4];
+    foobar();
     return 0;
 }
