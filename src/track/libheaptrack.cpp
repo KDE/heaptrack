@@ -495,7 +495,7 @@ private:
             debugLog<MinimalOutput>("%s", "constructing LockedData");
             procStatm = fopen("/proc/self/statm", "r");
             if (!procStatm) {
-                fprintf(stderr, "WARNING: Failed to open /proc/self/statm for reading.\n");
+                fprintf(stderr, "WARNING: Failed to open /proc/self/statm for reading: %s.\n", strerror(errno));
             }
 
             // ensure this utility thread is not handling any signals
