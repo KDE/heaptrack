@@ -48,11 +48,7 @@ struct StringCache
 
     QString file(const Frame& frame) const
     {
-        if (frame.fileIndex) {
-            return stringify(frame.fileIndex);
-        } else {
-            return {};
-        }
+        return stringify(frame.fileIndex);
     }
 
     QString stringify(const StringIndex index) const
