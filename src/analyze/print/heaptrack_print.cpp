@@ -85,6 +85,34 @@ ostream& operator<<(ostream& out, const formatBytes data)
     return out << fixed << setprecision(2) << bytes << *unit;
 }
 
+enum CostType
+{
+    Allocations,
+    Temporary,
+    Allocated,
+    Leaked,
+    Peak
+};
+
+std::istream& operator>>(std::istream& in, CostType& type)
+{
+    std::string token;
+    in >> token;
+    if (token == "allocations")
+        type = Allocations;
+    else if (token == "temporary")
+        type = Temporary;
+    else if (token == "allocated")
+        type = Allocated;
+    else if (token == "leaked")
+        type = Leaked;
+    else if (token == "peak")
+        type = Peak;
+    else
+        in.setstate(std::ios_base::failbit);
+    return in;
+}
+
 struct Printer final : public AccumulatedTraceData
 {
     void finalize()
@@ -552,6 +580,13 @@ int main(int argc, char** argv)
             "Limit the number of reported backtraces of merged peak locations.")
         ("print-histogram,H", po::value<string>()->default_value(string()),
             "Path to output file where an allocation size histogram will be written to.")
+        ("flamegraph-cost-type", po::value<CostType>()->default_value(Allocations),
+            "The cost type to use when generating a flamegraph. Possible options are:\n"
+            "  - allocations: number of allocations\n"
+            "  - temporary: number of temporary allocations\n"
+            "  - allocated: bytes allocated, ignoring deallocations\n"
+            "  - leaked: bytes not deallocated at the end\n"
+            "  - peak: bytes consumed at highest total memory consumption")
         ("print-flamegraph,F", po::value<string>()->default_value(string()),
             "Path to output file where a flame-graph compatible stack file will be written to.\n"
             "To visualize the resulting file, use flamegraph.pl from "
@@ -620,6 +655,7 @@ int main(int argc, char** argv)
     const string printHistogram = vm["print-histogram"].as<string>();
     data.printHistogram = !printHistogram.empty();
     const string printFlamegraph = vm["print-flamegraph"].as<string>();
+    const auto flamegraphCostType = vm["flamegraph-cost-type"].as<CostType>();
     const string printMassif = vm["print-massif"].as<string>();
     if (!printMassif.empty()) {
         data.massifOut.open(printMassif, ios_base::out);
@@ -765,7 +801,25 @@ int main(int argc, char** argv)
                 } else {
                     data.printFlamegraph(data.findTrace(allocation.traceIndex), flamegraph);
                 }
-                flamegraph << ' ' << allocation.allocations << '\n';
+                flamegraph << ' ';
+                switch (flamegraphCostType) {
+                case Allocations:
+                    flamegraph << allocation.allocations;
+                    break;
+                case Allocated:
+                    flamegraph << allocation.allocated;
+                    break;
+                case Temporary:
+                    flamegraph << allocation.temporary;
+                    break;
+                case Peak:
+                    flamegraph << allocation.peak;
+                    break;
+                case Leaked:
+                    flamegraph << allocation.leaked;
+                    break;
+                }
+                flamegraph << '\n';
             }
         }
     }
