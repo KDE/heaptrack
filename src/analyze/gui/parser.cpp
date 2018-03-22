@@ -297,6 +297,7 @@ struct ParserData final : public AccumulatedTraceData
 
 void setParents(QVector<RowData>& children, const RowData* parent)
 {
+    children.squeeze();
     for (auto& row : children) {
         row.parent = parent;
         setParents(row.children, &row);
