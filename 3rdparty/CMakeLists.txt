@@ -1,4 +1,6 @@
-include(ECMEnableSanitizers)
+if (ECM_FOUND)
+    include(ECMEnableSanitizers)
+endif()
 
 add_subdirectory(libbacktrace)
 

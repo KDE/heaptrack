@@ -1,4 +1,6 @@
-include(ECMEnableSanitizers)
+if (ECM_FOUND)
+    include(ECMEnableSanitizers)
+endif()
 
 configure_file(analyze_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/analyze_config.h)
 

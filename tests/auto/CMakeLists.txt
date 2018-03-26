@@ -1,4 +1,7 @@
-include(ECMEnableSanitizers)
+if (ECM_FOUND)
+    include(ECMEnableSanitizers)
+endif()
+
 set(CMAKE_BUILD_TYPE Debug)
 
 include_directories(
