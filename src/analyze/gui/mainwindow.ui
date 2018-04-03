@@ -64,16 +64,16 @@
            <item row="1" column="1">
             <widget class="KUrlRequester" name="openFile">
              <property name="toolTip">
-              <string>&lt;qt&gt;&lt;p&gt;This field specifies the primary heaptrack data file. These files are called &lt;tt&gt;heaptrack.$APP.$PID.gz&lt;/tt&gt;. You can produce such a file by profiling your application, e.g. via:&lt;/p&gt;
+              <string>&lt;qt&gt;&lt;p&gt;This field specifies the primary heaptrack data file. These files are called &lt;tt&gt;heaptrack.$APP.$PID.gz&lt;/tt&gt; or &lt;tt&gt;heaptrack.$APP.$PID.zst&lt;/tt&gt;. You can produce such a file by profiling your application, e.g. via:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;heaptrack &amp;lt;yourapplication&amp;gt; ...&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Or, alternatively, you can attach to a running process via&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;heaptrack --pid $(pidof &amp;lt;yourapplication&amp;gt;)&lt;/code&gt;&lt;/pre&gt;&lt;/qt&gt;</string>
              </property>
              <property name="filter">
-              <string>heaptrack.*.*.gz</string>
+              <string>heaptrack.*.*.gz heaptrack.*.*.zst</string>
              </property>
              <property name="placeholderText">
-              <string>path/to/heaptrack.$APP.$PID.gz</string>
+              <string>path/to/heaptrack.$APP.$PID.{gz,zst}</string>
              </property>
              <property name="fileDialogModality">
               <enum>Qt::WindowModal</enum>
@@ -86,10 +86,10 @@
               <string>&lt;qt&gt;You can optionally specify a second heaptrack data file to compare to. If set, this file will be used as a base and its cost gets subtracted from the primary data costs.&lt;/qt&gt;</string>
              </property>
              <property name="filter">
-              <string>heaptrack.*.*.gz</string>
+              <string>heaptrack.*.*.gz heaptrack.*.*.zst</string>
              </property>
              <property name="placeholderText">
-              <string>path/to/heaptrack.$APP.$PID.gz</string>
+              <string>path/to/heaptrack.$APP.$PID.{gz,zst}</string>
              </property>
              <property name="fileDialogModality">
               <enum>Qt::WindowModal</enum>
