@@ -296,6 +296,7 @@ public:
 
         debugLog<MinimalOutput>("%s", "shutdown()");
 
+        s_data->out.disableBuffering();
         writeTimestamp();
         writeRSS();
 
@@ -327,7 +328,7 @@ public:
 
         debugLog<VeryVerboseOutput>("writeTimestamp(%" PRIx64 ")", elapsed.count());
 
-        if (fprintf(s_data->out, "c %" PRIx64 "\n", elapsed.count()) < 0) {
+        if (s_data->out.sendTimestamp(elapsed.count())) {
             writeError();
             return;
         }
@@ -352,7 +353,7 @@ public:
         // TODO: use custom allocators with known page sizes to prevent tainting
         //       the RSS numbers with heaptrack-internal data
 
-        if (fprintf(s_data->out, "R %zx\n", rss) < 0) {
+        if (s_data->out.sendRSS(rss)) {
             writeError();
             return;
         }
@@ -372,7 +373,7 @@ public:
         s_data->known.insert(ptr);
 #endif
 
-        if (fprintf(s_data->out, "+ %zx %x %" PRIxPTR "\n", size, index, reinterpret_cast<uintptr_t>(ptr)) < 0) {
+        if (s_data->out.sendAllocation(size, index, ptr)) {
             writeError();
             return;
         }
@@ -390,7 +391,7 @@ public:
         s_data->known.erase(it);
 #endif
 
-        if (fprintf(s_data->out, "- %" PRIxPTR "\n", reinterpret_cast<uintptr_t>(ptr)) < 0) {
+        if (s_data->out.sendDeallocation(ptr)) {
             writeError();
             return;
         }
@@ -407,7 +408,7 @@ private:
 
         debugLog<VerboseOutput>("dlopen_notify_callback: %s %zx", fileName, info->dlpi_addr);
 
-        if (fprintf(heaptrack->s_data->out, "m %s %zx", fileName, info->dlpi_addr) < 0) {
+        if (s_data->out.fprintf("m %s %zx", fileName, info->dlpi_addr) < 0) {
             heaptrack->writeError();
             return 1;
         }
@@ -415,14 +416,14 @@ private:
         for (int i = 0; i < info->dlpi_phnum; i++) {
             const auto& phdr = info->dlpi_phdr[i];
             if (phdr.p_type == PT_LOAD) {
-                if (fprintf(heaptrack->s_data->out, " %zx %zx", phdr.p_vaddr, phdr.p_memsz) < 0) {
+                if (s_data->out.fprintf(" %zx %zx", phdr.p_vaddr, phdr.p_memsz) < 0) {
                     heaptrack->writeError();
                     return 1;
                 }
             }
         }
 
-        if (fputc('\n', heaptrack->s_data->out) == EOF) {
+        if (s_data->out.fputc('\n') == EOF) {
             heaptrack->writeError();
             return 1;
         }
@@ -459,7 +460,7 @@ private:
             return;
         }
         debugLog<MinimalOutput>("%s", "updateModuleCache()");
-        if (fputs("m -\n", s_data->out) == EOF) {
+        if (s_data->out.fputs("m -\n") == EOF) {
             writeError();
             return;
         }
@@ -470,7 +471,7 @@ private:
     void writeError()
     {
         debugLog<MinimalOutput>("write error %d/%s", errno, strerror(errno));
-        s_data->out = nullptr;
+        s_data->out.clear();
         shutdown();
     }
 
@@ -551,7 +552,7 @@ private:
             }
 
             if (out) {
-                fclose(out);
+                out.fclose();
             }
 
             if (procStatm) {
@@ -569,7 +570,7 @@ private:
          *       Esp. in multi-threaded environments this is much faster
          *       to produce non-per-line-interleaved output.
          */
-        FILE* out = nullptr;
+        BufferedStream out {nullptr};
 
         /// /proc/self/statm file stream to read RSS value from
         FILE* procStatm = nullptr;

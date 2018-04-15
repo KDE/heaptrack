@@ -28,6 +28,7 @@
 #include <vector>
 
 #include "trace.h"
+#include "bufferedstream.h"
 
 struct TraceEdge
 {
@@ -36,6 +37,9 @@ struct TraceEdge
     // the evaluation process can then reverse-map the index to the parent ip
     // to rebuild the backtrace from the bottom-up
     uint32_t index;
+
+    Trace::ip_t lastIpSearch;
+    TraceEdge*  lastTraceSearch;
     // sorted list of children, assumed to be small
     std::vector<TraceEdge> children;
 };
@@ -61,7 +65,7 @@ public:
      *
      * Unknown instruction pointers will be printed to @p out.
      */
-    uint32_t index(const Trace& trace, FILE* out)
+    uint32_t index(const Trace& trace, BufferedStream& out)
     {
         uint32_t index = 0;
         TraceEdge* parent = &m_root;
@@ -70,16 +74,26 @@ public:
             if (!ip) {
                 continue;
             }
-            auto it =
-                std::lower_bound(parent->children.begin(), parent->children.end(), ip,
-                                 [](const TraceEdge& l, const Trace::ip_t ip) { return l.instructionPointer < ip; });
-            if (it == parent->children.end() || it->instructionPointer != ip) {
-                index = m_index++;
-                it = parent->children.insert(it, {ip, index, {}});
-                fprintf(out, "t %" PRIxPTR " %x\n", reinterpret_cast<uintptr_t>(ip), parent->index);
+            if (ip == parent->lastIpSearch) {
+                parent = parent->lastTraceSearch;
+                index = parent->index;
             }
-            index = it->index;
-            parent = &(*it);
+            else {
+                auto it =
+                    std::lower_bound(parent->children.begin(), parent->children.end(), ip,
+                                     [](const TraceEdge& l, const Trace::ip_t ip) { return l.instructionPointer < ip; });
+                if (it == parent->children.end() || it->instructionPointer != ip) {
+                    index = m_index++;
+                    it = parent->children.insert(it, {ip, index, nullptr, nullptr, {}});
+                    out.fprintf("t %" PRIxPTR " %x\n", reinterpret_cast<uintptr_t>(ip), parent->index);
+                }
+
+                parent->lastIpSearch = ip;
+                parent->lastTraceSearch = &(*it);
+
+                index = it->index;
+                parent = &(*it);
+            }
         }
         return index;
     }
