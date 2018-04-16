@@ -70,6 +70,14 @@ SCRIPT_PATH=$(readlink -f "$0")
 SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
 EXE_PATH=$(readlink -f "$SCRIPT_DIR")
 
+openHeaptrackDataFiles() {
+    if [ -x "$EXE_PATH/heaptrack_gui" ]; then
+        "$EXE_PATH/heaptrack_gui" "$@"
+    else
+        "$EXE_PATH/heaptrack_print" "$@"
+    fi
+}
+
 while true; do
     case "$1" in
         "-d" | "--debug")
@@ -113,19 +121,18 @@ while true; do
             ;;
         "-a" | "--analyze")
             shift 1
-            if [ -x "$EXE_PATH/heaptrack_gui" ]; then
-                "$EXE_PATH/heaptrack_gui" "$@"
-                exit
-            else
-                "$EXE_PATH/heaptrack_print" "$@"
-                exit
-            fi
+            openHeaptrackDataFiles "$@"
+            exit
             ;;
         *)
             if [ "$1" = "--" ]; then
                 shift 1
             fi
             if [ ! -x "$(which "$1" 2> /dev/null)" ]; then
+                if [ -f "$1" ] && echo "$1" | grep -q "heaptrack."; then
+                    openHeaptrackDataFiles "$@"
+                    exit
+                fi
                 echo "Error: Debuggee \"$1\" is not an executable."
                 echo
                 echo "Usage: $0 [--debug|-d] [--help|-h] DEBUGGEE [ARGS...]"
