@@ -66,7 +66,9 @@ pid=
 client=
 
 # path to current heaptrack.sh executable
-EXE_PATH=$(readlink -f $(dirname $(readlink -f $0)))
+SCRIPT_PATH=$(readlink -f "$0")
+SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
+EXE_PATH=$(readlink -f "$SCRIPT_DIR")
 
 while true; do
     case "$1" in
@@ -112,10 +114,10 @@ while true; do
         "-a" | "--analyze")
             shift 1
             if [ -x "$EXE_PATH/heaptrack_gui" ]; then
-                $EXE_PATH/heaptrack_gui "$@"
+                "$EXE_PATH/heaptrack_gui" "$@"
                 exit
             else
-                $EXE_PATH/heaptrack_print "$@"
+                "$EXE_PATH/heaptrack_print" "$@"
                 exit
             fi
             ;;
@@ -204,7 +206,7 @@ echo "heaptrack output will be written to \"$output\""
 
 if [ -z "$debug" ] && [ -z "$pid" ]; then
   echo "starting application, this might take some time..."
-  LD_PRELOAD=$LIBHEAPTRACK_PRELOAD${LD_PRELOAD:+:$LD_PRELOAD} DUMP_HEAPTRACK_OUTPUT="$pipe" "$client" "$@"
+  LD_PRELOAD="$LIBHEAPTRACK_PRELOAD${LD_PRELOAD:+:$LD_PRELOAD}" DUMP_HEAPTRACK_OUTPUT="$pipe" "$client" "$@"
 else
   if [ -z "$pid" ]; then
     echo "starting application in GDB, this might take some time..."
