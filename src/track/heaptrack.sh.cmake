@@ -112,10 +112,10 @@ while true; do
         "-a" | "--analyze")
             shift 1
             if [ -x "$EXE_PATH/heaptrack_gui" ]; then
-                $EXE_PATH/heaptrack_gui $@
+                $EXE_PATH/heaptrack_gui "$@"
                 exit
             else
-                $EXE_PATH/heaptrack_print $@
+                $EXE_PATH/heaptrack_print "$@"
                 exit
             fi
             ;;
