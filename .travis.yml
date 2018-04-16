@@ -50,7 +50,7 @@ script:
   - linuxdeployqt ./appdir/usr/share/applications/org.kde.heaptrack.desktop -executable=./appdir/usr/lib/heaptrack/libexec/heaptrack_interpret -executable=./appdir/usr/lib/heaptrack/libheaptrack_preload.so -executable=./appdir/usr/lib/heaptrack/libheaptrack_inject.so -bundle-non-qt-libs
   - # Ensure we prefer the bundled libs also when calling dlopen, cf.: https://github.com/KDAB/hotspot/issues/89
   - mv ./appdir/usr/bin/heaptrack_gui{,_bin}
-  - echo -e '#!/bin/bash\nd="$(dirname "$(readlink -f "${0}")")"\nLD_LIBRARY_PATH="$d/../lib":$LD_LIBRARY_PATH "$d/heaptrack_gui_bin" $@' > ./appdir/usr/bin/heaptrack_gui
+  - echo -e '#!/bin/bash\nf="$(readlink -f "${0}")"\nd="$(dirname "$f")"\nLD_LIBRARY_PATH="$d/../lib:$LD_LIBRARY_PATH" "$d/heaptrack_gui_bin" "$@"' > ./appdir/usr/bin/heaptrack_gui
   - chmod +x ./appdir/usr/bin/heaptrack_gui
   - # use the shell script as AppRun entry point
   - rm ./appdir/AppRun
