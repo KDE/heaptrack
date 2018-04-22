@@ -219,6 +219,7 @@ else
     echo "starting application in GDB, this might take some time..."
     gdb --quiet --eval-command="set environment LD_PRELOAD=$LIBHEAPTRACK_PRELOAD" \
         --eval-command="set environment DUMP_HEAPTRACK_OUTPUT=$pipe" \
+        --eval-command="set startup-with-shell off" \
         --eval-command="run" --args "$client" "$@"
   else
     echo "injecting heaptrack into application via GDB, this might take some time..."
