@@ -217,7 +217,7 @@ if [ -z "$debug" ] && [ -z "$pid" ]; then
 else
   if [ -z "$pid" ]; then
     echo "starting application in GDB, this might take some time..."
-    gdb --eval-command="set environment LD_PRELOAD=$LIBHEAPTRACK_PRELOAD" \
+    gdb --quiet --eval-command="set environment LD_PRELOAD=$LIBHEAPTRACK_PRELOAD" \
         --eval-command="set environment DUMP_HEAPTRACK_OUTPUT=$pipe" \
         --eval-command="run" --args "$client" "$@"
   else
@@ -230,7 +230,7 @@ else
             --eval-command="call (void) heaptrack_inject(\"$pipe\")" \
             --eval-command="detach"
     else
-        gdb -p $pid \
+        gdb --quiet -p $pid \
             --eval-command="sharedlibrary libc.so" \
             --eval-command="call (void) __libc_dlopen_mode(\"$LIBHEAPTRACK_INJECT\", 0x80000000 | 0x002)" \
             --eval-command="sharedlibrary libheaptrack_inject" \
