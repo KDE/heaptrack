@@ -31,6 +31,8 @@
 #include <pthread.h>
 #include <signal.h>
 #include <stdio_ext.h>
+#include <sys/file.h>
+#include <syscall.h>
 
 #include <atomic>
 #include <cinttypes>
@@ -57,6 +59,11 @@ using namespace std;
 
 namespace {
 
+__pid_t gettid()
+{
+    return syscall(SYS_gettid);
+}
+
 enum DebugVerbosity
 {
     NoDebugOutput,
@@ -77,7 +84,7 @@ inline void debugLog(const char fmt[], Args... args)
 {
     if (debugLevel <= s_debugVerbosity) {
         flockfile(stderr);
-        fprintf(stderr, "heaptrack debug [%d]: ", static_cast<int>(debugLevel));
+        fprintf(stderr, "heaptrack debug(%d) [%d:%d]: ", static_cast<int>(debugLevel), getpid(), gettid());
         fprintf(stderr, fmt, args...);
         fputc('\n', stderr);
         funlockfile(stderr);
