@@ -123,6 +123,39 @@ inline void debugLog(const char fmt[], Args... args)
     }
 }
 
+void printBacktrace()
+{
+    if (s_debugVerbosity == NoDebugOutput)
+        return;
+
+#if LIBUNWIND_HAS_UNW_GETCONTEXT && LIBUNWIND_HAS_UNW_INIT_LOCAL
+    RecursionGuard guard;
+
+    unw_context_t context;
+    unw_getcontext(&context);
+
+    unw_cursor_t cursor;
+    unw_init_local(&cursor, &context);
+
+    int frameNr = 0;
+    while (unw_step(&cursor)) {
+        ++frameNr;
+        unw_word_t ip = 0;
+        unw_get_reg(&cursor, UNW_REG_IP, &ip);
+
+        unw_word_t sp = 0;
+        unw_get_reg(&cursor, UNW_REG_SP, &sp);
+
+        char symbol[256] = {"<unknown>"};
+        unw_word_t offset = 0;
+        unw_get_proc_name(&cursor, symbol, sizeof(symbol), &offset);
+
+        fprintf(stderr, "#%-2d 0x%016" PRIxPTR " sp=0x%016" PRIxPTR " %s + 0x%" PRIxPTR "\n", frameNr,
+                static_cast<uintptr_t>(ip), static_cast<uintptr_t>(sp), symbol, static_cast<uintptr_t>(offset));
+    }
+#endif
+}
+
 /**
  * Set to true in an atexit handler. In such conditions, the stop callback
  * will not be called.
@@ -486,6 +519,7 @@ private:
     void writeError()
     {
         debugLog<MinimalOutput>("write error %d/%s", errno, strerror(errno));
+        printBacktrace();
         s_data->out = nullptr;
         shutdown();
     }
