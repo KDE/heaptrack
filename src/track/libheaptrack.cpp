@@ -60,10 +60,15 @@ using namespace std;
 namespace {
 
 using clock = chrono::steady_clock;
-const chrono::time_point<clock> s_start = clock::now();
+chrono::time_point<clock> startTime()
+{
+    static const chrono::time_point<clock> s_start = clock::now();
+    return s_start;
+}
+
 chrono::milliseconds elapsedTime()
 {
-    return chrono::duration_cast<chrono::milliseconds>(clock::now() - s_start);
+    return chrono::duration_cast<chrono::milliseconds>(clock::now() - startTime());
 }
 
 __pid_t gettid()
@@ -656,6 +661,8 @@ void heaptrack_init(const char* outputFileName, heaptrack_callback_t initBeforeC
                     heaptrack_callback_initialized_t initAfterCallback, heaptrack_callback_t stopCallback)
 {
     RecursionGuard guard;
+    // initialize
+    startTime();
 
     debugLog<MinimalOutput>("heaptrack_init(%s)", outputFileName);
 
