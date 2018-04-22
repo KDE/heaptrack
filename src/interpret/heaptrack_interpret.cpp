@@ -40,6 +40,7 @@
 #include "util/linereader.h"
 #include "util/pointermap.h"
 
+#include <signal.h>
 #include <unistd.h>
 
 using namespace std;
@@ -375,6 +376,24 @@ private:
     unordered_map<string, size_t> m_internedData;
     unordered_map<uintptr_t, size_t> m_encounteredIps;
 };
+
+struct Stats
+{
+    uint64_t allocations = 0;
+    uint64_t leakedAllocations = 0;
+    uint64_t temporaryAllocations = 0;
+} c_stats;
+
+void exitHandler()
+{
+    fflush(stdout);
+    fprintf(stderr,
+            "heaptrack stats:\n"
+            "\tallocations:          \t%" PRIu64 "\n"
+            "\tleaked allocations:   \t%" PRIu64 "\n"
+            "\ttemporary allocations:\t%" PRIu64 "\n",
+            c_stats.allocations, c_stats.leakedAllocations, c_stats.temporaryAllocations);
+}
 }
 
 int main(int /*argc*/, char** /*argv*/)
@@ -383,6 +402,9 @@ int main(int /*argc*/, char** /*argv*/)
     ios_base::sync_with_stdio(false);
     __fsetlocking(stdout, FSETLOCKING_BYCALLER);
     __fsetlocking(stdin, FSETLOCKING_BYCALLER);
+
+    // output data at end, even when we get terminated
+    std::atexit(exitHandler);
 
     AccumulatedTraceData data;
 
@@ -393,10 +415,6 @@ int main(int /*argc*/, char** /*argv*/)
     PointerMap ptrToIndex;
     uint64_t lastPtr = 0;
     AllocationInfoSet allocationInfos;
-
-    uint64_t allocations = 0;
-    uint64_t leakedAllocations = 0;
-    uint64_t temporaryAllocations = 0;
 
     while (reader.getLine(cin)) {
         if (reader.mode() == 'x') {
@@ -440,8 +458,8 @@ int main(int /*argc*/, char** /*argv*/)
             // trace point, map current output index to parent index
             fprintf(stdout, "t %zx %zx\n", ipId, parentIndex);
         } else if (reader.mode() == '+') {
-            ++allocations;
-            ++leakedAllocations;
+            ++c_stats.allocations;
+            ++c_stats.leakedAllocations;
             uint64_t size = 0;
             TraceIndex traceId;
             uint64_t ptr = 0;
@@ -471,21 +489,14 @@ int main(int /*argc*/, char** /*argv*/)
             }
             fprintf(stdout, "- %x\n", allocation.first.index);
             if (temporary) {
-                ++temporaryAllocations;
+                ++c_stats.temporaryAllocations;
             }
-            --leakedAllocations;
+            --c_stats.leakedAllocations;
         } else {
             fputs(reader.line().c_str(), stdout);
             fputc('\n', stdout);
         }
     }
-
-    fprintf(stderr,
-            "heaptrack stats:\n"
-            "\tallocations:          \t%" PRIu64 "\n"
-            "\tleaked allocations:   \t%" PRIu64 "\n"
-            "\ttemporary allocations:\t%" PRIu64 "\n",
-            allocations, leakedAllocations, temporaryAllocations);
 
     return 0;
 }
