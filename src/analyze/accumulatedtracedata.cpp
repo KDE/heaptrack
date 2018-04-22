@@ -187,6 +187,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
         allocation.clearCost();
     }
     uint fileVersion = 0;
+    bool debuggeeEncountered = false;
 
     // required for backwards compatibility
     // newer versions handle this in heaptrack_interpret already
@@ -374,6 +375,11 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 peakRSS = rss;
             }
         } else if (reader.mode() == 'X') {
+            if (debuggeeEncountered) {
+                cerr << "Duplicated debuggee entry - corrupt data file?" << endl;
+                return false;
+            }
+            debuggeeEncountered = true;
             if (pass != FirstPass) {
                 handleDebuggee(reader.line().c_str() + 2);
             }
