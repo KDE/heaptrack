@@ -55,14 +55,22 @@ if(LIBUNWIND_INCLUDE_DIR AND EXISTS "${LIBUNWIND_INCLUDE_DIR}/libunwind-common.h
 endif()
 
 if (LIBUNWIND_LIBRARY)
-  include (CheckLibraryExists)
+  include(CheckCSourceCompiles)
   set(CMAKE_REQUIRED_QUIET_SAVE ${CMAKE_REQUIRED_QUIET})
   set(CMAKE_REQUIRED_QUIET ${LibUnwind_FIND_QUIETLY})
-  check_library_exists(${LIBUNWIND_LIBRARY} unw_getcontext "" LIBUNWIND_HAS_UNW_GETCONTEXT)
-  check_library_exists(${LIBUNWIND_LIBRARY} unw_init_local "" LIBUNWIND_HAS_UNW_INIT_LOCAL)
-  check_library_exists(${LIBUNWIND_LIBRARY} unw_backtrace "" LIBUNWIND_HAS_UNW_BACKTRACE)
-  check_library_exists (${LIBUNWIND_LIBRARY} unw_backtrace_skip "" LIBUNWIND_HAS_UNW_BACKTRACE_SKIP)
+  set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
+  set(CMAKE_REQUIRED_LIBRARIES ${LIBUNWIND_LIBRARY})
+  set(CMAKE_REQUIRED_INCLUDES_SAVE ${CMAKE_REQUIRED_INCLUDES})
+  set(CMAKE_REQUIRED_INCLUDES ${LIBUNWIND_INCLUDE_DIR})
+  check_c_source_compiles("#define UNW_LOCAL_ONLY 1\n#include <libunwind.h>\nint main() { unw_context_t context; unw_getcontext(&context); return 0; }"
+                          LIBUNWIND_HAS_UNW_GETCONTEXT)
+  check_c_source_compiles("#define UNW_LOCAL_ONLY 1\n#include <libunwind.h>\nint main() { unw_context_t context; unw_cursor_t cursor; unw_getcontext(&context); unw_init_local(&cursor, &context); return 0; }"
+                          LIBUNWIND_HAS_UNW_INIT_LOCAL)
+  check_c_source_compiles("#define UNW_LOCAL_ONLY 1\n#include <libunwind.h>\nint main() { void* buf[10]; unw_backtrace(&buf, 10); return 0; }" LIBUNWIND_HAS_UNW_BACKTRACE)
+  check_c_source_compiles ("#define UNW_LOCAL_ONLY 1\n#include <libunwind.h>\nint main() { void* buf[10]; unw_backtrace_skip(&buf, 10, 2); return 0; }" LIBUNWIND_HAS_UNW_BACKTRACE_SKIP)
   set(CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
+  set(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES_SAVE})
+  set(CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES_SAVE})
 endif ()
 
 include(FindPackageHandleStandardArgs)
