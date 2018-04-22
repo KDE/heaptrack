@@ -59,6 +59,13 @@ using namespace std;
 
 namespace {
 
+using clock = chrono::steady_clock;
+const chrono::time_point<clock> s_start = clock::now();
+chrono::milliseconds elapsedTime()
+{
+    return chrono::duration_cast<chrono::milliseconds>(clock::now() - s_start);
+}
+
 __pid_t gettid()
 {
     return syscall(SYS_gettid);
@@ -108,7 +115,8 @@ inline void debugLog(const char fmt[], Args... args)
     if (debugLevel <= s_debugVerbosity) {
         RecursionGuard guard;
         flockfile(stderr);
-        fprintf(stderr, "heaptrack debug(%d) [%d:%d]: ", static_cast<int>(debugLevel), getpid(), gettid());
+        fprintf(stderr, "heaptrack debug(%d) [%d:%d]@%lu ", static_cast<int>(debugLevel), getpid(), gettid(),
+                elapsedTime().count());
         fprintf(stderr, fmt, args...);
         fputc('\n', stderr);
         funlockfile(stderr);
@@ -331,7 +339,7 @@ public:
             return;
         }
 
-        auto elapsed = chrono::duration_cast<chrono::milliseconds>(clock::now() - s_data->start);
+        auto elapsed = elapsedTime();
 
         debugLog<VeryVerboseOutput>("writeTimestamp(%" PRIx64 ")", elapsed.count());
 
@@ -492,8 +500,6 @@ private:
         debugLog<VeryVerboseOutput>("%s", "lock acquired");
     }
 
-    using clock = chrono::steady_clock;
-
     struct LockedData
     {
         LockedData(FILE* out, heaptrack_callback_t stopCallback)
@@ -593,7 +599,6 @@ private:
 
         TraceTree traceTree;
 
-        const chrono::time_point<clock> start = clock::now();
         atomic<bool> stopTimerThread{false};
         thread timerThread;
 
