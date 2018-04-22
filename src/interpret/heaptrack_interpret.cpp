@@ -400,6 +400,10 @@ int main(int /*argc*/, char** /*argv*/)
 
     while (reader.getLine(cin)) {
         if (reader.mode() == 'x') {
+            if (!exe.empty()) {
+                cerr << "received duplicate exe event - child process tracking is not yet supported" << endl;
+                return 1;
+            }
             reader >> exe;
         } else if (reader.mode() == 'm') {
             string fileName;
