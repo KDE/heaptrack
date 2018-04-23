@@ -381,10 +381,7 @@ public:
 
         debugLog<VeryVerboseOutput>("writeTimestamp(%" PRIx64 ")", elapsed.count());
 
-        if (fprintf(s_data->out, "c %" PRIx64 "\n", elapsed.count()) < 0) {
-            writeError();
-            return;
-        }
+        writeLine("c %" PRIx64 "\n", elapsed.count());
     }
 
     void writeRSS()
@@ -406,10 +403,7 @@ public:
         // TODO: use custom allocators with known page sizes to prevent tainting
         //       the RSS numbers with heaptrack-internal data
 
-        if (fprintf(s_data->out, "R %zx\n", rss) < 0) {
-            writeError();
-            return;
-        }
+        writeLine("R %zx\n", rss);
     }
 
     void handleMalloc(void* ptr, size_t size, const Trace& trace)
@@ -419,13 +413,8 @@ public:
         }
         updateModuleCache();
 
-        const auto index = s_data->traceTree.index(trace, [this](uintptr_t ip, uint32_t index) {
-            if (fprintf(s_data->out, "t %" PRIxPTR " %x\n", ip, index) < 0) {
-                writeError();
-                return false;
-            }
-            return true;
-        });
+        const auto index = s_data->traceTree.index(
+            trace, [this](uintptr_t ip, uint32_t index) { return writeLine("t %" PRIxPTR " %x\n", ip, index); });
 
 #ifdef DEBUG_MALLOC_PTRS
         auto it = s_data->known.find(ptr);
@@ -433,10 +422,7 @@ public:
         s_data->known.insert(ptr);
 #endif
 
-        if (fprintf(s_data->out, "+ %zx %x %" PRIxPTR "\n", size, index, reinterpret_cast<uintptr_t>(ptr)) < 0) {
-            writeError();
-            return;
-        }
+        writeLine("+ %zx %x %" PRIxPTR "\n", size, index, reinterpret_cast<uintptr_t>(ptr));
     }
 
     void handleFree(void* ptr)
@@ -451,10 +437,7 @@ public:
         s_data->known.erase(it);
 #endif
 
-        if (fprintf(s_data->out, "- %" PRIxPTR "\n", reinterpret_cast<uintptr_t>(ptr)) < 0) {
-            writeError();
-            return;
-        }
+        writeLine("- %" PRIxPTR "\n", reinterpret_cast<uintptr_t>(ptr));
     }
 
 private:
@@ -468,23 +451,20 @@ private:
 
         debugLog<VerboseOutput>("dlopen_notify_callback: %s %zx", fileName, info->dlpi_addr);
 
-        if (fprintf(heaptrack->s_data->out, "m %s %zx", fileName, info->dlpi_addr) < 0) {
-            heaptrack->writeError();
+        if (!heaptrack->writeLine("m %s %zx", fileName, info->dlpi_addr)) {
             return 1;
         }
 
         for (int i = 0; i < info->dlpi_phnum; i++) {
             const auto& phdr = info->dlpi_phdr[i];
             if (phdr.p_type == PT_LOAD) {
-                if (fprintf(heaptrack->s_data->out, " %zx %zx", phdr.p_vaddr, phdr.p_memsz) < 0) {
-                    heaptrack->writeError();
+                if (!heaptrack->writeLine(" %zx %zx", phdr.p_vaddr, phdr.p_memsz)) {
                     return 1;
                 }
             }
         }
 
-        if (fputc('\n', heaptrack->s_data->out) == EOF) {
-            heaptrack->writeError();
+        if (!heaptrack->writeLine("\n")) {
             return 1;
         }
 
@@ -520,12 +500,40 @@ private:
             return;
         }
         debugLog<MinimalOutput>("%s", "updateModuleCache()");
-        if (fputs("m -\n", s_data->out) == EOF) {
-            writeError();
+        if (!writeLine("m -\n")) {
             return;
         }
         dl_iterate_phdr(&dl_iterate_phdr_callback, this);
         s_data->moduleCacheDirty = false;
+    }
+
+    template <typename... T>
+    inline bool writeLine(const char* fmt, T... args)
+    {
+        int ret = 0;
+        do {
+            ret = fprintf(s_data->out, fmt, args...);
+        } while (ret < 0 && errno == EINTR);
+
+        if (ret < 0) {
+            writeError();
+        }
+
+        return ret >= 0;
+    }
+
+    inline bool writeLine(const char* line)
+    {
+        int ret = 0;
+        do {
+            ret = fputs(line, s_data->out);
+        } while (ret < 0 && errno == EINTR);
+
+        if (ret < 0) {
+            writeError();
+        }
+
+        return ret >= 0;
     }
 
     void writeError()
