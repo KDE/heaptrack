@@ -235,7 +235,7 @@ FILE* createFile(const char* fileName)
 
     boost::replace_all(outputFileName, "$$", to_string(getpid()));
 
-    auto out = fopen(outputFileName.c_str(), "w");
+    auto out = fopen(outputFileName.c_str(), "we");
     debugLog<VerboseOutput>("will write to %s/%p\n", outputFileName.c_str(), out);
     // we do our own locking, this speeds up the writing significantly
     if (out) {
