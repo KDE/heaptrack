@@ -245,6 +245,13 @@ FILE* createFile(const char* fileName)
                 strerror(errno), errno);
     }
 
+    if (flock(fileno(out), LOCK_EX | LOCK_NB) != 0) {
+        fprintf(stderr, "ERROR: failed to lock heaptrack output file %s: %s (%d)\n", outputFileName.c_str(),
+                strerror(errno), errno);
+        fclose(out);
+        return nullptr;
+    }
+
     return out;
 }
 
