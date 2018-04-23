@@ -418,7 +418,14 @@ public:
             return;
         }
         updateModuleCache();
-        const auto index = s_data->traceTree.index(trace, s_data->out);
+
+        const auto index = s_data->traceTree.index(trace, [this](uintptr_t ip, uint32_t index) {
+            if (fprintf(s_data->out, "t %" PRIxPTR " %x\n", ip, index) < 0) {
+                writeError();
+                return false;
+            }
+            return true;
+        });
 
 #ifdef DEBUG_MALLOC_PTRS
         auto it = s_data->known.find(ptr);

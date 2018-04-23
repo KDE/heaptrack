@@ -59,9 +59,10 @@ public:
      * Index the data in @p trace and return the index of the last instruction
      * pointer.
      *
-     * Unknown instruction pointers will be printed to @p out.
+     * Unknown instruction pointers will be handled by the @p callback
      */
-    uint32_t index(const Trace& trace, FILE* out)
+    template <typename Fun>
+    uint32_t index(const Trace& trace, Fun callback)
     {
         uint32_t index = 0;
         TraceEdge* parent = &m_root;
@@ -76,7 +77,9 @@ public:
             if (it == parent->children.end() || it->instructionPointer != ip) {
                 index = m_index++;
                 it = parent->children.insert(it, {ip, index, {}});
-                fprintf(out, "t %" PRIxPTR " %x\n", reinterpret_cast<uintptr_t>(ip), parent->index);
+                if (!callback(reinterpret_cast<uintptr_t>(ip), parent->index)) {
+                    return 0;
+                }
             }
             index = it->index;
             parent = &(*it);
