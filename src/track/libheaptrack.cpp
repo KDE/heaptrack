@@ -581,11 +581,15 @@ private:
         shutdown();
     }
 
+    struct LockCheckFailed{};
+
     template <typename AdditionalLockCheck>
     HeapTrack(AdditionalLockCheck lockCheck)
     {
         debugLog<VeryVerboseOutput>("%s", "acquiring lock");
-        while (!s_lock.try_lock() && lockCheck()) {
+        while (!s_lock.try_lock()) {
+            if (!lockCheck())
+                throw LockCheckFailed();
             this_thread::sleep_for(chrono::microseconds(1));
         }
         debugLog<VeryVerboseOutput>("%s", "lock acquired");
@@ -630,10 +634,12 @@ private:
                     // TODO: make interval customizable
                     this_thread::sleep_for(chrono::milliseconds(10));
 
-                    HeapTrack heaptrack([&] { return !stopTimerThread.load(); });
-                    if (!stopTimerThread) {
+                    try {
+                        HeapTrack heaptrack([&] { return !stopTimerThread.load(); });
                         heaptrack.writeTimestamp();
                         heaptrack.writeRSS();
+                    } catch (LockCheckFailed) {
+                        break;
                     }
                 }
             });
