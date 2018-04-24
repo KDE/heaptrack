@@ -31,7 +31,7 @@
 
 bool initBeforeCalled = false;
 bool initAfterCalled = false;
-FILE* out = nullptr;
+int out = -1;
 bool stopCalled = false;
 
 using namespace std;
@@ -54,25 +54,28 @@ TEST_CASE ("api") {
     TempFile tmp;
 
     SECTION ("init") {
-        heaptrack_init(tmp.fileName.c_str(), [](){
-            REQUIRE(!initBeforeCalled);
-            REQUIRE(!initAfterCalled);
-            REQUIRE(!stopCalled);
-            initBeforeCalled = true;
-        }, [](FILE* file) {
-            REQUIRE(initBeforeCalled);
-            REQUIRE(!initAfterCalled);
-            REQUIRE(!stopCalled);
-            REQUIRE(file);
-            out = file;
-            initAfterCalled = true;
-        }, []() {
-            REQUIRE(initBeforeCalled);
-            REQUIRE(initAfterCalled);
-            REQUIRE(!stopCalled);
-            stopCalled = true;
-            out = nullptr;
-        });
+        heaptrack_init(tmp.fileName.c_str(),
+                       []() {
+                           REQUIRE(!initBeforeCalled);
+                           REQUIRE(!initAfterCalled);
+                           REQUIRE(!stopCalled);
+                           initBeforeCalled = true;
+                       },
+                       [](int fd) {
+                           REQUIRE(initBeforeCalled);
+                           REQUIRE(!initAfterCalled);
+                           REQUIRE(!stopCalled);
+                           REQUIRE(fd != -1);
+                           out = fd;
+                           initAfterCalled = true;
+                       },
+                       []() {
+                           REQUIRE(initBeforeCalled);
+                           REQUIRE(initAfterCalled);
+                           REQUIRE(!stopCalled);
+                           stopCalled = true;
+                           out = -1;
+                       });
 
         REQUIRE(initBeforeCalled);
         REQUIRE(initAfterCalled);

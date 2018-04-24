@@ -185,47 +185,7 @@ atomic<bool> s_atexit{false};
  */
 atomic<bool> s_forceCleanup{false};
 
-void writeVersion(FILE* out)
-{
-    fprintf(out, "v %x %x\n", HEAPTRACK_VERSION, HEAPTRACK_FILE_FORMAT_VERSION);
-}
-
-void writeExe(FILE* out)
-{
-    const int BUF_SIZE = 1023;
-    char buf[BUF_SIZE + 1];
-    ssize_t size = readlink("/proc/self/exe", buf, BUF_SIZE);
-    if (size > 0 && size < BUF_SIZE) {
-        buf[size] = 0;
-        fprintf(out, "x %s\n", buf);
-    }
-}
-
-void writeCommandLine(FILE* out)
-{
-    fputc('X', out);
-    const int BUF_SIZE = 4096;
-    char buf[BUF_SIZE + 1];
-    auto fd = open("/proc/self/cmdline", O_RDONLY);
-    int bytesRead = read(fd, buf, BUF_SIZE);
-    char* end = buf + bytesRead;
-    for (char* p = buf; p < end;) {
-        fputc(' ', out);
-        fputs(p, out);
-        while (*p++)
-            ; // skip until start of next 0-terminated section
-    }
-
-    close(fd);
-    fputc('\n', out);
-}
-
-void writeSystemInfo(FILE* out)
-{
-    fprintf(out, "I %lx %lx\n", sysconf(_SC_PAGESIZE), sysconf(_SC_PHYS_PAGES));
-}
-
-FILE* createFile(const char* fileName)
+int createFile(const char* fileName)
 {
     string outputFileName;
     if (fileName) {
@@ -234,10 +194,10 @@ FILE* createFile(const char* fileName)
 
     if (outputFileName == "-" || outputFileName == "stdout") {
         debugLog<VerboseOutput>("%s", "will write to stdout");
-        return stdout;
+        return fileno(stdout);
     } else if (outputFileName == "stderr") {
         debugLog<VerboseOutput>("%s", "will write to stderr");
-        return stderr;
+        return fileno(stderr);
     }
 
     if (outputFileName.empty()) {
@@ -247,21 +207,17 @@ FILE* createFile(const char* fileName)
 
     boost::replace_all(outputFileName, "$$", to_string(getpid()));
 
-    auto out = fopen(outputFileName.c_str(), "we");
+    auto out = open(outputFileName.c_str(), O_CREAT | O_WRONLY | O_CLOEXEC, 0644);
     debugLog<VerboseOutput>("will write to %s/%p\n", outputFileName.c_str(), out);
     // we do our own locking, this speeds up the writing significantly
-    if (out) {
-        __fsetlocking(out, FSETLOCKING_BYCALLER);
-    } else {
+    if (out == -1) {
         fprintf(stderr, "ERROR: failed to open heaptrack output file %s: %s (%d)\n", outputFileName.c_str(),
                 strerror(errno), errno);
-    }
-
-    if (flock(fileno(out), LOCK_EX | LOCK_NB) != 0) {
+    } else if (flock(out, LOCK_EX | LOCK_NB) != 0) {
         fprintf(stderr, "ERROR: failed to lock heaptrack output file %s: %s (%d)\n", outputFileName.c_str(),
                 strerror(errno), errno);
-        fclose(out);
-        return nullptr;
+        close(out);
+        return -1;
     }
 
     return out;
@@ -311,6 +267,7 @@ using Lock = std::mutex;
 using Lock = SpinLock;
 #endif
 
+const unsigned BUFFER_CAPACITY = PIPE_BUF;
 
 /**
  * Thread-Safe heaptrack API
@@ -320,9 +277,9 @@ using Lock = SpinLock;
  * calls, as well as initialization and shutdown.
  *
  * This uses a spinlock, instead of a std::mutex, as the latter can lead to
- * deadlocks
- * on destruction. The spinlock is "simple", and OK to only guard the small
- * sections.
+ * deadlocks on destruction, when we try to join the timer thread which in
+ * turn is waiting to obtain the lock.
+ * The spinlock is "simple", and OK to only guard the small sections.
  */
 class HeapTrack
 {
@@ -381,21 +338,21 @@ public:
             });
         });
 
-        FILE* out = createFile(fileName);
+        const auto out = createFile(fileName);
 
-        if (!out) {
+        if (out == -1) {
             if (stopCallback) {
                 stopCallback();
             }
             return;
         }
 
-        writeVersion(out);
-        writeExe(out);
-        writeCommandLine(out);
-        writeSystemInfo(out);
-
         s_data = new LockedData(out, stopCallback);
+
+        writeVersion();
+        writeExe();
+        writeCommandLine();
+        writeSystemInfo();
 
         if (initAfterCallback) {
             debugLog<MinimalOutput>("%s", "calling initAfterCallback");
@@ -416,6 +373,7 @@ public:
 
         writeTimestamp();
         writeRSS();
+        sendBuffer();
 
         // NOTE: we leak heaptrack data on exit, intentionally
         // This way, we can be sure to get all static deallocations.
@@ -437,7 +395,7 @@ public:
 
     void writeTimestamp()
     {
-        if (!s_data || !s_data->out) {
+        if (!s_data || s_data->out == -1) {
             return;
         }
 
@@ -450,7 +408,7 @@ public:
 
     void writeRSS()
     {
-        if (!s_data || !s_data->out || !s_data->procStatm) {
+        if (!s_data || s_data->out == -1 || !s_data->procStatm) {
             return;
         }
 
@@ -470,9 +428,48 @@ public:
         writeLine("R %zx\n", rss);
     }
 
+    void writeVersion()
+    {
+        writeLine("v %x %x\n", HEAPTRACK_VERSION, HEAPTRACK_FILE_FORMAT_VERSION);
+    }
+
+    void writeExe()
+    {
+        const int BUF_SIZE = 1023;
+        char buf[BUF_SIZE + 1];
+        ssize_t size = readlink("/proc/self/exe", buf, BUF_SIZE);
+        if (size > 0 && size < BUF_SIZE) {
+            buf[size] = 0;
+            writeLine("x %s\n", buf);
+        }
+    }
+
+    void writeCommandLine()
+    {
+        writeLine("X");
+        const int BUF_SIZE = 4096;
+        char buf[BUF_SIZE + 1];
+        auto fd = open("/proc/self/cmdline", O_RDONLY);
+        int bytesRead = read(fd, buf, BUF_SIZE);
+        char* end = buf + bytesRead;
+        for (char* p = buf; p < end;) {
+            writeLine(" %s", p);
+            while (*p++)
+                ; // skip until start of next 0-terminated section
+        }
+
+        close(fd);
+        writeLine("\n");
+    }
+
+    void writeSystemInfo()
+    {
+        writeLine("I %lx %lx\n", sysconf(_SC_PAGESIZE), sysconf(_SC_PHYS_PAGES));
+    }
+
     void handleMalloc(void* ptr, size_t size, const Trace& trace)
     {
-        if (!s_data || !s_data->out) {
+        if (!s_data || s_data->out == -1) {
             return;
         }
         updateModuleCache();
@@ -491,7 +488,7 @@ public:
 
     void handleFree(void* ptr)
     {
-        if (!s_data || !s_data->out) {
+        if (!s_data || s_data->out == -1) {
             return;
         }
 
@@ -560,7 +557,7 @@ private:
 
     void updateModuleCache()
     {
-        if (!s_data || !s_data->out || !s_data->moduleCacheDirty) {
+        if (!s_data || s_data->out == -1 || !s_data->moduleCacheDirty) {
             return;
         }
         debugLog<MinimalOutput>("%s", "updateModuleCache()");
@@ -572,39 +569,63 @@ private:
     }
 
     template <typename... T>
-    inline bool writeLine(const char* fmt, T... args)
+    bool writeLine(const char* fmt, T... args)
     {
-        int ret = 0;
-        do {
-            ret = fprintf(s_data->out, fmt, args...);
-        } while (ret < 0 && errno == EINTR);
-
-        if (ret < 0) {
-            writeError();
+        for (bool first_try : {true, false}) {
+            const auto available_buffer_size = BUFFER_CAPACITY - s_data->bufferSize;
+            int ret = snprintf(s_data->buffer.get() + s_data->bufferSize, available_buffer_size, fmt, args...);
+            if (ret < 0) {
+                writeError();
+                return false;
+            } else if (static_cast<unsigned>(ret) < available_buffer_size) {
+                s_data->bufferSize += ret;
+                return true;
+            } else if (!first_try) {
+                fprintf(stderr, "failed to write line of length %d, available space: %d", ret, available_buffer_size);
+                return false;
+            } else if (static_cast<unsigned>(ret) >= BUFFER_CAPACITY) {
+                fprintf(stderr, "failed to write line of length %d, available space: %d", ret, BUFFER_CAPACITY);
+                return false;
+            } else if (!sendBuffer()) {
+                // buffer doesn't have enough space, send current buffer contents and clear buffer
+                return false;
+            }
         }
 
-        return ret >= 0;
+        return true;
     }
 
-    inline bool writeLine(const char* line)
+    bool writeLine(const char* line)
     {
+        // TODO: could be optimized to use strncpy or similar
+        return writeLine("%s", line);
+    }
+
+    bool sendBuffer()
+    {
+        if (!s_data->bufferSize)
+            return 0;
+
         int ret = 0;
         do {
-            ret = fputs(line, s_data->out);
+            ret = write(s_data->out, s_data->buffer.get(), s_data->bufferSize);
         } while (ret < 0 && errno == EINTR);
 
         if (ret < 0) {
             writeError();
+            return false;
         }
-
-        return ret >= 0;
+        s_data->bufferSize = 0;
+        memset(s_data->buffer.get(), 0, BUFFER_CAPACITY);
+        return true;
     }
 
     void writeError()
     {
         debugLog<MinimalOutput>("write error %d/%s", errno, strerror(errno));
         printBacktrace();
-        s_data->out = nullptr;
+        close(s_data->out);
+        s_data->out = -1;
         shutdown();
     }
 
@@ -624,10 +645,13 @@ private:
 
     struct LockedData
     {
-        LockedData(FILE* out, heaptrack_callback_t stopCallback)
+        LockedData(int out, heaptrack_callback_t stopCallback)
             : out(out)
+            , buffer(new char[BUFFER_CAPACITY])
             , stopCallback(stopCallback)
         {
+            memset(buffer.get(), 0, BUFFER_CAPACITY);
+
             debugLog<MinimalOutput>("%s", "constructing LockedData");
             procStatm = fopen("/proc/self/statm", "r");
             if (!procStatm) {
@@ -688,8 +712,8 @@ private:
                 }
             }
 
-            if (out) {
-                fclose(out);
+            if (out != -1) {
+                close(out);
             }
 
             if (procStatm) {
@@ -703,11 +727,14 @@ private:
         }
 
         /**
-         * Note: We use the C stdio API here for performance reasons.
+         * Note: We use the C API here for performance reasons.
          *       Esp. in multi-threaded environments this is much faster
          *       to produce non-per-line-interleaved output.
+         * Note: We use non-buffered API to workaround https://bugs.kde.org/show_bug.cgi?id=393387
          */
-        FILE* out = nullptr;
+        int out = -1;
+        unsigned bufferSize = 0;
+        unique_ptr<char> buffer;
 
         /// /proc/self/statm file stream to read RSS value from
         FILE* procStatm = nullptr;

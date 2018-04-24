@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 typedef void (*heaptrack_callback_t)();
-typedef void (*heaptrack_callback_initialized_t)(FILE*);
+typedef void (*heaptrack_callback_initialized_t)(int);
 
 void heaptrack_init(const char* outputFileName, heaptrack_callback_t initCallbackBefore,
                     heaptrack_callback_initialized_t initCallbackAfter, heaptrack_callback_t stopCallback);

@@ -22,8 +22,10 @@
 #include <cstdlib>
 #include <cstring>
 
+#include <errno.h>
 #include <link.h>
 #include <malloc.h>
+#include <unistd.h>
 
 #include <sys/mman.h>
 
@@ -299,7 +301,13 @@ void overwrite_symbols() noexcept
 extern "C" {
 void heaptrack_inject(const char* outputFileName) noexcept
 {
-    heaptrack_init(outputFileName, []() { overwrite_symbols(); }, [](FILE* out) { fprintf(out, "A\n"); },
+    heaptrack_init(outputFileName, []() { overwrite_symbols(); },
+                   [](int fd) {
+                       int ret = -1;
+                       do {
+                           ret = write(fd, "A\n", sizeof("A\n"));
+                       } while (ret < 0 && errno == EINTR);
+                   },
                    []() {
                        bool do_shutdown = true;
                        dl_iterate_phdr(&iterate_phdrs, &do_shutdown);
