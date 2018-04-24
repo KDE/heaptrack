@@ -49,6 +49,11 @@
 #include "util/libunwind_config.h"
 
 /**
+ * uncomment to add helgrind annotations to the custom spinlock
+ */
+// #include <valgrind/helgrind.h>
+
+/**
  * uncomment this to get extended debug code for known pointers
  * there are still some malloc functions I'm missing apparently,
  * related to TLS and such I guess
@@ -265,14 +270,36 @@ FILE* createFile(const char* fileName)
 class SpinLock
 {
 public:
+    SpinLock()
+    {
+#ifdef ANNOTATE_RWLOCK_CREATE
+        ANNOTATE_RWLOCK_CREATE(this);
+#endif
+    }
+    ~SpinLock()
+    {
+#ifdef ANNOTATE_RWLOCK_DESTROY
+        ANNOTATE_RWLOCK_DESTROY(this);
+#endif
+    }
+
     bool try_lock()
     {
-        return m_locked.exchange(true, memory_order_acquire) == false;
+        auto ret = m_locked.exchange(true, memory_order_acquire) == false;
+#ifdef ANNOTATE_RWLOCK_ACQUIRED
+        if (ret) {
+            ANNOTATE_RWLOCK_ACQUIRED(this, 1);
+        }
+#endif
+        return ret;
     }
 
     void unlock()
     {
         m_locked.store(false, memory_order_release);
+#ifdef ANNOTATE_RWLOCK_RELEASED
+        ANNOTATE_RWLOCK_RELEASED(this, 1);
+#endif
     }
 private:
     atomic<bool> m_locked{false};
