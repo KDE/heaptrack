@@ -55,6 +55,13 @@
  */
 // #define DEBUG_MALLOC_PTRS
 
+/**
+ * uncomment this to use std::mutex for locking instead of a spinlock
+ *
+ * this makes it possible to use valgrind's helgrind/drd tools for error detection
+ */
+// #define DEBUG_USE_MUTEX
+
 using namespace std;
 
 namespace {
@@ -255,6 +262,29 @@ FILE* createFile(const char* fileName)
     return out;
 }
 
+class SpinLock
+{
+public:
+    bool try_lock()
+    {
+        return m_locked.exchange(true, memory_order_acquire) == false;
+    }
+
+    void unlock()
+    {
+        m_locked.store(false, memory_order_release);
+    }
+private:
+    atomic<bool> m_locked{false};
+};
+
+#ifdef DEBUG_USE_MUTEX
+using Lock = std::mutex;
+#else
+using Lock = SpinLock;
+#endif
+
+
 /**
  * Thread-Safe heaptrack API
  *
@@ -278,7 +308,7 @@ public:
     ~HeapTrack()
     {
         debugLog<VeryVerboseOutput>("%s", "releasing lock");
-        s_locked.store(false, memory_order_release);
+        s_lock.unlock();
     }
 
     void initialize(const char* fileName, heaptrack_callback_t initBeforeCallback,
@@ -555,7 +585,7 @@ private:
     HeapTrack(AdditionalLockCheck lockCheck)
     {
         debugLog<VeryVerboseOutput>("%s", "acquiring lock");
-        while (s_locked.exchange(true, memory_order_acquire) && lockCheck()) {
+        while (!s_lock.try_lock() && lockCheck()) {
             this_thread::sleep_for(chrono::microseconds(1));
         }
         debugLog<VeryVerboseOutput>("%s", "lock acquired");
@@ -670,11 +700,11 @@ private:
 #endif
     };
 
-    static atomic<bool> s_locked;
+    static Lock s_lock;
     static LockedData* s_data;
 };
 
-atomic<bool> HeapTrack::s_locked{false};
+Lock HeapTrack::s_lock;
 HeapTrack::LockedData* HeapTrack::s_data{nullptr};
 }
 extern "C" {
