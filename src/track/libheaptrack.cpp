@@ -49,23 +49,11 @@
 #include "util/libunwind_config.h"
 
 /**
- * uncomment to add helgrind annotations to the custom spinlock
- */
-// #include <valgrind/helgrind.h>
-
-/**
  * uncomment this to get extended debug code for known pointers
  * there are still some malloc functions I'm missing apparently,
  * related to TLS and such I guess
  */
 // #define DEBUG_MALLOC_PTRS
-
-/**
- * uncomment this to use std::mutex for locking instead of a spinlock
- *
- * this makes it possible to use valgrind's helgrind/drd tools for error detection
- */
-// #define DEBUG_USE_MUTEX
 
 using namespace std;
 
@@ -223,50 +211,6 @@ int createFile(const char* fileName)
     return out;
 }
 
-class SpinLock
-{
-public:
-    SpinLock()
-    {
-#ifdef ANNOTATE_RWLOCK_CREATE
-        ANNOTATE_RWLOCK_CREATE(this);
-#endif
-    }
-    ~SpinLock()
-    {
-#ifdef ANNOTATE_RWLOCK_DESTROY
-        ANNOTATE_RWLOCK_DESTROY(this);
-#endif
-    }
-
-    bool try_lock()
-    {
-        auto ret = m_locked.exchange(true, memory_order_acquire) == false;
-#ifdef ANNOTATE_RWLOCK_ACQUIRED
-        if (ret) {
-            ANNOTATE_RWLOCK_ACQUIRED(this, 1);
-        }
-#endif
-        return ret;
-    }
-
-    void unlock()
-    {
-        m_locked.store(false, memory_order_release);
-#ifdef ANNOTATE_RWLOCK_RELEASED
-        ANNOTATE_RWLOCK_RELEASED(this, 1);
-#endif
-    }
-private:
-    atomic<bool> m_locked{false};
-};
-
-#ifdef DEBUG_USE_MUTEX
-using Lock = std::mutex;
-#else
-using Lock = SpinLock;
-#endif
-
 const unsigned BUFFER_CAPACITY = PIPE_BUF;
 
 /**
@@ -275,18 +219,15 @@ const unsigned BUFFER_CAPACITY = PIPE_BUF;
  * The only critical section in libheaptrack is the output of the data,
  * dl_iterate_phdr
  * calls, as well as initialization and shutdown.
- *
- * This uses a spinlock, instead of a std::mutex, as the latter can lead to
- * deadlocks on destruction, when we try to join the timer thread which in
- * turn is waiting to obtain the lock.
- * The spinlock is "simple", and OK to only guard the small sections.
  */
 class HeapTrack
 {
 public:
     HeapTrack(const RecursionGuard& /*recursionGuard*/)
-        : HeapTrack([] { return true; })
     {
+        debugLog<VeryVerboseOutput>("%s", "acquiring lock");
+        s_lock.lock();
+        debugLog<VeryVerboseOutput>("%s", "lock acquired");
     }
 
     ~HeapTrack()
@@ -631,10 +572,14 @@ private:
 
     struct LockCheckFailed{};
 
+    /**
+     * To prevent deadlocks on shutdown, we try to lock from the timer thread
+     * and throw an LockCheckFailed exception otherwise.
+     */
     template <typename AdditionalLockCheck>
     HeapTrack(AdditionalLockCheck lockCheck)
     {
-        debugLog<VeryVerboseOutput>("%s", "acquiring lock");
+        debugLog<VeryVerboseOutput>("%s", "trying to acquire lock");
         while (!s_lock.try_lock()) {
             if (!lockCheck())
                 throw LockCheckFailed();
@@ -760,11 +705,11 @@ private:
 #endif
     };
 
-    static Lock s_lock;
+    static std::mutex s_lock;
     static LockedData* s_data;
 };
 
-Lock HeapTrack::s_lock;
+std::mutex HeapTrack::s_lock;
 HeapTrack::LockedData* HeapTrack::s_data{nullptr};
 }
 extern "C" {
