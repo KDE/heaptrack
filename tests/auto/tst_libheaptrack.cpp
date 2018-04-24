@@ -20,6 +20,13 @@
 #include "src/track/libheaptrack.h"
 
 #include <cstdio>
+#include <cmath>
+
+#include <thread>
+#include <future>
+#include <vector>
+#include <iostream>
+
 #include <boost/filesystem.hpp>
 
 bool initBeforeCalled = false;
@@ -97,6 +104,28 @@ TEST_CASE ("api") {
 
         SECTION ("invalidate-cache") {
             heaptrack_invalidate_module_cache();
+        }
+
+        SECTION ("multi-threaded") {
+            const auto numThreads = min(4u, thread::hardware_concurrency());
+
+            cout << "start threads" << endl;
+            {
+                vector<future<void>> futures;
+                for (unsigned i = 0; i < numThreads; ++i) {
+                    futures.emplace_back(async(launch::async, [](){
+                        for (int i = 0; i < 10000; ++i) {
+                            heaptrack_malloc(&i, i);
+                            heaptrack_realloc(&i, i + 1, &i);
+                            heaptrack_free(&i);
+                            if (i % 100 == 0) {
+                                heaptrack_invalidate_module_cache();
+                            }
+                        }
+                    }));
+                }
+            }
+            cout << "threads finished" << endl;
         }
 
         SECTION ("stop") {
