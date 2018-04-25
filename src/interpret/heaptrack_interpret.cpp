@@ -38,6 +38,7 @@
 #include "libbacktrace/backtrace.h"
 #include "libbacktrace/internal.h"
 #include "util/linereader.h"
+#include "util/linewriter.h"
 #include "util/pointermap.h"
 
 #include <signal.h>
@@ -192,6 +193,7 @@ struct Module
 struct AccumulatedTraceData
 {
     AccumulatedTraceData()
+        : out(fileno(stdout))
     {
         m_modules.reserve(256);
         m_backtraceStates.reserve(64);
@@ -201,7 +203,8 @@ struct AccumulatedTraceData
 
     ~AccumulatedTraceData()
     {
-        fprintf(stdout, "# strings: %zu\n# ips: %zu\n", m_internedData.size(), m_encounteredIps.size());
+        out.write("# strings: %zu\n# ips: %zu\n", m_internedData.size(), m_encounteredIps.size());
+        out.flush();
     }
 
     ResolvedIP resolve(const uintptr_t ip)
@@ -270,7 +273,7 @@ struct AccumulatedTraceData
         if (internedString) {
             *internedString = it->first.data();
         }
-        fprintf(stdout, "s %s\n", str.c_str());
+        out.write("s %s\n", str.c_str());
         return id;
     }
 
@@ -303,17 +306,17 @@ struct AccumulatedTraceData
         m_encounteredIps.insert(it, make_pair(instructionPointer, ipId));
 
         const auto ip = resolve(instructionPointer);
-        fprintf(stdout, "i %zx %zx", instructionPointer, ip.moduleIndex);
+        out.write("i %zx %zx", instructionPointer, ip.moduleIndex);
         if (ip.frame.functionIndex || ip.frame.fileIndex) {
-            fprintf(stdout, " %zx", ip.frame.functionIndex);
+            out.write(" %zx", ip.frame.functionIndex);
             if (ip.frame.fileIndex) {
-                fprintf(stdout, " %zx %x", ip.frame.fileIndex, ip.frame.line);
+                out.write(" %zx %x", ip.frame.fileIndex, ip.frame.line);
                 for (const auto& inlined : ip.inlined) {
-                    fprintf(stdout, " %zx %zx %x", inlined.functionIndex, inlined.fileIndex, inlined.line);
+                    out.write(" %zx %zx %x", inlined.functionIndex, inlined.fileIndex, inlined.line);
                 }
             }
         }
-        fputc('\n', stdout);
+        out.write("\n");
         return ipId;
     }
 
@@ -367,6 +370,8 @@ struct AccumulatedTraceData
 
         return state;
     }
+
+    LineWriter out;
 
 private:
     vector<Module> m_modules;
@@ -456,7 +461,7 @@ int main(int /*argc*/, char** /*argv*/)
             // ensure ip is encountered
             const auto ipId = data.addIp(instructionPointer);
             // trace point, map current output index to parent index
-            fprintf(stdout, "t %zx %zx\n", ipId, parentIndex);
+            data.out.writeHexLine('t', ipId, parentIndex);
         } else if (reader.mode() == '+') {
             ++c_stats.allocations;
             ++c_stats.leakedAllocations;
@@ -470,11 +475,11 @@ int main(int /*argc*/, char** /*argv*/)
 
             AllocationInfoIndex index;
             if (allocationInfos.add(size, traceId, &index)) {
-                fprintf(stdout, "a %" PRIx64 " %x\n", size, traceId.index);
+                data.out.writeHexLine('a', size, traceId.index);
             }
             ptrToIndex.addPointer(ptr, index);
             lastPtr = ptr;
-            fprintf(stdout, "+ %x\n", index.index);
+            data.out.writeHexLine('+', index.index);
         } else if (reader.mode() == '-') {
             uint64_t ptr = 0;
             if (!(reader >> ptr)) {
@@ -487,14 +492,13 @@ int main(int /*argc*/, char** /*argv*/)
             if (!allocation.second) {
                 continue;
             }
-            fprintf(stdout, "- %x\n", allocation.first.index);
+            data.out.writeHexLine('-', allocation.first.index);
             if (temporary) {
                 ++c_stats.temporaryAllocations;
             }
             --c_stats.leakedAllocations;
         } else {
-            fputs(reader.line().c_str(), stdout);
-            fputc('\n', stdout);
+            data.out.write("%s\n", reader.line().c_str());
         }
     }
 
