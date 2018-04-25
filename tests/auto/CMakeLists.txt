@@ -7,6 +7,7 @@ set(CMAKE_BUILD_TYPE Debug)
 include_directories(
     ${LIBUNWIND_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../src
 )
 add_definitions(-DCATCH_CONFIG_MAIN)
 
@@ -34,4 +35,11 @@ if (${Boost_FILESYSTEM_FOUND} AND ${Boost_SYSTEM_FOUND})
             ${Boost_FILESYSTEM_LIBRARY}
     )
     add_test(NAME tst_libheaptrack COMMAND tst_libheaptrack)
+
+    add_executable(tst_io tst_io.cpp)
+    target_link_libraries(tst_io
+            ${Boost_SYSTEM_LIBRARY}
+            ${Boost_FILESYSTEM_LIBRARY}
+    )
+    add_test(NAME tst_io COMMAND tst_io)
 endif()

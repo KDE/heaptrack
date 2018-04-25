@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2017 Milian Wolff <mail@milianw.de>
+ * Copyright 2018 Milian Wolff <mail@milianw.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,28 +16,43 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <stdio.h>
+#ifndef TEMPFILE_H
+#define TEMPFILE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <boost/filesystem.hpp>
+#include <fcntl.h>
+#include <unistd.h>
 
-typedef void (*heaptrack_callback_t)();
-typedef void (*heaptrack_callback_initialized_t)(struct LineWriter&);
+struct TempFile
+{
+    TempFile()
+        : path(boost::filesystem::unique_path())
+        , fileName(path.native())
+    {
+    }
 
-void heaptrack_init(const char* outputFileName, heaptrack_callback_t initCallbackBefore,
-                    heaptrack_callback_initialized_t initCallbackAfter, heaptrack_callback_t stopCallback);
+    ~TempFile()
+    {
+        boost::filesystem::remove(path);
+        close();
+    }
 
-void heaptrack_stop();
+    bool open()
+    {
+        fd = ::open(fileName.c_str(), O_CREAT | O_CLOEXEC | O_RDWR, 0644);
+        return fd != -1;
+    }
 
-void heaptrack_malloc(void* ptr, size_t size);
+    void close()
+    {
+        if (fd != -1) {
+            ::close(fd);
+        }
+    }
 
-void heaptrack_free(void* ptr);
+    const boost::filesystem::path path;
+    const std::string fileName;
+    int fd = -1;
+};
 
-void heaptrack_realloc(void* ptr_in, size_t size, void* ptr_out);
-
-void heaptrack_invalidate_module_cache();
-
-#ifdef __cplusplus
-}
 #endif

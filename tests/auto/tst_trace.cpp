@@ -17,7 +17,7 @@
  */
 
 #include "3rdparty/catch.hpp"
-#include "src/track/trace.h"
+#include "track/trace.h"
 
 #include <algorithm>
 

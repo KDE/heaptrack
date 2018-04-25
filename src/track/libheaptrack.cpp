@@ -47,6 +47,7 @@
 #include "tracetree.h"
 #include "util/config.h"
 #include "util/libunwind_config.h"
+#include "util/linewriter.h"
 
 /**
  * uncomment this to get extended debug code for known pointers
@@ -211,8 +212,6 @@ int createFile(const char* fileName)
     return out;
 }
 
-const unsigned BUFFER_CAPACITY = PIPE_BUF;
-
 /**
  * Thread-Safe heaptrack API
  *
@@ -297,7 +296,7 @@ public:
 
         if (initAfterCallback) {
             debugLog<MinimalOutput>("%s", "calling initAfterCallback");
-            initAfterCallback(out);
+            initAfterCallback(s_data->out);
             debugLog<MinimalOutput>("%s", "calling initAfterCallback done");
         }
 
@@ -314,7 +313,9 @@ public:
 
         writeTimestamp();
         writeRSS();
-        sendBuffer();
+
+        s_data->out.flush();
+        s_data->out.close();
 
         // NOTE: we leak heaptrack data on exit, intentionally
         // This way, we can be sure to get all static deallocations.
@@ -336,7 +337,7 @@ public:
 
     void writeTimestamp()
     {
-        if (!s_data || s_data->out == -1) {
+        if (!s_data || !s_data->out.canWrite()) {
             return;
         }
 
@@ -344,12 +345,12 @@ public:
 
         debugLog<VeryVerboseOutput>("writeTimestamp(%" PRIx64 ")", elapsed.count());
 
-        writeLine("c %" PRIx64 "\n", elapsed.count());
+        s_data->out.writeHexLine('c', static_cast<size_t>(elapsed.count()));
     }
 
     void writeRSS()
     {
-        if (!s_data || s_data->out == -1 || !s_data->procStatm) {
+        if (!s_data || !s_data->out.canWrite() || !s_data->procStatm) {
             return;
         }
 
@@ -366,12 +367,13 @@ public:
         // TODO: use custom allocators with known page sizes to prevent tainting
         //       the RSS numbers with heaptrack-internal data
 
-        writeLine("R %zx\n", rss);
+        s_data->out.writeHexLine('R', rss);
     }
 
     void writeVersion()
     {
-        writeLine("v %x %x\n", HEAPTRACK_VERSION, HEAPTRACK_FILE_FORMAT_VERSION);
+        s_data->out.writeHexLine('v', static_cast<size_t>(HEAPTRACK_VERSION),
+                                 static_cast<size_t>(HEAPTRACK_FILE_FORMAT_VERSION));
     }
 
     void writeExe()
@@ -381,42 +383,43 @@ public:
         ssize_t size = readlink("/proc/self/exe", buf, BUF_SIZE);
         if (size > 0 && size < BUF_SIZE) {
             buf[size] = 0;
-            writeLine("x %s\n", buf);
+            s_data->out.write("x %s\n", buf);
         }
     }
 
     void writeCommandLine()
     {
-        writeLine("X");
+        s_data->out.write("X");
         const int BUF_SIZE = 4096;
         char buf[BUF_SIZE + 1];
         auto fd = open("/proc/self/cmdline", O_RDONLY);
         int bytesRead = read(fd, buf, BUF_SIZE);
         char* end = buf + bytesRead;
         for (char* p = buf; p < end;) {
-            writeLine(" %s", p);
+            s_data->out.write(" %s", p);
             while (*p++)
                 ; // skip until start of next 0-terminated section
         }
 
         close(fd);
-        writeLine("\n");
+        s_data->out.write("\n");
     }
 
     void writeSystemInfo()
     {
-        writeLine("I %lx %lx\n", sysconf(_SC_PAGESIZE), sysconf(_SC_PHYS_PAGES));
+        s_data->out.writeHexLine('I', static_cast<size_t>(sysconf(_SC_PAGESIZE)),
+                                 static_cast<size_t>(sysconf(_SC_PHYS_PAGES)));
     }
 
     void handleMalloc(void* ptr, size_t size, const Trace& trace)
     {
-        if (!s_data || s_data->out == -1) {
+        if (!s_data || !s_data->out.canWrite()) {
             return;
         }
         updateModuleCache();
 
         const auto index = s_data->traceTree.index(
-            trace, [this](uintptr_t ip, uint32_t index) { return writeLine("t %" PRIxPTR " %x\n", ip, index); });
+            trace, [this](uintptr_t ip, uint32_t index) { return s_data->out.writeHexLine('t', ip, index); });
 
 #ifdef DEBUG_MALLOC_PTRS
         auto it = s_data->known.find(ptr);
@@ -424,12 +427,12 @@ public:
         s_data->known.insert(ptr);
 #endif
 
-        writeLine("+ %zx %x %" PRIxPTR "\n", size, index, reinterpret_cast<uintptr_t>(ptr));
+        s_data->out.writeHexLine('+', size, index, reinterpret_cast<uintptr_t>(ptr));
     }
 
     void handleFree(void* ptr)
     {
-        if (!s_data || s_data->out == -1) {
+        if (!s_data || !s_data->out.canWrite()) {
             return;
         }
 
@@ -439,7 +442,7 @@ public:
         s_data->known.erase(it);
 #endif
 
-        writeLine("- %" PRIxPTR "\n", reinterpret_cast<uintptr_t>(ptr));
+        s_data->out.writeHexLine('-', reinterpret_cast<uintptr_t>(ptr));
     }
 
 private:
@@ -453,20 +456,20 @@ private:
 
         debugLog<VerboseOutput>("dlopen_notify_callback: %s %zx", fileName, info->dlpi_addr);
 
-        if (!heaptrack->writeLine("m %s %zx", fileName, info->dlpi_addr)) {
+        if (!heaptrack->s_data->out.write("m %s %zx", fileName, info->dlpi_addr)) {
             return 1;
         }
 
         for (int i = 0; i < info->dlpi_phnum; i++) {
             const auto& phdr = info->dlpi_phdr[i];
             if (phdr.p_type == PT_LOAD) {
-                if (!heaptrack->writeLine(" %zx %zx", phdr.p_vaddr, phdr.p_memsz)) {
+                if (!heaptrack->s_data->out.write(" %zx %zx", phdr.p_vaddr, phdr.p_memsz)) {
                     return 1;
                 }
             }
         }
 
-        if (!heaptrack->writeLine("\n")) {
+        if (!heaptrack->s_data->out.write("\n")) {
             return 1;
         }
 
@@ -498,75 +501,21 @@ private:
 
     void updateModuleCache()
     {
-        if (!s_data || s_data->out == -1 || !s_data->moduleCacheDirty) {
+        if (!s_data || !s_data->out.canWrite() || !s_data->moduleCacheDirty) {
             return;
         }
         debugLog<MinimalOutput>("%s", "updateModuleCache()");
-        if (!writeLine("m -\n")) {
+        if (!s_data->out.write("m -\n")) {
             return;
         }
         dl_iterate_phdr(&dl_iterate_phdr_callback, this);
         s_data->moduleCacheDirty = false;
     }
 
-    template <typename... T>
-    bool writeLine(const char* fmt, T... args)
-    {
-        for (bool first_try : {true, false}) {
-            const auto available_buffer_size = BUFFER_CAPACITY - s_data->bufferSize;
-            int ret = snprintf(s_data->buffer.get() + s_data->bufferSize, available_buffer_size, fmt, args...);
-            if (ret < 0) {
-                writeError();
-                return false;
-            } else if (static_cast<unsigned>(ret) < available_buffer_size) {
-                s_data->bufferSize += ret;
-                return true;
-            } else if (!first_try) {
-                fprintf(stderr, "failed to write line of length %d, available space: %d", ret, available_buffer_size);
-                return false;
-            } else if (static_cast<unsigned>(ret) >= BUFFER_CAPACITY) {
-                fprintf(stderr, "failed to write line of length %d, available space: %d", ret, BUFFER_CAPACITY);
-                return false;
-            } else if (!sendBuffer()) {
-                // buffer doesn't have enough space, send current buffer contents and clear buffer
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    bool writeLine(const char* line)
-    {
-        // TODO: could be optimized to use strncpy or similar
-        return writeLine("%s", line);
-    }
-
-    bool sendBuffer()
-    {
-        if (!s_data->bufferSize)
-            return 0;
-
-        int ret = 0;
-        do {
-            ret = write(s_data->out, s_data->buffer.get(), s_data->bufferSize);
-        } while (ret < 0 && errno == EINTR);
-
-        if (ret < 0) {
-            writeError();
-            return false;
-        }
-        s_data->bufferSize = 0;
-        memset(s_data->buffer.get(), 0, BUFFER_CAPACITY);
-        return true;
-    }
-
     void writeError()
     {
         debugLog<MinimalOutput>("write error %d/%s", errno, strerror(errno));
         printBacktrace();
-        close(s_data->out);
-        s_data->out = -1;
         shutdown();
     }
 
@@ -592,10 +541,8 @@ private:
     {
         LockedData(int out, heaptrack_callback_t stopCallback)
             : out(out)
-            , buffer(new char[BUFFER_CAPACITY])
             , stopCallback(stopCallback)
         {
-            memset(buffer.get(), 0, BUFFER_CAPACITY);
 
             debugLog<MinimalOutput>("%s", "constructing LockedData");
             procStatm = fopen("/proc/self/statm", "r");
@@ -657,9 +604,7 @@ private:
                 }
             }
 
-            if (out != -1) {
-                close(out);
-            }
+            out.close();
 
             if (procStatm) {
                 fclose(procStatm);
@@ -671,15 +616,7 @@ private:
             debugLog<MinimalOutput>("%s", "done destroying LockedData");
         }
 
-        /**
-         * Note: We use the C API here for performance reasons.
-         *       Esp. in multi-threaded environments this is much faster
-         *       to produce non-per-line-interleaved output.
-         * Note: We use non-buffered API to workaround https://bugs.kde.org/show_bug.cgi?id=393387
-         */
-        int out = -1;
-        unsigned bufferSize = 0;
-        unique_ptr<char> buffer;
+        LineWriter out;
 
         /// /proc/self/statm file stream to read RSS value from
         FILE* procStatm = nullptr;

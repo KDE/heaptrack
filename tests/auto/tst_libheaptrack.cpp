@@ -17,7 +17,8 @@
  */
 
 #include "3rdparty/catch.hpp"
-#include "src/track/libheaptrack.h"
+#include "track/libheaptrack.h"
+#include "util/linewriter.h"
 
 #include <cstdio>
 #include <cmath>
@@ -27,31 +28,16 @@
 #include <vector>
 #include <iostream>
 
-#include <boost/filesystem.hpp>
+#include "tempfile.h"
 
 bool initBeforeCalled = false;
 bool initAfterCalled = false;
-int out = -1;
 bool stopCalled = false;
 
 using namespace std;
 
-struct TempFile {
-    TempFile()
-        : path(boost::filesystem::unique_path())
-        , fileName(path.native())
-    {
-
-    }
-    ~TempFile()
-    {
-        boost::filesystem::remove(path);
-    }
-    const boost::filesystem::path path;
-    const string fileName;
-};
 TEST_CASE ("api") {
-    TempFile tmp;
+    TempFile tmp; // opened/closed by heaptrack_init
 
     SECTION ("init") {
         heaptrack_init(tmp.fileName.c_str(),
@@ -61,12 +47,10 @@ TEST_CASE ("api") {
                            REQUIRE(!stopCalled);
                            initBeforeCalled = true;
                        },
-                       [](int fd) {
+                       [](LineWriter& out) {
                            REQUIRE(initBeforeCalled);
                            REQUIRE(!initAfterCalled);
                            REQUIRE(!stopCalled);
-                           REQUIRE(fd != -1);
-                           out = fd;
                            initAfterCalled = true;
                        },
                        []() {
@@ -74,7 +58,6 @@ TEST_CASE ("api") {
                            REQUIRE(initAfterCalled);
                            REQUIRE(!stopCalled);
                            stopCalled = true;
-                           out = -1;
                        });
 
         REQUIRE(initBeforeCalled);

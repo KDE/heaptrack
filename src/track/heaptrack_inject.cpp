@@ -18,6 +18,7 @@
 
 #include "libheaptrack.h"
 #include "util/config.h"
+#include "util/linewriter.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -301,13 +302,7 @@ void overwrite_symbols() noexcept
 extern "C" {
 void heaptrack_inject(const char* outputFileName) noexcept
 {
-    heaptrack_init(outputFileName, []() { overwrite_symbols(); },
-                   [](int fd) {
-                       int ret = -1;
-                       do {
-                           ret = write(fd, "A\n", sizeof("A\n"));
-                       } while (ret < 0 && errno == EINTR);
-                   },
+    heaptrack_init(outputFileName, []() { overwrite_symbols(); }, [](LineWriter& out) { out.write("A\n"); },
                    []() {
                        bool do_shutdown = true;
                        dl_iterate_phdr(&iterate_phdrs, &do_shutdown);
