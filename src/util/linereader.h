@@ -84,6 +84,7 @@ public:
                 ++it;
                 break;
             } else {
+                fprintf(stderr, "unexpected non-hex char: %d %zx\n", c, std::distance(m_line.cbegin(), it));
                 return false;
             }
             ++it;

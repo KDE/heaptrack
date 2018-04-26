@@ -18,12 +18,14 @@
 
 #include "3rdparty/catch.hpp"
 
+#include "util/linereader.h"
 #include "util/linewriter.h"
 
 #include "tempfile.h"
 
 #include <fstream>
 #include <limits>
+#include <sstream>
 
 using namespace std;
 
@@ -117,4 +119,65 @@ TEST_CASE ("write flush", "[write]") {
 
     writer.flush();
     REQUIRE(fileContents(file.fileName) == data1 + data2);
+}
+
+TEST_CASE ("read line 64bit", "[read]") {
+    const string contents =
+        "m /tmp/KDevelop-5.2.1-x86_64/usr/lib/libKF5Completion.so.5 7f48beedc00 0 36854 236858 2700\n";
+    stringstream stream(contents);
+
+    LineReader reader;
+    REQUIRE(reader.getLine(stream));
+    REQUIRE(reader.line()
+            == "m /tmp/KDevelop-5.2.1-x86_64/usr/lib/libKF5Completion.so.5 7f48beedc00 0 36854 236858 2700");
+    REQUIRE(reader.mode() == 'm');
+
+    string module;
+    REQUIRE(reader >> module);
+    REQUIRE(module == "/tmp/KDevelop-5.2.1-x86_64/usr/lib/libKF5Completion.so.5");
+
+    for (uint64_t expected : {0x7f48beedc00ul, 0x0ul, 0x36854ul, 0x236858ul, 0x2700ul}) {
+        uint64_t addr = 0;
+        REQUIRE(reader >> addr);
+        REQUIRE(addr == expected);
+    }
+
+    uint64_t x = 0;
+    REQUIRE(!(reader >> x));
+    REQUIRE(!(reader >> module));
+}
+
+TEST_CASE ("read line 32bit", "[read]") {
+    const string contents = "t 4 3\n"
+                            "a 11c00 4\n"
+                            "+ 0\n";
+    stringstream stream(contents);
+    LineReader reader;
+    uint32_t idx = 0;
+
+    REQUIRE(reader.getLine(stream));
+    REQUIRE(reader.line() == "t 4 3");
+    REQUIRE(reader.mode() == 't');
+    REQUIRE(reader >> idx);
+    REQUIRE(idx == 0x4);
+    REQUIRE(reader >> idx);
+    REQUIRE(idx == 0x3);
+    REQUIRE(!(reader >> idx));
+
+    REQUIRE(reader.getLine(stream));
+    REQUIRE(reader.line() == "a 11c00 4");
+    REQUIRE(reader.mode() == 'a');
+    REQUIRE(reader >> idx);
+    REQUIRE(idx == 0x11c00);
+    REQUIRE(reader >> idx);
+    REQUIRE(idx == 0x4);
+    REQUIRE(!(reader >> idx));
+
+    REQUIRE(reader.getLine(stream));
+    REQUIRE(reader.line() == "+ 0");
+    REQUIRE(reader.mode() == '+');
+
+    REQUIRE(reader >> idx);
+    REQUIRE(idx == 0x0);
+    REQUIRE(!(reader >> idx));
 }
