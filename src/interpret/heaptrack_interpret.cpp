@@ -48,6 +48,8 @@ using namespace std;
 
 namespace {
 
+#define error_out cerr << __FILE__ << ':' << __LINE__ << " ERROR:"
+
 string demangle(const char* function)
 {
     if (!function) {
@@ -162,8 +164,8 @@ struct Module
                 },
                 [](void* _data, const char* msg, int errnum) {
                     auto* data = reinterpret_cast<const Data*>(_data);
-                    cerr << "Module backtrace error for address " << hex << data->address << dec << " in module "
-                         << data->module->fileName << " (code " << errnum << "): " << msg << endl;
+                    error_out << "Module backtrace error for address " << hex << data->address << dec << " in module "
+                              << data->module->fileName << " (code " << errnum << "): " << msg << endl;
                 },
                 &data);
         }
@@ -344,8 +346,8 @@ struct AccumulatedTraceData
 
         auto errorHandler = [](void* rawData, const char* msg, int errnum) {
             auto data = reinterpret_cast<const CallbackData*>(rawData);
-            cerr << "Failed to create backtrace state for module " << data->fileName << ": " << msg << " / "
-                 << strerror(errnum) << " (error code " << errnum << ")" << endl;
+            error_out << "Failed to create backtrace state for module " << data->fileName << ": " << msg << " / "
+                      << strerror(errnum) << " (error code " << errnum << ")" << endl;
         };
 
         auto state = backtrace_create_state(data.fileName, /* we are single threaded, so: not thread safe */ false,
@@ -424,7 +426,7 @@ int main(int /*argc*/, char** /*argv*/)
     while (reader.getLine(cin)) {
         if (reader.mode() == 'x') {
             if (!exe.empty()) {
-                cerr << "received duplicate exe event - child process tracking is not yet supported" << endl;
+                error_out << "received duplicate exe event - child process tracking is not yet supported" << endl;
                 return 1;
             }
             reader >> exe;
@@ -441,7 +443,7 @@ int main(int /*argc*/, char** /*argv*/)
                 const auto moduleIndex = data.intern(fileName, &internedString);
                 uintptr_t addressStart = 0;
                 if (!(reader >> addressStart)) {
-                    cerr << "failed to parse line: " << reader.line() << endl;
+                    error_out << "failed to parse line: " << reader.line() << endl;
                     return 1;
                 }
                 auto state = data.findBacktraceState(internedString, addressStart);
@@ -455,7 +457,7 @@ int main(int /*argc*/, char** /*argv*/)
             uintptr_t instructionPointer = 0;
             size_t parentIndex = 0;
             if (!(reader >> instructionPointer) || !(reader >> parentIndex)) {
-                cerr << "failed to parse line: " << reader.line() << endl;
+                error_out << "failed to parse line: " << reader.line() << endl;
                 return 1;
             }
             // ensure ip is encountered
@@ -469,7 +471,7 @@ int main(int /*argc*/, char** /*argv*/)
             TraceIndex traceId;
             uint64_t ptr = 0;
             if (!(reader >> size) || !(reader >> traceId.index) || !(reader >> ptr)) {
-                cerr << "failed to parse line: " << reader.line() << endl;
+                error_out << "failed to parse line: " << reader.line() << endl;
                 continue;
             }
 
@@ -483,7 +485,7 @@ int main(int /*argc*/, char** /*argv*/)
         } else if (reader.mode() == '-') {
             uint64_t ptr = 0;
             if (!(reader >> ptr)) {
-                cerr << "failed to parse line: " << reader.line() << endl;
+                error_out << "failed to parse line: " << reader.line() << endl;
                 continue;
             }
             bool temporary = lastPtr == ptr;
