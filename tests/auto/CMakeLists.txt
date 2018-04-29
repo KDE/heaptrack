@@ -3,9 +3,11 @@ if (ECM_FOUND)
 endif()
 
 set(CMAKE_BUILD_TYPE Debug)
+configure_file(tst_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/tst_config.h @ONLY)
 
 include_directories(
     ${LIBUNWIND_INCLUDE_DIR}
+    ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../
     ${CMAKE_CURRENT_SOURCE_DIR}/../../src
 )
@@ -42,4 +44,14 @@ if (${Boost_FILESYSTEM_FOUND} AND ${Boost_SYSTEM_FOUND})
             ${Boost_FILESYSTEM_LIBRARY}
     )
     add_test(NAME tst_io COMMAND tst_io)
+
+
+    add_executable(tst_inject tst_inject.cpp)
+    target_link_libraries(tst_inject
+            ${CMAKE_DL_LIBS}
+            ${Boost_SYSTEM_LIBRARY}
+            ${Boost_FILESYSTEM_LIBRARY}
+    )
+    add_test(NAME tst_inject COMMAND tst_inject)
+
 endif()

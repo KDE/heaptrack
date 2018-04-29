@@ -23,21 +23,9 @@
 
 #include "tempfile.h"
 
-#include <fstream>
 #include <limits>
-#include <sstream>
 
 using namespace std;
-
-namespace {
-string fileContents(const string& fileName)
-{
-    // open in binary mode to really read everything
-    // we want to ensure that the contents are really clean
-    ifstream ifs(fileName, ios::binary);
-    return {istreambuf_iterator<char>(ifs), istreambuf_iterator<char>()};
-}
-}
 
 TEST_CASE ("write data", "[write]") {
     TempFile file;
@@ -51,7 +39,7 @@ TEST_CASE ("write data", "[write]") {
     REQUIRE(writer.writeHexLine('u', std::numeric_limits<uint32_t>::max() - 1, std::numeric_limits<uint32_t>::max()));
     REQUIRE(writer.writeHexLine('l', std::numeric_limits<uint64_t>::max() - 1, std::numeric_limits<uint64_t>::max()));
 
-    REQUIRE(fileContents(file.fileName).empty());
+    REQUIRE(file.readContents().empty());
 
     REQUIRE(writer.flush());
 
@@ -61,7 +49,7 @@ TEST_CASE ("write data", "[write]") {
                                     "u fffffffe ffffffff\n"
                                     "l fffffffffffffffe ffffffffffffffff\n";
 
-    REQUIRE(fileContents(file.fileName) == expectedContents);
+    REQUIRE(file.readContents() == expectedContents);
 }
 
 TEST_CASE ("buffered write", "[write]") {
@@ -78,7 +66,7 @@ TEST_CASE ("buffered write", "[write]") {
     REQUIRE(expectedContents.size() > LineWriter::BUFFER_CAPACITY);
     REQUIRE(writer.flush());
 
-    REQUIRE(fileContents(file.fileName) == expectedContents);
+    REQUIRE(file.readContents() == expectedContents);
 }
 
 TEST_CASE ("buffered writeHex", "[write]") {
@@ -95,7 +83,7 @@ TEST_CASE ("buffered writeHex", "[write]") {
     REQUIRE(expectedContents.size() > LineWriter::BUFFER_CAPACITY);
     REQUIRE(writer.flush());
 
-    REQUIRE(fileContents(file.fileName) == expectedContents);
+    REQUIRE(file.readContents() == expectedContents);
 }
 
 TEST_CASE ("write flush", "[write]") {
@@ -108,17 +96,17 @@ TEST_CASE ("write flush", "[write]") {
     string data1(LineWriter::BUFFER_CAPACITY - 10, '#');
     REQUIRE(writer.write(data1.c_str()));
     // not yet written
-    REQUIRE(fileContents(file.fileName).empty());
+    REQUIRE(file.readContents().empty());
 
     // NOTE: while this data would fit,
     //       snprintf used by the writer tries to append a \0 too which doesn't fit
     string data2(10, '+');
     REQUIRE(writer.write(data2.c_str()));
     // so the above flushes, but only the first chunk
-    REQUIRE(fileContents(file.fileName) == data1);
+    REQUIRE(file.readContents() == data1);
 
     writer.flush();
-    REQUIRE(fileContents(file.fileName) == data1 + data2);
+    REQUIRE(file.readContents() == data1 + data2);
 }
 
 TEST_CASE ("read line 64bit", "[read]") {

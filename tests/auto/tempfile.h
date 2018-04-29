@@ -23,6 +23,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include <fstream>
+#include <sstream>
+
 struct TempFile
 {
     TempFile()
@@ -48,6 +51,14 @@ struct TempFile
         if (fd != -1) {
             ::close(fd);
         }
+    }
+
+    std::string readContents() const
+    {
+        // open in binary mode to really read everything
+        // we want to ensure that the contents are really clean
+        std::ifstream ifs(fileName, std::ios::binary);
+        return {std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>()};
     }
 
     const boost::filesystem::path path;
