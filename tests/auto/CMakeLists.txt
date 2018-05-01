@@ -17,7 +17,6 @@ add_executable(tst_trace tst_trace.cpp)
 target_link_libraries(tst_trace ${LIBUNWIND_LIBRARY})
 add_test(NAME tst_trace COMMAND tst_trace)
 
-find_package(Boost 1.41.0 COMPONENTS system filesystem)
 if (${Boost_FILESYSTEM_FOUND} AND ${Boost_SYSTEM_FOUND})
     include_directories(
         ${Boost_INCLUDE_DIRS}

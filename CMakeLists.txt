@@ -24,7 +24,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(FeatureSummary)
 find_package(Libunwind REQUIRED)
-find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options)
+find_package(Boost 1.41.0 COMPONENTS system filesystem) # option first
+find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options) # then required
 find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Zstd)
