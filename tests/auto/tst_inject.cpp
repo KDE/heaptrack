@@ -79,6 +79,8 @@ void runInjectTest(Load load, Unload unload)
     const auto contents = file.readContents();
     REQUIRE(!contents.empty());
     REQUIRE(contents.find("\nA\n") != std::string::npos);
+    REQUIRE(contents.find("\n+") != std::string::npos);
+    REQUIRE(contents.find("\n-") != std::string::npos);
 }
 }
 
