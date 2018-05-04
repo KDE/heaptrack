@@ -41,22 +41,37 @@ cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_BUILD_TYPE=Release ..
 make -j$(nproc)
 make DESTDIR=appdir install
 
+# copy the zstd binary into the app image
+cp $ZSTD ./appdir/$PREFIX/bin/zstd
+
 linuxdeployqt "./appdir/$PREFIX/share/applications/org.kde.heaptrack.desktop" \
     -executable="./appdir/$PREFIX/lib/heaptrack/libexec/heaptrack_interpret" \
     -executable="./appdir/$PREFIX/lib/heaptrack/libheaptrack_preload.so" \
     -executable="./appdir/$PREFIX/lib/heaptrack/libheaptrack_inject.so" \
-    -executable="$ZSTD" \
+    -executable="./appdir/$PREFIX/bin/zstd" \
     -bundle-non-qt-libs
 
 # Ensure we prefer the bundled libs also when calling dlopen, cf.: https://github.com/KDAB/hotspot/issues/89
 mv "./appdir/$PREFIX/bin/heaptrack_gui" "./appdir/$PREFIX/bin/heaptrack_gui_bin"
-printf '#!/bin/bash\nf="$(readlink -f "${0}")"\nd="$(dirname "$f")"\nLD_LIBRARY_PATH="$d/../lib:$LD_LIBRARY_PATH" "$d/heaptrack_gui_bin" "$@"\n' > ./appdir/$PREFIX/bin/heaptrack_gui
-
+cat << WRAPPER_SCRIPT > ./appdir/$PREFIX/bin/heaptrack_gui
+#!/bin/bash
+f="\$(readlink -f "\${0}")"
+d="\$(dirname "\$f")"
+LD_LIBRARY_PATH="\$d/../lib:\$LD_LIBRARY_PATH" "\$d/heaptrack_gui_bin" "\$@"
+WRAPPER_SCRIPT
 chmod +x ./appdir/$PREFIX/bin/heaptrack_gui
 
 # use the shell script as AppRun entry point
+# also make sure we find the bundled zstd
 rm ./appdir/AppRun
-ln -sr ./appdir/$PREFIX/bin/heaptrack ./appdir/AppRun
+cat << WRAPPER_SCRIPT > ./appdir/AppRun
+#!/bin/bash
+f="\$(readlink -f "\${0}")"
+d="\$(dirname "\$f")"
+bin="\$d/$PREFIX/bin"
+PATH="\$PATH:\$bin" "\$bin/heaptrack" "\$@"
+WRAPPER_SCRIPT
+chmod +x ./appdir/AppRun
 
 # Actually create the final image
 appimagetool ./appdir $OUTDIR/heaptrack-$(git describe)-x86_64.AppImage

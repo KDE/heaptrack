@@ -180,7 +180,7 @@ mkfifo $pipe
 output_suffix="gz"
 COMPRESSOR="gzip -c"
 
-if [ "@ZSTD_FOUND@" = "TRUE" ] && [ ! -z "$(which zstd)" ]; then
+if [ "@ZSTD_FOUND@" = "TRUE" ] && [ ! -z "$(which zstd 2> /dev/null)" ]; then
     output_suffix="zst"
     COMPRESSOR="zstd -c"
 fi
