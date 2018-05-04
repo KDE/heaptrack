@@ -260,7 +260,7 @@ private:
 
     int fd = -1;
     unsigned bufferSize = 0;
-    std::unique_ptr<char> buffer;
+    std::unique_ptr<char[]> buffer;
 };
 
 #endif
