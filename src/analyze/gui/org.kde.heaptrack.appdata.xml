@@ -24,6 +24,9 @@
   <name xml:lang="x-test">xxHeaptrackxx</name>
   <name xml:lang="zh-CN">堆栈追踪</name>
   <summary>A heap memory profiler for Linux</summary>
+  <summary xml:lang="ca">Un perfilador de memòria en monticles per a Linux</summary>
+  <summary xml:lang="sv">Ett heap-profileringsverktyg för Linux</summary>
+  <summary xml:lang="x-test">xxA heap memory profiler for Linuxxx</summary>
   <description>
     <p>
       Heaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:
