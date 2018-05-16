@@ -600,7 +600,7 @@ private:
             if (timerThread.joinable()) {
                 try {
                     timerThread.join();
-                } catch (std::system_error) {
+                } catch (const std::system_error&) {
                 }
             }
 
