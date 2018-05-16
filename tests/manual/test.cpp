@@ -100,7 +100,7 @@ int main()
     printf("valloc: %p\n", buf);
     free(buf);
 
-    posix_memalign(&buf, 16, 64);
+    int __attribute__((unused)) ret = posix_memalign(&buf, 16, 64);
     printf("posix_memalign: %p\n", buf);
     free(buf);
 
