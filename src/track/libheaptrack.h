@@ -16,14 +16,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <stdio.h>
+#include <stddef.h>
 
 #ifdef __cplusplus
+typedef class LineWriter linewriter_t;
 extern "C" {
+#else
+typedef struct LineWriter linewriter_t;
 #endif
 
 typedef void (*heaptrack_callback_t)();
-typedef void (*heaptrack_callback_initialized_t)(struct LineWriter&);
+typedef void (*heaptrack_callback_initialized_t)(linewriter_t&);
 
 void heaptrack_init(const char* outputFileName, heaptrack_callback_t initCallbackBefore,
                     heaptrack_callback_initialized_t initCallbackAfter, heaptrack_callback_t stopCallback);
