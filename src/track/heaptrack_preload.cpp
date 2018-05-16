@@ -110,7 +110,7 @@ HOOK(dlclose);
 void* dummy_calloc(size_t num, size_t size) noexcept
 {
     const size_t MAX_SIZE = 1024;
-    static char* buf[MAX_SIZE];
+    static char buf[MAX_SIZE];
     static size_t offset = 0;
     if (!offset) {
         memset(buf, 0, MAX_SIZE);
