@@ -419,7 +419,7 @@ public:
         updateModuleCache();
 
         const auto index = s_data->traceTree.index(
-            trace, [this](uintptr_t ip, uint32_t index) { return s_data->out.writeHexLine('t', ip, index); });
+            trace, [](uintptr_t ip, uint32_t index) { return s_data->out.writeHexLine('t', ip, index); });
 
 #ifdef DEBUG_MALLOC_PTRS
         auto it = s_data->known.find(ptr);
