@@ -79,6 +79,9 @@ struct hook
         static constexpr const char* identifier = #name;                                                               \
     } name
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wignored-attributes"
+
 HOOK(malloc);
 HOOK(free);
 HOOK(calloc);
@@ -93,6 +96,9 @@ HOOK(aligned_alloc);
 #endif
 HOOK(dlopen);
 HOOK(dlclose);
+
+#pragma GCC diagnostic pop
+#undef HOOK
 
 /**
  * Dummy implementation, since the call to dlsym from findReal triggers a call
