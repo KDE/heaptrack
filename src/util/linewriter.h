@@ -158,6 +158,11 @@ public:
         return __builtin_clzl(V);
     }
 
+    inline static unsigned clz(long long unsigned V)
+    {
+        return __builtin_clzll(V);
+    }
+
     template <typename V>
     static char* writeHexNumber(char* buffer, V value)
     {
