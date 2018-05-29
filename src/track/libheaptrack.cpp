@@ -121,7 +121,7 @@ inline void debugLog(const char fmt[], Args... args)
     if (debugLevel <= s_debugVerbosity) {
         RecursionGuard guard;
         flockfile(stderr);
-        fprintf(stderr, "heaptrack debug(%d) [%d:%d]@%lu ", static_cast<int>(debugLevel), getpid(), gettid(),
+        fprintf(stderr, "heaptrack debug(%d) [%d:%d]@%" PRIu64 " ", static_cast<int>(debugLevel), getpid(), gettid(),
                 elapsedTime().count());
         fprintf(stderr, fmt, args...);
         fputc('\n', stderr);
