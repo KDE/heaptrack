@@ -27,6 +27,11 @@
 
 using namespace std;
 
+constexpr uint64_t operator""_u64(unsigned long long v)
+{
+    return static_cast<uint64_t>(v);
+}
+
 TEST_CASE ("write data", "[write]") {
     TempFile file;
     REQUIRE(file.open());
@@ -124,7 +129,7 @@ TEST_CASE ("read line 64bit", "[read]") {
     REQUIRE(reader >> module);
     REQUIRE(module == "/tmp/KDevelop-5.2.1-x86_64/usr/lib/libKF5Completion.so.5");
 
-    for (uint64_t expected : {0x7f48beedc00ul, 0x0ul, 0x36854ul, 0x236858ul, 0x2700ul}) {
+    for (auto expected : {0x7f48beedc00_u64, 0x0_u64, 0x36854_u64, 0x236858_u64, 0x2700_u64}) {
         uint64_t addr = 0;
         REQUIRE(reader >> addr);
         REQUIRE(addr == expected);
