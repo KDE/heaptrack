@@ -49,6 +49,13 @@
 #include "util/libunwind_config.h"
 #include "util/linewriter.h"
 
+extern "C" {
+__attribute__((weak)) void __libc_freeres();
+}
+namespace __gnu_cxx {
+__attribute__((weak)) extern void __freeres();
+}
+
 /**
  * uncomment this to get extended debug code for known pointers
  * there are still some malloc functions I'm missing apparently,
@@ -273,6 +280,18 @@ public:
                     return;
                 }
                 debugLog<MinimalOutput>("%s", "atexit()");
+
+                // free internal libstdc++ resources
+                // see also Valgrind's `--run-cxx-freeres` option
+                if (&__gnu_cxx::__freeres) {
+                    __gnu_cxx::__freeres();
+                }
+                // free internal libc resources, cf: https://bugs.kde.org/show_bug.cgi?id=378765
+                // see also Valgrind's `--run-libc-freeres` option
+                if (&__libc_freeres) {
+                    __libc_freeres();
+                }
+
                 s_atexit.store(true);
                 heaptrack_stop();
             });

@@ -35,13 +35,6 @@ using namespace std;
 #define HAVE_ALIGNED_ALLOC 0
 #endif
 
-extern "C" {
-__attribute__((weak)) void __libc_freeres();
-}
-namespace __gnu_cxx {
-__attribute__((weak)) extern void __freeres();
-}
-
 namespace {
 
 namespace hooks {
@@ -123,18 +116,6 @@ void* dummy_calloc(size_t num, size_t size) noexcept
 
 void init()
 {
-    atexit([]() {
-        // free internal libstdc++ resources
-        // see also Valgrind's `--run-cxx-freeres` option
-        if (&__gnu_cxx::__freeres) {
-            __gnu_cxx::__freeres();
-        }
-        // free internal libc resources, cf: https://bugs.kde.org/show_bug.cgi?id=378765
-        // see also Valgrind's `--run-libc-freeres` option
-        if (&__libc_freeres) {
-            __libc_freeres();
-        }
-    });
     heaptrack_init(getenv("DUMP_HEAPTRACK_OUTPUT"),
                    [] {
                        hooks::calloc.original = &dummy_calloc;
