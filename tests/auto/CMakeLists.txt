@@ -17,7 +17,7 @@ add_executable(tst_trace tst_trace.cpp)
 target_link_libraries(tst_trace ${LIBUNWIND_LIBRARY})
 add_test(NAME tst_trace COMMAND tst_trace)
 
-if (${Boost_FILESYSTEM_FOUND} AND ${Boost_SYSTEM_FOUND})
+if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
     include_directories(
         ${Boost_INCLUDE_DIRS}
         ${CMAKE_CURRENT_BINARY_DIR}/../../src/
