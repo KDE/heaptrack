@@ -369,19 +369,30 @@ public:
 
     void writeRSS()
     {
-        if (!s_data || !s_data->out.canWrite() || !s_data->procStatm) {
+        if (!s_data || !s_data->out.canWrite() || s_data->procStatm == -1) {
             return;
         }
 
         // read RSS in pages from statm, then rewind for next read
-        size_t rss = 0;
-        if (fscanf(s_data->procStatm, "%*x %zx", &rss) != 1) {
+        // NOTE: don't use fscanf here, it could potentially deadlock us
+        const int BUF_SIZE = 512;
+        char buf[BUF_SIZE + 1];
+        if (read(s_data->procStatm, buf, BUF_SIZE) <= 0) {
             fprintf(stderr, "WARNING: Failed to read RSS value from /proc/self/statm.\n");
-            fclose(s_data->procStatm);
-            s_data->procStatm = nullptr;
+            close(s_data->procStatm);
+            s_data->procStatm = -1;
             return;
         }
-        rewind(s_data->procStatm);
+        lseek(s_data->procStatm, 0, SEEK_SET);
+
+        size_t rss = 0;
+        if (sscanf(buf, "%*x %zx", &rss) != 1) {
+            fprintf(stderr, "WARNING: Failed to read RSS value from /proc/self/statm.\n");
+            close(s_data->procStatm);
+            s_data->procStatm = -1;
+            return;
+        }
+
         // TODO: compare to rusage.ru_maxrss (getrusage) to find "real" peak?
         // TODO: use custom allocators with known page sizes to prevent tainting
         //       the RSS numbers with heaptrack-internal data
@@ -564,13 +575,9 @@ private:
         {
 
             debugLog<MinimalOutput>("%s", "constructing LockedData");
-            procStatm = fopen("/proc/self/statm", "r");
-            if (!procStatm) {
+            procStatm = open("/proc/self/statm", O_RDONLY);
+            if (procStatm == -1) {
                 fprintf(stderr, "WARNING: Failed to open /proc/self/statm for reading: %s.\n", strerror(errno));
-            } else if (setvbuf(procStatm, nullptr, _IONBF, 0)) {
-                // disable buffering to ensure we read the latest values
-                fprintf(stderr, "WARNING: Failed to disable buffering for reading of /proc/self/statm: %s.\n",
-                        strerror(errno));
             }
 
             // ensure this utility thread is not handling any signals
@@ -625,8 +632,8 @@ private:
 
             out.close();
 
-            if (procStatm) {
-                fclose(procStatm);
+            if (procStatm != -1) {
+                close(procStatm);
             }
 
             if (stopCallback && (!s_atexit || s_forceCleanup)) {
@@ -637,8 +644,8 @@ private:
 
         LineWriter out;
 
-        /// /proc/self/statm file stream to read RSS value from
-        FILE* procStatm = nullptr;
+        /// /proc/self/statm file descriptor to read RSS value from
+        int procStatm = -1;
 
         /**
          * Calls to dlopen/dlclose mark the cache as dirty.
