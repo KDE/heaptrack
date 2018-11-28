@@ -100,24 +100,41 @@ HOOK(dlclose);
  * This is only called at startup and will eventually be replaced by the
  * "proper" calloc implementation.
  */
+struct DummyPool
+{
+    static const constexpr size_t MAX_SIZE = 1024;
+    char buf[MAX_SIZE] = {0};
+    size_t offset = 0;
+
+    bool isDummyAllocation(void* ptr) noexcept
+    {
+        return ptr >= buf && ptr < buf + MAX_SIZE;
+    }
+
+    void* alloc(size_t num, size_t size) noexcept
+    {
+        size_t oldOffset = offset;
+        offset += num * size;
+        if (offset >= MAX_SIZE) {
+            fprintf(stderr,
+                    "failed to initialize, dummy calloc buf size exhausted: "
+                    "%zu requested, %zu available\n",
+                    offset, MAX_SIZE);
+            abort();
+        }
+        return buf + oldOffset;
+    }
+};
+
+DummyPool& dummyPool()
+{
+    static DummyPool pool;
+    return pool;
+}
+
 void* dummy_calloc(size_t num, size_t size) noexcept
 {
-    const size_t MAX_SIZE = 1024;
-    static char buf[MAX_SIZE];
-    static size_t offset = 0;
-    if (!offset) {
-        memset(buf, 0, MAX_SIZE);
-    }
-    size_t oldOffset = offset;
-    offset += num * size;
-    if (offset >= MAX_SIZE) {
-        fprintf(stderr,
-                "failed to initialize, dummy calloc buf size exhausted: "
-                "%zu requested, %zu available\n",
-                offset, MAX_SIZE);
-        abort();
-    }
-    return buf + oldOffset;
+    return dummyPool().alloc(num, size);
 }
 
 void init()
@@ -169,6 +186,10 @@ void free(void* ptr) noexcept
 {
     if (!hooks::free) {
         hooks::init();
+    }
+
+    if (hooks::dummyPool().isDummyAllocation(ptr)) {
+        return;
     }
 
     // call handler before handing over the real free implementation
