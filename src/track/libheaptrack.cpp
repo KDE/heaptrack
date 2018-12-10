@@ -386,7 +386,7 @@ public:
         lseek(s_data->procStatm, 0, SEEK_SET);
 
         size_t rss = 0;
-        if (sscanf(buf, "%*x %zx", &rss) != 1) {
+        if (sscanf(buf, "%*u %zu", &rss) != 1) {
             fprintf(stderr, "WARNING: Failed to read RSS value from /proc/self/statm.\n");
             close(s_data->procStatm);
             s_data->procStatm = -1;
