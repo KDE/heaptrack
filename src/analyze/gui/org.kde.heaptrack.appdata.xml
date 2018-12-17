@@ -29,6 +29,7 @@
   <summary xml:lang="ca-valencia">Un perfilador de memòria en monticles per a Linux</summary>
   <summary xml:lang="en-GB">A heap memory profiler for Linux</summary>
   <summary xml:lang="es">Un analizador de rendimiento de la memoria de almacenamiento libre para Linux</summary>
+  <summary xml:lang="gl">Un analizador de uso de memoria dinámica (heap) para Linux</summary>
   <summary xml:lang="nl">Een profiler van heap-geheugen voor Linux</summary>
   <summary xml:lang="nn">Profileringsprogram for heap-minne</summary>
   <summary xml:lang="pl">Program profilujący pamięć na stosie dla Linuksa</summary>
