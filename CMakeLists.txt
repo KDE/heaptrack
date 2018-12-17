@@ -23,30 +23,44 @@ set(HEAPTRACK_FILE_FORMAT_VERSION 2)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(FeatureSummary)
-find_package(Libunwind REQUIRED)
-find_package(Boost 1.41.0 COMPONENTS system filesystem) # option first
-find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options) # then required
+find_package(Boost 1.41.0 COMPONENTS system filesystem iostreams)
 find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(Zstd)
+
+if (${BOOST_iostreams_FOUND})
+    find_package(Zstd)
+endif()
 set_package_properties(Zstd PROPERTIES TYPE RECOMMENDED PURPOSE "Zstandard offers better (de)compression performance compared with gzip/zlib, making heaptrack faster and datafiles smaller.")
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(HEAPTRACK_BUILD_TRACK_DEFAULT ON)
+else()
+    set(HEAPTRACK_BUILD_TRACK_DEFAULT OFF)
+endif()
+
+option(
+  HEAPTRACK_BUILD_TRACK
+  "Disable this option to skip building the tracker part for heaptrack, e.g. to only build the GUI."
+  ${HEAPTRACK_BUILD_TRACK_DEFAULT}
+)
+
+if (CMAKE_CROSSCOMPILING)
+    set(HEAPTRACK_BUILD_ANALYZE_DEFAULT OFF)
+else()
+    set(HEAPTRACK_BUILD_ANALYZE_DEFAULT ON)
+endif()
+
+option(
+  HEAPTRACK_BUILD_PRINT
+  "Disable this option to skip building heaptrack_print, e.g. when you're cross-compiling."
+  ${HEAPTRACK_BUILD_ANALYZE_DEFAULT}
+)
 
 option(
   HEAPTRACK_BUILD_GUI
   "Disable this option to skip building the Qt5 / KF5 based GUI for heaptrack."
-  On
+  ${HEAPTRACK_BUILD_ANALYZE_DEFAULT}
 )
-
-if(HEAPTRACK_BUILD_GUI)
-    find_package(Qt5 5.2.0 NO_MODULE OPTIONAL_COMPONENTS Widgets)
-    find_package(ECM 1.0.0 NO_MODULE)
-    if(Qt5_FOUND AND ECM_FOUND)
-        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
-            find_package(KF5 COMPONENTS CoreAddons I18n ItemModels ThreadWeaver ConfigWidgets KIO)
-            find_package(KChart "2.6.0")
-            set_package_properties(KChart PROPERTIES TYPE RECOMMENDED PURPOSE "Required for the heaptrack_gui executable. Get it from the kdiagram module.")
-    endif()
-endif()
 
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -64,17 +78,6 @@ if (NOT HAVE_CXX11_SUPPORT)
     message(FATAL_ERROR "Your compiler is too old and does not support the required C++11 features.")
 endif()
 
-check_cxx_source_compiles(
-    "#include <stdio_ext.h>
-    #include <fcntl.h>
-    #include <dlfcn.h>
-    #include <link.h>
-    int main() { return 0; }"
-    HAVE_LINUX_HEADERS)
-
-if (NOT HAVE_LINUX_HEADERS)
-    message(FATAL_ERROR "You are missing some Linux headers required to compile heaptrack.")
-endif()
 
 # cfree() does not exist in glibc 2.26+.
 # See: https://bugs.kde.org/show_bug.cgi?id=383889
@@ -95,6 +98,22 @@ file(RELATIVE_PATH LIB_REL_PATH
     "${CMAKE_INSTALL_PREFIX}/${LIB_INSTALL_DIR}/heaptrack")
 
 set(ECM_ENABLE_SANITIZERS "" CACHE STRING "semicolon-separated list of sanitizers to enable for code that is not injected into client applications")
+
+if (HEAPTRACK_BUILD_TRACK)
+    find_package(Libunwind REQUIRED)
+
+    check_cxx_source_compiles(
+        "#include <stdio_ext.h>
+        #include <fcntl.h>
+        #include <dlfcn.h>
+        #include <link.h>
+        int main() { return 0; }"
+        HAVE_LINUX_HEADERS)
+
+    if (NOT HAVE_LINUX_HEADERS)
+        message(FATAL_ERROR "You are missing some Linux headers required to compile heaptrack.")
+    endif()
+endif()
 
 add_subdirectory(3rdparty)
 add_subdirectory(src)

@@ -2,8 +2,10 @@ if (ECM_FOUND)
     include(ECMEnableSanitizers)
 endif()
 
-add_subdirectory(libbacktrace)
+if(HEAPTRACK_BUILD_TRACK)
+    add_subdirectory(libbacktrace)
+endif()
 
 if (ZSTD_FOUND)
-add_subdirectory(boost-zstd)
+    add_subdirectory(boost-zstd)
 endif()

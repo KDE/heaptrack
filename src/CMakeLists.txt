@@ -4,6 +4,12 @@ include_directories(
 )
 
 add_subdirectory(util)
-add_subdirectory(track)
-add_subdirectory(interpret)
-add_subdirectory(analyze)
+
+if (HEAPTRACK_BUILD_TRACK)
+    add_subdirectory(track)
+    add_subdirectory(interpret)
+endif()
+
+if (HEAPTRACK_BUILD_PRINT OR HEAPTRACK_BUILD_GUI)
+    add_subdirectory(analyze)
+endif()

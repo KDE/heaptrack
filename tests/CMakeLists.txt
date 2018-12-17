@@ -1,3 +1,5 @@
-add_subdirectory(manual)
-add_subdirectory(auto)
-add_subdirectory(benchmarks)
+if (HEAPTRACK_BUILD_TRACK AND BUILD_TESTING)
+    add_subdirectory(manual)
+    add_subdirectory(auto)
+    add_subdirectory(benchmarks)
+endif()
