@@ -257,7 +257,6 @@ public:
         }
 
         bufferSize = 0;
-        memset(buffer.get(), 0, bufferSize);
 
         return true;
     }
