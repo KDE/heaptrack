@@ -275,7 +275,9 @@ struct AccumulatedTraceData
         if (internedString) {
             *internedString = it->first.data();
         }
-        out.write("s %s\n", str.c_str());
+        out.write("s ");
+        out.write(str);
+        out.write("\n");
         return id;
     }
 

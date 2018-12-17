@@ -107,6 +107,29 @@ public:
     }
 
     /**
+     * write an arbitrary string literal to the buffer
+     */
+    bool write(const std::string& line)
+    {
+        const auto length = line.length();
+        if (availableSpace() < length) {
+            if (!flush()) {
+                return false;
+            }
+            if (availableSpace() < length) {
+                int ret = 0;
+                do {
+                    ret = ::write(fd, line.c_str(), length);
+                } while (ret < 0 && errno == EINTR);
+                return ret >= 0;
+            }
+        }
+        memcpy(out(), line.c_str(), length);
+        bufferSize += length;
+        return true;
+    }
+
+    /**
      * write one of the common heaptrack output lines to the buffer
      *
      * @arg type char that identifies the type of the line

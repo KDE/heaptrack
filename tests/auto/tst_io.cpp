@@ -67,6 +67,16 @@ TEST_CASE ("buffered write", "[write]") {
     for (unsigned i = 0; i < 10000; ++i) {
         REQUIRE(writer.write("%d %x\n", 42, 42));
         expectedContents += "42 2a\n";
+        if (i % 1000 == 0) {
+            const string longString(LineWriter::BUFFER_CAPACITY * 2, '*');
+            REQUIRE(writer.write(longString));
+            expectedContents += longString;
+        }
+    }
+    for (unsigned i = 0; i < LineWriter::BUFFER_CAPACITY * 2; ++i) {
+        const string longString(i, '*');
+        REQUIRE(writer.write(longString));
+        expectedContents += longString;
     }
     REQUIRE(expectedContents.size() > LineWriter::BUFFER_CAPACITY);
     REQUIRE(writer.flush());
