@@ -107,6 +107,36 @@ of the CMake command, as it will tell you about missing dependencies!
     cmake -DCMAKE_BUILD_TYPE=Release .. # look for messages about missing dependencies!
     make -j$(nproc)
 
+#### Compile `heaptrack_gui` on macOS using homebrew
+
+`heaptrack_print` and `heaptrack_gui` can be built on platforms other than Linux, using the dependencies mentioned above.
+On macOS the dependencies can be installed easily using [homebrew](http://brew.sh) and the [KDE homebrew tap](https://github.com/KDE-mac/homebrew-kde).
+
+    # prepare tap
+    brew tap kde-mac/kde
+    "$(brew --repo)/Library/Taps/kde-mac/homebrew-kde/tools/all-fixes.sh"
+    
+    # install dependencies
+    brew install kde-mac/kde/kf5-extra-cmake-modules kde-mac/kde/kf5-kcoreaddons kde-mac/kde/kf5-ki18n \
+                 kde-mac/kde/kf5-kitemmodels kde-mac/kde/kf5-threadweaver kde-mac/kde/kf5-kconfigwidgets \
+                 kde-mac/kde/kf5-kio kde-mac/kde/kf5-kdiagram \
+                 boost zstd gettext
+    
+    # run manual steps as printed by brew
+    ln -sfv "$(brew --prefix)/share/kf5" "$HOME/Library/Application Support"
+    ln -sfv "$(brew --prefix)/share/knotifications5" "$HOME/Library/Application Support"
+    ln -sfv "$(brew --prefix)/share/kservices5" "$HOME/Library/Application Support"
+    ln -sfv "$(brew --prefix)/share/kservicetypes5" "$HOME/Library/Application Support"
+
+To compile make sure to use Qt from homebrew and to have gettext in the path:
+
+    cd heaptrack # i.e. the source folder
+    mkdir build
+    cd build
+    CMAKE_PREFIX_PATH=/usr/local/opt/qt PATH=$PATH:/usr/local/opt/gettext/bin cmake ..
+    cmake -DCMAKE_BUILD_TYPE=Release .. # look for messages about missing dependencies!
+    make heaptrack_gui heaptrack_print
+
 ## Interpreting the heap profile
 
 Heaptrack generates data files that are impossible to analyze for a human. Instead, you need
