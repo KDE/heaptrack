@@ -131,7 +131,6 @@ void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegat
 
     view->setModel(proxy);
     view->setItemDelegateForColumn(TreeModel::PeakColumn, costDelegate);
-    view->setItemDelegateForColumn(TreeModel::AllocatedColumn, costDelegate);
     view->setItemDelegateForColumn(TreeModel::LeakedColumn, costDelegate);
     view->setItemDelegateForColumn(TreeModel::AllocationsColumn, costDelegate);
     view->setItemDelegateForColumn(TreeModel::TemporaryColumn, costDelegate);
@@ -156,12 +155,10 @@ void setupCallerCalle(CallerCalleeModel* model, QTreeView* view, CostDelegate* c
     view->setModel(callerCalleeProxy);
     view->sortByColumn(CallerCalleeModel::InclusivePeakColumn);
     view->setItemDelegateForColumn(CallerCalleeModel::SelfPeakColumn, costDelegate);
-    view->setItemDelegateForColumn(CallerCalleeModel::SelfAllocatedColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::SelfLeakedColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::SelfAllocationsColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::SelfTemporaryColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::InclusivePeakColumn, costDelegate);
-    view->setItemDelegateForColumn(CallerCalleeModel::InclusiveAllocatedColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::InclusiveLeakedColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::InclusiveAllocationsColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::InclusiveTemporaryColumn, costDelegate);
@@ -272,10 +269,6 @@ MainWindow::MainWindow(QWidget* parent)
                            data.cost.temporary,
                            std::round(float(data.cost.temporary) * 100.f * 100.f / data.cost.allocations) / 100.f,
                            qint64(data.cost.temporary / totalTimeS))
-                   << i18n("<dt><b>bytes allocated in total</b> (ignoring "
-                           "deallocations):</dt><dd>%1 (%2/s)</dd>",
-                           format.formatByteSize(data.cost.allocated, 2, KFormat::MetricBinaryDialect),
-                           format.formatByteSize(data.cost.allocated / totalTimeS, 1, KFormat::MetricBinaryDialect))
                    << "</dl></qt>";
         }
         {
@@ -323,8 +316,6 @@ MainWindow::MainWindow(QWidget* parent)
                 &Parser::allocationsChartDataAvailable, this);
     addChartTab(m_ui->tabWidget, i18n("Temporary Allocations"), ChartModel::Temporary, m_parser,
                 &Parser::temporaryChartDataAvailable, this);
-    addChartTab(m_ui->tabWidget, i18n("Allocated"), ChartModel::Allocated, m_parser,
-                &Parser::allocatedChartDataAvailable, this);
 
     auto sizesTab = new HistogramWidget(this);
     m_ui->tabWidget->addTab(sizesTab, i18n("Sizes"));
@@ -393,8 +384,6 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->topAllocations->setItemDelegate(costDelegate);
     setupTopView(bottomUpModel, m_ui->topTemporary, TopProxy::Temporary);
     m_ui->topTemporary->setItemDelegate(costDelegate);
-    setupTopView(bottomUpModel, m_ui->topAllocated, TopProxy::Allocated);
-    m_ui->topAllocated->setItemDelegate(costDelegate);
 
     setWindowTitle(i18n("Heaptrack"));
     // closing the current file shows the stack page to open a new one

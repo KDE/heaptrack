@@ -459,45 +459,6 @@
                    </item>
                   </layout>
                  </widget>
-                 <widget class="QWidget" name="widget_9" native="true">
-                  <layout class="QVBoxLayout" name="verticalLayout_12">
-                   <item>
-                    <widget class="QLabel" name="topAllocatedLabel">
-                     <property name="font">
-                      <font>
-                       <weight>75</weight>
-                       <bold>true</bold>
-                      </font>
-                     </property>
-                     <property name="toolTip">
-                      <string>List of functions that allocated the most memory overall, ignoring deallocations.</string>
-                     </property>
-                     <property name="text">
-                      <string>Most Memory Allocated</string>
-                     </property>
-                     <property name="alignment">
-                      <set>Qt::AlignCenter</set>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QTreeView" name="topAllocated">
-                     <property name="toolTip">
-                      <string>List of functions that allocated the most memory overall, ignoring deallocations.</string>
-                     </property>
-                     <property name="alternatingRowColors">
-                      <bool>true</bool>
-                     </property>
-                     <property name="rootIsDecorated">
-                      <bool>false</bool>
-                     </property>
-                     <property name="uniformRowHeights">
-                      <bool>true</bool>
-                     </property>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
                 </widget>
                </item>
               </layout>
@@ -778,7 +739,7 @@
      <x>0</x>
      <y>0</y>
      <width>1332</width>
-     <height>30</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">

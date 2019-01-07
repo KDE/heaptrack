@@ -56,7 +56,6 @@ public:
     {
         Consumed,
         Allocations,
-        Allocated,
         Temporary,
     };
     explicit ChartModel(Type type, QObject* parent = nullptr);

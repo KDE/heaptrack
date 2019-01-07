@@ -285,14 +285,12 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
             if (pass != FirstPass) {
                 auto& allocation = allocations[info.allocationIndex.index];
                 allocation.leaked += info.size;
-                allocation.allocated += info.size;
                 ++allocation.allocations;
 
                 handleAllocation(info, allocationIndex);
             }
 
             ++totalCost.allocations;
-            totalCost.allocated += info.size;
             totalCost.leaked += info.size;
             if (totalCost.leaked > totalCost.peak) {
                 totalCost.peak = totalCost.leaked;

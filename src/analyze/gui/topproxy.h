@@ -32,7 +32,6 @@ public:
         Peak,
         Leaked,
         Allocations,
-        Allocated,
         Temporary
     };
 

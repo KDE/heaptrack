@@ -57,7 +57,6 @@ public:
         TemporaryColumn,
         PeakColumn,
         LeakedColumn,
-        AllocatedColumn,
         FunctionColumn,
         FileColumn,
         LineColumn,

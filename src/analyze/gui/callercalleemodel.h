@@ -57,12 +57,10 @@ public:
         InclusiveLeakedColumn,
         InclusiveAllocationsColumn,
         InclusiveTemporaryColumn,
-        InclusiveAllocatedColumn,
         SelfPeakColumn,
         SelfLeakedColumn,
         SelfAllocationsColumn,
         SelfTemporaryColumn,
-        SelfAllocatedColumn,
         NUM_COLUMNS
     };
 

@@ -32,8 +32,6 @@ TreeModel::Columns toSource(TopProxy::Type type)
         return TreeModel::AllocationsColumn;
     case TopProxy::Temporary:
         return TreeModel::TemporaryColumn;
-    case TopProxy::Allocated:
-        return TreeModel::AllocatedColumn;
     }
     Q_UNREACHABLE();
 }

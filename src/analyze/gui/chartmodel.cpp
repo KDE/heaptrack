@@ -65,8 +65,6 @@ QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int ro
                 return i18n("Elapsed Time");
             }
             switch (m_type) {
-            case Allocated:
-                return i18n("Memory Allocated");
             case Allocations:
                 return i18n("Memory Allocations");
             case Consumed:
@@ -139,8 +137,6 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
                 return i18n("<qt>%1 temporary allocations in total after %2</qt>", cost, time);
             case Consumed:
                 return i18n("<qt>%1 consumed in total after %2</qt>", byteCost(), time);
-            case Allocated:
-                return i18n("<qt>%1 allocated in total after %2</qt>", byteCost(), time);
             }
         } else {
             const auto label = m_data.labels.value(column).toHtmlEscaped();
@@ -155,10 +151,6 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
                             label, cost, time);
             case Consumed:
                 return i18n("<qt>%2 consumed after %3 from:<p "
-                            "style='margin-left:10px'>%1</p></qt>",
-                            label, byteCost(), time);
-            case Allocated:
-                return i18n("<qt>%2 allocated after %3 from:<p "
                             "style='margin-left:10px'>%1</p></qt>",
                             label, byteCost(), time);
             }

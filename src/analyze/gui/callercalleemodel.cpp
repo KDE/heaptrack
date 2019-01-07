@@ -47,9 +47,8 @@ QVariant CallerCalleeModel::headerData(int section, Qt::Orientation orientation,
         return {};
     }
     if (role == Qt::InitialSortOrderRole) {
-        if (section == SelfAllocatedColumn || section == SelfAllocationsColumn || section == SelfPeakColumn
-            || section == SelfLeakedColumn || section == SelfTemporaryColumn || section == InclusiveAllocatedColumn
-            || section == InclusiveAllocationsColumn || section == InclusivePeakColumn
+        if (section == SelfAllocationsColumn || section == SelfPeakColumn || section == SelfLeakedColumn
+            || section == SelfTemporaryColumn || section == InclusiveAllocationsColumn || section == InclusivePeakColumn
             || section == InclusiveLeakedColumn || section == InclusiveTemporaryColumn) {
             return Qt::DescendingOrder;
         }
@@ -72,8 +71,6 @@ QVariant CallerCalleeModel::headerData(int section, Qt::Orientation orientation,
             return i18n("Peak (Self)");
         case SelfLeakedColumn:
             return i18n("Leaked (Self)");
-        case SelfAllocatedColumn:
-            return i18n("Allocated (Self)");
         case InclusiveAllocationsColumn:
             return i18n("Allocations (Incl.)");
         case InclusiveTemporaryColumn:
@@ -82,8 +79,6 @@ QVariant CallerCalleeModel::headerData(int section, Qt::Orientation orientation,
             return i18n("Peak (Incl.)");
         case InclusiveLeakedColumn:
             return i18n("Leaked (Incl.)");
-        case InclusiveAllocatedColumn:
-            return i18n("Allocated (Incl.)");
         case LocationColumn:
             return i18n("Location");
         case NUM_COLUMNS:
@@ -119,9 +114,6 @@ QVariant CallerCalleeModel::headerData(int section, Qt::Orientation orientation,
         case SelfLeakedColumn:
             return i18n("<qt>The bytes allocated directly at this location that have "
                         "not been deallocated.</qt>");
-        case SelfAllocatedColumn:
-            return i18n("<qt>The sum of all bytes directly allocated from this "
-                        "location, ignoring deallocations.</qt>");
         case InclusiveAllocationsColumn:
             return i18n("<qt>The inclusive number of times an allocation function "
                         "was called from this location or any "
@@ -138,10 +130,6 @@ QVariant CallerCalleeModel::headerData(int section, Qt::Orientation orientation,
         case InclusiveLeakedColumn:
             return i18n("<qt>The bytes allocated at this location that have not been "
                         "deallocated.</qt>");
-        case InclusiveAllocatedColumn:
-            return i18n("<qt>The inclusive sum of all bytes allocated from this "
-                        "location or functions called from "
-                        "here, ignoring deallocations.</qt>");
         case LocationColumn:
             return i18n("<qt>The location from which an allocation function was "
                         "called. Function symbol and file "
@@ -165,12 +153,6 @@ QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
 
     if (role == Qt::DisplayRole || role == SortRole || role == MaxCostRole) {
         switch (static_cast<Columns>(index.column())) {
-        case SelfAllocatedColumn:
-            if (role == SortRole || role == MaxCostRole) {
-                return static_cast<qint64>(row.selfCost.allocated);
-            } else {
-                return m_format.formatByteSize(row.selfCost.allocated, 1, KFormat::MetricBinaryDialect);
-            }
         case SelfAllocationsColumn:
             return static_cast<qint64>(row.selfCost.allocations);
         case SelfTemporaryColumn:
@@ -186,12 +168,6 @@ QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
                 return static_cast<qint64>(row.selfCost.leaked);
             } else {
                 return m_format.formatByteSize(row.selfCost.leaked, 1, KFormat::MetricBinaryDialect);
-            }
-        case InclusiveAllocatedColumn:
-            if (role == SortRole || role == MaxCostRole) {
-                return static_cast<qint64>(row.inclusiveCost.allocated);
-            } else {
-                return m_format.formatByteSize(row.inclusiveCost.allocated, 1, KFormat::MetricBinaryDialect);
             }
         case InclusiveAllocationsColumn:
             return static_cast<qint64>(row.inclusiveCost.allocations);
@@ -240,9 +216,8 @@ QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
                             row.location->module.toHtmlEscaped());
         }
         stream << '\n';
-        stream << i18n("inclusive: allocated %1 over %2 calls (%3 temporary, i.e. "
-                       "%4%), peak at %5, leaked %6",
-                       m_format.formatByteSize(row.inclusiveCost.allocated, 1, KFormat::MetricBinaryDialect),
+        stream << i18n("inclusive: %1 allocations (%2 temporary, i.e. %3%), "
+                       "peak at %4, leaked %5",
                        row.inclusiveCost.allocations, row.inclusiveCost.temporary,
                        round(float(row.inclusiveCost.temporary) * 100.f * 100.f
                              / std::max(int64_t(1), row.inclusiveCost.allocations))
@@ -251,9 +226,8 @@ QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
                        m_format.formatByteSize(row.inclusiveCost.leaked, 1, KFormat::MetricBinaryDialect));
         stream << '\n';
         stream << i18n(
-            "self: allocated %1 over %2 calls (%3 temporary, i.e. %4%), "
-            "peak at %5, leaked %6",
-            m_format.formatByteSize(row.selfCost.allocated, 1, KFormat::MetricBinaryDialect), row.selfCost.allocations,
+            "self: %1 allocations (%2 temporary, i.e. %3%), "
+            "peak at %4, leaked %5",
             row.selfCost.temporary,
             round(float(row.selfCost.temporary) * 100.f * 100.f / std::max(int64_t(1), row.selfCost.allocations))
                 / 100.f,

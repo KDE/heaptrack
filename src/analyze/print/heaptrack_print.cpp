@@ -89,7 +89,6 @@ enum CostType
 {
     Allocations,
     Temporary,
-    Allocated,
     Leaked,
     Peak
 };
@@ -102,8 +101,6 @@ std::istream& operator>>(std::istream& in, CostType& type)
         type = Allocations;
     else if (token == "temporary")
         type = Temporary;
-    else if (token == "allocated")
-        type = Allocated;
     else if (token == "leaked")
         type = Leaked;
     else if (token == "peak")
@@ -160,7 +157,6 @@ struct Printer final : public AccumulatedTraceData
         }
         for (MergedAllocation& merged : ret) {
             for (const Allocation& allocation : merged.traces) {
-                merged.allocated += allocation.allocated;
                 merged.allocations += allocation.allocations;
                 merged.leaked += allocation.leaked;
                 merged.peak += allocation.peak;
@@ -572,8 +568,6 @@ int main(int argc, char** argv)
             "Print backtraces to top allocators, sorted by number of temporary allocations.")
         ("print-leaks,l", po::value<bool>()->default_value(false)->implicit_value(true),
             "Print backtraces to leaked memory allocations.")
-        ("print-overall-allocated,o", po::value<bool>()->default_value(false)->implicit_value(true),
-            "Print top overall allocators, ignoring memory frees.")
         ("peak-limit,n", po::value<size_t>()->default_value(10)->implicit_value(10),
             "Limit the number of reported peaks.")
         ("sub-peak-limit,s", po::value<size_t>()->default_value(5)->implicit_value(5),
@@ -584,7 +578,6 @@ int main(int argc, char** argv)
             "The cost type to use when generating a flamegraph. Possible options are:\n"
             "  - allocations: number of allocations\n"
             "  - temporary: number of temporary allocations\n"
-            "  - allocated: bytes allocated, ignoring deallocations\n"
             "  - leaked: bytes not deallocated at the end\n"
             "  - peak: bytes consumed at highest total memory consumption")
         ("print-flamegraph,F", po::value<string>()->default_value(string()),
@@ -667,7 +660,6 @@ int main(int argc, char** argv)
         data.massifDetailedFreq = vm["massif-detailed-freq"].as<size_t>();
     }
     const bool printLeaks = vm["print-leaks"].as<bool>();
-    const bool printOverallAlloc = vm["print-overall-allocated"].as<bool>();
     const bool printPeaks = vm["print-peaks"].as<bool>();
     const bool printAllocs = vm["print-allocators"].as<bool>();
     const bool printTemporary = vm["print-temporary"].as<bool>();
@@ -703,20 +695,6 @@ int main(int argc, char** argv)
                               [](const AllocationData& data) {
                                   cout << data.allocations << " calls with " << formatBytes(data.peak)
                                        << " peak consumption from:\n";
-                              });
-        cout << endl;
-    }
-
-    if (printOverallAlloc) {
-        cout << "MOST BYTES ALLOCATED OVER TIME (ignoring deallocations)\n";
-        data.printAllocations(&AllocationData::allocated,
-                              [](const AllocationData& data) {
-                                  cout << formatBytes(data.allocated) << " allocated over " << data.allocations
-                                       << " calls from\n";
-                              },
-                              [](const AllocationData& data) {
-                                  cout << formatBytes(data.allocated) << " allocated over " << data.allocations
-                                       << " calls from:\n";
                               });
         cout << endl;
     }
@@ -769,8 +747,6 @@ int main(int argc, char** argv)
 
     const double totalTimeS = 0.001 * data.totalTime;
     cout << "total runtime: " << fixed << totalTimeS << "s.\n"
-         << "bytes allocated in total (ignoring deallocations): " << formatBytes(data.totalCost.allocated) << " ("
-         << formatBytes(data.totalCost.allocated / totalTimeS) << "/s)" << '\n'
          << "calls to allocation functions: " << data.totalCost.allocations << " ("
          << int64_t(data.totalCost.allocations / totalTimeS) << "/s)\n"
          << "temporary memory allocations: " << data.totalCost.temporary << " ("
@@ -805,9 +781,6 @@ int main(int argc, char** argv)
                 switch (flamegraphCostType) {
                 case Allocations:
                     flamegraph << allocation.allocations;
-                    break;
-                case Allocated:
-                    flamegraph << allocation.allocated;
                     break;
                 case Temporary:
                     flamegraph << allocation.temporary;

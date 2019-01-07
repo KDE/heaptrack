@@ -48,7 +48,6 @@ enum CostType
     Temporary,
     Peak,
     Leaked,
-    Allocated
 };
 Q_DECLARE_METATYPE(CostType)
 
@@ -233,11 +232,6 @@ QString FrameGraphicsItem::description() const
         tooltip = i18nc("%1: leaked bytes, %2: relative number, %3: function label", "%1 (%2%) leaked in %3 and below.",
                         format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, function);
         break;
-    case Allocated:
-        tooltip =
-            i18nc("%1: allocated bytes, %2: relative number, %3: function label", "%1 (%2%) allocated in %3 and below.",
-                  format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, function);
-        break;
     }
 
     return tooltip;
@@ -343,8 +337,6 @@ int64_t AllocationData::*memberForType(CostType type)
         return &AllocationData::peak;
     case Leaked:
         return &AllocationData::leaked;
-    case Allocated:
-        return &AllocationData::allocated;
     }
     Q_UNREACHABLE();
 }
@@ -377,9 +369,6 @@ FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type,
         break;
     case Leaked:
         label = i18n("%1 leaked in total", format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
-        break;
-    case Allocated:
-        label = i18n("%1 allocated in total", format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
         break;
     }
     auto rootItem = new FrameGraphicsItem(totalCost, type, label);
@@ -452,12 +441,6 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
                                    "triggered by functions in your code. "
                                    "Allocations are marked as temporary when they are immediately "
                                    "followed by their deallocation."),
-                              Qt::ToolTipRole);
-    m_costSource->addItem(i18n("Allocated"), QVariant::fromValue(Allocated));
-    m_costSource->setItemData(4,
-                              i18n("Show a flame graph over the total memory allocated by functions in "
-                                   "your code. "
-                                   "This aggregates all memory allocations and ignores deallocations."),
                               Qt::ToolTipRole);
     connect(m_costSource, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this,
             &FlameGraph::showData);
@@ -747,7 +730,6 @@ void FlameGraph::setSearchValue(const QString& value)
             break;
         case Peak:
         case Leaked:
-        case Allocated:
             label = i18n("%1 (%2% of total of %3) matched by search.",
                          format.formatByteSize(match.directCost, 1, KFormat::MetricBinaryDialect), costFraction,
                          format.formatByteSize(m_rootItem->cost(), 1, KFormat::MetricBinaryDialect));

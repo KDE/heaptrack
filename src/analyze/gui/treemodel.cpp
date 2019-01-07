@@ -70,8 +70,8 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
         return {};
     }
     if (role == Qt::InitialSortOrderRole) {
-        if (section == AllocatedColumn || section == AllocationsColumn || section == PeakColumn
-            || section == LeakedColumn || section == TemporaryColumn) {
+        if (section == AllocationsColumn || section == PeakColumn || section == LeakedColumn
+            || section == TemporaryColumn) {
             return Qt::DescendingOrder;
         }
     }
@@ -93,8 +93,6 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
             return i18n("Peak");
         case LeakedColumn:
             return i18n("Leaked");
-        case AllocatedColumn:
-            return i18n("Allocated");
         case LocationColumn:
             return i18n("Location");
         case NUM_COLUMNS:
@@ -129,9 +127,6 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
         case LeakedColumn:
             return i18n("<qt>The bytes allocated at this location that have not been "
                         "deallocated.</qt>");
-        case AllocatedColumn:
-            return i18n("<qt>The sum of all bytes allocated from this location, "
-                        "ignoring deallocations.</qt>");
         case LocationColumn:
             return i18n("<qt>The location from which an allocation function was "
                         "called. Function symbol and file "
@@ -155,11 +150,6 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
 
     if (role == Qt::DisplayRole || role == SortRole || role == MaxCostRole) {
         switch (static_cast<Columns>(index.column())) {
-        case AllocatedColumn:
-            if (role == SortRole || role == MaxCostRole) {
-                return static_cast<qint64>(abs(row->cost.allocated));
-            }
-            return m_format.formatByteSize(row->cost.allocated, 1, KFormat::MetricBinaryDialect);
         case AllocationsColumn:
             if (role == SortRole || role == MaxCostRole) {
                 return static_cast<qint64>(abs(row->cost.allocations));
@@ -215,8 +205,6 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         stream << '\n';
         stream << '\n';
         KFormat format;
-        const auto allocatedFraction =
-            QString::number(double(row->cost.allocated) * 100. / m_maxCost.cost.allocated, 'g', 3);
         const auto peakFraction = QString::number(double(row->cost.peak) * 100. / m_maxCost.cost.peak, 'g', 3);
         const auto leakedFraction = QString::number(double(row->cost.leaked) * 100. / m_maxCost.cost.leaked, 'g', 3);
         const auto allocationsFraction =
@@ -225,8 +213,6 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             QString::number(double(row->cost.temporary) * 100. / row->cost.allocations, 'g', 3);
         const auto temporaryFractionTotal =
             QString::number(double(row->cost.temporary) * 100. / m_maxCost.cost.temporary, 'g', 3);
-        stream << i18n("allocated: %1 (%2% of total)\n",
-                       format.formatByteSize(row->cost.allocated, 1, KFormat::MetricBinaryDialect), allocatedFraction);
         stream << i18n("peak contribution: %1 (%2% of total)\n",
                        format.formatByteSize(row->cost.peak, 1, KFormat::MetricBinaryDialect), peakFraction);
         stream << i18n("leaked: %1 (%2% of total)\n",

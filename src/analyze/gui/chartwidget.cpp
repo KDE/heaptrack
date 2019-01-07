@@ -109,11 +109,6 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
     case ChartModel::Consumed:
         setToolTip(i18n("<qt>Shows the heap memory consumption over time.</qt>"));
         break;
-    case ChartModel::Allocated:
-        setToolTip(i18n("<qt>Displays total memory allocated over time. "
-                        "This value ignores deallocations and just measures heap "
-                        "allocation throughput.</qt>"));
-        break;
     case ChartModel::Allocations:
         setToolTip(i18n("<qt>Shows number of memory allocations over time.</qt>"));
         break;
