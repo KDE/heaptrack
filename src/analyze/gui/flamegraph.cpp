@@ -364,8 +364,7 @@ FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type,
         label = i18n("%1 temporary allocations in total", totalCost);
         break;
     case Peak:
-        label = i18n("%1 contribution to peak consumption",
-                     format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
+        label = i18n("%1 peak memory consumption", format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
         break;
     case Leaked:
         label = i18n("%1 leaked in total", format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
