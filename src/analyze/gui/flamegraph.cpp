@@ -431,6 +431,16 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
 {
     qRegisterMetaType<FrameGraphicsItem*>();
 
+    m_costSource->addItem(i18n("Memory Peak"), QVariant::fromValue(Peak));
+    m_costSource->setItemData(2,
+                              i18n("Show a flame graph over the contributions to the peak heap "
+                                   "memory consumption of your application."),
+                              Qt::ToolTipRole);
+    m_costSource->addItem(i18n("Leaked"), QVariant::fromValue(Leaked));
+    m_costSource->setItemData(3,
+                              i18n("Show a flame graph over the leaked heap memory of your application. "
+                                   "Memory is considered to be leaked when it never got deallocated. "),
+                              Qt::ToolTipRole);
     m_costSource->addItem(i18n("Allocations"), QVariant::fromValue(Allocations));
     m_costSource->setItemData(0,
                               i18n("Show a flame graph over the number of allocations triggered by "
@@ -442,16 +452,6 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
                                    "triggered by functions in your code. "
                                    "Allocations are marked as temporary when they are immediately "
                                    "followed by their deallocation."),
-                              Qt::ToolTipRole);
-    m_costSource->addItem(i18n("Memory Peak"), QVariant::fromValue(Peak));
-    m_costSource->setItemData(2,
-                              i18n("Show a flame graph over the contributions to the peak heap "
-                                   "memory consumption of your application."),
-                              Qt::ToolTipRole);
-    m_costSource->addItem(i18n("Leaked"), QVariant::fromValue(Leaked));
-    m_costSource->setItemData(3,
-                              i18n("Show a flame graph over the leaked heap memory of your application. "
-                                   "Memory is considered to be leaked when it never got deallocated. "),
                               Qt::ToolTipRole);
     m_costSource->addItem(i18n("Allocated"), QVariant::fromValue(Allocated));
     m_costSource->setItemData(4,
