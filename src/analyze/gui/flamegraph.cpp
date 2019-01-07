@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Milian Wolff <mail@milianw.de>
+ * Copyright 2015-2019 Milian Wolff <mail@milianw.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -42,6 +42,8 @@
 #include <KStandardAction>
 #include <ThreadWeaver/ThreadWeaver>
 
+#include "util.h"
+
 enum CostType
 {
     Allocations,
@@ -52,11 +54,6 @@ enum CostType
 Q_DECLARE_METATYPE(CostType)
 
 namespace {
-QString fraction(qint64 cost, qint64 totalCost)
-{
-    return QString::number(double(cost) * 100. / totalCost, 'g', 3);
-}
-
 enum SearchMatchType
 {
     NoSearch,
@@ -206,7 +203,7 @@ QString FrameGraphicsItem::description() const
         }
         totalCost = item->cost();
     }
-    const auto fraction = QString::number(double(m_cost) * 100. / totalCost, 'g', 3);
+    const auto fraction = Util::formatCostRelative(m_cost, totalCost);
     const auto function = m_function;
     if (!parentItem()) {
         return function;
@@ -720,7 +717,7 @@ void FlameGraph::setSearchValue(const QString& value)
     } else {
         QString label;
         KFormat format;
-        const auto costFraction = fraction(match.directCost, m_rootItem->cost());
+        const auto costFraction = Util::formatCostRelative(match.directCost, m_rootItem->cost());
         switch (m_costSource->currentData().value<CostType>()) {
         case Allocations:
         case Temporary:

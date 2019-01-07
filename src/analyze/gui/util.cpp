@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Milian Wolff <mail@milianw.de>
+ * Copyright 2017-2019 Milian Wolff <mail@milianw.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -29,4 +29,17 @@ QString Util::formatTime(qint64 ms)
         // seconds
         return QString::number(double(ms) / 1000, 'g', 3) + QLatin1Char('s');
     }
+}
+
+QString Util::formatCostRelative(quint64 selfCost, quint64 totalCost, bool addPercentSign)
+{
+    if (!totalCost) {
+        return QString();
+    }
+
+    auto ret = QString::number(static_cast<double>(selfCost) * 100. / totalCost, 'g', 3);
+    if (addPercentSign) {
+        ret.append(QLatin1Char('%'));
+    }
+    return ret;
 }

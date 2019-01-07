@@ -26,6 +26,8 @@
 
 #include <cmath>
 
+#include "util.h"
+
 namespace {
 
 int indexOf(const RowData* row, const TreeData& siblings)
@@ -205,14 +207,11 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         stream << '\n';
         stream << '\n';
         KFormat format;
-        const auto peakFraction = QString::number(double(row->cost.peak) * 100. / m_maxCost.cost.peak, 'g', 3);
-        const auto leakedFraction = QString::number(double(row->cost.leaked) * 100. / m_maxCost.cost.leaked, 'g', 3);
-        const auto allocationsFraction =
-            QString::number(double(row->cost.allocations) * 100. / m_maxCost.cost.allocations, 'g', 3);
-        const auto temporaryFraction =
-            QString::number(double(row->cost.temporary) * 100. / row->cost.allocations, 'g', 3);
-        const auto temporaryFractionTotal =
-            QString::number(double(row->cost.temporary) * 100. / m_maxCost.cost.temporary, 'g', 3);
+        const auto peakFraction = Util::formatCostRelative(row->cost.peak, m_maxCost.cost.peak);
+        const auto leakedFraction = Util::formatCostRelative(row->cost.leaked, m_maxCost.cost.leaked);
+        const auto allocationsFraction = Util::formatCostRelative(row->cost.allocations, m_maxCost.cost.allocations);
+        const auto temporaryFraction = Util::formatCostRelative(row->cost.temporary, row->cost.allocations);
+        const auto temporaryFractionTotal = Util::formatCostRelative(row->cost.temporary, m_maxCost.cost.temporary);
         stream << i18n("peak contribution: %1 (%2% of total)\n",
                        format.formatByteSize(row->cost.peak, 1, KFormat::MetricBinaryDialect), peakFraction);
         stream << i18n("leaked: %1 (%2% of total)\n",
