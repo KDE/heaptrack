@@ -47,6 +47,8 @@ QVariant CallerCalleeModel::headerCell(int column, int role) const
     }
     if (role == Qt::DisplayRole) {
         switch (static_cast<Columns>(column)) {
+        case LocationColumn:
+            return i18n("Location");
         case SymbolColumn:
             return i18n("Symbol");
         case BinaryColumn:
@@ -72,9 +74,12 @@ QVariant CallerCalleeModel::headerCell(int column, int role) const
         }
     } else if (role == Qt::ToolTipRole) {
         switch (static_cast<Columns>(column)) {
+        case LocationColumn:
+            return i18n("<qt>The parent symbol that called an allocation function. "
+                        "The function name may be unresolved when debug information is missing.</qt>");
         case SymbolColumn:
             return i18n("<qt>The parent function that called an allocation function. "
-                        "May be unknown when debug information is missing.</qt>");
+                        "May be unresolved when debug information is missing.</qt>");
         case BinaryColumn:
             return i18n("<qt>The module, i.e. executable or shared library, from "
                         "which an allocation function was called.</qt>");
@@ -122,6 +127,9 @@ QVariant CallerCalleeModel::cell(int column, int role, const Symbol& symbol, con
         return QVariant::fromValue(symbol);
     } else if (role == SortRole) {
         switch (static_cast<Columns>(column)) {
+        case LocationColumn:
+            // TODO: optimize this
+            return QString(symbol.symbol + symbol.binary);
         case SymbolColumn:
             return symbol.symbol;
         case BinaryColumn:
@@ -159,6 +167,7 @@ QVariant CallerCalleeModel::cell(int column, int role, const Symbol& symbol, con
         case SelfLeakedColumn:
         case InclusiveLeakedColumn:
             return QVariant::fromValue<qint64>(m_results.totalCosts.leaked);
+        case LocationColumn:
         case SymbolColumn:
         case BinaryColumn:
         case NUM_COLUMNS:
@@ -169,6 +178,8 @@ QVariant CallerCalleeModel::cell(int column, int role, const Symbol& symbol, con
         return QString(symbol.symbol + symbol.binary);
     } else if (role == Qt::DisplayRole) {
         switch (static_cast<Columns>(column)) {
+        case LocationColumn:
+            return i18nc("%1: function name, %2: binary basename", "%1 in %2", symbol.symbol, symbol.binary);
         case SymbolColumn:
             return symbol.symbol;
         case BinaryColumn:

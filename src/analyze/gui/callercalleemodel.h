@@ -116,6 +116,7 @@ public:
     {
         SymbolColumn = 0,
         BinaryColumn,
+        LocationColumn,
         InclusivePeakColumn,
         InclusiveLeakedColumn,
         InclusiveAllocationsColumn,
@@ -173,6 +174,7 @@ public:
     {
         SymbolColumn = 0,
         BinaryColumn,
+        LocationColumn,
         PeakColumn,
         LeakedColumn,
         AllocationsColumn,
@@ -198,6 +200,7 @@ public:
             return Qt::DescendingOrder;
         } else if (role == Qt::DisplayRole) {
             switch (static_cast<Columns>(column)) {
+            case LocationColumn:
             case SymbolColumn:
                 return symbolHeader();
             case BinaryColumn:
@@ -215,12 +218,15 @@ public:
             }
         } else if (role == Qt::ToolTipRole) {
             switch (static_cast<Columns>(column)) {
+            case LocationColumn:
+                return i18n(
+                    "The location of the %1. The function name may be unresolved when debug information is missing.",
+                    symbolHeader());
             case SymbolColumn:
-                return i18n("The function name of the %1. May be empty when debug information is missing.",
+                return i18n("The function name of the %1. May be unresolved when debug information is missing.",
                             symbolHeader());
             case BinaryColumn:
-                return i18n("The name of the executable the symbol resides in. May be empty when debug information is "
-                            "missing.");
+                return i18n("The name of the executable the symbol resides in.");
             case PeakColumn:
                 return i18n("<qt>The inclusive maximum heap memory in bytes consumed "
                             "from allocations originating at this "
@@ -249,6 +255,7 @@ public:
     {
         if (role == SortRole) {
             switch (static_cast<Columns>(column)) {
+            case LocationColumn:
             case SymbolColumn:
                 return symbol.symbol;
             case BinaryColumn:
@@ -274,6 +281,7 @@ public:
                 return QVariant::fromValue<qint64>(costs.allocations);
             case TemporaryColumn:
                 return QVariant::fromValue<qint64>(costs.temporary);
+            case LocationColumn:
             case SymbolColumn:
             case BinaryColumn:
             case NUM_COLUMNS:
@@ -283,15 +291,11 @@ public:
             // TODO: optimize this
             return QString(symbol.symbol + symbol.binary);
         } else if (role == Qt::DisplayRole) {
-            switch (column) {
+            switch (static_cast<Columns>(column)) {
+            case LocationColumn:
+                return i18nc("%1: function name, %2: binary basename", "%1 in %2", symbol.symbol, symbol.binary);
             case SymbolColumn:
                 return symbol.symbol;
-            case BinaryColumn:
-                return symbol.binary;
-            }
-            switch (static_cast<Columns>(column)) {
-            case SymbolColumn:
-                return symbol.symbol.isEmpty() ? i18n("??") : symbol.symbol;
             case BinaryColumn:
                 return symbol.binary;
             case PeakColumn:

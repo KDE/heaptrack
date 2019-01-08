@@ -191,6 +191,8 @@ void setupCallerCallee(CallerCalleeModel* model, QTreeView* view, QLineEdit* fil
     view->setItemDelegateForColumn(CallerCalleeModel::InclusiveLeakedColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::InclusiveAllocationsColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::InclusiveTemporaryColumn, costDelegate);
+    view->hideColumn(CallerCalleeModel::SymbolColumn);
+    view->hideColumn(CallerCalleeModel::BinaryColumn);
     QObject::connect(filterFunction, &QLineEdit::textChanged, callerCalleeProxy, &TreeProxy::setFunctionFilter);
     QObject::connect(filterModule, &QLineEdit::textChanged, callerCalleeProxy, &TreeProxy::setModuleFilter);
 }
@@ -206,6 +208,11 @@ Model* setupModelAndProxyForView(QTreeView* view, int nonCostColumns)
     view->setModel(proxy);
     view->header()->setStretchLastSection(false);
     view->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    for (int i = 0; i < nonCostColumns; ++i) {
+        if (i != Model::LocationColumn) {
+            view->hideColumn(i);
+        }
+    }
     auto costDelegate = new CostDelegate(Model::SortRole, Model::TotalCostRole, view);
     for (int i = nonCostColumns; i < Model::NUM_COLUMNS; ++i) {
         view->setItemDelegateForColumn(i, costDelegate);
