@@ -53,6 +53,9 @@ private slots:
     void navigateBack();
     void navigateForward();
 
+signals:
+    void callerCalleeViewRequested(const Symbol& symbol);
+
 private:
     void setTooltipItem(const FrameGraphicsItem* item);
     void updateTooltip();

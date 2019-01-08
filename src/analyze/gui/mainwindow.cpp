@@ -402,6 +402,7 @@ MainWindow::MainWindow(QWidget* parent)
         m_ui->tabWidget->setCurrentWidget(m_ui->callerCalleeTab);
         selectCallerCaleeeIndex(callerCalleeModel->indexForSymbol(symbol));
     };
+    connect(m_ui->flameGraphTab, &FlameGraph::callerCalleeViewRequested, this, showSymbolInCallerCallee);
 
     auto costDelegate = new CostDelegate(TreeModel::SortRole, TreeModel::MaxCostRole, this);
     setupTreeModel(bottomUpModel, m_ui->bottomUpResults, costDelegate, m_ui->bottomUpFilterFunction,

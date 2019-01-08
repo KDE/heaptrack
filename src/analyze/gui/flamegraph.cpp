@@ -32,6 +32,7 @@
 #include <QGraphicsView>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QStyleOption>
 #include <QToolTip>
 #include <QVBoxLayout>
@@ -66,13 +67,12 @@ enum SearchMatchType
 class FrameGraphicsItem : public QGraphicsRectItem
 {
 public:
-    FrameGraphicsItem(const qint64 cost, CostType costType, const QString& function,
-                      FrameGraphicsItem* parent = nullptr);
-    FrameGraphicsItem(const qint64 cost, const QString& function, FrameGraphicsItem* parent);
+    FrameGraphicsItem(const qint64 cost, CostType costType, const Symbol& symbol, FrameGraphicsItem* parent = nullptr);
+    FrameGraphicsItem(const qint64 cost, const Symbol& symbol, FrameGraphicsItem* parent);
 
     qint64 cost() const;
     void setCost(qint64 cost);
-    QString function() const;
+    Symbol symbol() const;
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
@@ -85,7 +85,7 @@ protected:
 
 private:
     qint64 m_cost;
-    QString m_function;
+    Symbol m_symbol;
     CostType m_costType;
     bool m_isHovered;
     SearchMatchType m_searchMatch = NoSearch;
@@ -93,11 +93,11 @@ private:
 
 Q_DECLARE_METATYPE(FrameGraphicsItem*)
 
-FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, CostType costType, const QString& function,
+FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, CostType costType, const Symbol& symbol,
                                      FrameGraphicsItem* parent)
     : QGraphicsRectItem(parent)
     , m_cost(cost)
-    , m_function(function)
+    , m_symbol(symbol)
     , m_costType(costType)
     , m_isHovered(false)
 {
@@ -105,8 +105,8 @@ FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, CostType costType, const
     setAcceptHoverEvents(true);
 }
 
-FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, const QString& function, FrameGraphicsItem* parent)
-    : FrameGraphicsItem(cost, parent->m_costType, function, parent)
+FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, const Symbol& symbol, FrameGraphicsItem* parent)
+    : FrameGraphicsItem(cost, parent->m_costType, symbol, parent)
 {
 }
 
@@ -120,9 +120,9 @@ void FrameGraphicsItem::setCost(qint64 cost)
     m_cost = cost;
 }
 
-QString FrameGraphicsItem::function() const
+Symbol FrameGraphicsItem::symbol() const
 {
-    return m_function;
+    return m_symbol;
 }
 
 void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* /*widget*/)
@@ -168,7 +168,7 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
     const int height = rect().height();
     painter->drawText(margin + rect().x(), rect().y(), width, height,
                       Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
-                      option->fontMetrics.elidedText(m_function, Qt::ElideRight, width));
+                      option->fontMetrics.elidedText(m_symbol.symbol, Qt::ElideRight, width));
 
     if (m_searchMatch == NoMatch) {
         painter->setPen(oldPen);
@@ -204,30 +204,30 @@ QString FrameGraphicsItem::description() const
         totalCost = item->cost();
     }
     const auto fraction = Util::formatCostRelative(m_cost, totalCost);
-    const auto function = m_function;
+    const auto symbol = i18nc("%1: function, %2: binary", "%1 (%2)", m_symbol.symbol, m_symbol.binary);
     if (!parentItem()) {
-        return function;
+        return symbol;
     }
 
     switch (m_costType) {
     case Allocations:
         tooltip = i18nc("%1: number of allocations, %2: relative number, %3: function label",
-                        "%1 (%2%) allocations in %3 and below.", m_cost, fraction, function);
+                        "%1 (%2%) allocations in %3 and below.", m_cost, fraction, symbol);
         break;
     case Temporary:
         tooltip = i18nc("%1: number of temporary allocations, %2: relative number, "
                         "%3 function label",
-                        "%1 (%2%) temporary allocations in %3 and below.", m_cost, fraction, function);
+                        "%1 (%2%) temporary allocations in %3 and below.", m_cost, fraction, symbol);
         break;
     case Peak:
         tooltip = i18nc("%1: peak consumption in bytes, %2: relative number, %3: "
                         "function label",
                         "%1 (%2%) contribution to peak consumption in %3 and below.",
-                        format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, function);
+                        format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, symbol);
         break;
     case Leaked:
         tooltip = i18nc("%1: leaked bytes, %2: relative number, %3: function label", "%1 (%2%) leaked in %3 and below.",
-                        format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, function);
+                        format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, symbol);
         break;
     }
 
@@ -287,11 +287,11 @@ void layoutItems(FrameGraphicsItem* parent)
     }
 }
 
-FrameGraphicsItem* findItemByFunction(const QList<QGraphicsItem*>& items, const QString& function)
+FrameGraphicsItem* findItemBySymbol(const QList<QGraphicsItem*>& items, const Symbol& symbol)
 {
     foreach (auto item_, items) {
         auto item = static_cast<FrameGraphicsItem*>(item_);
-        if (item->function() == function) {
+        if (item->symbol() == symbol) {
             return item;
         }
     }
@@ -305,13 +305,12 @@ void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem* parent, in
                      const double costThreshold, bool collapseRecursion)
 {
     foreach (const auto& row, data) {
-        if (collapseRecursion && row.symbol.symbol != unresolvedFunctionName()
-            && row.symbol.symbol == parent->function()) {
+        if (collapseRecursion && row.symbol.symbol != unresolvedFunctionName() && row.symbol == parent->symbol()) {
             continue;
         }
-        auto item = findItemByFunction(parent->childItems(), row.symbol.symbol);
+        auto item = findItemBySymbol(parent->childItems(), row.symbol);
         if (!item) {
-            item = new FrameGraphicsItem(row.cost.*member, row.symbol.symbol, parent);
+            item = new FrameGraphicsItem(row.cost.*member, row.symbol, parent);
             item->setPen(parent->pen());
             item->setBrush(brush());
         } else {
@@ -385,7 +384,8 @@ SearchResults applySearch(FrameGraphicsItem* item, const QString& searchValue)
     SearchResults result;
     if (searchValue.isEmpty()) {
         result.matchType = NoSearch;
-    } else if (item->function().contains(searchValue, Qt::CaseInsensitive)) {
+    } else if (item->symbol().symbol.contains(searchValue, Qt::CaseInsensitive)
+               || item->symbol().binary.contains(searchValue, Qt::CaseInsensitive)) {
         result.directCost += item->cost();
         result.matchType = DirectMatch;
     }
@@ -523,7 +523,19 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     connect(m_resetAction, &QAction::triggered, this, [this]() { selectItem(0); });
     addAction(m_resetAction);
     updateNavigationActions();
-    setContextMenuPolicy(Qt::ActionsContextMenu);
+    setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, &QWidget::customContextMenuRequested, this, [this](const QPoint& point) {
+        auto* menu = new QMenu(this);
+        menu->setAttribute(Qt::WA_DeleteOnClose, true);
+        if (auto item = static_cast<const FrameGraphicsItem*>(m_view->itemAt(point))) {
+            auto* action = menu->addAction(i18n("View Caller/Callee"));
+            connect(action, &QAction::triggered, this,
+                    [this, item]() { emit callerCalleeViewRequested(item->symbol()); });
+            menu->addSeparator();
+        }
+        menu->addActions(actions());
+        menu->popup(mapToGlobal(point));
+    });
 }
 
 FlameGraph::~FlameGraph() = default;
