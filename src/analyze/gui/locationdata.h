@@ -49,6 +49,11 @@ struct Symbol
         return std::tie(symbol, binary, path) == std::tie(rhs.symbol, rhs.binary, rhs.path);
     }
 
+    bool operator!=(const Symbol& rhs) const
+    {
+        return !operator==(rhs);
+    }
+
     bool operator<(const Symbol& rhs) const
     {
         return std::tie(symbol, binary, path) < std::tie(rhs.symbol, rhs.binary, rhs.path);
@@ -63,40 +68,32 @@ struct Symbol
 Q_DECLARE_TYPEINFO(Symbol, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(Symbol)
 
-struct LocationData
+struct FileLine
 {
-    using Ptr = std::shared_ptr<LocationData>;
-
-    Symbol symbol;
     QString file;
     int line;
 
-    bool operator==(const LocationData& rhs) const
+    bool operator==(const FileLine& rhs) const
     {
-        return symbol == rhs.symbol && file == rhs.file && line == rhs.line;
+        return file == rhs.file && line == rhs.line;
     }
 
-    bool operator<(const LocationData& rhs) const
+    bool operator<(const FileLine& rhs) const
     {
-        return std::tie(symbol, file, line) < std::tie(rhs.symbol, rhs.file, rhs.line);
+        return std::tie(file, line) < std::tie(rhs.file, rhs.line);
     }
 
-    QString fileLine() const
+    QString toString() const
     {
         return file.isEmpty() ? QStringLiteral("??") : (file + QLatin1Char(':') + QString::number(line));
     }
 };
-Q_DECLARE_TYPEINFO(LocationData, Q_MOVABLE_TYPE);
-Q_DECLARE_METATYPE(LocationData::Ptr)
+Q_DECLARE_TYPEINFO(FileLine, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(FileLine)
 
 inline QString unresolvedFunctionName()
 {
     return i18n("<unresolved function>");
-}
-
-inline bool operator<(const LocationData::Ptr& lhs, const LocationData& rhs)
-{
-    return *lhs < rhs;
 }
 
 inline uint qHash(const Symbol& symbol, uint seed_ = 0)
@@ -108,18 +105,12 @@ inline uint qHash(const Symbol& symbol, uint seed_ = 0)
     return seed;
 }
 
-inline uint qHash(const LocationData& location, uint seed_ = 0)
+inline uint qHash(const FileLine& location, uint seed_ = 0)
 {
     size_t seed = seed_;
-    boost::hash_combine(seed, qHash(location.symbol));
     boost::hash_combine(seed, qHash(location.file));
     boost::hash_combine(seed, location.line);
     return seed;
-}
-
-inline uint qHash(const LocationData::Ptr& location, uint seed = 0)
-{
-    return location ? qHash(*location, seed) : seed;
 }
 
 #endif // LOCATIONDATA_H

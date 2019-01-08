@@ -48,12 +48,6 @@ const RowData* toParentRow(const QModelIndex& index)
 {
     return static_cast<const RowData*>(index.internalPointer());
 }
-
-QString basename(const QString& path)
-{
-    int idx = path.lastIndexOf(QLatin1Char('/'));
-    return path.mid(idx + 1);
-}
 }
 
 TreeModel::TreeModel(QObject* parent)
@@ -79,10 +73,6 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
     }
     if (role == Qt::DisplayRole) {
         switch (static_cast<Columns>(section)) {
-        case FileColumn:
-            return i18n("File");
-        case LineColumn:
-            return i18n("Line");
         case FunctionColumn:
             return i18n("Function");
         case ModuleColumn:
@@ -102,12 +92,6 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
         }
     } else if (role == Qt::ToolTipRole) {
         switch (static_cast<Columns>(section)) {
-        case FileColumn:
-            return i18n("<qt>The file where the allocation function was called from. "
-                        "May be empty when debug information is missing.</qt>");
-        case LineColumn:
-            return i18n("<qt>The line number where the allocation function was called from. "
-                        "May be empty when debug information is missing.</qt>");
         case FunctionColumn:
             return i18n("<qt>The parent function that called an allocation function. "
                         "May be unknown when debug information is missing.</qt>");
@@ -175,21 +159,11 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
                 return m_format.formatByteSize(row->cost.leaked, 1, KFormat::MetricBinaryDialect);
             }
         case FunctionColumn:
-            return row->location->symbol.symbol;
+            return row->symbol.symbol;
         case ModuleColumn:
-            return row->location->symbol.binary;
-        case FileColumn:
-            return row->location->file;
-        case LineColumn:
-            return row->location->line;
+            return row->symbol.binary;
         case LocationColumn:
-            if (row->location->file.isEmpty()) {
-                return i18n("%1 in ?? (%2)", basename(row->location->symbol.symbol),
-                            basename(row->location->symbol.binary));
-            } else {
-                return i18n("%1 in %2:%3 (%4)", row->location->symbol.symbol, basename(row->location->file),
-                            row->location->line, basename(row->location->symbol.binary));
-            }
+            return i18n("%1 in %2 (%3)", row->symbol.symbol, row->symbol.binary, row->symbol.path);
         case NUM_COLUMNS:
             break;
         }
@@ -197,16 +171,9 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         QString tooltip;
         QTextStream stream(&tooltip);
         stream << "<qt><pre style='font-family:monospace;'>";
-        if (row->location->line > 0) {
-            stream << i18nc("1: function, 2: file, 3: line, 4: module, 5: module path", "%1\n  at %2:%3\n  in %4 (%5)",
-                            row->location->symbol.symbol.toHtmlEscaped(), row->location->file.toHtmlEscaped(),
-                            row->location->line, row->location->symbol.binary.toHtmlEscaped(),
-                            row->location->symbol.path.toHtmlEscaped());
-        } else {
-            stream << i18nc("1: function, 2: module, 3: module path", "%1\n  in %2 (%3)",
-                            row->location->symbol.symbol.toHtmlEscaped(), row->location->symbol.binary.toHtmlEscaped(),
-                            row->location->symbol.path.toHtmlEscaped());
-        }
+        stream << i18nc("1: function, 2: module, 3: module path", "%1\n  in %2 (%3)",
+                        row->symbol.symbol.toHtmlEscaped(), row->symbol.binary.toHtmlEscaped(),
+                        row->symbol.path.toHtmlEscaped());
         stream << '\n';
         stream << '\n';
         KFormat format;
@@ -230,18 +197,9 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             }
             while (child->children.count() == 1 && max-- > 0) {
                 stream << "\n";
-                if (child->location->line > 0) {
-                    stream << i18nc("1: function, 2: file, 3: line, 4: module, 5: module path",
-                                    "%1\n  at %2:%3\n  in %4", child->location->symbol.symbol.toHtmlEscaped(),
-                                    child->location->file.toHtmlEscaped(), child->location->line,
-                                    child->location->symbol.binary.toHtmlEscaped(),
-                                    child->location->symbol.path.toHtmlEscaped());
-                } else {
-                    stream << i18nc("1: function, 2: module, 3: module path", "%1\n  in %2",
-                                    child->location->symbol.symbol.toHtmlEscaped(),
-                                    child->location->symbol.binary.toHtmlEscaped(),
-                                    child->location->symbol.path.toHtmlEscaped());
-                }
+                stream << i18nc("1: function, 2: module, 3: module path", "%1\n  in %2",
+                                child->symbol.symbol.toHtmlEscaped(), child->symbol.binary.toHtmlEscaped(),
+                                child->symbol.path.toHtmlEscaped());
                 child = child->children.data();
             }
             if (child->children.count() > 1) {
@@ -251,8 +209,8 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         }
         stream << "</pre></qt>";
         return tooltip;
-    } else if (role == LocationRole) {
-        return QVariant::fromValue(row->location);
+    } else if (role == SymbolRole) {
+        return QVariant::fromValue(row->symbol);
     }
     return {};
 }

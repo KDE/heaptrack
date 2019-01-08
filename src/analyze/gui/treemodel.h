@@ -31,12 +31,12 @@
 struct RowData
 {
     AllocationData cost;
-    LocationData::Ptr location;
+    Symbol symbol;
     const RowData* parent;
     QVector<RowData> children;
-    bool operator<(const LocationData::Ptr& rhs) const
+    bool operator<(const Symbol& rhs) const
     {
-        return *location < *rhs;
+        return symbol < rhs;
     }
 };
 Q_DECLARE_TYPEINFO(RowData, Q_MOVABLE_TYPE);
@@ -58,8 +58,6 @@ public:
         PeakColumn,
         LeakedColumn,
         FunctionColumn,
-        FileColumn,
-        LineColumn,
         ModuleColumn,
         LocationColumn,
         NUM_COLUMNS
@@ -69,7 +67,7 @@ public:
     {
         SortRole = Qt::UserRole,
         MaxCostRole,
-        LocationRole
+        SymbolRole
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;

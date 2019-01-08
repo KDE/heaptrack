@@ -20,10 +20,9 @@
 
 #include <QDebug>
 
-TreeProxy::TreeProxy(int functionColumn, int fileColumn, int moduleColumn, QObject* parent)
+TreeProxy::TreeProxy(int functionColumn, int moduleColumn, QObject* parent)
     : KRecursiveFilterProxyModel(parent)
     , m_functionColumn(functionColumn)
-    , m_fileColumn(fileColumn)
     , m_moduleColumn(moduleColumn)
 {
     setSortLocaleAware(false);
@@ -34,12 +33,6 @@ TreeProxy::~TreeProxy() = default;
 void TreeProxy::setFunctionFilter(const QString& functionFilter)
 {
     m_functionFilter = functionFilter;
-    invalidate();
-}
-
-void TreeProxy::setFileFilter(const QString& fileFilter)
-{
-    m_fileFilter = fileFilter;
     invalidate();
 }
 
@@ -58,12 +51,6 @@ bool TreeProxy::acceptRow(int sourceRow, const QModelIndex& sourceParent) const
     if (!m_functionFilter.isEmpty()) {
         const auto& function = source->index(sourceRow, m_functionColumn, sourceParent).data().toString();
         if (!function.contains(m_functionFilter, Qt::CaseInsensitive)) {
-            return false;
-        }
-    }
-    if (!m_fileFilter.isEmpty()) {
-        const auto& file = source->index(sourceRow, m_fileColumn, sourceParent).data().toString();
-        if (!file.contains(m_fileFilter, Qt::CaseInsensitive)) {
             return false;
         }
     }

@@ -33,7 +33,12 @@ using namespace std;
 
 namespace {
 
-// TODO: use QString directly
+struct Location
+{
+    Symbol symbol;
+    FileLine fileLine;
+};
+
 struct StringCache
 {
     QString func(const Frame& frame) const
@@ -60,34 +65,19 @@ struct StringCache
         }
     }
 
-    LocationData::Ptr location(const IpIndex& index, const InstructionPointer& ip) const
+    Location location(const InstructionPointer& ip) const
     {
-        // first try a fast index-based lookup
-        auto& location = m_locationsMap[index];
-        if (!location) {
-            location = frameLocation(ip.frame, ip.moduleIndex);
-        }
-        return location;
+        return frameLocation(ip.frame, ip.moduleIndex);
     }
 
-    LocationData::Ptr frameLocation(const Frame& frame, const ModuleIndex& moduleIndex) const
+    Location frameLocation(const Frame& frame, const ModuleIndex& moduleIndex) const
     {
-        LocationData::Ptr location;
-        // slow-path, look for interned location
-        // note that we can get the same location for different IPs
         const auto module = stringify(moduleIndex);
-        LocationData data = {{func(frame), Util::basename(module), module}, file(frame), frame.line};
-        auto it = lower_bound(m_locations.begin(), m_locations.end(), data);
-        if (it != m_locations.end() && **it == data) {
-            // we got the location already from a different ip, cache it
-            location = *it;
-        } else {
-            // completely new location, cache it in both containers
-            auto interned = make_shared<LocationData>(data);
-            m_locations.insert(it, interned);
-            location = interned;
+        auto binaryIt = m_pathToBinaries.find(module);
+        if (binaryIt == m_pathToBinaries.end()) {
+            binaryIt = m_pathToBinaries.insert(module, Util::basename(module));
         }
-        return location;
+        return {{func(frame), *binaryIt, module}, {file(frame), frame.line}};
     }
 
     void update(const vector<string>& strings)
@@ -97,8 +87,8 @@ struct StringCache
     }
 
     vector<QString> m_strings;
-    mutable vector<LocationData::Ptr> m_locations;
-    mutable QHash<IpIndex, LocationData::Ptr> m_locationsMap;
+    // interned module basenames
+    mutable QHash<QString, QString> m_pathToBinaries;
 
     bool diffMode = false;
 };
@@ -150,7 +140,6 @@ struct ParserData final : public AccumulatedTraceData
         vector<ChartMergeData> merged;
         merged.reserve(instructionPointers.size());
         // merge the allocation cost by instruction pointer
-        // TODO: aggregate by function instead?
         // TODO: traverse the merged call stack up until the first fork
         for (const auto& alloc : allocations) {
             const auto ip = findTrace(alloc.traceIndex).ipIndex;
@@ -294,16 +283,37 @@ void setParents(QVector<RowData>& children, const RowData* parent)
     }
 }
 
-TreeData mergeAllocations(const ParserData& data)
+void addCallerCalleeEvent(const Location& location, const AllocationData& cost, QSet<Symbol>* recursionGuard,
+                          CallerCalleeResults* callerCalleeResult)
 {
+    auto recursionIt = recursionGuard->find(location.symbol);
+    if (recursionIt == recursionGuard->end()) {
+        auto& entry = callerCalleeResult->entry(location.symbol);
+        auto& locationCost = entry.source(location.fileLine.toString());
+
+        locationCost.inclusiveCost += cost;
+        if (recursionGuard->isEmpty()) {
+            // increment self cost for leaf
+            locationCost.selfCost += cost;
+        }
+        recursionGuard->insert(location.symbol);
+    }
+}
+
+std::pair<TreeData, CallerCalleeResults> mergeAllocations(const ParserData& data)
+{
+    CallerCalleeResults callerCalleeResults;
     TreeData topRows;
-    auto addRow = [](TreeData* rows, const LocationData::Ptr& location, const Allocation& cost) -> TreeData* {
-        auto it = lower_bound(rows->begin(), rows->end(), location);
-        if (it != rows->end() && it->location == location) {
+    QSet<Symbol> symbolRecursionGuard;
+    auto addRow = [&symbolRecursionGuard, &callerCalleeResults](TreeData* rows, const Location& location,
+                                                                const Allocation& cost) -> TreeData* {
+        auto it = lower_bound(rows->begin(), rows->end(), location.symbol);
+        if (it != rows->end() && it->symbol == location.symbol) {
             it->cost += cost;
         } else {
-            it = rows->insert(it, {cost, location, nullptr, {}});
+            it = rows->insert(it, {cost, location.symbol, nullptr, {}});
         }
+        addCallerCalleeEvent(location, cost, &symbolRecursionGuard, &callerCalleeResults);
         return &it->children;
     };
     // merge allocations, leave parent pointers invalid (their location may change)
@@ -312,10 +322,11 @@ TreeData mergeAllocations(const ParserData& data)
         auto rows = &topRows;
         unordered_set<uint32_t> recursionGuard;
         recursionGuard.insert(traceIndex.index);
+        symbolRecursionGuard.clear();
         while (traceIndex) {
             const auto& trace = data.findTrace(traceIndex);
             const auto& ip = data.findIp(trace.ipIndex);
-            auto location = data.stringCache.location(trace.ipIndex, ip);
+            auto location = data.stringCache.location(ip);
             rows = addRow(rows, location, allocation);
             for (const auto& inlined : ip.inlined) {
                 auto inlinedLocation = data.stringCache.frameLocation(inlined, ip.moduleIndex);
@@ -334,13 +345,13 @@ TreeData mergeAllocations(const ParserData& data)
     // now set the parents, the data is constant from here on
     setParents(topRows, nullptr);
 
-    return topRows;
+    return {topRows, callerCalleeResults};
 }
 
-RowData* findByLocation(const RowData& row, QVector<RowData>* data)
+RowData* findBySymbol(const RowData& row, QVector<RowData>* data)
 {
     for (int i = 0; i < data->size(); ++i) {
-        if (data->at(i).location == row.location) {
+        if (data->at(i).symbol == row.symbol) {
             return data->data() + i;
         }
     }
@@ -361,10 +372,10 @@ AllocationData buildTopDown(const TreeData& bottomUpData, TreeData* topDownData)
             auto node = &row;
             auto stack = topDownData;
             while (node) {
-                auto data = findByLocation(*node, stack);
+                auto data = findBySymbol(*node, stack);
                 if (!data) {
                     // create an empty top-down item for this bottom-up node
-                    *stack << RowData{{}, node->location, nullptr, {}};
+                    *stack << RowData {{}, node->symbol, nullptr, {}};
                     data = &stack->back();
                 }
                 // always use the leaf node's cost and propagate that one up the chain
@@ -409,20 +420,17 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResul
             CallerCalleeEntry* lastEntry = nullptr;
 
             while (node) {
-                const auto& symbol = node->location->symbol;
+                const auto& symbol = node->symbol;
                 // aggregate caller-callee data
                 auto& entry = callerCalleeResults->entry(symbol);
-                auto& source = entry.source(node->location->fileLine());
                 if (!recursionGuard.contains(symbol)) {
                     // only increment inclusive cost once for a given stack
                     entry.inclusiveCost += cost;
-                    source.inclusiveCost += cost;
                     recursionGuard.insert(symbol);
                 }
                 if (!node->parent) {
                     // always increment the self cost
                     entry.selfCost += cost;
-                    source.selfCost += cost;
                 }
                 // add current entry as callee to last entry
                 // and last entry as caller to current entry
@@ -445,10 +453,10 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResul
     return totalCost;
 }
 
-CallerCalleeResults toCallerCalleeData(const QVector<RowData>& bottomUpData, bool diffMode)
+CallerCalleeResults toCallerCalleeData(const TreeData& bottomUpData, const CallerCalleeResults& results, bool diffMode)
 {
-    CallerCalleeResults callerCalleeResults;
-
+    // copy the source map and continue from there
+    auto callerCalleeResults = results;
     callerCalleeResults.totalCosts = buildCallerCallee(bottomUpData, &callerCalleeResults);
 
     if (diffMode) {
@@ -467,11 +475,11 @@ CallerCalleeResults toCallerCalleeData(const QVector<RowData>& bottomUpData, boo
 
 struct MergedHistogramColumnData
 {
-    LocationData::Ptr location;
+    Symbol symbol;
     int64_t allocations;
-    bool operator<(const LocationData::Ptr& rhs) const
+    bool operator<(const Symbol& rhs) const
     {
-        return location < rhs;
+        return symbol < rhs;
     }
 };
 
@@ -506,7 +514,7 @@ HistogramData buildSizeHistogram(ParserData& data)
         // -1 to account for total row
         for (size_t i = 0; i < min(columnData.size(), size_t(HistogramRow::NUM_COLUMNS - 1)); ++i) {
             const auto& column = columnData[i];
-            row.columns[i + 1] = {column.allocations, column.location};
+            row.columns[i + 1] = {column.allocations, column.symbol};
         }
     };
     for (const auto& info : data.allocationInfoCounter) {
@@ -524,10 +532,10 @@ HistogramData buildSizeHistogram(ParserData& data)
         const auto& allocation = data.allocations[info.info.allocationIndex.index];
         const auto ipIndex = data.findTrace(allocation.traceIndex).ipIndex;
         const auto ip = data.findIp(ipIndex);
-        const auto location = data.stringCache.location(ipIndex, ip);
-        auto it = lower_bound(columnData.begin(), columnData.end(), location);
-        if (it == columnData.end() || it->location != location) {
-            columnData.insert(it, {location, info.allocations});
+        const auto location = data.stringCache.location(ip);
+        auto it = lower_bound(columnData.begin(), columnData.end(), location.symbol);
+        if (it == columnData.end() || it->symbol != location.symbol) {
+            columnData.insert(it, {location.symbol, info.allocations});
         } else {
             it->allocations += info.allocations;
         }
@@ -582,7 +590,7 @@ void Parser::parse(const QString& path, const QString& diffBase)
         emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again
         const auto mergedAllocations = mergeAllocations(*data);
-        emit bottomUpDataAvailable(mergedAllocations);
+        emit bottomUpDataAvailable(mergedAllocations.first);
 
         // also calculate the size histogram
         emit progressMessageAvailable(i18n("building size histogram..."));
@@ -594,11 +602,11 @@ void Parser::parse(const QString& path, const QString& diffBase)
         emit progressMessageAvailable(i18n("building charts..."));
         auto parallel = new Collection;
         *parallel << make_job([this, mergedAllocations]() {
-            const auto topDownData = toTopDownData(mergedAllocations);
+            const auto topDownData = toTopDownData(mergedAllocations.first);
             emit topDownDataAvailable(topDownData);
         }) << make_job([this, mergedAllocations, diffMode]() {
-            const auto callerCalleeData = toCallerCalleeData(mergedAllocations, diffMode);
-            emit callerCalleeDataAvailable(callerCalleeData);
+            emit callerCalleeDataAvailable(
+                toCallerCalleeData(mergedAllocations.first, mergedAllocations.second, diffMode));
         });
         if (!data->stringCache.diffMode) {
             // only build charts when we are not diffing

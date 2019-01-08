@@ -73,13 +73,8 @@ QVariant HistogramModel::data(const QModelIndex& index, int role) const
         if (index.column() == 0) {
             return i18n("%1 allocations in total", column.allocations);
         }
-        if (!column.location->file.isEmpty()) {
-            return i18n("%1 allocations from %2 at %3:%4 in %5 (%6)", column.allocations,
-                        column.location->symbol.symbol, column.location->file, column.location->line,
-                        column.location->symbol.binary, column.location->symbol.path);
-        }
-        return i18n("%1 allocations from %2 in %3 (%4)", column.allocations, column.location->symbol.symbol,
-                    column.location->symbol.binary, column.location->symbol.path);
+        return i18n("%1 allocations from %2 in %3 (%4)", column.allocations, column.symbol.symbol, column.symbol.binary,
+                    column.symbol.path);
     }
     return column.allocations;
 }

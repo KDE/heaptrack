@@ -68,16 +68,16 @@ const char State[] = "State";
 }
 }
 
-void addContextMenu(QTreeView* treeView, int role)
+void addLocationContextMenu(QTreeView* treeView)
 {
     treeView->setContextMenuPolicy(Qt::CustomContextMenu);
-    QObject::connect(treeView, &QTreeView::customContextMenuRequested, treeView, [treeView, role](const QPoint& pos) {
+    QObject::connect(treeView, &QTreeView::customContextMenuRequested, treeView, [treeView](const QPoint& pos) {
         auto index = treeView->indexAt(pos);
         if (!index.isValid()) {
             return;
         }
-        const auto location = index.data(role).value<LocationData::Ptr>();
-        if (!location || !QFile::exists(location->file)) {
+        const auto location = index.data(SourceMapModel::LocationRole).value<FileLine>();
+        if (!QFile::exists(location.file)) {
             return;
         }
         auto menu = new QMenu(treeView);
@@ -85,8 +85,8 @@ void addContextMenu(QTreeView* treeView, int role)
             new QAction(QIcon::fromTheme(QStringLiteral("document-open")), i18n("Open file in editor"), menu);
         QObject::connect(openFile, &QAction::triggered, openFile, [location] {
             /// FIXME: add settings to let user configure this
-            auto url = QUrl::fromLocalFile(location->file);
-            url.setFragment(QString::number(location->line));
+            auto url = QUrl::fromLocalFile(location.file);
+            url.setFragment(QString::number(location.line));
             QDesktopServices::openUrl(url);
         });
         menu->addAction(openFile);
@@ -102,7 +102,8 @@ void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type)
     view->setModel(proxy);
     view->sortByColumn(0);
     view->header()->setStretchLastSection(true);
-    addContextMenu(view, TreeModel::LocationRole);
+    // TODO: switch to caller/callee via context menu
+    //     addContextMenu(view, TreeModel::LocationRole);
 }
 
 #if KChart_FOUND
@@ -123,9 +124,9 @@ void addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel::Type t
 #endif
 
 void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegate, QLineEdit* filterFunction,
-                    QLineEdit* filterFile, QLineEdit* filterModule)
+                    QLineEdit* filterModule)
 {
-    auto proxy = new TreeProxy(TreeModel::FunctionColumn, TreeModel::FileColumn, TreeModel::ModuleColumn, model);
+    auto proxy = new TreeProxy(TreeModel::FunctionColumn, TreeModel::ModuleColumn, model);
     proxy->setSourceModel(model);
     proxy->setSortRole(TreeModel::SortRole);
 
@@ -135,22 +136,18 @@ void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegat
     view->setItemDelegateForColumn(TreeModel::AllocationsColumn, costDelegate);
     view->setItemDelegateForColumn(TreeModel::TemporaryColumn, costDelegate);
     view->hideColumn(TreeModel::FunctionColumn);
-    view->hideColumn(TreeModel::FileColumn);
-    view->hideColumn(TreeModel::LineColumn);
     view->hideColumn(TreeModel::ModuleColumn);
 
     QObject::connect(filterFunction, &QLineEdit::textChanged, proxy, &TreeProxy::setFunctionFilter);
-    QObject::connect(filterFile, &QLineEdit::textChanged, proxy, &TreeProxy::setFileFilter);
     QObject::connect(filterModule, &QLineEdit::textChanged, proxy, &TreeProxy::setModuleFilter);
-    addContextMenu(view, TreeModel::LocationRole);
+    // TODO: switch to caller/callee via context menu
+    //     addContextMenu(view, TreeModel::LocationRole);
 }
 
 void setupCallerCallee(CallerCalleeModel* model, QTreeView* view, QLineEdit* filterFunction, QLineEdit* filterModule)
 {
     auto costDelegate = new CostDelegate(CallerCalleeModel::SortRole, CallerCalleeModel::TotalCostRole, view);
-    // TODO don't use symbol column twice
-    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::SymbolColumn, CallerCalleeModel::SymbolColumn,
-                                           CallerCalleeModel::BinaryColumn, model);
+    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::SymbolColumn, CallerCalleeModel::BinaryColumn, model);
     callerCalleeProxy->setSourceModel(model);
     callerCalleeProxy->setSortRole(CallerCalleeModel::SortRole);
     view->setModel(callerCalleeProxy);
@@ -355,10 +352,10 @@ MainWindow::MainWindow(QWidget* parent)
 
     auto costDelegate = new CostDelegate(TreeModel::SortRole, TreeModel::MaxCostRole, this);
     setupTreeModel(bottomUpModel, m_ui->bottomUpResults, costDelegate, m_ui->bottomUpFilterFunction,
-                   m_ui->bottomUpFilterFile, m_ui->bottomUpFilterModule);
+                   m_ui->bottomUpFilterModule);
 
     setupTreeModel(topDownModel, m_ui->topDownResults, costDelegate, m_ui->topDownFilterFunction,
-                   m_ui->topDownFilterFile, m_ui->topDownFilterModule);
+                   m_ui->topDownFilterModule);
 
     setupCallerCallee(callerCalleeModel, m_ui->callerCalleeResults, m_ui->callerCalleeFilterFunction,
                       m_ui->callerCalleeFilterModule);
@@ -382,8 +379,7 @@ MainWindow::MainWindow(QWidget* parent)
     };
     connectCallerOrCalleeModel<CalleeModel>(m_ui->calleeView, callerCalleeModel, selectCallerCaleeeIndex);
     connectCallerOrCalleeModel<CallerModel>(m_ui->callerView, callerCalleeModel, selectCallerCaleeeIndex);
-
-    addContextMenu(m_ui->locationView, SourceMapModel::LocationRole);
+    addLocationContextMenu(m_ui->locationView);
 
     connect(m_ui->callerCalleeResults->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             [selectCallerCaleeeIndex](const QModelIndex& current, const QModelIndex&) {
