@@ -30,8 +30,8 @@ namespace Util {
 QString basename(const QString& path);
 QString formatString(const QString& input);
 QString formatTime(qint64 ms);
-QString formatBytes(quint64 bytes);
-QString formatCostRelative(quint64 selfCost, quint64 totalCost, bool addPercentSign = false);
+QString formatBytes(qint64 bytes);
+QString formatCostRelative(qint64 selfCost, qint64 totalCost, bool addPercentSign = false);
 QString formatTooltip(const Symbol& symbol, const AllocationData& costs, const AllocationData& totalCosts);
 QString formatTooltip(const Symbol& symbol, const AllocationData& selfCosts, const AllocationData& inclusiveCosts,
                       const AllocationData& totalCosts);

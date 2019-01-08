@@ -45,13 +45,13 @@ QString Util::formatTime(qint64 ms)
     }
 }
 
-QString Util::formatBytes(quint64 bytes)
+QString Util::formatBytes(qint64 bytes)
 {
     static const KFormat format;
     return format.formatByteSize(bytes, 1, KFormat::MetricBinaryDialect);
 }
 
-QString Util::formatCostRelative(quint64 selfCost, quint64 totalCost, bool addPercentSign)
+QString Util::formatCostRelative(qint64 selfCost, qint64 totalCost, bool addPercentSign)
 {
     if (!totalCost) {
         return QString();

@@ -261,13 +261,14 @@ public:
             case BinaryColumn:
                 return symbol.binary;
             case PeakColumn:
-                return QVariant::fromValue<qint64>(costs.peak);
+                // NOTE: we sort by unsigned absolute value
+                return QVariant::fromValue<quint64>(std::abs(costs.peak));
             case LeakedColumn:
-                return QVariant::fromValue<qint64>(costs.leaked);
+                return QVariant::fromValue<quint64>(std::abs(costs.leaked));
             case AllocationsColumn:
-                return QVariant::fromValue<qint64>(costs.allocations);
+                return QVariant::fromValue<quint64>(std::abs(costs.allocations));
             case TemporaryColumn:
-                return QVariant::fromValue<qint64>(costs.temporary);
+                return QVariant::fromValue<quint64>(std::abs(costs.temporary));
             case NUM_COLUMNS:
                 break;
             }
@@ -470,21 +471,22 @@ public:
             case LocationColumn:
                 return location;
             case SelfAllocationsColumn:
-                return QVariant::fromValue<qint64>(costs.selfCost.allocations);
+                // NOTE: we sort by unsigned absolute value
+                return QVariant::fromValue<quint64>(std::abs(costs.selfCost.allocations));
             case SelfTemporaryColumn:
-                return QVariant::fromValue<qint64>(costs.selfCost.temporary);
+                return QVariant::fromValue<quint64>(std::abs(costs.selfCost.temporary));
             case SelfPeakColumn:
-                return QVariant::fromValue<qint64>(costs.selfCost.peak);
+                return QVariant::fromValue<quint64>(std::abs(costs.selfCost.peak));
             case SelfLeakedColumn:
-                return QVariant::fromValue<qint64>(costs.selfCost.leaked);
+                return QVariant::fromValue<quint64>(std::abs(costs.selfCost.leaked));
             case InclusiveAllocationsColumn:
-                return QVariant::fromValue<qint64>(costs.inclusiveCost.allocations);
+                return QVariant::fromValue<quint64>(std::abs(costs.inclusiveCost.allocations));
             case InclusiveTemporaryColumn:
-                return QVariant::fromValue<qint64>(costs.inclusiveCost.temporary);
+                return QVariant::fromValue<quint64>(std::abs(costs.inclusiveCost.temporary));
             case InclusivePeakColumn:
-                return QVariant::fromValue<qint64>(costs.inclusiveCost.peak);
+                return QVariant::fromValue<quint64>(std::abs(costs.inclusiveCost.peak));
             case InclusiveLeakedColumn:
-                return QVariant::fromValue<qint64>(costs.inclusiveCost.leaked);
+                return QVariant::fromValue<quint64>(std::abs(costs.inclusiveCost.leaked));
             case NUM_COLUMNS:
                 break;
             }
