@@ -565,7 +565,7 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     };
     auto remapIp = [&remapString, &remapFrame](InstructionPointer ip) -> InstructionPointer {
         remapString(ip.moduleIndex);
-        remapFrame(ip.frame);
+        ip.frame = remapFrame(ip.frame);
         for (auto& inlined : ip.inlined) {
             inlined = remapFrame(inlined);
         }
