@@ -68,6 +68,37 @@ const char State[] = "State";
 }
 }
 
+template <typename T>
+void setupContextMenu(QTreeView* view, T callback)
+{
+    view->setContextMenuPolicy(Qt::CustomContextMenu);
+    QObject::connect(view, &QTreeView::customContextMenuRequested, view, [view, callback](const QPoint& point) {
+        const auto index = view->indexAt(point);
+        if (!index.isValid()) {
+            return;
+        }
+
+        callback(index);
+    });
+}
+
+template <typename T>
+void setupTreeContextMenu(QTreeView* view, T callback)
+{
+    setupContextMenu(view, [callback](const QModelIndex& index) {
+        QMenu contextMenu;
+        auto* viewCallerCallee = contextMenu.addAction(i18n("View Caller/Callee"));
+        auto* action = contextMenu.exec(QCursor::pos());
+        if (action == viewCallerCallee) {
+            const auto symbol = index.data(TreeModel::SymbolRole).value<Symbol>();
+
+            if (symbol.isValid()) {
+                callback(symbol);
+            }
+        }
+    });
+}
+
 void addLocationContextMenu(QTreeView* treeView)
 {
     treeView->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -94,7 +125,8 @@ void addLocationContextMenu(QTreeView* treeView)
     });
 }
 
-void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type)
+template <typename T>
+void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type, T callback)
 {
     auto proxy = new TopProxy(type, source);
     proxy->setSourceModel(source);
@@ -102,8 +134,7 @@ void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type)
     view->setModel(proxy);
     view->sortByColumn(0);
     view->header()->setStretchLastSection(true);
-    // TODO: switch to caller/callee via context menu
-    //     addContextMenu(view, TreeModel::LocationRole);
+    setupTreeContextMenu(view, callback);
 }
 
 #if KChart_FOUND
@@ -123,8 +154,9 @@ void addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel::Type t
 }
 #endif
 
+template <typename T>
 void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegate, QLineEdit* filterFunction,
-                    QLineEdit* filterModule)
+                    QLineEdit* filterModule, T callback)
 {
     auto proxy = new TreeProxy(TreeModel::FunctionColumn, TreeModel::ModuleColumn, model);
     proxy->setSourceModel(model);
@@ -140,8 +172,7 @@ void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegat
 
     QObject::connect(filterFunction, &QLineEdit::textChanged, proxy, &TreeProxy::setFunctionFilter);
     QObject::connect(filterModule, &QLineEdit::textChanged, proxy, &TreeProxy::setModuleFilter);
-    // TODO: switch to caller/callee via context menu
-    //     addContextMenu(view, TreeModel::LocationRole);
+    setupTreeContextMenu(view, callback);
 }
 
 void setupCallerCallee(CallerCalleeModel* model, QTreeView* view, QLineEdit* filterFunction, QLineEdit* filterModule)
@@ -350,16 +381,6 @@ MainWindow::MainWindow(QWidget* parent)
     });
 #endif
 
-    auto costDelegate = new CostDelegate(TreeModel::SortRole, TreeModel::MaxCostRole, this);
-    setupTreeModel(bottomUpModel, m_ui->bottomUpResults, costDelegate, m_ui->bottomUpFilterFunction,
-                   m_ui->bottomUpFilterModule);
-
-    setupTreeModel(topDownModel, m_ui->topDownResults, costDelegate, m_ui->topDownFilterFunction,
-                   m_ui->topDownFilterModule);
-
-    setupCallerCallee(callerCalleeModel, m_ui->callerCalleeResults, m_ui->callerCalleeFilterFunction,
-                      m_ui->callerCalleeFilterModule);
-
     auto calleesModel = setupModelAndProxyForView<CalleeModel>(m_ui->calleeView, 2);
     auto callersModel = setupModelAndProxyForView<CallerModel>(m_ui->callerView, 2);
     auto sourceMapModel = setupModelAndProxyForView<SourceMapModel>(m_ui->locationView, 1);
@@ -377,6 +398,21 @@ MainWindow::MainWindow(QWidget* parent)
                 qobject_cast<QSortFilterProxyModel*>(m_ui->callerCalleeResults->model())->mapFromSource(index));
         }
     };
+    auto showSymbolInCallerCallee = [this, callerCalleeModel, selectCallerCaleeeIndex](const Symbol& symbol) {
+        m_ui->tabWidget->setCurrentWidget(m_ui->callerCalleeTab);
+        selectCallerCaleeeIndex(callerCalleeModel->indexForSymbol(symbol));
+    };
+
+    auto costDelegate = new CostDelegate(TreeModel::SortRole, TreeModel::MaxCostRole, this);
+    setupTreeModel(bottomUpModel, m_ui->bottomUpResults, costDelegate, m_ui->bottomUpFilterFunction,
+                   m_ui->bottomUpFilterModule, showSymbolInCallerCallee);
+
+    setupTreeModel(topDownModel, m_ui->topDownResults, costDelegate, m_ui->topDownFilterFunction,
+                   m_ui->topDownFilterModule, showSymbolInCallerCallee);
+
+    setupCallerCallee(callerCalleeModel, m_ui->callerCalleeResults, m_ui->callerCalleeFilterFunction,
+                      m_ui->callerCalleeFilterModule);
+
     connectCallerOrCalleeModel<CalleeModel>(m_ui->calleeView, callerCalleeModel, selectCallerCaleeeIndex);
     connectCallerOrCalleeModel<CallerModel>(m_ui->callerView, callerCalleeModel, selectCallerCaleeeIndex);
     addLocationContextMenu(m_ui->locationView);
@@ -423,13 +459,13 @@ MainWindow::MainWindow(QWidget* parent)
 
     setupStacks();
 
-    setupTopView(bottomUpModel, m_ui->topPeak, TopProxy::Peak);
+    setupTopView(bottomUpModel, m_ui->topPeak, TopProxy::Peak, showSymbolInCallerCallee);
     m_ui->topPeak->setItemDelegate(costDelegate);
-    setupTopView(bottomUpModel, m_ui->topLeaked, TopProxy::Leaked);
+    setupTopView(bottomUpModel, m_ui->topLeaked, TopProxy::Leaked, showSymbolInCallerCallee);
     m_ui->topLeaked->setItemDelegate(costDelegate);
-    setupTopView(bottomUpModel, m_ui->topAllocations, TopProxy::Allocations);
+    setupTopView(bottomUpModel, m_ui->topAllocations, TopProxy::Allocations, showSymbolInCallerCallee);
     m_ui->topAllocations->setItemDelegate(costDelegate);
-    setupTopView(bottomUpModel, m_ui->topTemporary, TopProxy::Temporary);
+    setupTopView(bottomUpModel, m_ui->topTemporary, TopProxy::Temporary, showSymbolInCallerCallee);
     m_ui->topTemporary->setItemDelegate(costDelegate);
 
     setWindowTitle(i18n("Heaptrack"));
