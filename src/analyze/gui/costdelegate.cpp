@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2017 Milian Wolff <mail@milianw.de>
+ * Copyright 2016-2019 Milian Wolff <mail@milianw.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,15 +18,15 @@
 
 #include "costdelegate.h"
 
-#include "treemodel.h"
-
 #include <QDebug>
 #include <QPainter>
 
 #include <cmath>
 
-CostDelegate::CostDelegate(QObject* parent)
+CostDelegate::CostDelegate(int sortRole, int maxCostRole, QObject* parent)
     : QStyledItemDelegate(parent)
+    , m_sortRole(sortRole)
+    , m_maxCostRole(maxCostRole)
 {
 }
 
@@ -35,13 +35,13 @@ CostDelegate::~CostDelegate() = default;
 void CostDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     // TODO: handle negative values
-    const int64_t cost = index.data(TreeModel::SortRole).toULongLong();
+    const int64_t cost = index.data(m_sortRole).toULongLong();
     if (cost == 0) {
         QStyledItemDelegate::paint(painter, option, index);
         return;
     }
 
-    const int64_t maxCost = index.data(TreeModel::MaxCostRole).toULongLong();
+    const int64_t maxCost = index.data(m_maxCostRole).toULongLong();
     // top-down can miscalculate the peak cost
     const auto fraction = std::min(1.f, std::abs(float(cost) / maxCost));
     auto rect = option.rect;

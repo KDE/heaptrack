@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Milian Wolff <mail@milianw.de>
+ * Copyright 2015-2019 Milian Wolff <mail@milianw.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -145,11 +145,12 @@ void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegat
     addContextMenu(view, TreeModel::LocationRole);
 }
 
-void setupCallerCalle(CallerCalleeModel* model, QTreeView* view, CostDelegate* costDelegate, QLineEdit* filterFunction,
-                      QLineEdit* filterFile, QLineEdit* filterModule)
+void setupCallerCallee(CallerCalleeModel* model, QTreeView* view, QLineEdit* filterFunction, QLineEdit* filterModule)
 {
-    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::FunctionColumn, CallerCalleeModel::FileColumn,
-                                           CallerCalleeModel::ModuleColumn, model);
+    auto costDelegate = new CostDelegate(CallerCalleeModel::SortRole, CallerCalleeModel::TotalCostRole, view);
+    // TODO don't use symbol column twice
+    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::SymbolColumn, CallerCalleeModel::SymbolColumn,
+                                           CallerCalleeModel::BinaryColumn, model);
     callerCalleeProxy->setSourceModel(model);
     callerCalleeProxy->setSortRole(CallerCalleeModel::SortRole);
     view->setModel(callerCalleeProxy);
@@ -162,14 +163,37 @@ void setupCallerCalle(CallerCalleeModel* model, QTreeView* view, CostDelegate* c
     view->setItemDelegateForColumn(CallerCalleeModel::InclusiveLeakedColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::InclusiveAllocationsColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::InclusiveTemporaryColumn, costDelegate);
-    view->hideColumn(CallerCalleeModel::FunctionColumn);
-    view->hideColumn(CallerCalleeModel::FileColumn);
-    view->hideColumn(CallerCalleeModel::LineColumn);
-    view->hideColumn(CallerCalleeModel::ModuleColumn);
     QObject::connect(filterFunction, &QLineEdit::textChanged, callerCalleeProxy, &TreeProxy::setFunctionFilter);
-    QObject::connect(filterFile, &QLineEdit::textChanged, callerCalleeProxy, &TreeProxy::setFileFilter);
     QObject::connect(filterModule, &QLineEdit::textChanged, callerCalleeProxy, &TreeProxy::setModuleFilter);
-    addContextMenu(view, CallerCalleeModel::LocationRole);
+}
+
+template <typename Model>
+Model* setupModelAndProxyForView(QTreeView* view, int nonCostColumns)
+{
+    auto model = new Model(view);
+    auto proxy = new QSortFilterProxyModel(model);
+    proxy->setSourceModel(model);
+    proxy->setSortRole(Model::SortRole);
+    view->sortByColumn(Model::InitialSortColumn);
+    view->setModel(proxy);
+    view->header()->setStretchLastSection(false);
+    view->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+    auto costDelegate = new CostDelegate(Model::SortRole, Model::TotalCostRole, view);
+    for (int i = nonCostColumns; i < Model::NUM_COLUMNS; ++i) {
+        view->setItemDelegateForColumn(i, costDelegate);
+    }
+
+    return model;
+}
+
+template <typename Model, typename Handler>
+void connectCallerOrCalleeModel(QTreeView* view, CallerCalleeModel* callerCalleeCostModel, Handler handler)
+{
+    QObject::connect(view, &QTreeView::activated, view, [callerCalleeCostModel, handler](const QModelIndex& index) {
+        const auto symbol = index.data(Model::SymbolRole).template value<Symbol>();
+        auto sourceIndex = callerCalleeCostModel->indexForKey(symbol);
+        handler(sourceIndex);
+    });
 }
 
 QString insertWordWrapMarkers(QString text)
@@ -220,8 +244,8 @@ MainWindow::MainWindow(QWidget* parent)
         m_ui->pages->setCurrentWidget(m_ui->resultsPage);
         m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->bottomUpTab), true);
     });
-    connect(m_parser, &Parser::callerCalleeDataAvailable, this, [=](const CallerCalleeRows& data) {
-        callerCalleeModel->resetData(data);
+    connect(m_parser, &Parser::callerCalleeDataAvailable, this, [=](const CallerCalleeResults& data) {
+        callerCalleeModel->setResults(data);
         m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->callerCalleeTab), true);
     });
     connect(m_parser, &Parser::topDownDataAvailable, this, [=](const TreeData& data) {
@@ -235,7 +259,6 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_parser, &Parser::summaryAvailable, this, [=](const SummaryData& data) {
         bottomUpModel->setSummary(data);
         topDownModel->setSummary(data);
-        callerCalleeModel->setSummary(data);
         KFormat format;
         QString textLeft;
         QString textCenter;
@@ -330,16 +353,44 @@ MainWindow::MainWindow(QWidget* parent)
     });
 #endif
 
-    auto costDelegate = new CostDelegate(this);
-
+    auto costDelegate = new CostDelegate(TreeModel::SortRole, TreeModel::MaxCostRole, this);
     setupTreeModel(bottomUpModel, m_ui->bottomUpResults, costDelegate, m_ui->bottomUpFilterFunction,
                    m_ui->bottomUpFilterFile, m_ui->bottomUpFilterModule);
 
     setupTreeModel(topDownModel, m_ui->topDownResults, costDelegate, m_ui->topDownFilterFunction,
                    m_ui->topDownFilterFile, m_ui->topDownFilterModule);
 
-    setupCallerCalle(callerCalleeModel, m_ui->callerCalleeResults, costDelegate, m_ui->callerCalleeFilterFunction,
-                     m_ui->callerCalleeFilterFile, m_ui->callerCalleeFilterModule);
+    setupCallerCallee(callerCalleeModel, m_ui->callerCalleeResults, m_ui->callerCalleeFilterFunction,
+                      m_ui->callerCalleeFilterModule);
+
+    auto calleesModel = setupModelAndProxyForView<CalleeModel>(m_ui->calleeView, 2);
+    auto callersModel = setupModelAndProxyForView<CallerModel>(m_ui->callerView, 2);
+    auto sourceMapModel = setupModelAndProxyForView<SourceMapModel>(m_ui->locationView, 1);
+
+    auto selectCallerCaleeeIndex = [calleesModel, callersModel, sourceMapModel, this](const QModelIndex& index) {
+        const auto costs = index.data(CallerCalleeModel::TotalCostsRole).value<AllocationData>();
+        const auto callees = index.data(CallerCalleeModel::CalleesRole).value<CalleeMap>();
+        calleesModel->setResults(callees, costs);
+        const auto callers = index.data(CallerCalleeModel::CallersRole).value<CallerMap>();
+        callersModel->setResults(callers, costs);
+        const auto sourceMap = index.data(CallerCalleeModel::SourceMapRole).value<LocationCostMap>();
+        sourceMapModel->setResults(sourceMap, costs);
+        if (index.model() != m_ui->callerCalleeResults->model()) {
+            m_ui->callerCalleeResults->setCurrentIndex(
+                qobject_cast<QSortFilterProxyModel*>(m_ui->callerCalleeResults->model())->mapFromSource(index));
+        }
+    };
+    connectCallerOrCalleeModel<CalleeModel>(m_ui->calleeView, callerCalleeModel, selectCallerCaleeeIndex);
+    connectCallerOrCalleeModel<CallerModel>(m_ui->callerView, callerCalleeModel, selectCallerCaleeeIndex);
+
+    addContextMenu(m_ui->locationView, SourceMapModel::LocationRole);
+
+    connect(m_ui->callerCalleeResults->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+            [selectCallerCaleeeIndex](const QModelIndex& current, const QModelIndex&) {
+                if (current.isValid()) {
+                    selectCallerCaleeeIndex(current);
+                }
+            });
 
     auto validateInputFile = [this](const QString& path, bool allowEmpty) -> bool {
         if (path.isEmpty()) {

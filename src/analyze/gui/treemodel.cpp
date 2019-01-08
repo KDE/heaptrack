@@ -175,19 +175,20 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
                 return m_format.formatByteSize(row->cost.leaked, 1, KFormat::MetricBinaryDialect);
             }
         case FunctionColumn:
-            return row->location->function;
+            return row->location->symbol.symbol;
         case ModuleColumn:
-            return row->location->module;
+            return row->location->symbol.binary;
         case FileColumn:
             return row->location->file;
         case LineColumn:
             return row->location->line;
         case LocationColumn:
             if (row->location->file.isEmpty()) {
-                return i18n("%1 in ?? (%2)", basename(row->location->function), basename(row->location->module));
+                return i18n("%1 in ?? (%2)", basename(row->location->symbol.symbol),
+                            basename(row->location->symbol.binary));
             } else {
-                return i18n("%1 in %2:%3 (%4)", row->location->function, basename(row->location->file),
-                            row->location->line, basename(row->location->module));
+                return i18n("%1 in %2:%3 (%4)", row->location->symbol.symbol, basename(row->location->file),
+                            row->location->line, basename(row->location->symbol.binary));
             }
         case NUM_COLUMNS:
             break;
@@ -197,12 +198,14 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         QTextStream stream(&tooltip);
         stream << "<qt><pre style='font-family:monospace;'>";
         if (row->location->line > 0) {
-            stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                            row->location->function.toHtmlEscaped(), row->location->file.toHtmlEscaped(),
-                            row->location->line, row->location->module.toHtmlEscaped());
+            stream << i18nc("1: function, 2: file, 3: line, 4: module, 5: module path", "%1\n  at %2:%3\n  in %4 (%5)",
+                            row->location->symbol.symbol.toHtmlEscaped(), row->location->file.toHtmlEscaped(),
+                            row->location->line, row->location->symbol.binary.toHtmlEscaped(),
+                            row->location->symbol.path.toHtmlEscaped());
         } else {
-            stream << i18nc("1: function, 2: module", "%1\n  in %2", row->location->function.toHtmlEscaped(),
-                            row->location->module.toHtmlEscaped());
+            stream << i18nc("1: function, 2: module, 3: module path", "%1\n  in %2 (%3)",
+                            row->location->symbol.symbol.toHtmlEscaped(), row->location->symbol.binary.toHtmlEscaped(),
+                            row->location->symbol.path.toHtmlEscaped());
         }
         stream << '\n';
         stream << '\n';
@@ -228,12 +231,16 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             while (child->children.count() == 1 && max-- > 0) {
                 stream << "\n";
                 if (child->location->line > 0) {
-                    stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                                    child->location->function.toHtmlEscaped(), child->location->file.toHtmlEscaped(),
-                                    child->location->line, child->location->module.toHtmlEscaped());
+                    stream << i18nc("1: function, 2: file, 3: line, 4: module, 5: module path",
+                                    "%1\n  at %2:%3\n  in %4", child->location->symbol.symbol.toHtmlEscaped(),
+                                    child->location->file.toHtmlEscaped(), child->location->line,
+                                    child->location->symbol.binary.toHtmlEscaped(),
+                                    child->location->symbol.path.toHtmlEscaped());
                 } else {
-                    stream << i18nc("1: function, 2: module", "%1\n  in %2", child->location->function.toHtmlEscaped(),
-                                    child->location->module.toHtmlEscaped());
+                    stream << i18nc("1: function, 2: module, 3: module path", "%1\n  in %2",
+                                    child->location->symbol.symbol.toHtmlEscaped(),
+                                    child->location->symbol.binary.toHtmlEscaped(),
+                                    child->location->symbol.path.toHtmlEscaped());
                 }
                 child = child->children.data();
             }

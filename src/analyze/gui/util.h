@@ -21,12 +21,25 @@
 
 #include <qglobal.h>
 
+#include "../allocationdata.h"
+#include "locationdata.h"
+
 class QString;
 
 namespace Util {
-
+QString basename(const QString& path);
+QString formatString(const QString& input);
 QString formatTime(qint64 ms);
+QString formatBytes(quint64 bytes);
 QString formatCostRelative(quint64 selfCost, quint64 totalCost, bool addPercentSign = false);
+QString formatTooltip(const Symbol& symbol, const AllocationData& costs, const AllocationData& totalCosts);
+QString formatTooltip(const Symbol& symbol, const AllocationData& selfCosts, const AllocationData& inclusiveCosts,
+                      const AllocationData& totalCosts);
+QString formatTooltip(const QString& location, const AllocationData& selfCosts, const AllocationData& inclusiveCosts,
+                      const AllocationData& totalCosts);
 }
+
+Q_DECLARE_TYPEINFO(AllocationData, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(AllocationData)
 
 #endif // UTIL_H

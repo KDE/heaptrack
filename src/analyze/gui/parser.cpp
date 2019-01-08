@@ -75,7 +75,8 @@ struct StringCache
         LocationData::Ptr location;
         // slow-path, look for interned location
         // note that we can get the same location for different IPs
-        LocationData data = {func(frame), file(frame), stringify(moduleIndex), frame.line};
+        const auto module = stringify(moduleIndex);
+        LocationData data = {{func(frame), Util::basename(module), module}, file(frame), frame.line};
         auto it = lower_bound(m_locations.begin(), m_locations.end(), data);
         if (it != m_locations.end() && **it == data) {
             // we got the location already from a different ip, cache it
@@ -387,12 +388,12 @@ QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
     return topRows;
 }
 
-AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeRows* callerCalleeData)
+AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResults* callerCalleeResults)
 {
     AllocationData totalCost;
     for (const auto& row : bottomUpData) {
         // recurse to find a leaf
-        const auto childCost = buildCallerCallee(row.children, callerCalleeData);
+        const auto childCost = buildCallerCallee(row.children, callerCalleeResults);
         if (childCost != row.cost) {
             // this row is (partially) a leaf
             const auto cost = row.cost - childCost;
@@ -400,25 +401,43 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeRows*
             // leaf node found, bubble up the parent chain to add cost for all frames
             // to the caller/callee data. this is done top-down since we must not count
             // symbols more than once in the caller-callee data
-            QSet<LocationData::Ptr> recursionGuard;
-
+            QSet<Symbol> recursionGuard;
             auto node = &row;
+
+            QSet<QPair<Symbol, Symbol>> callerCalleeRecursionGuard;
+            Symbol lastSymbol;
+            CallerCalleeEntry* lastEntry = nullptr;
+
             while (node) {
-                const auto& location = node->location;
-                if (!recursionGuard.contains(location)) { // aggregate caller-callee data
-                    auto it = lower_bound(
-                        callerCalleeData->begin(), callerCalleeData->end(), location,
-                        [](const CallerCalleeData& lhs, const LocationData::Ptr& rhs) { return lhs.location < rhs; });
-                    if (it == callerCalleeData->end() || it->location != location) {
-                        it = callerCalleeData->insert(it, {{}, {}, location});
-                    }
-                    it->inclusiveCost += cost;
-                    if (!node->parent) {
-                        it->selfCost += cost;
-                    }
-                    recursionGuard.insert(location);
+                const auto& symbol = node->location->symbol;
+                // aggregate caller-callee data
+                auto& entry = callerCalleeResults->entry(symbol);
+                auto& source = entry.source(node->location->fileLine());
+                if (!recursionGuard.contains(symbol)) {
+                    // only increment inclusive cost once for a given stack
+                    entry.inclusiveCost += cost;
+                    source.inclusiveCost += cost;
+                    recursionGuard.insert(symbol);
                 }
+                if (!node->parent) {
+                    // always increment the self cost
+                    entry.selfCost += cost;
+                    source.selfCost += cost;
+                }
+                // add current entry as callee to last entry
+                // and last entry as caller to current entry
+                if (lastEntry) {
+                    const auto callerCalleePair = qMakePair(symbol, lastSymbol);
+                    if (!callerCalleeRecursionGuard.contains(callerCalleePair)) {
+                        lastEntry->callee(symbol) += cost;
+                        entry.caller(lastSymbol) += cost;
+                        callerCalleeRecursionGuard.insert(callerCalleePair);
+                    }
+                }
+
                 node = node->parent;
+                lastSymbol = symbol;
+                lastEntry = &entry;
             }
         }
         totalCost += row.cost;
@@ -426,23 +445,24 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeRows*
     return totalCost;
 }
 
-CallerCalleeRows toCallerCalleeData(const QVector<RowData>& bottomUpData, bool diffMode)
+CallerCalleeResults toCallerCalleeData(const QVector<RowData>& bottomUpData, bool diffMode)
 {
-    CallerCalleeRows callerCalleeRows;
+    CallerCalleeResults callerCalleeResults;
 
-    buildCallerCallee(bottomUpData, &callerCalleeRows);
+    callerCalleeResults.totalCosts = buildCallerCallee(bottomUpData, &callerCalleeResults);
 
     if (diffMode) {
         // remove rows without cost
-        callerCalleeRows.erase(remove_if(callerCalleeRows.begin(), callerCalleeRows.end(),
-                                         [](const CallerCalleeData& data) -> bool {
-                                             return data.inclusiveCost == AllocationData()
-                                                 && data.selfCost == AllocationData();
-                                         }),
-                               callerCalleeRows.end());
+        for (auto it = callerCalleeResults.entries.begin(); it != callerCalleeResults.entries.end();) {
+            if (it->inclusiveCost == AllocationData() && it->selfCost == AllocationData()) {
+                it = callerCalleeResults.entries.erase(it);
+            } else {
+                ++it;
+            }
+        }
     }
 
-    return callerCalleeRows;
+    return callerCalleeResults;
 }
 
 struct MergedHistogramColumnData

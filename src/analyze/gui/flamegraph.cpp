@@ -305,13 +305,13 @@ void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem* parent, in
                      const double costThreshold, bool collapseRecursion)
 {
     foreach (const auto& row, data) {
-        if (collapseRecursion && row.location->function != unresolvedFunctionName()
-            && row.location->function == parent->function()) {
+        if (collapseRecursion && row.location->symbol.symbol != unresolvedFunctionName()
+            && row.location->symbol.symbol == parent->function()) {
             continue;
         }
-        auto item = findItemByFunction(parent->childItems(), row.location->function);
+        auto item = findItemByFunction(parent->childItems(), row.location->symbol.symbol);
         if (!item) {
-            item = new FrameGraphicsItem(row.cost.*member, row.location->function, parent);
+            item = new FrameGraphicsItem(row.cost.*member, row.location->symbol.symbol, parent);
             item->setPen(parent->pen());
             item->setBrush(brush());
         } else {

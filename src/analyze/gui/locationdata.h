@@ -19,6 +19,7 @@
 #ifndef LOCATIONDATA_H
 #define LOCATIONDATA_H
 
+#include <QMetaType>
 #include <QString>
 
 #include <memory>
@@ -27,33 +28,62 @@
 
 #include <KLocalizedString>
 
+struct Symbol
+{
+    Symbol(const QString& symbol = {}, const QString& binary = {}, const QString& path = {})
+        : symbol(symbol)
+        , binary(binary)
+        , path(path)
+    {
+    }
+
+    // function name
+    QString symbol;
+    // dso / executable name
+    QString binary;
+    // path to dso / executable
+    QString path;
+
+    bool operator==(const Symbol& rhs) const
+    {
+        return std::tie(symbol, binary, path) == std::tie(rhs.symbol, rhs.binary, rhs.path);
+    }
+
+    bool operator<(const Symbol& rhs) const
+    {
+        return std::tie(symbol, binary, path) < std::tie(rhs.symbol, rhs.binary, rhs.path);
+    }
+
+    bool isValid() const
+    {
+        return !symbol.isEmpty() || !binary.isEmpty() || !path.isEmpty();
+    }
+};
+
+Q_DECLARE_TYPEINFO(Symbol, Q_MOVABLE_TYPE);
+Q_DECLARE_METATYPE(Symbol)
+
 struct LocationData
 {
     using Ptr = std::shared_ptr<LocationData>;
 
-    QString function;
+    Symbol symbol;
     QString file;
-    QString module;
     int line;
 
     bool operator==(const LocationData& rhs) const
     {
-        return function == rhs.function && file == rhs.file && module == rhs.module && line == rhs.line;
+        return symbol == rhs.symbol && file == rhs.file && line == rhs.line;
     }
 
     bool operator<(const LocationData& rhs) const
     {
-        int i = function.compare(rhs.function);
-        if (!i) {
-            i = file.compare(rhs.file);
-        }
-        if (!i) {
-            i = line < rhs.line ? -1 : (line > rhs.line);
-        }
-        if (!i) {
-            i = module.compare(rhs.module);
-        }
-        return i < 0;
+        return std::tie(symbol, file, line) < std::tie(rhs.symbol, rhs.file, rhs.line);
+    }
+
+    QString fileLine() const
+    {
+        return file.isEmpty() ? QStringLiteral("??") : (file + QLatin1Char(':') + QString::number(line));
     }
 };
 Q_DECLARE_TYPEINFO(LocationData, Q_MOVABLE_TYPE);
@@ -69,12 +99,20 @@ inline bool operator<(const LocationData::Ptr& lhs, const LocationData& rhs)
     return *lhs < rhs;
 }
 
+inline uint qHash(const Symbol& symbol, uint seed_ = 0)
+{
+    size_t seed = seed_;
+    boost::hash_combine(seed, qHash(symbol.symbol));
+    boost::hash_combine(seed, qHash(symbol.binary));
+    boost::hash_combine(seed, qHash(symbol.path));
+    return seed;
+}
+
 inline uint qHash(const LocationData& location, uint seed_ = 0)
 {
     size_t seed = seed_;
-    boost::hash_combine(seed, qHash(location.function));
+    boost::hash_combine(seed, qHash(location.symbol));
     boost::hash_combine(seed, qHash(location.file));
-    boost::hash_combine(seed, qHash(location.module));
     boost::hash_combine(seed, location.line);
     return seed;
 }

@@ -20,49 +20,37 @@
 
 #include <KLocalizedString>
 
-#include <QTextStream>
-
-#include <cmath>
-
-namespace {
-/// TODO: share code
-QString basename(const QString& path)
-{
-    int idx = path.lastIndexOf(QLatin1Char('/'));
-    return path.mid(idx + 1);
-}
-}
-
 CallerCalleeModel::CallerCalleeModel(QObject* parent)
-    : QAbstractTableModel(parent)
+    : HashModel(parent)
 {
-    qRegisterMetaType<CallerCalleeRows>();
+    qRegisterMetaType<CallerCalleeResults>();
 }
 
 CallerCalleeModel::~CallerCalleeModel() = default;
 
-QVariant CallerCalleeModel::headerData(int section, Qt::Orientation orientation, int role) const
+void CallerCalleeModel::setResults(const CallerCalleeResults& results)
 {
-    if (orientation != Qt::Horizontal || section < 0 || section >= NUM_COLUMNS) {
-        return {};
-    }
+    m_results = results;
+    setRows(results.entries);
+}
+
+void CallerCalleeModel::clearData()
+{
+    m_results = {};
+    setRows({});
+}
+
+QVariant CallerCalleeModel::headerCell(int column, int role) const
+{
     if (role == Qt::InitialSortOrderRole) {
-        if (section == SelfAllocationsColumn || section == SelfPeakColumn || section == SelfLeakedColumn
-            || section == SelfTemporaryColumn || section == InclusiveAllocationsColumn || section == InclusivePeakColumn
-            || section == InclusiveLeakedColumn || section == InclusiveTemporaryColumn) {
-            return Qt::DescendingOrder;
-        }
+        return (column > BinaryColumn) ? Qt::DescendingOrder : Qt::AscendingOrder;
     }
     if (role == Qt::DisplayRole) {
-        switch (static_cast<Columns>(section)) {
-        case FileColumn:
-            return i18n("File");
-        case LineColumn:
-            return i18n("Line");
-        case FunctionColumn:
-            return i18n("Function");
-        case ModuleColumn:
-            return i18n("Module");
+        switch (static_cast<Columns>(column)) {
+        case SymbolColumn:
+            return i18n("Symbol");
+        case BinaryColumn:
+            return i18n("Binary");
         case SelfAllocationsColumn:
             return i18n("Allocations (Self)");
         case SelfTemporaryColumn:
@@ -79,26 +67,17 @@ QVariant CallerCalleeModel::headerData(int section, Qt::Orientation orientation,
             return i18n("Peak (Incl.)");
         case InclusiveLeakedColumn:
             return i18n("Leaked (Incl.)");
-        case LocationColumn:
-            return i18n("Location");
         case NUM_COLUMNS:
             break;
         }
     } else if (role == Qt::ToolTipRole) {
-        switch (static_cast<Columns>(section)) {
-        case FileColumn:
-            return i18n("<qt>The file where the allocation function was called from. "
-                        "May be empty when debug information is missing.</qt>");
-        case LineColumn:
-            return i18n("<qt>The line number where the allocation function was called from. "
-                        "May be empty when debug information is missing.</qt>");
-        case FunctionColumn:
+        switch (static_cast<Columns>(column)) {
+        case SymbolColumn:
             return i18n("<qt>The parent function that called an allocation function. "
                         "May be unknown when debug information is missing.</qt>");
-        case ModuleColumn:
+        case BinaryColumn:
             return i18n("<qt>The module, i.e. executable or shared library, from "
-                        "which an allocation function was "
-                        "called.</qt>");
+                        "which an allocation function was called.</qt>");
         case SelfAllocationsColumn:
             return i18n("<qt>The number of times an allocation function was directly "
                         "called from this location.</qt>");
@@ -130,12 +109,6 @@ QVariant CallerCalleeModel::headerData(int section, Qt::Orientation orientation,
         case InclusiveLeakedColumn:
             return i18n("<qt>The bytes allocated at this location that have not been "
                         "deallocated.</qt>");
-        case LocationColumn:
-            return i18n("<qt>The location from which an allocation function was "
-                        "called. Function symbol and file "
-                        "information "
-                        "may be unknown when debug information was missing when "
-                        "heaptrack was run.</qt>");
         case NUM_COLUMNS:
             break;
         }
@@ -143,134 +116,134 @@ QVariant CallerCalleeModel::headerData(int section, Qt::Orientation orientation,
     return {};
 }
 
-QVariant CallerCalleeModel::data(const QModelIndex& index, int role) const
+QVariant CallerCalleeModel::cell(int column, int role, const Symbol& symbol, const CallerCalleeEntry& entry) const
 {
-    if (!hasIndex(index.row(), index.column(), index.parent())) {
-        return {};
-    }
-
-    const auto& row = (role == MaxCostRole) ? m_maxCost : m_rows.at(index.row());
-
-    if (role == Qt::DisplayRole || role == SortRole || role == MaxCostRole) {
-        switch (static_cast<Columns>(index.column())) {
+    if (role == SymbolRole) {
+        return QVariant::fromValue(symbol);
+    } else if (role == SortRole) {
+        switch (static_cast<Columns>(column)) {
+        case SymbolColumn:
+            return symbol.symbol;
+        case BinaryColumn:
+            return symbol.binary;
         case SelfAllocationsColumn:
-            return static_cast<qint64>(row.selfCost.allocations);
+            return QVariant::fromValue<qint64>(entry.selfCost.allocations);
         case SelfTemporaryColumn:
-            return static_cast<qint64>(row.selfCost.temporary);
+            return QVariant::fromValue<qint64>(entry.selfCost.temporary);
         case SelfPeakColumn:
-            if (role == SortRole || role == MaxCostRole) {
-                return static_cast<qint64>(row.selfCost.peak);
-            } else {
-                return m_format.formatByteSize(row.selfCost.peak, 1, KFormat::MetricBinaryDialect);
-            }
+            return QVariant::fromValue<qint64>(entry.selfCost.peak);
         case SelfLeakedColumn:
-            if (role == SortRole || role == MaxCostRole) {
-                return static_cast<qint64>(row.selfCost.leaked);
-            } else {
-                return m_format.formatByteSize(row.selfCost.leaked, 1, KFormat::MetricBinaryDialect);
-            }
+            return QVariant::fromValue<qint64>(entry.selfCost.leaked);
         case InclusiveAllocationsColumn:
-            return static_cast<qint64>(row.inclusiveCost.allocations);
+            return QVariant::fromValue<qint64>(entry.inclusiveCost.allocations);
         case InclusiveTemporaryColumn:
-            return static_cast<qint64>(row.inclusiveCost.temporary);
+            return QVariant::fromValue<qint64>(entry.inclusiveCost.temporary);
         case InclusivePeakColumn:
-            if (role == SortRole || role == MaxCostRole) {
-                return static_cast<qint64>(row.inclusiveCost.peak);
-            } else {
-                return m_format.formatByteSize(row.inclusiveCost.peak, 1, KFormat::MetricBinaryDialect);
-            }
+            return QVariant::fromValue<qint64>(entry.inclusiveCost.peak);
         case InclusiveLeakedColumn:
-            if (role == SortRole || role == MaxCostRole) {
-                return static_cast<qint64>(row.inclusiveCost.leaked);
-            } else {
-                return m_format.formatByteSize(row.inclusiveCost.leaked, 1, KFormat::MetricBinaryDialect);
-            }
-        case FunctionColumn:
-            return row.location->function;
-        case ModuleColumn:
-            return row.location->module;
-        case FileColumn:
-            return row.location->file;
-        case LineColumn:
-            return row.location->line;
-        case LocationColumn:
-            if (row.location->file.isEmpty()) {
-                return i18n("%1 in ?? (%2)", basename(row.location->function), basename(row.location->module));
-            } else {
-                return i18n("%1 in %2:%3 (%4)", row.location->function, basename(row.location->file),
-                            row.location->line, basename(row.location->module));
-            }
+            return QVariant::fromValue<qint64>(entry.inclusiveCost.leaked);
         case NUM_COLUMNS:
             break;
         }
-    } else if (role == Qt::ToolTipRole) {
-        QString tooltip;
-        QTextStream stream(&tooltip);
-        stream << "<qt><pre style='font-family:monospace;'>";
-        if (row.location->line > 0) {
-            stream << i18nc("1: function, 2: file, 3: line, 4: module", "%1\n  at %2:%3\n  in %4",
-                            row.location->function.toHtmlEscaped(), row.location->file.toHtmlEscaped(),
-                            row.location->line, row.location->module.toHtmlEscaped());
-        } else {
-            stream << i18nc("1: function, 2: module", "%1\n  in %2", row.location->function.toHtmlEscaped(),
-                            row.location->module.toHtmlEscaped());
+    } else if (role == TotalCostRole) {
+        switch (static_cast<Columns>(column)) {
+        case SelfAllocationsColumn:
+        case InclusiveAllocationsColumn:
+            return QVariant::fromValue<qint64>(m_results.totalCosts.allocations);
+        case SelfTemporaryColumn:
+        case InclusiveTemporaryColumn:
+            return QVariant::fromValue<qint64>(m_results.totalCosts.temporary);
+        case SelfPeakColumn:
+        case InclusivePeakColumn:
+            return QVariant::fromValue<qint64>(m_results.totalCosts.peak);
+        case SelfLeakedColumn:
+        case InclusiveLeakedColumn:
+            return QVariant::fromValue<qint64>(m_results.totalCosts.leaked);
+        case SymbolColumn:
+        case BinaryColumn:
+        case NUM_COLUMNS:
+            break;
         }
-        stream << '\n';
-        stream << i18n("inclusive: %1 allocations (%2 temporary, i.e. %3%), "
-                       "peak at %4, leaked %5",
-                       row.inclusiveCost.allocations, row.inclusiveCost.temporary,
-                       round(float(row.inclusiveCost.temporary) * 100.f * 100.f
-                             / std::max(int64_t(1), row.inclusiveCost.allocations))
-                           / 100.f,
-                       m_format.formatByteSize(row.inclusiveCost.peak, 1, KFormat::MetricBinaryDialect),
-                       m_format.formatByteSize(row.inclusiveCost.leaked, 1, KFormat::MetricBinaryDialect));
-        stream << '\n';
-        stream << i18n(
-            "self: %1 allocations (%2 temporary, i.e. %3%), "
-            "peak at %4, leaked %5",
-            row.selfCost.temporary,
-            round(float(row.selfCost.temporary) * 100.f * 100.f / std::max(int64_t(1), row.selfCost.allocations))
-                / 100.f,
-            m_format.formatByteSize(row.selfCost.peak, 1, KFormat::MetricBinaryDialect),
-            m_format.formatByteSize(row.selfCost.leaked, 1, KFormat::MetricBinaryDialect));
-        stream << '\n';
-        stream << "</pre></qt>";
-        return tooltip;
-    } else if (role == LocationRole) {
-        return QVariant::fromValue(row.location);
+    } else if (role == FilterRole) {
+        // TODO: optimize this
+        return QString(symbol.symbol + symbol.binary);
+    } else if (role == Qt::DisplayRole) {
+        switch (static_cast<Columns>(column)) {
+        case SymbolColumn:
+            return symbol.symbol;
+        case BinaryColumn:
+            return symbol.binary;
+        case SelfAllocationsColumn:
+            return QVariant::fromValue<qint64>(entry.selfCost.allocations);
+        case SelfTemporaryColumn:
+            return QVariant::fromValue<qint64>(entry.selfCost.temporary);
+        case SelfPeakColumn:
+            return Util::formatBytes(entry.selfCost.peak);
+        case SelfLeakedColumn:
+            return Util::formatBytes(entry.selfCost.leaked);
+        case InclusiveAllocationsColumn:
+            return QVariant::fromValue<qint64>(entry.inclusiveCost.allocations);
+        case InclusiveTemporaryColumn:
+            return QVariant::fromValue<qint64>(entry.inclusiveCost.temporary);
+        case InclusivePeakColumn:
+            return Util::formatBytes(entry.inclusiveCost.peak);
+        case InclusiveLeakedColumn:
+            return Util::formatBytes(entry.inclusiveCost.leaked);
+        case NUM_COLUMNS:
+            break;
+        }
+    } else if (role == CalleesRole) {
+        return QVariant::fromValue(entry.callees);
+    } else if (role == CallersRole) {
+        return QVariant::fromValue(entry.callers);
+    } else if (role == SourceMapRole) {
+        return QVariant::fromValue(entry.sourceMap);
+    } else if (role == Qt::ToolTipRole) {
+        return Util::formatTooltip(symbol, entry.selfCost, entry.inclusiveCost, m_results.totalCosts);
+    } else if (role == TotalCostsRole) {
+        return QVariant::fromValue(m_results.totalCosts);
     }
+
     return {};
 }
 
-int CallerCalleeModel::columnCount(const QModelIndex& parent) const
+QModelIndex CallerCalleeModel::indexForSymbol(const Symbol& symbol) const
 {
-    return parent.isValid() ? 0 : NUM_COLUMNS;
+    return indexForKey(symbol);
 }
 
-int CallerCalleeModel::rowCount(const QModelIndex& parent) const
+CallerModel::CallerModel(QObject* parent)
+    : SymbolCostModelImpl(parent)
 {
-    return parent.isValid() ? 0 : m_rows.size();
 }
 
-void CallerCalleeModel::resetData(const QVector<CallerCalleeData>& rows)
+CallerModel::~CallerModel() = default;
+
+QString CallerModel::symbolHeader() const
 {
-    beginResetModel();
-    m_rows = rows;
-    endResetModel();
+    return i18n("Caller");
 }
 
-void CallerCalleeModel::setSummary(const SummaryData& data)
+CalleeModel::CalleeModel(QObject* parent)
+    : SymbolCostModelImpl(parent)
 {
-    beginResetModel();
-    m_maxCost.inclusiveCost = data.cost;
-    m_maxCost.selfCost = data.cost;
-    endResetModel();
 }
 
-void CallerCalleeModel::clearData()
+CalleeModel::~CalleeModel() = default;
+
+QString CalleeModel::symbolHeader() const
 {
-    beginResetModel();
-    m_rows = {};
-    m_maxCost = {};
-    endResetModel();
+    return i18n("Callee");
+}
+
+SourceMapModel::SourceMapModel(QObject* parent)
+    : LocationCostModelImpl(parent)
+{
+}
+
+SourceMapModel::~SourceMapModel() = default;
+
+int CallerCalleeModel::numColumns() const
+{
+    return NUM_COLUMNS;
 }

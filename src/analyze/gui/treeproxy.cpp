@@ -18,12 +18,15 @@
 
 #include "treeproxy.h"
 
+#include <QDebug>
+
 TreeProxy::TreeProxy(int functionColumn, int fileColumn, int moduleColumn, QObject* parent)
     : KRecursiveFilterProxyModel(parent)
     , m_functionColumn(functionColumn)
     , m_fileColumn(fileColumn)
     , m_moduleColumn(moduleColumn)
 {
+    setSortLocaleAware(false);
 }
 
 TreeProxy::~TreeProxy() = default;
