@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Milian Wolff <mail@milianw.de>
+ * Copyright 2017-2019 Milian Wolff <mail@milianw.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,5 +20,7 @@
 #define HEAPTRACK_GUI_CONFIG_H
 
 #cmakedefine01 KChart_FOUND
+
+#cmakedefine01 APPIMAGE_BUILD
 
 #endif // HEAPTRACK_CONFIG_H

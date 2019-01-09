@@ -37,7 +37,7 @@ fi
 
 cd build-appimage
 
-cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_BUILD_TYPE=Release ..
+cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_BUILD_TYPE=Release  -DAPPIMAGE_BUILD=ON ..
 make -j$(nproc)
 make DESTDIR=appdir install
 

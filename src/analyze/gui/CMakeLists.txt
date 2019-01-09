@@ -15,6 +15,8 @@ include(ECMAddTests)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
+option(APPIMAGE_BUILD "configure build for bundling in an appimage" OFF)
+
 configure_file(gui_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/gui_config.h)
 
 set(SRCFILES
