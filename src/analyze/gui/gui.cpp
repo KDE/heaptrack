@@ -29,6 +29,11 @@ int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
 
+#if APPIMAGE_BUILD
+    QIcon::setThemeSearchPaths({app.applicationDirPath() + QLatin1String("/../share/icons/")});
+    QIcon::setThemeName(QStringLiteral("breeze"));
+#endif
+
     KLocalizedString::setApplicationDomain("heaptrack");
 
     KAboutData aboutData(QStringLiteral("heaptrack_gui"), i18n("Heaptrack GUI"), QStringLiteral("0.1"),

@@ -61,6 +61,11 @@ LD_LIBRARY_PATH="\$d/../lib:\$LD_LIBRARY_PATH" "\$d/heaptrack_gui_bin" "\$@"
 WRAPPER_SCRIPT
 chmod +x ./appdir/$PREFIX/bin/heaptrack_gui
 
+# include breeze icons
+if [ -d /opt/share/icons/breeze ]; then
+    cp -va /opt/share/icons/breeze ./appdir/usr/share/icons/
+fi
+
 # use the shell script as AppRun entry point
 # also make sure we find the bundled zstd
 rm ./appdir/AppRun
