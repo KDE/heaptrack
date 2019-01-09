@@ -43,12 +43,12 @@ struct EntryCost
 };
 Q_DECLARE_TYPEINFO(EntryCost, Q_MOVABLE_TYPE);
 
-using LocationCostMap = QHash<QString, EntryCost>;
+using LocationCostMap = QHash<FileLine, EntryCost>;
 Q_DECLARE_METATYPE(LocationCostMap)
 
 struct CallerCalleeEntry : EntryCost
 {
-    EntryCost& source(const QString& location)
+    EntryCost& source(const FileLine& location)
     {
         auto it = sourceMap.find(location);
         if (it == sourceMap.end()) {
@@ -464,12 +464,12 @@ public:
         return {};
     }
 
-    QVariant cell(int column, int role, const QString& location, const EntryCost& costs) const final override
+    QVariant cell(int column, int role, const FileLine& location, const EntryCost& costs) const final override
     {
         if (role == SortRole) {
             switch (static_cast<Columns>(column)) {
             case LocationColumn:
-                return location;
+                return location.toString();
             case SelfAllocationsColumn:
                 // NOTE: we sort by unsigned absolute value
                 return QVariant::fromValue<quint64>(std::abs(costs.selfCost.allocations));
@@ -509,11 +509,11 @@ public:
                 break;
             }
         } else if (role == FilterRole) {
-            return location;
+            return location.toString();
         } else if (role == Qt::DisplayRole) {
             switch (static_cast<Columns>(column)) {
             case LocationColumn:
-                return Util::basename(location);
+                return Util::basename(location.toString());
             case SelfAllocationsColumn:
                 return QVariant::fromValue<qint64>(costs.selfCost.allocations);
             case SelfTemporaryColumn:

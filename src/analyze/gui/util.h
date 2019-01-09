@@ -35,7 +35,7 @@ QString formatCostRelative(qint64 selfCost, qint64 totalCost, bool addPercentSig
 QString formatTooltip(const Symbol& symbol, const AllocationData& costs, const AllocationData& totalCosts);
 QString formatTooltip(const Symbol& symbol, const AllocationData& selfCosts, const AllocationData& inclusiveCosts,
                       const AllocationData& totalCosts);
-QString formatTooltip(const QString& location, const AllocationData& selfCosts, const AllocationData& inclusiveCosts,
+QString formatTooltip(const FileLine& location, const AllocationData& selfCosts, const AllocationData& inclusiveCosts,
                       const AllocationData& totalCosts);
 }
 

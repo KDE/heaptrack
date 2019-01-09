@@ -117,10 +117,10 @@ QString Util::formatTooltip(const Symbol& symbol, const AllocationData& selfCost
     return QString(QLatin1String("<qt>") + toolTip + QLatin1String("</qt>"));
 }
 
-QString Util::formatTooltip(const QString& location, const AllocationData& selfCosts,
+QString Util::formatTooltip(const FileLine& location, const AllocationData& selfCosts,
                             const AllocationData& inclusiveCosts, const AllocationData& totalCosts)
 {
-    QString toolTip = location.toHtmlEscaped();
+    QString toolTip = location.toString().toHtmlEscaped();
 
     auto formatCost = [&](const QString& label, int64_t AllocationData::*member) -> QString {
         const auto selfCost = selfCosts.*member;

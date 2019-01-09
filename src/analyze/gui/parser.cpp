@@ -289,7 +289,7 @@ void addCallerCalleeEvent(const Location& location, const AllocationData& cost, 
     auto recursionIt = recursionGuard->find(location.symbol);
     if (recursionIt == recursionGuard->end()) {
         auto& entry = callerCalleeResult->entry(location.symbol);
-        auto& locationCost = entry.source(location.fileLine.toString());
+        auto& locationCost = entry.source(location.fileLine);
 
         locationCost.inclusiveCost += cost;
         if (recursionGuard->isEmpty()) {
