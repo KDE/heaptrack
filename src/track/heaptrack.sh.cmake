@@ -78,6 +78,8 @@ openHeaptrackDataFiles() {
     fi
 }
 
+ORIG_CMDLINE=$@
+
 while true; do
     case "$1" in
         "-d" | "--debug")
@@ -130,7 +132,7 @@ while true; do
             fi
             if [ ! -x "$(which "$1" 2> /dev/null)" ]; then
                 if [ -f "$1" ] && echo "$1" | grep -q "heaptrack."; then
-                    openHeaptrackDataFiles "$@"
+                    openHeaptrackDataFiles $ORIG_CMDLINE
                     exit
                 fi
                 echo "Error: Debuggee \"$1\" is not an executable."
