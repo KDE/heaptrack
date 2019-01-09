@@ -43,12 +43,16 @@ public slots:
     void openNewFile();
     void closeFile();
 
+    void setCodeNavigationIDE(QAction* action);
+    void navigateToCode(const QString& url, int lineNumber, int columnNumber = -1);
+
 signals:
     void clearData();
 
 private:
     void showError(const QString& message);
     void setupStacks();
+    void setupCodeNavigationMenu();
 
     QScopedPointer<Ui::MainWindow> m_ui;
     Parser* m_parser;

@@ -35,6 +35,8 @@
 #include <QMenu>
 #include <QShortcut>
 #include <QStatusBar>
+#include <QProcess>
+#include <QInputDialog>
 
 #include "callercalleemodel.h"
 #include "costdelegate.h"
@@ -62,10 +64,45 @@ const int MAINWINDOW_VERSION = 1;
 namespace Config {
 namespace Groups {
 const char MainWindow[] = "MainWindow";
+const char CodeNavigation[] = "CodeNavigation";
 }
 namespace Entries {
 const char State[] = "State";
+const char CustomCommand[] = "CustomCommand";
+const char IDE[] = "IDE";
 }
+}
+
+struct IdeSettings
+{
+    const char* const app;
+    const char* const args;
+    const char* const name;
+};
+
+static const IdeSettings ideSettings[] = {
+    {"kdevelop", "%f:%l:%c", I18N_NOOP("KDevelop")},
+    {"kate", "%f --line %l --column %c", I18N_NOOP("Kate")},
+    {"kwrite", "%f --line %l --column %c", I18N_NOOP("KWrite")},
+    {"gedit", "%f +%l:%c", I18N_NOOP("gedit")},
+    {"gvim", "%f +%l", I18N_NOOP("gvim")},
+    {"qtcreator", "-client %f:%l", I18N_NOOP("Qt Creator")}
+};
+static const int ideSettingsSize = sizeof(ideSettings) / sizeof(IdeSettings);
+
+bool isAppAvailable(const char* app)
+{
+    return !QStandardPaths::findExecutable(QString::fromUtf8(app)).isEmpty();
+}
+
+int firstAvailableIde()
+{
+    for (int i = 0; i < ideSettingsSize; ++i) {
+        if (isAppAvailable(ideSettings[i].app)) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 template <typename T>
@@ -99,10 +136,10 @@ void setupTreeContextMenu(QTreeView* view, T callback)
     });
 }
 
-void addLocationContextMenu(QTreeView* treeView)
+void addLocationContextMenu(QTreeView* treeView, MainWindow* window)
 {
     treeView->setContextMenuPolicy(Qt::CustomContextMenu);
-    QObject::connect(treeView, &QTreeView::customContextMenuRequested, treeView, [treeView](const QPoint& pos) {
+    QObject::connect(treeView, &QTreeView::customContextMenuRequested, treeView, [treeView, window](const QPoint& pos) {
         auto index = treeView->indexAt(pos);
         if (!index.isValid()) {
             return;
@@ -114,11 +151,8 @@ void addLocationContextMenu(QTreeView* treeView)
         auto menu = new QMenu(treeView);
         auto openFile =
             new QAction(QIcon::fromTheme(QStringLiteral("document-open")), i18n("Open file in editor"), menu);
-        QObject::connect(openFile, &QAction::triggered, openFile, [location] {
-            /// FIXME: add settings to let user configure this
-            auto url = QUrl::fromLocalFile(location.file);
-            url.setFragment(QString::number(location.line));
-            QDesktopServices::openUrl(url);
+        QObject::connect(openFile, &QAction::triggered, openFile, [location, window] {
+            window->navigateToCode(location.file, location.line);
         });
         menu->addAction(openFile);
         menu->popup(treeView->mapToGlobal(pos));
@@ -423,7 +457,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     connectCallerOrCalleeModel<CalleeModel>(m_ui->calleeView, callerCalleeModel, selectCallerCaleeeIndex);
     connectCallerOrCalleeModel<CallerModel>(m_ui->callerView, callerCalleeModel, selectCallerCaleeeIndex);
-    addLocationContextMenu(m_ui->locationView);
+    addLocationContextMenu(m_ui->locationView, this);
 
     connect(m_ui->callerCalleeResults->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
             [selectCallerCaleeeIndex](const QModelIndex& current, const QModelIndex&) {
@@ -503,6 +537,8 @@ MainWindow::MainWindow(QWidget* parent)
             QApplication::clipboard()->setText(text);
         }
     });
+
+    setupCodeNavigationMenu();
 }
 
 MainWindow::~MainWindow()
@@ -597,4 +633,107 @@ void MainWindow::setupStacks()
     connect(m_parser, &Parser::bottomUpDataAvailable, this, [tabChanged]() { tabChanged(0); });
 
     m_ui->stacksDock->setVisible(false);
+}
+
+
+void MainWindow::setupCodeNavigationMenu()
+{
+    // Code Navigation
+    QAction* configAction =
+        new QAction(QIcon::fromTheme(QStringLiteral("applications-development")), i18n("Code Navigation"), this);
+    auto menu = new QMenu(this);
+    auto group = new QActionGroup(this);
+    group->setExclusive(true);
+
+    const auto settings = m_config->group(Config::Groups::CodeNavigation);
+    const auto currentIdx = settings.readEntry(Config::Entries::IDE, firstAvailableIde());
+
+    for (int i = 0; i < ideSettingsSize; ++i) {
+        auto action = new QAction(menu);
+        action->setText(i18n(ideSettings[i].name));
+        auto icon = QIcon::fromTheme(QString::fromUtf8(ideSettings[i].app));
+        if (icon.isNull()) {
+            icon = QIcon::fromTheme(QStringLiteral("application-x-executable"));
+        }
+        action->setIcon(icon);
+        action->setCheckable(true);
+        action->setChecked(currentIdx == i);
+        action->setData(i);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) // It's not worth it to reimplement missing findExecutable for Qt4.
+        action->setEnabled(isAppAvailable(ideSettings[i].app));
+#endif
+        group->addAction(action);
+        menu->addAction(action);
+    }
+    menu->addSeparator();
+
+    QAction* action = new QAction(menu);
+    action->setText(i18n("Custom..."));
+    action->setCheckable(true);
+    action->setChecked(currentIdx == -1);
+    action->setData(-1);
+    action->setIcon(QIcon::fromTheme(QStringLiteral("application-x-executable-script")));
+    group->addAction(action);
+    menu->addAction(action);
+
+#if defined(Q_OS_WIN) || defined(Q_OS_OSX)
+    // This is a workaround for the cases, where we can't safely do assumptions
+    // about the install location of the IDE
+    action = new QAction(menu);
+    action->setText(i18n("Automatic (No Line numbers)"));
+    action->setCheckable(true);
+    action->setChecked(currentIdx == -2);
+    action->setData(-2);
+    group->addAction(action);
+    menu->addAction(action);
+#endif
+
+    QObject::connect(group, &QActionGroup::triggered, this, &MainWindow::setCodeNavigationIDE);
+
+    configAction->setMenu(menu);
+    m_ui->menu_Settings->addMenu(menu);
+}
+
+void MainWindow::setCodeNavigationIDE(QAction* action)
+{
+    auto settings = m_config->group(Config::Groups::CodeNavigation);
+
+    if (action->data() == -1) {
+        const auto customCmd =
+            QInputDialog::getText(this, i18n("Custom Code Navigation"),
+                                  i18n("Specify command to use for code navigation, '%f' will be replaced by the file "
+                                     "name, '%l' by the line number and '%c' by the column number."),
+                                  QLineEdit::Normal, settings.readEntry(Config::Entries::CustomCommand));
+        if (!customCmd.isEmpty()) {
+            settings.writeEntry(Config::Entries::CustomCommand, customCmd);
+            settings.writeEntry(Config::Entries::IDE, -1);
+        }
+        return;
+    }
+
+    const auto defaultIde = action->data().toInt();
+    settings.writeEntry(Config::Entries::IDE, defaultIde);
+}
+
+void MainWindow::navigateToCode(const QString& filePath, int lineNumber, int columnNumber)
+{
+    const auto settings = m_config->group(Config::Groups::CodeNavigation);
+    const auto ideIdx = settings.readEntry(Config::Entries::IDE, firstAvailableIde());
+
+    QString command;
+    if (ideIdx >= 0 && ideIdx < ideSettingsSize) {
+        command = QString::fromUtf8(ideSettings[ideIdx].app) + QLatin1Char(' ') + QString::fromUtf8(ideSettings[ideIdx].args);
+    } else if (ideIdx == -1) {
+        command = settings.readEntry(Config::Entries::CustomCommand);
+    }
+
+    if (!command.isEmpty()) {
+        command.replace(QStringLiteral("%f"), filePath);
+        command.replace(QStringLiteral("%l"), QString::number(std::max(1, lineNumber)));
+        command.replace(QStringLiteral("%c"), QString::number(std::max(1, columnNumber)));
+
+        QProcess::startDetached(command);
+    } else {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+    }
 }

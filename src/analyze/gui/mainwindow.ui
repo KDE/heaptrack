@@ -806,7 +806,13 @@
      <string>&amp;File</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menu_Settings">
+    <property name="title">
+     <string>Setti&amp;ngs</string>
+    </property>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menu_Settings"/>
   </widget>
  </widget>
  <customwidgets>
