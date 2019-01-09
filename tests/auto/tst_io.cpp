@@ -27,7 +27,7 @@
 
 using namespace std;
 
-constexpr uint64_t operator""_u64(unsigned long long v)
+constexpr uint64_t operator"" _u64(unsigned long long v)
 {
     return static_cast<uint64_t>(v);
 }
