@@ -1,5 +1,5 @@
 # trusty
-FROM ubuntu:14.04 as appimage_intermediate
+FROM ubuntu:14.04 as heaptrack_appimage_intermediate
 
 # install dependencies
 ARG DEBIAN_FRONTEND=noninteractive
@@ -65,7 +65,7 @@ RUN cmake -DBUILD_TESTING=OFF -DCMAKE_INSTALL_PREFIX=/opt -DCMAKE_BUILD_TYPE=Rel
 
 # setup heaptrack build environment
 
-FROM appimage_intermediate
+FROM heaptrack_appimage_intermediate
 
 ADD . /opt/heaptrack
 WORKDIR /opt/heaptrack
