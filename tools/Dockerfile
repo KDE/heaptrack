@@ -7,9 +7,9 @@ RUN apt-get update && \
     apt-get -y upgrade && \
     apt-get install -y software-properties-common build-essential curl git wget \
         autotools-dev autoconf libtool liblzma-dev libz-dev gettext && \
-    add-apt-repository ppa:beineri/opt-qt593-trusty -y && \
+    add-apt-repository ppa:beineri/opt-qt-5.10.1-trusty -y && \
     apt-get update && \
-    apt-get install -y qt59base qt59svg qt59x11extras cmake3 libdwarf-dev mesa-common-dev \
+    apt-get install -y qt510base qt510svg qt510x11extras cmake3 libdwarf-dev mesa-common-dev \
         libboost-iostreams-dev libboost-program-options-dev libboost-system-dev libboost-filesystem-dev
 
 WORKDIR /opt
@@ -31,9 +31,9 @@ RUN wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/contin
 
 # setup env
 
-ENV PATH="/opt/bin:/opt/qt59/bin:${PATH}"
-ENV PKG_CONFIG_PATH="/opt/qt59/lib/pkgconfig:${PKG_CONFIG_PATH}"
-ENV LD_LIBRARY_PATH="/opt/qt59/lib:/opt/lib/x86_64-linux-gnu"
+ENV PATH="/opt/bin:/opt/qt510/bin:${PATH}" \
+    PKG_CONFIG_PATH="/opt/qt510/lib/pkgconfig:${PKG_CONFIG_PATH}" \
+    LD_LIBRARY_PATH="/opt/qt510/lib:/opt/lib/x86_64-linux-gnu"
 
 # grab sources
 
