@@ -4,11 +4,11 @@ sudo: require
 dist: trusty
 
 before_install:
-  - sudo add-apt-repository ppa:beineri/opt-qt593-trusty -y
+  - sudo add-apt-repository ppa:beineri/opt-qt-5.10.1-trusty -y
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get -y install qt59base qt59svg qt59x11extras libdwarf-dev libboost-iostreams-dev libboost-program-options-dev
+  - sudo apt-get -y install qt510base qt510svg qt510x11extras libdwarf-dev libboost-iostreams-dev libboost-program-options-dev
   - source /opt/qt*/bin/qt*-env.sh
   - git clone git://anongit.kde.org/extra-cmake-modules
   - cd extra-cmake-modules
@@ -42,16 +42,18 @@ script:
   - set -e # Exit immediately if anything fails
   - mkdir build
   - cd build
-  - cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DAPPIMAGE_BUILD=ON
   - make -j$(nproc)
   - make DESTDIR=appdir install
   - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
-  - export LD_LIBRARY_PATH=/opt/qt59/lib/x86_64-linux-gnu # make sure this path is known so all Qt/KF5 libs are found
+  - export LD_LIBRARY_PATH=/opt/qt510/lib/x86_64-linux-gnu # make sure this path is known so all Qt/KF5 libs are found
   - linuxdeployqt ./appdir/usr/share/applications/org.kde.heaptrack.desktop -executable=./appdir/usr/lib/heaptrack/libexec/heaptrack_interpret -executable=./appdir/usr/lib/heaptrack/libheaptrack_preload.so -executable=./appdir/usr/lib/heaptrack/libheaptrack_inject.so -bundle-non-qt-libs
   - # Ensure we prefer the bundled libs also when calling dlopen, cf.: https://github.com/KDAB/hotspot/issues/89
   - mv ./appdir/usr/bin/heaptrack_gui{,_bin}
   - echo -e '#!/bin/bash\nf="$(readlink -f "${0}")"\nd="$(dirname "$f")"\nLD_LIBRARY_PATH="$d/../lib:$LD_LIBRARY_PATH" "$d/heaptrack_gui_bin" "$@"' > ./appdir/usr/bin/heaptrack_gui
   - chmod +x ./appdir/usr/bin/heaptrack_gui
+  - # include breeze icons
+  - cp -va /opt/qt*/share/icons/breeze ./appdir/usr/share/icons/
   - # use the shell script as AppRun entry point
   - rm ./appdir/AppRun
   - ln -sr ./appdir/usr/bin/heaptrack ./appdir/AppRun
