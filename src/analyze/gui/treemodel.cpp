@@ -197,7 +197,7 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             }
             while (child->children.count() == 1 && max-- > 0) {
                 stream << "\n";
-                stream << i18nc("1: function, 2: module, 3: module path", "%1\n  in %2",
+                stream << i18nc("1: function, 2: module, 3: module path", "%1\n  in %2 (%3)",
                                 child->symbol.symbol.toHtmlEscaped(), child->symbol.binary.toHtmlEscaped(),
                                 child->symbol.path.toHtmlEscaped());
                 child = child->children.data();
