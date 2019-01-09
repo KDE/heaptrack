@@ -21,3 +21,7 @@ callgrind.out.*
 *.BASE.*
 *.LOCAL.*
 *.REMOTE.*
+build*/
+*.zst
+*.gz
+*.AppImage
