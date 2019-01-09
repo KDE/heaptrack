@@ -2,6 +2,7 @@
 FROM ubuntu:14.04 as appimage_intermediate
 
 # install dependencies
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
     apt-get -y upgrade && \
