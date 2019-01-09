@@ -79,4 +79,4 @@ WRAPPER_SCRIPT
 chmod +x ./appdir/AppRun
 
 # Actually create the final image
-appimagetool ./appdir $OUTDIR/heaptrack-$(git describe)-x86_64.AppImage
+appimagetool ./appdir $OUTDIR/heaptrack-x86_64.AppImage

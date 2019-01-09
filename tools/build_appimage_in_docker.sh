@@ -8,5 +8,5 @@ fi
 
 sudo docker build -t heaptrack_appimage -f tools/Dockerfile . || exit 1
 sudo docker run -v /tmp/heaptrack-appimage-artifacts:/artifacts -it heaptrack_appimage
-mv /tmp/heaptrack-appimage-artifacts/heaptrack-*.AppImage .
+mv /tmp/heaptrack-appimage-artifacts/heaptrack-x86_64.AppImage heaptrack-$(git describe)-x86_64.AppImage
 ls -latr heaptrack-*.AppImage | tail -n 1
