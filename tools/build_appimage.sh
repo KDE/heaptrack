@@ -63,7 +63,7 @@ chmod +x ./appdir/$PREFIX/bin/heaptrack_gui
 
 # include breeze icons
 if [ -d /opt/share/icons/breeze ]; then
-    cp -va /opt/share/icons/breeze ./appdir/usr/share/icons/
+    cp -va /opt/share/icons/breeze ./appdir/$PREFIX/share/icons/
 fi
 
 # use the shell script as AppRun entry point
