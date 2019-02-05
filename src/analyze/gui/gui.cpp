@@ -19,6 +19,7 @@
 #include <QApplication>
 #include <QCommandLineParser>
 
+#include <kcoreaddons_version.h>
 #include <KAboutData>
 #include <KLocalizedString>
 
@@ -45,7 +46,9 @@ int main(int argc, char** argv)
                         QStringLiteral("http://milianw.de"));
 
     aboutData.setOrganizationDomain("kde.org");
-
+#if KCOREADDONS_VERSION >= QT_VERSION_CHECK(5, 16, 0)
+    aboutData.setDesktopFileName(QStringLiteral("org.kde.heaptrack"));
+#endif
     KAboutData::setApplicationData(aboutData);
     app.setWindowIcon(QIcon::fromTheme(QStringLiteral("office-chart-area")));
 
