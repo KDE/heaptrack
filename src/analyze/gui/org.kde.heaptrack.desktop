@@ -7,6 +7,7 @@ MimeType=application/x-heaptrack;
 Icon=heaptrack
 # FIXME: write docs!
 # X-DocPath=kcachegrind/index.html
+StartupWMClass=heaptrack_gui
 Terminal=false
 Name=Heaptrack
 Name[ca]=Heaptrack
