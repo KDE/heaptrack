@@ -50,7 +50,7 @@ int main(int argc, char** argv)
     aboutData.setDesktopFileName(QStringLiteral("org.kde.heaptrack"));
 #endif
     KAboutData::setApplicationData(aboutData);
-    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("office-chart-area")));
+    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("heaptrack")));
 
     QCommandLineParser parser;
     aboutData.setupCommandLine(&parser);
