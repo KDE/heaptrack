@@ -50,8 +50,6 @@ int main(int argc, char** argv)
     app.setWindowIcon(QIcon::fromTheme(QStringLiteral("office-chart-area")));
 
     QCommandLineParser parser;
-    parser.addVersionOption();
-    parser.addHelpOption();
     aboutData.setupCommandLine(&parser);
 
     QCommandLineOption diffOption{{QStringLiteral("d"), QStringLiteral("diff")},
