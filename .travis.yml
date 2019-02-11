@@ -37,6 +37,9 @@ install:
   - wget -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
   - chmod a+x appimagetool-*.AppImage
   - sudo mv appimagetool-*.AppImage /usr/bin/appimagetool
+  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - chmod a+x upload.sh
+  - sudo mv upload.sh /usr/bin/github-upload
 
 script:
   - set -e # Exit immediately if anything fails
@@ -59,4 +62,6 @@ script:
   - ln -sr ./appdir/usr/bin/heaptrack ./appdir/AppRun
   - # Actually create the final image
   - appimagetool ./appdir/
-  - curl --upload-file ./Heaptrack-*.AppImage https://transfer.sh/heaptrack-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+  - # upload the appimage to GitHub
+  - mv Heaptrack-*.AppImage heaptrack-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+  - github-upload ./Hotspot-git.*-x86_64.AppImage
