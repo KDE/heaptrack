@@ -64,4 +64,4 @@ script:
   - appimagetool ./appdir/
   - # upload the appimage to GitHub
   - mv Heaptrack-*.AppImage heaptrack-git.$(git rev-parse --short HEAD)-x86_64.AppImage
-  - github-upload ./Hotspot-git.*-x86_64.AppImage
+  - github-upload ./heaptrack-git.*-x86_64.AppImage
