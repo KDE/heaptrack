@@ -88,7 +88,7 @@
       <li xml:lang="en-GB">find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
       <li xml:lang="es">encontrar fugas de memoria (es decir, lugares donde se asigna memoria que no se llega a liberar)</li>
       <li xml:lang="gl">Atopar perdas de memoria, é dicir, lugares que asignan memoria que nunca se libera.</li>
-      <li xml:lang="id">menemukan kebocoran memori, mis. lokasi yang mengalokasikan memori yang tidak pernah dialokasikan</li>
+      <li xml:lang="id">menemukan kebocoran memori, misal lokasi yang mengalokasikan memori yang tidak pernah dialokasikan</li>
       <li xml:lang="nl">zoek naar lekken in het geheugen, d.w.z. locaties die geheugen toewijzen die nooit wordt vrijgegeven</li>
       <li xml:lang="nn">Finna minnelekkasjar – område der minne vert reservert men aldri frigjort.</li>
       <li xml:lang="pl">znaleźć wycieki pamięci, tj. miejsca, które przydzielają pamięć, która nigdy nie zostanie zwolniona</li>
@@ -105,7 +105,7 @@
       <li xml:lang="en-GB">find allocation hotspots, i.e. code locations that trigger a lot of memory allocation calls</li>
       <li xml:lang="es">encontrar cuellos de botella de asignaciones (es decir, lugares del código fuente que desencadenan numerosas llamadas de asignación de memoria)</li>
       <li xml:lang="gl">Atopar puntos quentes de asignación, é dicir, lugares do código que causan moitas chamadas de asignación de memoria.</li>
-      <li xml:lang="id">menemukan hotspot alokasi, mis. lokasi kode yang memicu banyak panggilan alokasi memori</li>
+      <li xml:lang="id">menemukan hotspot alokasi, misal lokasi kode yang memicu banyak panggilan alokasi memori</li>
       <li xml:lang="nl">zoek naar hotspots voor toewijzingen, d.w.z. locaties in de code die veel aanroepen van geheugen toewijzen doen</li>
       <li xml:lang="nn">Finna område i programkoden som utløyser veldig mange minnereserveringskall.</li>
       <li xml:lang="pl">znaleźć gorące miejsca przydziału pamięci, tj. miejsca kodu, które są odpowiedzialne za wiele przydzieleń pamięci</li>
