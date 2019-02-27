@@ -55,7 +55,7 @@ script:
   - # include breeze icons
   - cp -a /opt/qt*/share/icons/breeze ./appdir/usr/share/icons/
   - # include zstd binary
-  - cp $(which zstd) ./appdir/usr/share/bin/zstd
+  - cp $(which zstd) ./appdir/usr/bin/zstd
   - # use the shell script as AppRun entry point
   - rm ./appdir/AppRun
   - ln -sr ./appdir/usr/bin/heaptrack ./appdir/AppRun
