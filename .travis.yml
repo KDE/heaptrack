@@ -17,24 +17,24 @@ install:
   - git clone https://github.com/facebook/zstd.git
   - cd zstd && make -j$(nproc) && sudo make install && cd ..
   - # Precompiled KF5
-  - wget -c "https://github.com/chigraph/precompiled-kf5-linux/releases/download/precompiled/kf5-gcc6-linux64-release.tar.xz"
+  - wget -nv -c "https://github.com/chigraph/precompiled-kf5-linux/releases/download/precompiled/kf5-gcc6-linux64-release.tar.xz"
   - tar xf kf5-gcc6-linux64-release.tar.xz
   - sudo cp -Rf root/kf5-release/* /opt/qt*/
   - # kdiagram
   - git clone https://anongit.kde.org/kdiagram
   - cd kdiagram && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/qt510 .. && make -j$(nproc) && sudo make install && cd ../../
   - # Precompiled version of libunwind in newer version (1.)2
-  - wget -c "https://swanson.kdab.com/owncloud/index.php/s/ZETvRRZ7J5Nllo5/download" -O libunwind.tar.bz2
+  - wget -nv -c "https://swanson.kdab.com/owncloud/index.php/s/ZETvRRZ7J5Nllo5/download" -O libunwind.tar.bz2
   - tar xf libunwind.tar.bz2
   - sudo cp -Rf libunwind-*/usr/* /usr/
   - # Get AppImage tools
-  - wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+  - wget -nv -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
   - chmod a+x linuxdeployqt*.AppImage
   - sudo mv linuxdeployqt*.AppImage /usr/bin/linuxdeployqt
-  - wget -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+  - wget -nv -c "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
   - chmod a+x appimagetool-*.AppImage
   - sudo mv appimagetool-*.AppImage /usr/bin/appimagetool
-  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - wget -nv -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - chmod a+x upload.sh
   - sudo mv upload.sh /usr/bin/github-upload
 
