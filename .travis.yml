@@ -20,10 +20,9 @@ install:
   - wget -c "https://github.com/chigraph/precompiled-kf5-linux/releases/download/precompiled/kf5-gcc6-linux64-release.tar.xz"
   - tar xf kf5-gcc6-linux64-release.tar.xz
   - sudo cp -Rf root/kf5-release/* /opt/qt*/
-  - # Precompiled kdiagram
-  - wget -c "https://swanson.kdab.com/owncloud/index.php/s/bZmRRXAKd54ROKd/download" -O kdiagram.tar.bz2
-  - tar xf kdiagram.tar.bz2
-  - sudo cp -Rf kdiagram-*/opt/qt* /opt/qt*/
+  - # kdiagram
+  - git clone https://anongit.kde.org/kdiagram
+  - cd kdiagram && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/qt510 .. && make -j$(nproc) && sudo make install && cd ../../
   - # Precompiled version of libunwind in newer version (1.)2
   - wget -c "https://swanson.kdab.com/owncloud/index.php/s/ZETvRRZ7J5Nllo5/download" -O libunwind.tar.bz2
   - tar xf libunwind.tar.bz2
