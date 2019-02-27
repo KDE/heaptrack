@@ -22,7 +22,7 @@ install:
   - sudo cp -Rf root/kf5-release/* /opt/qt*/
   - # kdiagram
   - git clone git://anongit.kde.org/kdiagram
-  - cd kdiagram && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/qt510 -DBUILD_KGantt=OFF .. && make -j$(nproc) && sudo make install && cd ../../
+  - cd kdiagram && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/qt510 -DBUILD_KGantt=OFF -DBUILD_TESTING=OFF .. && make -j$(nproc) && sudo make install && cd ../../
   - # Precompiled version of libunwind in newer version (1.)2
   - wget -nv -c "https://swanson.kdab.com/owncloud/index.php/s/ZETvRRZ7J5Nllo5/download" -O libunwind.tar.bz2
   - tar xf libunwind.tar.bz2
