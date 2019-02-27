@@ -20,7 +20,7 @@ install:
   - cd ../..
   - # zstd
   - git clone https://github.com/facebook/zstd.git
-  - cd zstd && make -j$(nproc) && make install && cd ..
+  - cd zstd && make -j$(nproc) && sudo make install && cd ..
   - # Precompiled KF5
   - wget -c "https://github.com/chigraph/precompiled-kf5-linux/releases/download/precompiled/kf5-gcc6-linux64-release.tar.xz"
   - tar xf kf5-gcc6-linux64-release.tar.xz
