@@ -21,7 +21,7 @@ install:
   - tar xf kf5-gcc6-linux64-release.tar.xz
   - sudo cp -Rf root/kf5-release/* /opt/qt*/
   - # kdiagram
-  - git clone https://anongit.kde.org/kdiagram
+  - git clone git://anongit.kde.org/kdiagram
   - cd kdiagram && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/qt510 .. && make -j$(nproc) && sudo make install && cd ../../
   - # Precompiled version of libunwind in newer version (1.)2
   - wget -nv -c "https://swanson.kdab.com/owncloud/index.php/s/ZETvRRZ7J5Nllo5/download" -O libunwind.tar.bz2
