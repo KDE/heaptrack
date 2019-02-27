@@ -53,7 +53,7 @@ script:
   - echo -e '#!/bin/bash\nf="$(readlink -f "${0}")"\nd="$(dirname "$f")"\nLD_LIBRARY_PATH="$d/../lib:$LD_LIBRARY_PATH" "$d/heaptrack_gui_bin" "$@"' > ./appdir/usr/bin/heaptrack_gui
   - chmod +x ./appdir/usr/bin/heaptrack_gui
   - # include breeze icons
-  - cp -va /opt/qt*/share/icons/breeze ./appdir/usr/share/icons/
+  - cp -a /opt/qt*/share/icons/breeze ./appdir/usr/share/icons/
   - # include zstd binary
   - cp $(which zstd) ./appdir/usr/share/bin/zstd
   - # use the shell script as AppRun entry point
