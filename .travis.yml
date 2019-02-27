@@ -28,7 +28,7 @@ install:
   - # Precompiled kdiagram
   - wget -c "https://swanson.kdab.com/owncloud/index.php/s/bZmRRXAKd54ROKd/download" -O kdiagram.tar.bz2
   - tar xf kdiagram.tar.bz2
-  - sudo cp -Rf kdiagram-*/opt/qt* /opt/
+  - sudo cp -Rf kdiagram-*/opt/qt* /opt/qt*/
   - # Precompiled version of libunwind in newer version (1.)2
   - wget -c "https://swanson.kdab.com/owncloud/index.php/s/ZETvRRZ7J5Nllo5/download" -O libunwind.tar.bz2
   - tar xf libunwind.tar.bz2
