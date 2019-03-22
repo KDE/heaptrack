@@ -172,7 +172,7 @@ struct ParserData final : public AccumulatedTraceData
         findTopChartEntries(&ChartMergeData::temporary, &LabelIds::temporary, &temporaryChartData);
     }
 
-    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp)
+    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp) override
     {
         if (!buildCharts || stringCache.diffMode) {
             return;
@@ -223,7 +223,7 @@ struct ParserData final : public AccumulatedTraceData
         temporaryChartData.rows << temporary;
     }
 
-    void handleAllocation(const AllocationInfo& info, const AllocationInfoIndex index)
+    void handleAllocation(const AllocationInfo& info, const AllocationInfoIndex index) override
     {
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, totalCost.leaked);
 
@@ -234,7 +234,7 @@ struct ParserData final : public AccumulatedTraceData
         }
     }
 
-    void handleDebuggee(const char* command)
+    void handleDebuggee(const char* command) override
     {
         debuggee = command;
     }
