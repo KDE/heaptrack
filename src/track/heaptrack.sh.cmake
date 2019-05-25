@@ -52,6 +52,7 @@ usage() {
     echo "                 to the debuggee."
     echo "  -h, --help     Show this help message and exit."
     echo "  -v, --version  Displays version information."
+    echo "  -o, --output   Specifies the data-file for the captured data."
     echo
     echo "Alternatively, to analyze a recorded heaptrack data file:"
     echo "  -a, --analyze FILE    Open the heaptrack data file in heaptrack_gui, if available,"
@@ -93,6 +94,18 @@ while true; do
         "-h" | "--help")
             usage
             exit 0
+            ;;
+        "-o" | "--output-file")
+            if [ -z "$2" ]; then
+                echo "Missing output argument."
+                exit 1
+            fi
+            output=$(readlink -f $2)
+            if [ -d "$output" ]; then
+                echo "Please specify a file-name or a full path-name for output."
+                exit 1
+            fi
+            shift 2
             ;;
         "-p" | "--pid")
             if [ -z "$(which gdb 2> /dev/null)" ]; then
@@ -148,7 +161,9 @@ while true; do
 done
 
 # put output into current pwd
-output=$(pwd)/heaptrack.$(basename "$client").$$
+if [ -z "$output" ]; then
+    output=$(pwd)/heaptrack.$(basename "$client").$$
+fi
 
 # find preload library and interpreter executable using relative paths
 LIB_REL_PATH="@LIB_REL_PATH@"
