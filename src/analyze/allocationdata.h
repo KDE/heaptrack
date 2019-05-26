@@ -31,6 +31,8 @@ struct AllocationData
     int64_t leaked = 0;
     // largest amount of bytes allocated
     int64_t peak = 0;
+    // amount of in RAM bytes leaked(HW RAM used)
+    int64_t inRam = 0;
 
     void clearCost()
     {
@@ -55,6 +57,7 @@ inline AllocationData& operator+=(AllocationData& lhs, const AllocationData& rhs
     lhs.temporary += rhs.temporary;
     lhs.peak += rhs.peak;
     lhs.leaked += rhs.leaked;
+    lhs.inRam += rhs.inRam;
     return lhs;
 }
 
@@ -64,6 +67,7 @@ inline AllocationData& operator-=(AllocationData& lhs, const AllocationData& rhs
     lhs.temporary -= rhs.temporary;
     lhs.peak -= rhs.peak;
     lhs.leaked -= rhs.leaked;
+    lhs.inRam -= rhs.inRam;
     return lhs;
 }
 

@@ -24,6 +24,7 @@
 
 #include "libheaptrack.h"
 
+#include <alloca.h>
 #include <cstdio>
 #include <cstdlib>
 #include <fcntl.h>
@@ -32,7 +33,9 @@
 #include <signal.h>
 #include <stdio_ext.h>
 #include <sys/file.h>
+#include <sys/mman.h>
 #include <syscall.h>
+#include <unistd.h>
 
 #include <atomic>
 #include <cinttypes>
@@ -276,6 +279,7 @@ public:
             pthread_atfork(&prepare_fork, &parent_fork, &child_fork);
 
             atexit([]() {
+                // TODO: it does not work
                 if (s_forceCleanup) {
                     return;
                 }
@@ -332,6 +336,7 @@ public:
 
         writeTimestamp();
         writeRSS();
+        writeInRam();
 
         s_data->out.flush();
         s_data->out.close();
@@ -398,6 +403,103 @@ public:
         //       the RSS numbers with heaptrack-internal data
 
         s_data->out.writeHexLine('R', rss);
+    }
+
+    int saveInRam(size_t address, size_t size, size_t pageSize)
+    {
+        if (0 == size) {
+            return 0;
+        }
+
+        debugLog<VeryVerboseOutput>("save in RAM %zx %zx", address / pageSize, size / pageSize);
+        if (!s_data->out.write(" %zx %zx", address / pageSize, size / pageSize)) {
+            return 1;
+        }
+
+        return 0;
+    }
+
+    void writeInRam()
+    {
+        if (!s_data || !s_data->out.canWrite() || s_data->procMaps == -1) {
+            return;
+        }
+
+        lseek(s_data->procMaps, 0, SEEK_SET);
+
+        const int BUF_SIZE = PATH_MAX + 1024;
+        char line[BUF_SIZE + 1];
+        size_t len = 0;
+
+        size_t pageSize = sysconf(_SC_PAGESIZE);
+
+        if (!s_data->out.write("P")) {
+            return;
+        }
+
+        while (true) {
+            switch (read(s_data->procMaps, &line[len], 1)) {
+            case -1:
+                fprintf(stderr, "WARNING: Failed to read value from /proc/self/maps, %s.\n", strerror(errno));
+                close(s_data->procMaps);
+                s_data->procMaps = -1;
+                return;
+            case 0:
+                s_data->out.write("\n");
+                return;
+            }
+            if (line[len] != '\n') {
+                ++len;
+                continue;
+            }
+            line[len] = 0;
+            len = 0;
+
+            size_t from, to, pgoff;
+            unsigned int major, minor;
+            unsigned long ino;
+            char path[PATH_MAX];
+            char flags[4];
+            if (sscanf(line, "%zx-%zx %4c %zx %x:%x %lu %s", &from, &to, flags, &pgoff, &major, &minor, &ino, path)
+                < 7) {
+                fprintf(stderr, "WARNING: Failed to parse value from /proc/self/maps '%s'.\n", line);
+                close(s_data->procMaps);
+                s_data->procMaps = -1;
+                return;
+            }
+            size_t length = to - from;
+            size_t count = (length + pageSize - 1) / pageSize;
+            unsigned char* vec = static_cast<unsigned char*>(alloca(count));
+            if (mincore(reinterpret_cast<void*>(from), length, vec) == -1) {
+                if (errno == ENOMEM && strcmp(path, "[vsyscall]") == 0) {
+                    // For some reason mincore returns ENOMEM for [vsyscall].
+                    // It does not matter in our case.
+                    continue;
+                }
+                fprintf(stderr, "WARNING: Failed to mincore at %zx, length %zu, name %s, %s.\n", from, length, path,
+                        strerror(errno));
+                close(s_data->procMaps);
+                s_data->procMaps = -1;
+                return;
+            }
+
+            size_t address = from;
+            size_t size = 0;
+            for (size_t i = 0; i < count; ++i) {
+                if ((vec[i] & 1) == 0) {
+                    if (saveInRam(address, size, pageSize)) {
+                        return;
+                    }
+                    address += pageSize + size;
+                    size = 0;
+                } else {
+                    size += pageSize;
+                }
+            }
+            if (saveInRam(address, size, pageSize)) {
+                return;
+            }
+        }
     }
 
     void writeVersion()
@@ -549,7 +651,9 @@ private:
         shutdown();
     }
 
-    struct LockCheckFailed{};
+    struct LockCheckFailed
+    {
+    };
 
     /**
      * To prevent deadlocks on shutdown, we try to lock from the timer thread
@@ -580,6 +684,11 @@ private:
                 fprintf(stderr, "WARNING: Failed to open /proc/self/statm for reading: %s.\n", strerror(errno));
             }
 
+            procMaps = open("/proc/self/maps", O_RDONLY);
+            if (procMaps == -1) {
+                fprintf(stderr, "WARNING: Failed to open /proc/self/maps for reading: %s.\n", strerror(errno));
+            }
+
             // ensure this utility thread is not handling any signals
             // our host application may assume only one specific thread
             // will handle the threads, if that's not the case things
@@ -597,6 +706,7 @@ private:
             timerThread = thread([&]() {
                 RecursionGuard::isActive = true;
                 debugLog<MinimalOutput>("%s", "timer thread started");
+                int counter = -1;
 
                 // now loop and repeatedly print the timestamp and RSS usage to the data stream
                 while (!stopTimerThread) {
@@ -607,6 +717,10 @@ private:
                         HeapTrack heaptrack([&] { return !stopTimerThread.load(); });
                         heaptrack.writeTimestamp();
                         heaptrack.writeRSS();
+                        counter = (counter + 1) % 100;
+                        if (counter == 0) {
+                            heaptrack.writeInRam();
+                        }
                     } catch (LockCheckFailed) {
                         break;
                     }
@@ -636,6 +750,10 @@ private:
                 close(procStatm);
             }
 
+            if (procMaps != -1) {
+                close(procMaps);
+            }
+
             if (stopCallback && (!s_atexit || s_forceCleanup)) {
                 stopCallback();
             }
@@ -646,6 +764,8 @@ private:
 
         /// /proc/self/statm file descriptor to read RSS value from
         int procStatm = -1;
+        /// /proc/self/maps file descriptor to read memory map
+        int procMaps = -1;
 
         /**
          * Calls to dlopen/dlclose mark the cache as dirty.

@@ -61,27 +61,41 @@ struct hash<IndexedAllocationInfo>
 };
 }
 
+//todo change name
 struct AllocationInfoSet
 {
     AllocationInfoSet()
     {
-        set.reserve(625000);
+        m_set.reserve(625000);
     }
 
     bool add(uint64_t size, TraceIndex traceIndex, AllocationInfoIndex* allocationIndex)
     {
-        allocationIndex->index = set.size();
+        allocationIndex->index = m_set.size();
         IndexedAllocationInfo info = {size, traceIndex, *allocationIndex};
-        auto it = set.find(info);
-        if (it != set.end()) {
+        auto it = m_set.find(info);
+        if (it != m_set.end()) {
             *allocationIndex = it->allocationIndex;
             return false;
         } else {
-            set.insert(it, info);
+            auto ret = m_set.insert(it, info);
+            m_allocationIndexToInfo.emplace_back(ret);
             return true;
         }
     }
-    std::unordered_set<IndexedAllocationInfo> set;
+
+    bool findAllocationInfo(AllocationInfoIndex index, IndexedAllocationInfo& info)
+    {
+        if(index.index >= m_allocationIndexToInfo.size())
+        {
+            return false;
+        }
+        info = *m_allocationIndexToInfo[index.index];
+        return true;
+    }
+private:
+    std::unordered_set<IndexedAllocationInfo> m_set;
+    std::vector<decltype(m_set)::iterator> m_allocationIndexToInfo;
 };
 
 /**
@@ -163,6 +177,24 @@ public:
         return {index, true};
     }
 
+    std::pair<AllocationInfoIndex, uint64_t> takePointer()
+    {
+        AllocationInfoIndex index;
+        if(map.empty())
+        {
+            return {index, 0};
+        }
+        auto mapIt = map.begin();
+        auto ptr = mapIt->first * SplitPointer::PageSize + mapIt->second.smallPtrParts.back();
+        index = mapIt->second.allocationIndices.back();
+        mapIt->second.allocationIndices.pop_back();
+        mapIt->second.smallPtrParts.pop_back();
+        if(mapIt->second.smallPtrParts.empty())
+        {
+            map.erase(mapIt);
+        }
+        return {index, ptr};
+    }
 private:
     struct Indices
     {

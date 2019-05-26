@@ -276,6 +276,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 }
                 info.allocationIndex = mapToAllocationIndex(traceIndex);
                 if (allocationInfoSet.add(info.size, traceIndex, &allocationIndex)) {
+                    // TODO fix me this data are duplicated now
                     allocationInfos.push_back(info);
                 }
                 pointers.addPointer(ptr, allocationIndex);
@@ -405,6 +406,22 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
         } else if (reader.mode() == 'I') { // system information
             reader >> systemInfo.pageSize;
             reader >> systemInfo.pages;
+        } else if (reader.mode() == 'P') {
+            if(pass != SecondPass){
+                continue;
+            }
+            AllocationInfoIndex allocationIndex;
+            uint64_t size;
+            while (reader >> size && reader >> allocationIndex) {
+                if (allocationIndex.index >= allocationInfos.size()) {
+                    cerr << "allocation index out of bounds: " << allocationIndex
+                         << ", maximum is: " << allocationInfos.size() << endl;
+                    continue;
+                }
+                const auto& info = allocationInfos[allocationIndex.index];
+                auto& allocation = allocations[info.allocationIndex.index];
+                allocation.inRam += size;
+            }
         } else {
             cerr << "failed to parse line: " << reader.line() << endl;
         }

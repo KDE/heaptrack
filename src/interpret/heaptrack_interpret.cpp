@@ -405,6 +405,13 @@ void exitHandler()
 }
 }
 
+//todo it is duplicated
+struct SystemInfo
+{
+    int64_t pages = 0;
+    int64_t pageSize = 0;
+};
+
 int main(int /*argc*/, char** /*argv*/)
 {
     // optimize: we only have a single thread
@@ -415,6 +422,8 @@ int main(int /*argc*/, char** /*argv*/)
     // output data at end, even when we get terminated
     std::atexit(exitHandler);
 
+    SystemInfo systemInfo;
+
     AccumulatedTraceData data;
 
     LineReader reader;
@@ -424,6 +433,7 @@ int main(int /*argc*/, char** /*argv*/)
     PointerMap ptrToIndex;
     uint64_t lastPtr = 0;
     AllocationInfoSet allocationInfos;
+    map<uint64_t, uint64_t, greater<uint64_t>> inRamPages;
 
     while (reader.getLine(cin)) {
         if (reader.mode() == 'x') {
@@ -501,10 +511,63 @@ int main(int /*argc*/, char** /*argv*/)
                 ++c_stats.temporaryAllocations;
             }
             --c_stats.leakedAllocations;
+        } else if (reader.mode() == 'P') {
+            inRamPages.clear();
+            size_t address;
+            size_t size;
+            while ((reader >> address) && (reader >> size)) {
+                inRamPages.emplace(address * systemInfo.pageSize, size * systemInfo.pageSize);
+            }
+        } else if (reader.mode() == 'I') { // system information
+            reader >> systemInfo.pageSize;
+            reader >> systemInfo.pages;
+            data.out.write("%s\n", reader.line().c_str());
         } else {
             data.out.write("%s\n", reader.line().c_str());
         }
     }
+
+    vector<pair<AllocationInfoIndex, uint64_t>> leaked;
+    while (true) {
+        auto leak = ptrToIndex.takePointer();
+        if (0 == leak.second) {
+            break;
+        }
+        leaked.emplace_back(leak);
+    }
+    std::map<AllocationInfoIndex, uint64_t> inRamAllocation;
+    for (auto& leakIt : leaked) {
+        uint64_t low = leakIt.second;
+        IndexedAllocationInfo info;
+        AllocationInfoIndex allocationIndex = leakIt.first;
+        if (!allocationInfos.findAllocationInfo(allocationIndex, info)) {
+            continue;
+        }
+        uint64_t high = low + info.size;
+        auto currentPage = inRamPages.upper_bound(high);
+        uint64_t inRamSize = 0;
+        while(currentPage != inRamPages.end())
+        {
+            uint64_t pageLow = currentPage->first;
+            uint64_t pageHigh = pageLow + currentPage->second;
+            if(pageHigh <= low)
+            {
+                break;
+            }
+            inRamSize += std::min(high, pageHigh) - std::max(low, pageLow);
+            ++currentPage;
+        }
+        if(inRamSize)
+        {
+            inRamAllocation[allocationIndex] += inRamSize;
+        }
+    }
+    data.out.write("P");
+    for(auto& inRamAllocationIt : inRamAllocation)
+    {
+        data.out.write(" %zx %zx", inRamAllocationIt.second, inRamAllocationIt.first);
+    }
+    data.out.write("\n");
 
     return 0;
 }
