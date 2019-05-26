@@ -96,9 +96,13 @@ while true; do
             exit 0
             ;;
         "-o" | "--output-file")
-            output=$2
-            if [ -z "$output" ]; then
+            if [ -z "$2" ]; then
                 echo "Missing output argument."
+                exit 1
+            fi
+            output=$(readlink -f $2)
+            if [ -d "$output" ]; then
+                echo "Please specify a file-name or a full path-name for output."
                 exit 1
             fi
             shift 2
