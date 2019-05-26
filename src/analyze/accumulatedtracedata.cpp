@@ -186,7 +186,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
     for (auto& allocation : allocations) {
         allocation.clearCost();
     }
-    uint fileVersion = 0;
+    unsigned int fileVersion = 0;
     bool debuggeeEncountered = false;
 
     // required for backwards compatibility
@@ -385,7 +385,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
             totalCost = {};
             fromAttached = true;
         } else if (reader.mode() == 'v') {
-            uint heaptrackVersion = 0;
+            unsigned int heaptrackVersion = 0;
             reader >> heaptrackVersion;
             if (!(reader >> fileVersion) && heaptrackVersion == 0x010200) {
                 // backwards compatibility: before the 1.0.0, I actually
