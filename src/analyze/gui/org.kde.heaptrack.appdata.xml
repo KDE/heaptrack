@@ -14,6 +14,7 @@
   <name xml:lang="fr">Heaptrack</name>
   <name xml:lang="gl">Heaptrack</name>
   <name xml:lang="id">Heaptrack</name>
+  <name xml:lang="ko">힙 추적</name>
   <name xml:lang="nl">Heaptrack</name>
   <name xml:lang="nn">Heaptrack</name>
   <name xml:lang="pl">Heaptrack</name>
@@ -33,6 +34,7 @@
   <summary xml:lang="es">Un analizador de rendimiento de la memoria de almacenamiento libre para Linux</summary>
   <summary xml:lang="gl">Un analizador de uso de memoria dinámica (heap) para Linux</summary>
   <summary xml:lang="id">Sebuah profil memori tumpukan untuk Linux</summary>
+  <summary xml:lang="ko">리눅스 힙 추적 메모리 프로파일러</summary>
   <summary xml:lang="nl">Een profiler van heap-geheugen voor Linux</summary>
   <summary xml:lang="nn">Profileringsprogram for heap-minne</summary>
   <summary xml:lang="pl">Program profilujący pamięć na stosie dla Linuksa</summary>
