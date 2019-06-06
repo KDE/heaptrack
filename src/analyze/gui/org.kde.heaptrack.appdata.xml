@@ -28,7 +28,7 @@
   <name xml:lang="x-test">xxHeaptrackxx</name>
   <name xml:lang="zh-CN">堆栈追踪</name>
   <summary>A heap memory profiler for Linux</summary>
-  <summary xml:lang="ca">Un perfilador de memòria en monticles per a Linux</summary>
+  <summary xml:lang="ca">Un perfilador de memòria en monticles per al Linux</summary>
   <summary xml:lang="ca-valencia">Un perfilador de memòria en monticles per a Linux</summary>
   <summary xml:lang="da">En heap-hukommelsesprofilering til Linux</summary>
   <summary xml:lang="en-GB">A heap memory profiler for Linux</summary>
