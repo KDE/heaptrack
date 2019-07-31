@@ -14,6 +14,7 @@
   <name xml:lang="fr">Heaptrack</name>
   <name xml:lang="gl">Heaptrack</name>
   <name xml:lang="id">Heaptrack</name>
+  <name xml:lang="it">Heaptrack</name>
   <name xml:lang="ko">힙 추적</name>
   <name xml:lang="nl">Heaptrack</name>
   <name xml:lang="nn">Heaptrack</name>
@@ -34,6 +35,7 @@
   <summary xml:lang="es">Un analizador de rendimiento de la memoria de almacenamiento libre para Linux</summary>
   <summary xml:lang="gl">Un analizador de uso de memoria dinámica (heap) para Linux</summary>
   <summary xml:lang="id">Sebuah profil memori tumpukan untuk Linux</summary>
+  <summary xml:lang="it">Un profiler della memoria heap per Linux</summary>
   <summary xml:lang="ko">리눅스 힙 추적 메모리 프로파일러</summary>
   <summary xml:lang="nl">Een profiler van heap-geheugen voor Linux</summary>
   <summary xml:lang="nn">Profileringsprogram for heap-minne</summary>
@@ -56,6 +58,7 @@
     <p xml:lang="es">Heaptrack rastrea todas las asignaciones de memoria y anota estos eventos con trazas de la pila para poder usar herramientas de dedicadas que le permitan interpretar el análisis de rendimiento de la memoria de almacenamiento libre para:</p>
     <p xml:lang="gl">Heaptrack fai un seguimento de todas as asociacións de memoria e apunta os eventos co historial da rima. Logo pode usar ferramentas de análise para interpretar os datos de uso da memoria dinámica (heap) para:</p>
     <p xml:lang="id">Heaptrack melacak semua alokasi memori dan membubuhi keterangan peristiwa ini dengan jejak tumpukan. Alat analisis khusus kemudian memungkinkan kamu untuk menginterpretasikan profil memori tumpukan untuk:</p>
+    <p xml:lang="it">Heaptrack traccia tutte le allocazioni di memoria e le annota con tracciati dello stack. Degli strumenti dedicati di analisi ti permettono quindi di interpretare il profilo della memoria heap in modo da:</p>
     <p xml:lang="nl">Heaptrack traceert alle toewijzigingen van geheugen en annoteert deze gebeurtenissen met stacktraces. Specifieke hulpmiddelen voor analyse bieden u de mogelijkheid om het geheugenprofiel van de heap te interpreteren:</p>
     <p xml:lang="nn">Heaptrack sporar alle minnereserveringar og merkjer dei med tilhøyrande stabelspor. Analyseverktøyet lèt deg så tolka minneprofilen for å:</p>
     <p xml:lang="pl">Heaptrack rejestruje wszystkie przydziały pamięci i przypisuje tym zdarzeniom ślady stosu. Dedykowane narzędzia analizy, które umożliwiają interpretację profilu pamięcy aby:</p>
@@ -74,6 +77,7 @@
       <li xml:lang="es">encontrar cuellos de botella que es necesario optimizar para reducir el impacto de su aplicación en la memoria</li>
       <li xml:lang="gl">Atopar puntos quentes que cómpre optimizar para reducir o consumo de memoria do aplicativo.</li>
       <li xml:lang="id">menemukan hotspot yang perlu dioptimalkan untuk mengurangi jejak memori aplikasimu</li>
+      <li xml:lang="it">trovare gli «hotspot» che devono essere ottimizzati per ridurre il consumo di memoria della tua applicazione</li>
       <li xml:lang="nl">zoek hotspots die het nodig hebben om geoptimaliseerd te worden om de voetafdruk van het geheugen van uw toepassing te verminderen</li>
       <li xml:lang="nn">Finna problemområde som må optimerast for å redusera minnebruken til programmet.</li>
       <li xml:lang="pl">znaleźć gorące miejsca, które wymagają optymalizacji do zmniejszenia zapotrzebowania na pamięć dla twojej aplikacji</li>
@@ -91,6 +95,7 @@
       <li xml:lang="es">encontrar fugas de memoria (es decir, lugares donde se asigna memoria que no se llega a liberar)</li>
       <li xml:lang="gl">Atopar perdas de memoria, é dicir, lugares que asignan memoria que nunca se libera.</li>
       <li xml:lang="id">menemukan kebocoran memori, misal lokasi yang mengalokasikan memori yang tidak pernah dialokasikan</li>
+      <li xml:lang="it">trovare i buchi di memoria, cioè le posizioni dove è allocata memoria che non viene mai rilasciata</li>
       <li xml:lang="nl">zoek naar lekken in het geheugen, d.w.z. locaties die geheugen toewijzen die nooit wordt vrijgegeven</li>
       <li xml:lang="nn">Finna minnelekkasjar – område der minne vert reservert men aldri frigjort.</li>
       <li xml:lang="pl">znaleźć wycieki pamięci, tj. miejsca, które przydzielają pamięć, która nigdy nie zostanie zwolniona</li>
@@ -108,6 +113,7 @@
       <li xml:lang="es">encontrar cuellos de botella de asignaciones (es decir, lugares del código fuente que desencadenan numerosas llamadas de asignación de memoria)</li>
       <li xml:lang="gl">Atopar puntos quentes de asignación, é dicir, lugares do código que causan moitas chamadas de asignación de memoria.</li>
       <li xml:lang="id">menemukan hotspot alokasi, misal lokasi kode yang memicu banyak panggilan alokasi memori</li>
+      <li xml:lang="it">trovare gli «hotspot» delle allocazioni, cioè posizioni nel codice che producono molte chiamate di allocazione della memoria</li>
       <li xml:lang="nl">zoek naar hotspots voor toewijzingen, d.w.z. locaties in de code die veel aanroepen van geheugen toewijzen doen</li>
       <li xml:lang="nn">Finna område i programkoden som utløyser veldig mange minnereserveringskall.</li>
       <li xml:lang="pl">znaleźć gorące miejsca przydziału pamięci, tj. miejsca kodu, które są odpowiedzialne za wiele przydzieleń pamięci</li>
@@ -125,6 +131,7 @@
       <li xml:lang="es">encontrar asignaciones de memoria temporales, que son asignaciones que son inmediatamente seguidas por sus correspondientes liberaciones</li>
       <li xml:lang="gl">Atopar asignacións temporais, asignacións que se liberan no momento.</li>
       <li xml:lang="id">menemukan alokasi sementara, yaitu alokasi yang langsung diikuti oleh alokasi mereka</li>
+      <li xml:lang="it">trovare allocazioni temporanee, cioè allocazioni che sono seguite direttamente dalle rispettivi de-allocazioni</li>
       <li xml:lang="nl">zoek naar tijdelijke toewijzingen, die toewijzingen zijn die direct gevolgd worden door hun vrijgave</li>
       <li xml:lang="nn">Finna «mellombelse» reserveringar – reserveringar som umiddelbart vert etterfølgde av avreserveringar.</li>
       <li xml:lang="pl">znaleźć tymczasowe przydzielenia, które są przydzieleniami bezpośrednio zwalnianymi poprzez zwolnienie przydziału</li>
@@ -150,6 +157,7 @@
       <caption xml:lang="es">Sumario de datos de asignación de memoria de almacenamiento libre rastreada.</caption>
       <caption xml:lang="gl">Resumo dos datos de asignación de memoria dinámica (heap) da que se fai seguimento.</caption>
       <caption xml:lang="id">Ringkasan data alokasi memori tumpukan yang terlacak.</caption>
+      <caption xml:lang="it">Riepilogo dei dati delle allocazioni di memoria heap tracciati.</caption>
       <caption xml:lang="nl">Samenvatting van gevolgde gegevens voor heap-geheugen toewijzen.</caption>
       <caption xml:lang="nn">Samandrag av minnereserveringsdata.</caption>
       <caption xml:lang="pl">podsumować dane przydzielone w pamięci</caption>
@@ -170,6 +178,7 @@
       <caption xml:lang="es">Visualización de gráfico de llamas del número de asignaciones de memoria de almacenamiento libre.</caption>
       <caption xml:lang="gl">Visualización mediante un gráfico de chamas do número de asignacións de memoria dinámica (heap).</caption>
       <caption xml:lang="id">Visualisasi Flamegraph dari jumlah alokasi memori tumpukan.</caption>
+      <caption xml:lang="it">Visualizzazione di tipo Flamegraph del totale di allocazioni di memoria heap.</caption>
       <caption xml:lang="nl">Flamegraph visualisatie van het aantal toewijzingen van heap-geheugen.</caption>
       <caption xml:lang="nn">Flammegraf-visualisering av talet på minnereserveringar.</caption>
       <caption xml:lang="pl">zobrazować na wykresie płomieni przydzielnia pamięci.</caption>
@@ -190,6 +199,7 @@
       <caption xml:lang="es">Gráfico de asignaciones de memoria del almacenamiento libre a lo largo del tiempo.</caption>
       <caption xml:lang="gl">Gráfica das asignacións de memoria dinámica (heap) co paso do tempo.</caption>
       <caption xml:lang="id">Bagan alokasi memori tumpukan dari waktu ke waktu.</caption>
+      <caption xml:lang="it">Grafico delle allocazioni della memoria heap nel tempo.</caption>
       <caption xml:lang="nl">Grafiek van toewijzingen van heap-geheugen in de tijd.</caption>
       <caption xml:lang="nn">Diagram over minnereserveringar over tid.</caption>
       <caption xml:lang="pl">zobrazować przydzielenia pamięci w czasie.</caption>
