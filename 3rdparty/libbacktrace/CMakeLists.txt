@@ -170,7 +170,6 @@ include_directories (BEFORE
 )
 include_directories (
     auxincl
-    ${LIBUNWIND_INCLUDE_DIR}
 )
 
 add_library (backtrace STATIC
@@ -185,8 +184,6 @@ add_library (backtrace STATIC
     state.c
     sort.c
 )
-
-target_link_libraries(backtrace ${LIBUNWIND_LIBRARY})
 
 set_target_properties (backtrace PROPERTIES
     COMPILE_FLAGS "${CMAKE_SHARED_LIBRARY_C_FLAGS}"
