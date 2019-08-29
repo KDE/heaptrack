@@ -6,7 +6,6 @@ set(CMAKE_BUILD_TYPE Debug)
 configure_file(tst_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/tst_config.h @ONLY)
 
 include_directories(
-    ${LIBUNWIND_INCLUDE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../
     ${CMAKE_CURRENT_SOURCE_DIR}/../../src
@@ -14,7 +13,7 @@ include_directories(
 add_definitions(-DCATCH_CONFIG_MAIN)
 
 add_executable(tst_trace tst_trace.cpp)
-target_link_libraries(tst_trace ${LIBUNWIND_LIBRARY})
+target_link_libraries(tst_trace heaptrack_unwind)
 add_test(NAME tst_trace COMMAND tst_trace)
 
 if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
@@ -30,7 +29,7 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
         LINK_PRIVATE
             ${CMAKE_DL_LIBS}
             ${CMAKE_THREAD_LIBS_INIT}
-            ${LIBUNWIND_LIBRARY}
+            heaptrack_unwind
             rt
             ${Boost_SYSTEM_LIBRARY}
             ${Boost_FILESYSTEM_LIBRARY}

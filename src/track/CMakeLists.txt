@@ -1,6 +1,5 @@
 include_directories(
     ${Boost_INCLUDE_DIRS}
-    ${LIBUNWIND_INCLUDE_DIR}
 )
 
 # heaptrack: bash script to inject/preload
@@ -12,6 +11,17 @@ install(PROGRAMS ${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}/heaptrack
     DESTINATION ${BIN_INSTALL_DIR}
 )
 
+if (HEAPTRACK_USE_LIBUNWIND)
+    include_directories(${LIBUNWIND_INCLUDE_DIR})
+
+    add_library(heaptrack_unwind STATIC trace_libunwind.cpp)
+    target_link_libraries(heaptrack_unwind LINK_PRIVATE ${LIBUNWIND_LIBRARY})
+else()
+    add_library(heaptrack_unwind STATIC trace_unwind_tables.cpp)
+endif()
+
+set_property(TARGET heaptrack_unwind PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 # heaptrack_preload: track a newly started process
 add_library(heaptrack_preload MODULE
     heaptrack_preload.cpp
@@ -21,7 +31,7 @@ add_library(heaptrack_preload MODULE
 target_link_libraries(heaptrack_preload LINK_PRIVATE
     ${CMAKE_DL_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
-    ${LIBUNWIND_LIBRARY}
+    heaptrack_unwind
     rt
 )
 
@@ -44,7 +54,7 @@ add_library(heaptrack_inject MODULE
 target_link_libraries(heaptrack_inject LINK_PRIVATE
     ${CMAKE_DL_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
-    ${LIBUNWIND_LIBRARY}
+    heaptrack_unwind
     rt
 )
 

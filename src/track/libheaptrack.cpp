@@ -141,32 +141,9 @@ void printBacktrace()
     if (s_debugVerbosity == NoDebugOutput)
         return;
 
-#if LIBUNWIND_HAS_UNW_GETCONTEXT && LIBUNWIND_HAS_UNW_INIT_LOCAL
     RecursionGuard guard;
 
-    unw_context_t context;
-    unw_getcontext(&context);
-
-    unw_cursor_t cursor;
-    unw_init_local(&cursor, &context);
-
-    int frameNr = 0;
-    while (unw_step(&cursor)) {
-        ++frameNr;
-        unw_word_t ip = 0;
-        unw_get_reg(&cursor, UNW_REG_IP, &ip);
-
-        unw_word_t sp = 0;
-        unw_get_reg(&cursor, UNW_REG_SP, &sp);
-
-        char symbol[256] = {"<unknown>"};
-        unw_word_t offset = 0;
-        unw_get_proc_name(&cursor, symbol, sizeof(symbol), &offset);
-
-        fprintf(stderr, "#%-2d 0x%016" PRIxPTR " sp=0x%016" PRIxPTR " %s + 0x%" PRIxPTR "\n", frameNr,
-                static_cast<uintptr_t>(ip), static_cast<uintptr_t>(sp), symbol, static_cast<uintptr_t>(offset));
-    }
-#endif
+    Trace::print();
 }
 
 /**
@@ -261,15 +238,8 @@ public:
         static once_flag once;
         call_once(once, [] {
             debugLog<MinimalOutput>("%s", "doing once-only initialization");
-            // configure libunwind for better speed
-            if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
-                fprintf(stderr, "WARNING: Failed to enable per-thread libunwind caching.\n");
-            }
-#if LIBUNWIND_HAS_UNW_SET_CACHE_SIZE
-            if (unw_set_cache_size(unw_local_addr_space, 1024, 0)) {
-                fprintf(stderr, "WARNING: Failed to set libunwind cache size.\n");
-            }
-#endif
+
+            Trace::setup();
 
             // do not trace forked child processes
             // TODO: make this configurable

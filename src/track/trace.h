@@ -19,13 +19,8 @@
 #ifndef TRACE_H
 #define TRACE_H
 
-#include <cstring>
-
-#define UNW_LOCAL_ONLY
-#include <libunwind.h>
-
 /**
- * @brief A libunwind based backtrace.
+ * @brief Backtrace interface.
  */
 struct Trace
 {
@@ -58,8 +53,8 @@ struct Trace
 
     bool fill(int skip)
     {
-        int size = unw_backtrace(m_data, MAX_SIZE);
-        // filter bogus frames at the end, which sometimes get returned by libunwind
+        int size = unwind(m_data);
+        // filter bogus frames at the end, which sometimes get returned by tracer backend
         // cf.: https://bugs.kde.org/show_bug.cgi?id=379082
         while (size > 0 && !m_data[size - 1]) {
             --size;
@@ -69,6 +64,13 @@ struct Trace
         return m_size > 0;
     }
 
+    static void setup();
+
+    static void print();
+
+private:
+    static int unwind(void** data);
+    
 private:
     int m_size = 0;
     int m_skip = 0;

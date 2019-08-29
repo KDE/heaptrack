@@ -62,6 +62,12 @@ option(
   ${HEAPTRACK_BUILD_ANALYZE_DEFAULT}
 )
 
+option(
+  HEAPTRACK_USE_LIBUNWIND
+  "Define preferred unwind functionality - Libunwind as ON and unwind_tables as OFF."
+  ON
+)
+
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if (NOT MSVC)
@@ -102,7 +108,9 @@ file(RELATIVE_PATH LIB_REL_PATH
 set(ECM_ENABLE_SANITIZERS "" CACHE STRING "semicolon-separated list of sanitizers to enable for code that is not injected into client applications")
 
 if (HEAPTRACK_BUILD_TRACK)
-    find_package(Libunwind REQUIRED)
+    if (HEAPTRACK_USE_LIBUNWIND)
+        find_package(Libunwind REQUIRED)
+    endif()
 
     check_cxx_source_compiles(
         "#include <stdio_ext.h>
