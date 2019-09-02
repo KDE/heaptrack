@@ -83,7 +83,9 @@ HOOK(cfree);
 #endif
 HOOK(realloc);
 HOOK(posix_memalign);
+#if HAVE_VALLOC
 HOOK(valloc);
+#endif
 #if HAVE_ALIGNED_ALLOC
 HOOK(aligned_alloc);
 #endif
@@ -153,7 +155,9 @@ void init()
 #endif
                        hooks::realloc.init();
                        hooks::posix_memalign.init();
+#if HAVE_VALLOC
                        hooks::valloc.init();
+#endif
 #if HAVE_ALIGNED_ALLOC
                        hooks::aligned_alloc.init();
 #endif
@@ -280,6 +284,7 @@ void* aligned_alloc(size_t alignment, size_t size) noexcept
 }
 #endif
 
+#if HAVE_VALLOC
 void* valloc(size_t size) noexcept
 {
     if (!hooks::valloc) {
@@ -294,6 +299,7 @@ void* valloc(size_t size) noexcept
 
     return ret;
 }
+#endif
 
 void* dlopen(const char* filename, int flag) noexcept
 {

@@ -109,6 +109,7 @@ endif()
 # See: https://bugs.kde.org/show_bug.cgi?id=383889
 include(CheckSymbolExists)
 check_symbol_exists(cfree malloc.h HAVE_CFREE)
+check_symbol_exists(valloc stdlib.h HAVE_VALLOC)
 
 set(BIN_INSTALL_DIR "bin")
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)")
