@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include <dlfcn.h>
 #include <errno.h>
 #include <link.h>
 #include <malloc.h>
