@@ -7,6 +7,9 @@ add_subdirectory(util)
 
 if (HEAPTRACK_BUILD_TRACK)
     add_subdirectory(track)
+endif()
+
+if (HEAPTRACK_BUILD_INTERPRET)
     add_subdirectory(interpret)
 endif()
 
