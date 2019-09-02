@@ -32,5 +32,6 @@
 // cfree() does not exist in glibc 2.26+.
 // See: https://bugs.kde.org/show_bug.cgi?id=383889
 #cmakedefine01 HAVE_CFREE
+#cmakedefine01 HAVE_VALLOC
 
 #endif // HEAPTRACK_CONFIG_H
