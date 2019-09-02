@@ -34,8 +34,10 @@ set_package_properties(Zstd PROPERTIES TYPE RECOMMENDED PURPOSE "Zstandard offer
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(HEAPTRACK_BUILD_TRACK_DEFAULT ON)
+    set(HEAPTRACK_BUILD_INTERPRET_DEFAULT ON)
 else()
     set(HEAPTRACK_BUILD_TRACK_DEFAULT OFF)
+    set(HEAPTRACK_BUILD_INTERPRET_DEFAULT OFF)
 endif()
 
 option(
@@ -43,6 +45,22 @@ option(
   "Disable this option to skip building the tracker part for heaptrack, e.g. to only build the GUI."
   ${HEAPTRACK_BUILD_TRACK_DEFAULT}
 )
+
+option(
+  HEAPTRACK_BUILD_BACKTRACE
+  "Enable this option to build libbacktrace. It will be enabled implicitly if HEAPTRACK_BUILD_INTERPRET is enabled."
+  OFF
+)
+
+option(
+  HEAPTRACK_BUILD_INTERPRET
+  "Disable this option to skip building the interpret part for heaptrack."
+  ${HEAPTRACK_BUILD_INTERPRET_DEFAULT}
+)
+
+if (HEAPTRACK_BUILD_INTERPRET)
+    set(HEAPTRACK_BUILD_BACKTRACE ON)
+endif()
 
 if (CMAKE_CROSSCOMPILING)
     set(HEAPTRACK_BUILD_ANALYZE_DEFAULT OFF)
