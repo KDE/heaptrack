@@ -445,6 +445,16 @@ public:
         s_data->out.writeHexLine('-', reinterpret_cast<uintptr_t>(ptr));
     }
 
+    static bool isPaused()
+    {
+        return s_paused;
+    }
+
+    static void setPaused(bool state)
+    {
+        s_paused = state;
+    }
+
 private:
     static int dl_iterate_phdr_callback(struct dl_phdr_info* info, size_t /*size*/, void* data)
     {
@@ -640,11 +650,16 @@ private:
 
     static std::mutex s_lock;
     static LockedData* s_data;
+
+private:
+    static std::atomic<bool> s_paused;
 };
 
 std::mutex HeapTrack::s_lock;
 HeapTrack::LockedData* HeapTrack::s_data{nullptr};
+std::atomic<bool> HeapTrack::s_paused{false};
 }
+
 extern "C" {
 
 void heaptrack_init(const char* outputFileName, heaptrack_callback_t initBeforeCallback,
@@ -675,9 +690,19 @@ void heaptrack_stop()
     heaptrack.shutdown();
 }
 
+void heaptrack_pause()
+{
+    HeapTrack::setPaused(true);
+}
+
+void heaptrack_resume()
+{
+    HeapTrack::setPaused(false);
+}
+
 void heaptrack_malloc(void* ptr, size_t size)
 {
-    if (ptr && !RecursionGuard::isActive) {
+    if (!HeapTrack::isPaused() && ptr && !RecursionGuard::isActive) {
         RecursionGuard guard;
 
         debugLog<VeryVerboseOutput>("heaptrack_malloc(%p, %zu)", ptr, size);
@@ -692,7 +717,7 @@ void heaptrack_malloc(void* ptr, size_t size)
 
 void heaptrack_free(void* ptr)
 {
-    if (ptr && !RecursionGuard::isActive) {
+    if (!HeapTrack::isPaused() && ptr && !RecursionGuard::isActive) {
         RecursionGuard guard;
 
         debugLog<VeryVerboseOutput>("heaptrack_free(%p)", ptr);
@@ -704,7 +729,7 @@ void heaptrack_free(void* ptr)
 
 void heaptrack_realloc(void* ptr_in, size_t size, void* ptr_out)
 {
-    if (ptr_out && !RecursionGuard::isActive) {
+    if (!HeapTrack::isPaused() && ptr_out && !RecursionGuard::isActive) {
         RecursionGuard guard;
 
         debugLog<VeryVerboseOutput>("heaptrack_realloc(%p, %zu, %p)", ptr_in, size, ptr_out);
