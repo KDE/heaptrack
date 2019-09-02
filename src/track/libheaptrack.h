@@ -33,6 +33,10 @@ void heaptrack_init(const char* outputFileName, heaptrack_callback_t initCallbac
 
 void heaptrack_stop();
 
+void heaptrack_pause();
+
+void heaptrack_resume();
+
 void heaptrack_malloc(void* ptr, size_t size);
 
 void heaptrack_free(void* ptr);
