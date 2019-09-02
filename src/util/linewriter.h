@@ -27,7 +27,10 @@
 #include <cassert>
 #include <climits>
 #include <cmath>
+#include <string>
 #include <cstring>
+
+#include <errno.h>
 #include <unistd.h>
 
 /**
