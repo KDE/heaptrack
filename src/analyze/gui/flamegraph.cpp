@@ -524,8 +524,8 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
     connect(m_resetAction, &QAction::triggered, this, [this]() { selectItem(0); });
     addAction(m_resetAction);
     updateNavigationActions();
-    setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(this, &QWidget::customContextMenuRequested, this, [this](const QPoint& point) {
+    m_view->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_view, &QWidget::customContextMenuRequested, this, [this](const QPoint& point) {
         auto* menu = new QMenu(this);
         menu->setAttribute(Qt::WA_DeleteOnClose, true);
         if (auto item = static_cast<const FrameGraphicsItem*>(m_view->itemAt(point))) {
@@ -535,7 +535,7 @@ FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
             menu->addSeparator();
         }
         menu->addActions(actions());
-        menu->popup(mapToGlobal(point));
+        menu->popup(m_view->mapToGlobal(point));
     });
 }
 
