@@ -27,7 +27,7 @@ find_package(Boost 1.41.0 COMPONENTS system filesystem iostreams)
 find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 
-if (${BOOST_iostreams_FOUND})
+if (${Boost_IOSTREAMS_FOUND})
     find_package(Zstd)
 endif()
 set_package_properties(Zstd PROPERTIES TYPE RECOMMENDED PURPOSE "Zstandard offers better (de)compression performance compared with gzip/zlib, making heaptrack faster and datafiles smaller.")
