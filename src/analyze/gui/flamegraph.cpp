@@ -576,7 +576,13 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
         }
         updateTooltip();
     } else if (event->type() == QEvent::ToolTip) {
-        const auto& tooltip = m_displayLabel->toolTip();
+        auto tooltip = m_displayLabel->toolTip();
+
+        if (m_tooltipItem != m_view->itemAt(m_view->mapFromGlobal(QCursor::pos()))) {
+            // don't show a tooltip when the cursor is in the empty region
+            tooltip.clear();
+        }
+
         if (tooltip.isEmpty()) {
             QToolTip::hideText();
         } else {
