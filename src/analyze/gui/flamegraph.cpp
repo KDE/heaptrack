@@ -193,7 +193,11 @@ QString FrameGraphicsItem::description() const
 {
     // we build the tooltip text on demand, which is much faster than doing that
     // for potentially thousands of items when we load the data
-    QString tooltip;
+    const auto symbol = i18nc("%1: function, %2: binary", "%1 (%2)", m_symbol.symbol, m_symbol.binary);
+    if (!parentItem()) {
+        return m_symbol.symbol;
+    }
+
     KFormat format;
     qint64 totalCost = 0;
     {
@@ -204,11 +208,8 @@ QString FrameGraphicsItem::description() const
         totalCost = item->cost();
     }
     const auto fraction = Util::formatCostRelative(m_cost, totalCost);
-    const auto symbol = i18nc("%1: function, %2: binary", "%1 (%2)", m_symbol.symbol, m_symbol.binary);
-    if (!parentItem()) {
-        return symbol;
-    }
 
+    QString tooltip;
     switch (m_costType) {
     case Allocations:
         tooltip = i18nc("%1: number of allocations, %2: relative number, %3: function label",
