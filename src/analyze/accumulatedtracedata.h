@@ -41,7 +41,9 @@ struct Frame
 
     bool operator==(const Frame& rhs) const
     {
-        return std::tie(functionIndex, fileIndex, line) == std::tie(rhs.functionIndex, rhs.fileIndex, rhs.line);
+        return functionIndex == rhs.functionIndex &&
+                fileIndex == rhs.fileIndex &&
+                line == rhs.line;
     }
 
     bool operator<(const Frame& rhs) const
@@ -64,7 +66,7 @@ struct InstructionPointer
 
     bool equalWithoutAddress(const InstructionPointer& other) const
     {
-        return std::tie(moduleIndex, frame) == std::tie(other.moduleIndex, other.frame);
+        return moduleIndex == other.moduleIndex && frame == other.frame;
     }
 };
 
