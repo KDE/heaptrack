@@ -5,7 +5,6 @@ endif()
 include_directories(
     ${Boost_INCLUDE_DIRS}
     ${PROJECT_SOURCE_DIR}/3rdparty/
-    ${ZLIB_INCLUDE_DIRS}
 )
 
 add_executable(heaptrack_interpret
