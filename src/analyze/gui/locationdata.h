@@ -93,7 +93,8 @@ Q_DECLARE_METATYPE(FileLine)
 
 inline QString unresolvedFunctionName()
 {
-    return i18n("<unresolved function>");
+    static QString msg = i18n("<unresolved function>");
+    return msg;
 }
 
 inline uint qHash(const Symbol& symbol, uint seed_ = 0)
