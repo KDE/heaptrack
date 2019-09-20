@@ -28,12 +28,15 @@
 
 #include <KLocalizedString>
 
+using SymbolId = uint64_t;
+
 struct Symbol
 {
-    Symbol(const QString& symbol = {}, const QString& binary = {}, const QString& path = {})
+    Symbol(const QString& symbol = {}, const QString& binary = {}, const QString& path = {}, SymbolId symbolId = 0)
         : symbol(symbol)
         , binary(binary)
         , path(path)
+        , symbolId(symbolId)
     {
     }
 
@@ -43,10 +46,12 @@ struct Symbol
     QString binary;
     // path to dso / executable
     QString path;
+    // ID
+    SymbolId symbolId;
 
     bool operator==(const Symbol& rhs) const
     {
-        return std::tie(symbol, binary, path) == std::tie(rhs.symbol, rhs.binary, rhs.path);
+        return symbolId == rhs.symbolId;
     }
 
     bool operator!=(const Symbol& rhs) const
@@ -56,12 +61,12 @@ struct Symbol
 
     bool operator<(const Symbol& rhs) const
     {
-        return std::tie(symbol, binary, path) < std::tie(rhs.symbol, rhs.binary, rhs.path);
+        return symbolId < rhs.symbolId;
     }
 
     bool isValid() const
     {
-        return !symbol.isEmpty() || !binary.isEmpty() || !path.isEmpty();
+        return symbolId > 0;
     }
 
     struct FullLessThan {
@@ -105,11 +110,7 @@ inline QString unresolvedFunctionName()
 
 inline uint qHash(const Symbol& symbol, uint seed_ = 0)
 {
-    size_t seed = seed_;
-    boost::hash_combine(seed, qHash(symbol.symbol));
-    boost::hash_combine(seed, qHash(symbol.binary));
-    boost::hash_combine(seed, qHash(symbol.path));
-    return seed;
+    return qHash(symbol.symbolId, seed_);
 }
 
 inline uint qHash(const FileLine& location, uint seed_ = 0)

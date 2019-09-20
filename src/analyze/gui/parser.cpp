@@ -77,7 +77,10 @@ struct StringCache
         if (binaryIt == m_pathToBinaries.end()) {
             binaryIt = m_pathToBinaries.insert(module, Util::basename(module));
         }
-        return {{func(frame), *binaryIt, module}, {file(frame), frame.line}};
+        const SymbolId id = ++m_nextSymbolId;
+        auto symbol = Symbol{func(frame), *binaryIt, module, id};
+        const auto it = m_symbols.emplace(std::make_pair(std::move(symbol), id)).first;
+        return {it->first, {file(frame), frame.line}};
     }
 
     void update(const vector<string>& strings)
@@ -86,11 +89,21 @@ struct StringCache
                   [](const string& str) { return QString::fromStdString(str); });
     }
 
+    struct SymbolCompare {
+        bool operator()(const Symbol &lhs, const Symbol &rhs) {
+            return std::tie(lhs.symbol, lhs.binary, lhs.path) < std::tie(rhs.symbol, rhs.binary, rhs.path);
+        }
+    };
+
     vector<QString> m_strings;
     // interned module basenames
     mutable QHash<QString, QString> m_pathToBinaries;
+    // existing symbols
+    mutable std::map<Symbol, SymbolId, SymbolCompare> m_symbols;
 
     bool diffMode = false;
+
+    mutable SymbolId m_nextSymbolId = 0;
 };
 
 struct ChartMergeData
