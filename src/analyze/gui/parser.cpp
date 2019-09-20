@@ -300,7 +300,7 @@ void addCallerCalleeEvent(const Location& location, const AllocationData& cost, 
     }
 }
 
-std::pair<TreeData, CallerCalleeResults> mergeAllocations(const ParserData& data)
+std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser *parser, const ParserData& data)
 {
     CallerCalleeResults callerCalleeResults;
     TreeData topRows;
@@ -316,6 +316,9 @@ std::pair<TreeData, CallerCalleeResults> mergeAllocations(const ParserData& data
         addCallerCalleeEvent(location, cost, &symbolRecursionGuard, &callerCalleeResults);
         return &it->children;
     };
+    const auto allocationCount = data.allocations.size();
+    const auto onePercent = std::max<size_t>(1, allocationCount / 100);
+    auto progress = 0;
     // merge allocations, leave parent pointers invalid (their location may change)
     for (const auto& allocation : data.allocations) {
         auto traceIndex = allocation.traceIndex;
@@ -340,6 +343,11 @@ std::pair<TreeData, CallerCalleeResults> mergeAllocations(const ParserData& data
                 qWarning() << "Trace recursion detected - corrupt data file?";
                 break;
             }
+        }
+        ++progress;
+        if ((progress % onePercent) == 0) {
+            const int percent = progress * 100 / allocationCount;
+            emit parser->progressMessageAvailable(i18n("merging allocations... %1%", percent));
         }
     }
     // now set the parents, the data is constant from here on
@@ -589,7 +597,7 @@ void Parser::parse(const QString& path, const QString& diffBase)
 
         emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again
-        const auto mergedAllocations = mergeAllocations(*data);
+        const auto mergedAllocations = mergeAllocations(this, *data);
         emit bottomUpDataAvailable(mergedAllocations.first);
 
         // also calculate the size histogram
