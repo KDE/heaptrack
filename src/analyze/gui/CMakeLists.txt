@@ -19,29 +19,47 @@ option(APPIMAGE_BUILD "configure build for bundling in an appimage" OFF)
 
 configure_file(gui_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/gui_config.h)
 
+add_definitions(-Wall
+    -DQT_NO_URL_CAST_FROM_STRING
+    -DQT_NO_CAST_FROM_ASCII -DQT_NO_CAST_TO_ASCII
+    -DQT_NO_CAST_FROM_BYTEARRAY
+    -DQT_USE_QSTRINGBUILDER
+)
+
+add_library(heaptrack_gui_private STATIC
+    util.cpp
+    parser.cpp
+)
+target_link_libraries(heaptrack_gui_private PUBLIC
+    KF5::I18n
+    KF5::CoreAddons # KFormat
+    KF5::ThreadWeaver
+    Qt5::Core
+    sharedprint
+    pthread
+    ${CMAKE_THREAD_LIBS_INIT}
+)
+
 set(SRCFILES
     gui.cpp
     mainwindow.cpp
     treemodel.cpp
     treeproxy.cpp
     costdelegate.cpp
-    parser.cpp
     flamegraph.cpp
     stacksmodel.cpp
     topproxy.cpp
     callercalleemodel.cpp
-    util.cpp
 )
 
 set(LIBRARIES
     Qt5::Widgets
     KF5::ItemModels
-    KF5::ThreadWeaver
     KF5::ConfigWidgets
     KF5::I18n
     KF5::KIOWidgets
     sharedprint
-    ${CMAKE_THREAD_LIBS_INIT}
+    heaptrack_gui_private
 )
 
 
@@ -57,13 +75,6 @@ if (KChart_FOUND)
         KChart
     )
 endif()
-
-add_definitions(-Wall
-    -DQT_NO_URL_CAST_FROM_STRING
-    -DQT_NO_CAST_FROM_ASCII -DQT_NO_CAST_TO_ASCII
-    -DQT_NO_CAST_FROM_BYTEARRAY
-    -DQT_USE_QSTRINGBUILDER
-)
 
 add_executable(heaptrack_gui
     ${SRCFILES}

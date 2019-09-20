@@ -15,3 +15,6 @@ if (HAVE_MALLOC_H)
 
     add_executable(measure_malloc_overhead measure_malloc_overhead.cpp)
 endif()
+
+add_executable(bench_parser bench_parser.cpp)
+target_link_libraries(bench_parser sharedprint heaptrack_gui_private)

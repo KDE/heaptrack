@@ -22,8 +22,6 @@
 #include <QAbstractItemModel>
 #include <QVector>
 
-#include <KFormat>
-
 #include "../allocationdata.h"
 #include "hashmodel.h"
 #include "locationdata.h"
