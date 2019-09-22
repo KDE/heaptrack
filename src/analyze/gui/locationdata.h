@@ -63,6 +63,12 @@ struct Symbol
     {
         return !symbol.isEmpty() || !binary.isEmpty() || !path.isEmpty();
     }
+
+    struct FullLessThan {
+        bool operator()(const Symbol &lhs, const Symbol &rhs) const {
+            return std::tie(lhs.symbol, lhs.binary, lhs.path) < std::tie(rhs.symbol, rhs.binary, rhs.path);
+        }
+    };
 };
 
 Q_DECLARE_TYPEINFO(Symbol, Q_MOVABLE_TYPE);
