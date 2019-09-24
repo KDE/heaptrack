@@ -28,8 +28,22 @@
 #include <future>
 #include <tuple>
 #include <vector>
+#include <unordered_map>
 
 using namespace std;
+
+// Only use this hash when filling in the cache
+struct CacheSymbolHash
+{
+    std::size_t operator()(const Symbol &symbol) const noexcept
+    {
+        size_t seed = 0;
+        boost::hash_combine(seed, std::hash<QString>{}(symbol.symbol));
+        boost::hash_combine(seed, std::hash<QString>{}(symbol.binary));
+        boost::hash_combine(seed, std::hash<QString>{}(symbol.path));
+        return seed;
+    }
+};
 
 namespace {
 
@@ -79,6 +93,7 @@ struct StringCache
         }
         const SymbolId id = ++m_nextSymbolId;
         auto symbol = Symbol{func(frame), *binaryIt, module, id};
+        // Insert symbol into the hash, or use existing one (in which case the new ID won't be used)
         const auto it = m_symbols.emplace(std::make_pair(std::move(symbol), id)).first;
         return {it->first, {file(frame), frame.line}};
     }
@@ -89,17 +104,11 @@ struct StringCache
                   [](const string& str) { return QString::fromStdString(str); });
     }
 
-    struct SymbolCompare {
-        bool operator()(const Symbol &lhs, const Symbol &rhs) {
-            return std::tie(lhs.symbol, lhs.binary, lhs.path) < std::tie(rhs.symbol, rhs.binary, rhs.path);
-        }
-    };
-
     vector<QString> m_strings;
     // interned module basenames
     mutable QHash<QString, QString> m_pathToBinaries;
     // existing symbols
-    mutable std::map<Symbol, SymbolId, SymbolCompare> m_symbols;
+    mutable std::unordered_map<Symbol, SymbolId, CacheSymbolHash, Symbol::FullEqual> m_symbols;
 
     bool diffMode = false;
 
