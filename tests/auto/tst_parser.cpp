@@ -20,6 +20,7 @@
 
 #include "parser.h"
 #include "locationdata.h"
+#include "treemodel.h"
 #include "tst_config.h" // for SRC_DIR
 
 #include <QDebug>
@@ -32,18 +33,20 @@ TEST_CASE ("parse sample file", "[parser]") {
     Parser parser;
 
     qRegisterMetaType<CallerCalleeResults>();
-    QSignalSpy spy(&parser, &Parser::callerCalleeDataAvailable);
+    QSignalSpy spyCCD(&parser, &Parser::callerCalleeDataAvailable);
+    QSignalSpy spyBottomUp(&parser, &Parser::bottomUpDataAvailable);
+    QSignalSpy spyTopDown(&parser, &Parser::topDownDataAvailable);
 
     parser.parse(SRC_DIR "/heaptrack.david.18594.gz", QString());
 
-    if (spy.isEmpty())
-        REQUIRE(spy.wait());
+    // ---- Check Caller Callee Data
 
-    const CallerCalleeResults ccr = spy.at(0).at(0).value<CallerCalleeResults>();
+    if (spyCCD.isEmpty())
+        REQUIRE(spyCCD.wait());
 
+    const CallerCalleeResults ccr = spyCCD.at(0).at(0).value<CallerCalleeResults>();
     auto ccrSymbolList = ccr.entries.keys();
     std::sort(ccrSymbolList.begin(), ccrSymbolList.end(), Symbol::FullLessThan());
-
     if (!qgetenv("HEAPTRACK_DEBUG").isEmpty()) {
         for (const Symbol &sym : ccrSymbolList) {
             qDebug() << sym.symbol << sym.binary << sym.path;
@@ -60,4 +63,41 @@ TEST_CASE ("parse sample file", "[parser]") {
 
     REQUIRE(ccr.entries.count() == 365);
     REQUIRE(ccr.totalCosts.allocations == 2896);
+
+    // ---- Check Bottom Up Data
+
+    if (spyBottomUp.isEmpty())
+        REQUIRE(spyBottomUp.wait());
+
+    const TreeData bottomUpData = spyBottomUp.at(0).at(0).value<TreeData>();
+    if (!qgetenv("HEAPTRACK_DEBUG").isEmpty()) {
+        qDebug() << "Bottom Up Data:";
+        for (const RowData &row : bottomUpData) {
+            qDebug() << symbolToString(row.symbol);
+        }
+    }
+    REQUIRE(bottomUpData.size() == 54);
+    REQUIRE(symbolToString(bottomUpData.at(0).symbol) == "<unresolved function>|libglib-2.0.so.0|/usr/lib64/libglib-2.0.so.0");
+    REQUIRE(bottomUpData.at(0).children.size() == 2);
+    REQUIRE(bottomUpData.at(0).cost.allocations == 17);
+    REQUIRE(bottomUpData.at(0).cost.peak == 2020);
+    REQUIRE(symbolToString(bottomUpData.at(53).symbol) == "QThreadPool::QThreadPool(QObject*)|libQt5Core.so.5|/d/qt/5/kde/build/qtbase/lib/libQt5Core.so.5");
+
+    // ---- Check Top Down Data
+
+    if (spyTopDown.isEmpty())
+        REQUIRE(spyTopDown.wait());
+
+    const TreeData topDownData = spyTopDown.at(0).at(0).value<TreeData>();
+    if (!qgetenv("HEAPTRACK_DEBUG").isEmpty()) {
+        qDebug() << "Top Down Data:";
+        for (const RowData &row : topDownData) {
+            qDebug() << symbolToString(row.symbol);
+        }
+    }
+    REQUIRE(topDownData.size() == 5);
+    REQUIRE(symbolToString(topDownData.at(0).symbol) == "<unresolved function>|ld-linux-x86-64.so.2|/lib64/ld-linux-x86-64.so.2");
+    REQUIRE(topDownData.at(0).children.size() == 1);
+    REQUIRE(topDownData.at(0).cost.allocations == 15);
+    REQUIRE(topDownData.at(0).cost.peak == 94496);
 }
