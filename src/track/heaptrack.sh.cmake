@@ -194,6 +194,16 @@ LIBHEAPTRACK_INJECT=$(readlink -f "$LIBHEAPTRACK_INJECT")
 pipe=/tmp/heaptrack_fifo$$
 mkfifo $pipe
 
+# if root is profiling a process for non root
+# give profiled process write access to the pipe
+if [ ! -z "$pid" ]; then
+  pid_user=$(stat -c %U /proc/"$pid")
+  if [ -z "$pid_user" ]; then
+    exit 1
+  fi
+  chown "$pid_user" "$pipe" || exit 1
+fi
+
 output_suffix="gz"
 COMPRESSOR="gzip -c"
 
