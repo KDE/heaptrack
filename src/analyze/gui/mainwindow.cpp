@@ -159,6 +159,19 @@ void addLocationContextMenu(QTreeView* treeView, MainWindow* window)
     });
 }
 
+Qt::SortOrder defaultSortOrder(QAbstractItemModel* model, int column)
+{
+    auto initialSortOrder = model->headerData(column, Qt::Horizontal, Qt::InitialSortOrderRole);
+    if (initialSortOrder.canConvert<Qt::SortOrder>())
+        return initialSortOrder.value<Qt::SortOrder>();
+    return Qt::AscendingOrder;
+}
+
+void sortByColumn(QTreeView* view, int column)
+{
+    view->sortByColumn(column, defaultSortOrder(view->model(), column));
+}
+
 template <typename T>
 void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type, T callback)
 {
@@ -166,7 +179,7 @@ void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type, T cal
     proxy->setSourceModel(source);
     proxy->setSortRole(TreeModel::SortRole);
     view->setModel(proxy);
-    view->sortByColumn(0);
+    sortByColumn(view, 0);
     view->header()->setStretchLastSection(true);
     setupTreeContextMenu(view, callback);
 }
@@ -216,7 +229,7 @@ void setupCallerCallee(CallerCalleeModel* model, QTreeView* view, QLineEdit* fil
     callerCalleeProxy->setSourceModel(model);
     callerCalleeProxy->setSortRole(CallerCalleeModel::SortRole);
     view->setModel(callerCalleeProxy);
-    view->sortByColumn(CallerCalleeModel::InclusivePeakColumn);
+    sortByColumn(view, CallerCalleeModel::InclusivePeakColumn);
     view->setItemDelegateForColumn(CallerCalleeModel::SelfPeakColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::SelfLeakedColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::SelfAllocationsColumn, costDelegate);
@@ -238,8 +251,8 @@ Model* setupModelAndProxyForView(QTreeView* view, int nonCostColumns)
     auto proxy = new QSortFilterProxyModel(model);
     proxy->setSourceModel(model);
     proxy->setSortRole(Model::SortRole);
-    view->sortByColumn(Model::InitialSortColumn);
     view->setModel(proxy);
+    sortByColumn(view, Model::InitialSortColumn);
     view->header()->setStretchLastSection(false);
     view->header()->setSectionResizeMode(0, QHeaderView::Stretch);
     for (int i = 0; i < nonCostColumns; ++i) {
