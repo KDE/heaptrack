@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>512-heaptrack_app_icon.png</file>
+    </qresource>
+</RCC>

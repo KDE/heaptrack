@@ -12,6 +12,8 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
 include(ECMAddTests)
+include(ECMInstallIcons)
+include(ECMAddAppIcon)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -50,6 +52,12 @@ set(SRCFILES
     stacksmodel.cpp
     topproxy.cpp
     callercalleemodel.cpp
+    resources.qrc
+)
+
+ecm_add_app_icon(SRCFILES ICONS
+    ${CMAKE_CURRENT_SOURCE_DIR}/128-heaptrack_app_icon.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/512-heaptrack_app_icon.png
 )
 
 set(LIBRARIES
@@ -61,7 +69,6 @@ set(LIBRARIES
     sharedprint
     heaptrack_gui_private
 )
-
 
 if (KChart_FOUND)
     list(APPEND SRCFILES
@@ -101,7 +108,6 @@ install(FILES org.kde.heaptrack.appdata.xml
     DESTINATION ${KDE_INSTALL_METAINFODIR}
 )
 
-include(ECMInstallIcons)
 ecm_install_icons(ICONS
   16-apps-heaptrack.png
   22-apps-heaptrack.png
@@ -109,7 +115,6 @@ ecm_install_icons(ICONS
   48-apps-heaptrack.png
   64-apps-heaptrack.png
   128-apps-heaptrack.png
-  sc-apps-heaptrack.svg
   DESTINATION ${KDE_INSTALL_ICONDIR}
   THEME hicolor
 )
