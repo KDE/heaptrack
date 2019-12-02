@@ -464,7 +464,7 @@ vector<StringIndex> remapStrings(vector<string>& lhs, const vector<string>& rhs)
 }
 
 template <typename T>
-inline const T& identity(const T& t)
+inline T identity(const T& t)
 {
     return t;
 }
