@@ -39,13 +39,15 @@ void StacksModel::setStackIndex(int index)
 
 static void findLeafs(const QModelIndex& index, QVector<QModelIndex>* leafs)
 {
-    int rows = index.model()->rowCount(index);
+    auto model = index.model();
+    Q_ASSERT(model);
+    int rows = model->rowCount(index);
     if (!rows) {
         leafs->append(index);
         return;
     }
     for (int i = 0; i < rows; ++i) {
-        findLeafs(index.child(i, 0), leafs);
+        findLeafs(model->index(i, 0, index), leafs);
     }
 }
 
