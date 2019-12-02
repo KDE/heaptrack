@@ -46,6 +46,7 @@ RUN git clone git://git.sv.gnu.org/libunwind.git && \
 
 WORKDIR /opt/libunwind
 
+COPY tools/elf.h /usr/include/
 RUN autoreconf -vfi && \
     ./configure --prefix /usr/local --enable-debug-frame --enable-minidebuginfo && \
     make -j$(nproc) && make install
