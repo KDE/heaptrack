@@ -65,6 +65,7 @@
     <p xml:lang="nn">Heaptrack sporar alle minnereserveringar og merkjer dei med tilhøyrande stabelspor. Analyseverktøyet lèt deg så tolka minneprofilen for å:</p>
     <p xml:lang="pl">Heaptrack rejestruje wszystkie przydziały pamięci i przypisuje tym zdarzeniom ślady stosu. Dedykowane narzędzia analizy, które umożliwiają interpretację profilu pamięcy aby:</p>
     <p xml:lang="pt">O Heaptrack faz uma análise de todas as alocações de memória e anota esses eventos com os registos de chamadas. As ferramentas de análise dedicadas permitem-lhe então interpretar o perfil da memória de dados para:</p>
+    <p xml:lang="pt-BR">O heaptrack traça todas as alocações de memória e anota estes eventos com rastreios de pilha. As ferramentas dedicadas de análises permitirão a você interpretar o perfil de memória da pilha para:</p>
     <p xml:lang="sk">Heaptrack trasuje všetky pamäťové alokácie a anotuje tieto udalosti s trasovaním sledu. Samostatné analytické nástroje vám pomôžu interpretovať profil pamäťovej haldy na:</p>
     <p xml:lang="sv">Heaptrack spårar alla minnestilldelningar och förser händelserna med noter om bakåtspårningar av stacken. Särskilda analysverktyg låter dig sedan tolka heap-minnesprofilen för att:</p>
     <p xml:lang="tr">Heaptrack, tüm bellek tahsislerini izler ve bu olayları yığın izleriyle açıklar. Ayrılmış analiz araçları daha sonra yığın bellek profilini yorumlamanıza izin verir:</p>
@@ -84,6 +85,7 @@
       <li xml:lang="nn">Finna problemområde som må optimerast for å redusera minnebruken til programmet.</li>
       <li xml:lang="pl">znaleźć gorące miejsca, które wymagają optymalizacji do zmniejszenia zapotrzebowania na pamięć dla twojej aplikacji</li>
       <li xml:lang="pt">descobrir pontos críticos que precisam de optimização para reduzir a 'pegada' de memória da sua aplicação</li>
+      <li xml:lang="pt-BR">encontrar pontos de acesso que precisam ser otimizados para reduzir o consumo de memória de seu aplicativo</li>
       <li xml:lang="sk">nájdenie hotspotu, ktoý treba optimalizovať na zníženie použitia pamäte vašej aplikácie</li>
       <li xml:lang="sv">Hitta överbelastningsställen som behöver optimeras för att reducera programmets minnesanvändning.</li>
       <li xml:lang="tr">uygulamanızın belleğin kapladığı alanı azaltmak için optimize edilmesi gereken etkin noktaları bulun</li>
@@ -102,6 +104,7 @@
       <li xml:lang="nn">Finna minnelekkasjar – område der minne vert reservert men aldri frigjort.</li>
       <li xml:lang="pl">znaleźć wycieki pamięci, tj. miejsca, które przydzielają pamięć, która nigdy nie zostanie zwolniona</li>
       <li xml:lang="pt">descobrir fugas de memória, i.e. localizações que alocam memória que nunca é libertada</li>
+      <li xml:lang="pt-BR">encontrar vazamentos de memória, por exemplo localizações que alocam memória que nunca é desalocada</li>
       <li xml:lang="sk">nájdenie pamäťových únikov, teda miest, ktoré alokujú pamäť, ktorá sa nikdy neuvoľní</li>
       <li xml:lang="sv">Hitta minnesläckor, dvs. ställen där minne tilldelas som aldrig frigörs.</li>
       <li xml:lang="tr">bellek sızıntılarını, yani hiçbir zaman tahsis edilmemiş belleği tahsis eden yerleri bulun</li>
@@ -120,6 +123,7 @@
       <li xml:lang="nn">Finna område i programkoden som utløyser veldig mange minnereserveringskall.</li>
       <li xml:lang="pl">znaleźć gorące miejsca przydziału pamięci, tj. miejsca kodu, które są odpowiedzialne za wiele przydzieleń pamięci</li>
       <li xml:lang="pt">descobrir pontos críticos de alocação, i.e. localizações de memória que despoletam bastantes chamadas de alocação de memória</li>
+      <li xml:lang="pt-BR">encontrar pontos de acesso de alocação, por exemplo localização de códigos que ativam muitas chamadas de alocação de memória</li>
       <li xml:lang="sk">nájdenie hotspotov alokácií, teda iest, ktoré spúšťajú veľa volaní alokácie pamäte</li>
       <li xml:lang="sv">Hitta överbelastningsställen för tilldelningar, dvs. ställen i koden som orsakar många anrop till minnestilldelning.</li>
       <li xml:lang="tr">tahsis edilen noktaları, yani bir çok bellek ayırma çağrısını tetikleyen kod yerlerini bulun</li>
@@ -138,6 +142,7 @@
       <li xml:lang="nn">Finna «mellombelse» reserveringar – reserveringar som umiddelbart vert etterfølgde av avreserveringar.</li>
       <li xml:lang="pl">znaleźć tymczasowe przydzielenia, które są przydzieleniami bezpośrednio zwalnianymi poprzez zwolnienie przydziału</li>
       <li xml:lang="pt">descobrir alocações temporárias, que são alocações que são directamente seguidas da sua libertação</li>
+      <li xml:lang="pt-BR">encontrar alocações temporárias, que são alocações que são seguidas diretamente por sua desalocação</li>
       <li xml:lang="sk">nájdenie dočasných alokácií, čo sú alokácie, ktoré priamo nasleduje ich dealokácia</li>
       <li xml:lang="sv">Hitta tillfälliga tilldelningar, som är tilldelningar som direkt frigörs.</li>
       <li xml:lang="tr">tahsisin ardından bırakılacak olan, geçici tahsisleri bulun</li>
@@ -164,6 +169,7 @@
       <caption xml:lang="nn">Samandrag av minnereserveringsdata.</caption>
       <caption xml:lang="pl">podsumować dane przydzielone w pamięci</caption>
       <caption xml:lang="pt">Um resumo dos dados de alocação de memória registados.</caption>
+      <caption xml:lang="pt-BR">Resumo dos dados rastreados de alocação de memória de dados.</caption>
       <caption xml:lang="sk">Sumár alokačných údajov sledovanej pamäťovej haldy.</caption>
       <caption xml:lang="sv">Sammanfattning av spårad heap-minnestilldelningsdata</caption>
       <caption xml:lang="tr">İzlenen yığın bellek tahsis verilerinin özeti.</caption>
@@ -185,6 +191,7 @@
       <caption xml:lang="nn">Flammegraf-visualisering av talet på minnereserveringar.</caption>
       <caption xml:lang="pl">zobrazować na wykresie płomieni przydzielnia pamięci.</caption>
       <caption xml:lang="pt">Uma visualização em mapa de calor das alocações de memória de dados.</caption>
+      <caption xml:lang="pt-BR">Visualização em gráfico de chamas do número de alocações de memória de dados.</caption>
       <caption xml:lang="sk">Plameňový graf vizualizácie počtu alokácií pamätovej hromady.</caption>
       <caption xml:lang="sv">Visualisering av antal heap-minnestilldelningar med Flamegraph.</caption>
       <caption xml:lang="tr">Yığın bellek tahis etme sayısının Flamegraph görüntüsü.</caption>
@@ -206,6 +213,7 @@
       <caption xml:lang="nn">Diagram over minnereserveringar over tid.</caption>
       <caption xml:lang="pl">zobrazować przydzielenia pamięci w czasie.</caption>
       <caption xml:lang="pt">Gráfico das alocações de memória de dados ao longo do tempo.</caption>
+      <caption xml:lang="pt-BR">Gráfico das alocações de memória de dado no período de tempo.</caption>
       <caption xml:lang="sk">Graf alokácií pamäťovej hromady v čase.</caption>
       <caption xml:lang="sv">Diagram över heap-minnestilldelningar över tiden.</caption>
       <caption xml:lang="tr">Zaman için yığın bellek tahsislerinin grafiği.</caption>
