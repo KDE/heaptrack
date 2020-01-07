@@ -21,6 +21,8 @@
 #include "tempfile.h"
 #include "tst_config.h"
 
+#include <benchutil.h>
+
 #include <dlfcn.h>
 
 #include <iostream>
@@ -67,6 +69,7 @@ void runInjectTest(Load load, Unload unload)
     heaptrack_inject(file.fileName.c_str());
 
     auto* p = malloc(100);
+    escape(p);
     free(p);
 
     heaptrack_stop();

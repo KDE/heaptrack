@@ -69,10 +69,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-void escape(void *p)
-{
-    asm volatile("" : : "g"(p) : "memory");
-}
+#include <benchutil.h>
 
 int main()
 {
