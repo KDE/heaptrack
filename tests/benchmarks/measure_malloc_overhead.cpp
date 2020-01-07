@@ -20,12 +20,9 @@
 #include <malloc.h>
 #include <unistd.h>
 
-using namespace std;
+#include <benchutil.h>
 
-inline void escape(void* p)
-{
-    asm volatile("" : : "g"(p) : "memory");
-}
+using namespace std;
 
 int main()
 {
