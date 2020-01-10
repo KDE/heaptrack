@@ -31,7 +31,7 @@ endif()
 add_subdirectory(print)
 
 if(HEAPTRACK_BUILD_GUI)
-    find_package(Qt5 5.2.0 NO_MODULE OPTIONAL_COMPONENTS Widgets)
+    find_package(Qt5 5.10.0 NO_MODULE OPTIONAL_COMPONENTS Widgets)
     find_package(ECM 1.0.0 NO_MODULE)
     if(Qt5_FOUND AND ECM_FOUND)
         set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})

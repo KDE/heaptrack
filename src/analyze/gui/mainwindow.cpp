@@ -24,7 +24,6 @@
 
 #include <KConfigGroup>
 #include <KLocalizedString>
-#include <KRecursiveFilterProxyModel>
 #include <KStandardAction>
 
 #include <QAction>

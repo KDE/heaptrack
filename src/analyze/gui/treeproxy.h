@@ -19,9 +19,9 @@
 #ifndef TREEPROXY_H
 #define TREEPROXY_H
 
-#include <KRecursiveFilterProxyModel>
+#include <QSortFilterProxyModel>
 
-class TreeProxy final : public KRecursiveFilterProxyModel
+class TreeProxy final : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
@@ -33,7 +33,7 @@ public slots:
     void setModuleFilter(const QString& moduleFilter);
 
 private:
-    bool acceptRow(int source_row, const QModelIndex& source_parent) const override;
+    bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
 
     int m_functionColumn;
     int m_moduleColumn;

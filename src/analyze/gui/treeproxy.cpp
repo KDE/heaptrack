@@ -21,10 +21,11 @@
 #include <QDebug>
 
 TreeProxy::TreeProxy(int functionColumn, int moduleColumn, QObject* parent)
-    : KRecursiveFilterProxyModel(parent)
+    : QSortFilterProxyModel(parent)
     , m_functionColumn(functionColumn)
     , m_moduleColumn(moduleColumn)
 {
+    setRecursiveFilteringEnabled(true);
     setSortLocaleAware(false);
 }
 
@@ -42,7 +43,7 @@ void TreeProxy::setModuleFilter(const QString& moduleFilter)
     invalidate();
 }
 
-bool TreeProxy::acceptRow(int sourceRow, const QModelIndex& sourceParent) const
+bool TreeProxy::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const
 {
     auto source = sourceModel();
     if (!source) {
