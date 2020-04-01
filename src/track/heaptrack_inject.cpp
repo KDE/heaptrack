@@ -46,6 +46,16 @@
 #error unsupported word size
 #endif
 
+#ifndef ElfW
+#if __WORDSIZE == 64
+#define ElfW(type) Elf64_##type
+#elif __WORDSIZE == 32
+#define ElfW(type) Elf32_##type
+#else
+#error unsupported word size
+#endif
+#endif
+
 namespace {
 
 namespace Elf {
