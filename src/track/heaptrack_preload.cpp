@@ -177,7 +177,15 @@ extern "C" {
 
 /// TODO: memalign, pvalloc, ...?
 
-void* malloc(size_t size) noexcept
+// NOTE: adding noexcept to C functions is a hard error in clang++
+//       (but not even a warning in GCC, even with -Wall)
+#if defined(__GNUC__) && !defined(__clang__)
+#define LIBC_FUN_ATTRS noexcept
+#else
+#define LIBC_FUN_ATTRS
+#endif
+
+void* malloc(size_t size) LIBC_FUN_ATTRS
 {
     if (!hooks::malloc) {
         hooks::init();
@@ -188,7 +196,7 @@ void* malloc(size_t size) noexcept
     return ptr;
 }
 
-void free(void* ptr) noexcept
+void free(void* ptr) LIBC_FUN_ATTRS
 {
     if (!hooks::free) {
         hooks::init();
@@ -206,7 +214,7 @@ void free(void* ptr) noexcept
     hooks::free(ptr);
 }
 
-void* realloc(void* ptr, size_t size) noexcept
+void* realloc(void* ptr, size_t size) LIBC_FUN_ATTRS
 {
     if (!hooks::realloc) {
         hooks::init();
@@ -221,7 +229,7 @@ void* realloc(void* ptr, size_t size) noexcept
     return ret;
 }
 
-void* calloc(size_t num, size_t size) noexcept
+void* calloc(size_t num, size_t size) LIBC_FUN_ATTRS
 {
     if (!hooks::calloc) {
         hooks::init();
@@ -237,7 +245,7 @@ void* calloc(size_t num, size_t size) noexcept
 }
 
 #if HAVE_CFREE
-void cfree(void* ptr) noexcept
+void cfree(void* ptr) LIBC_FUN_ATTRS
 {
     if (!hooks::cfree) {
         hooks::init();
@@ -254,7 +262,7 @@ void cfree(void* ptr) noexcept
 }
 #endif
 
-int posix_memalign(void** memptr, size_t alignment, size_t size) noexcept
+int posix_memalign(void** memptr, size_t alignment, size_t size) LIBC_FUN_ATTRS
 {
     if (!hooks::posix_memalign) {
         hooks::init();
@@ -270,7 +278,7 @@ int posix_memalign(void** memptr, size_t alignment, size_t size) noexcept
 }
 
 #if HAVE_ALIGNED_ALLOC
-void* aligned_alloc(size_t alignment, size_t size) noexcept
+void* aligned_alloc(size_t alignment, size_t size) LIBC_FUN_ATTRS
 {
     if (!hooks::aligned_alloc) {
         hooks::init();
@@ -287,7 +295,7 @@ void* aligned_alloc(size_t alignment, size_t size) noexcept
 #endif
 
 #if HAVE_VALLOC
-void* valloc(size_t size) noexcept
+void* valloc(size_t size) LIBC_FUN_ATTRS
 {
     if (!hooks::valloc) {
         hooks::init();
@@ -303,7 +311,7 @@ void* valloc(size_t size) noexcept
 }
 #endif
 
-void* dlopen(const char* filename, int flag) noexcept
+void* dlopen(const char* filename, int flag) LIBC_FUN_ATTRS
 {
     if (!hooks::dlopen) {
         hooks::init();
@@ -318,7 +326,7 @@ void* dlopen(const char* filename, int flag) noexcept
     return ret;
 }
 
-int dlclose(void* handle) noexcept
+int dlclose(void* handle) LIBC_FUN_ATTRS
 {
     if (!hooks::dlclose) {
         hooks::init();
