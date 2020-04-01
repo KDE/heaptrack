@@ -1854,10 +1854,12 @@ read_line_program (struct backtrace_state *state, struct dwarf_data *ddata,
 		  }
 	      }
 	      break;
+#ifdef DW_LNE_set_discriminator
 	    case DW_LNE_set_discriminator:
 	      /* We don't care about discriminators.  */
 	      read_uleb128 (line_buf);
 	      break;
+#endif
 	    default:
 	      if (!advance (line_buf, len - 1))
 		return 0;
