@@ -228,6 +228,11 @@ cleanup() {
         #       crashes in the debuggee. So instead, we keep heaptrack loaded.
     fi
     rm -f "$pipe"
+    case $(uname) in
+        FreeBSD*)
+            rm -f "$pipe.lock"
+        ;;
+    esac
     kill "$debuggee" 2> /dev/null
 
     echo "Heaptrack finished! Now run the following to investigate the data:"

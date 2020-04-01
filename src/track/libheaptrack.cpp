@@ -196,6 +196,16 @@ int createFile(const char* fileName)
         fprintf(stderr, "ERROR: failed to open heaptrack output file %s: %s (%d)\n", outputFileName.c_str(),
                 strerror(errno), errno);
     } else if (flock(out, LOCK_EX | LOCK_NB) != 0) {
+#ifdef __FreeBSD__
+        // pipes do not support flock, create a regular file
+        auto lockpath = outputFileName + ".lock";
+        auto lockfile = open(lockpath.c_str(), O_CREAT | O_WRONLY | O_CLOEXEC, 0644);
+        debugLog<VerboseOutput>("will lock %s/%p\n", lockpath.c_str(), lockfile);
+        if (flock(lockfile, LOCK_EX | LOCK_NB) == 0) {
+            // leaking the fd seems fine
+            return out;
+        }
+#endif
         fprintf(stderr, "ERROR: failed to lock heaptrack output file %s: %s (%d)\n", outputFileName.c_str(),
                 strerror(errno), errno);
         close(out);
