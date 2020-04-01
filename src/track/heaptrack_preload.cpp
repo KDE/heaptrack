@@ -23,6 +23,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <dlfcn.h>
+#include <unistd.h>
 
 #include <atomic>
 #include <type_traits>
