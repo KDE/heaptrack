@@ -36,6 +36,10 @@
 #endif
 #ifdef __FreeBSD__
 #include <pthread_np.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#include <sys/user.h>
+#include <libutil.h>
 #endif
 #include <sys/file.h>
 
@@ -358,10 +362,16 @@ public:
 
     void writeRSS()
     {
-        if (!s_data || !s_data->out.canWrite() || s_data->procStatm == -1) {
+        if (!s_data || !s_data->out.canWrite()) {
             return;
         }
 
+        size_t rss = 0;
+
+#ifdef __linux__
+        if (s_data->procStatm == -1) {
+            return;
+        }
         // read RSS in pages from statm, then rewind for next read
         // NOTE: don't use fscanf here, it could potentially deadlock us
         const int BUF_SIZE = 512;
@@ -374,13 +384,22 @@ public:
         }
         lseek(s_data->procStatm, 0, SEEK_SET);
 
-        size_t rss = 0;
         if (sscanf(buf, "%*u %zu", &rss) != 1) {
             fprintf(stderr, "WARNING: Failed to read RSS value from /proc/self/statm.\n");
             close(s_data->procStatm);
             s_data->procStatm = -1;
             return;
         }
+#elif defined(__FreeBSD__)
+        auto proc_info = kinfo_getproc(getpid());
+        if (proc_info == nullptr) {
+            return;
+        }
+
+        rss = proc_info->ki_rssize;
+
+        free(proc_info);
+#endif
 
         // TODO: compare to rusage.ru_maxrss (getrusage) to find "real" peak?
         // TODO: use custom allocators with known page sizes to prevent tainting
@@ -399,7 +418,15 @@ public:
     {
         const int BUF_SIZE = 1023;
         char buf[BUF_SIZE + 1];
+
+#ifdef __linux__
         ssize_t size = readlink("/proc/self/exe", buf, BUF_SIZE);
+#elif defined(__FreeBSD__)
+        int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
+        size_t size = BUF_SIZE;
+        sysctl(mib, 4, buf, &size, NULL, 0);
+#endif
+
         if (size > 0 && size < BUF_SIZE) {
             buf[size] = 0;
             s_data->out.write("x %s\n", buf);
@@ -410,9 +437,18 @@ public:
     {
         s_data->out.write("X");
         const int BUF_SIZE = 4096;
-        char buf[BUF_SIZE + 1];
+        char buf[BUF_SIZE + 1] = {0};
+
+#ifdef __linux__
         auto fd = open("/proc/self/cmdline", O_RDONLY);
         int bytesRead = read(fd, buf, BUF_SIZE);
+        close(fd);
+#elif defined(__FreeBSD__)
+        int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_ARGS, getpid() };
+        size_t bytesRead = BUF_SIZE;
+        sysctl(mib, 4, buf, &bytesRead, NULL, 0);
+#endif
+
         char* end = buf + bytesRead;
         for (char* p = buf; p < end;) {
             s_data->out.write(" %s", p);
@@ -420,7 +456,6 @@ public:
                 ; // skip until start of next 0-terminated section
         }
 
-        close(fd);
         s_data->out.write("\n");
     }
 
@@ -574,10 +609,12 @@ private:
         {
 
             debugLog<MinimalOutput>("%s", "constructing LockedData");
+#ifdef __linux__
             procStatm = open("/proc/self/statm", O_RDONLY);
             if (procStatm == -1) {
                 fprintf(stderr, "WARNING: Failed to open /proc/self/statm for reading: %s.\n", strerror(errno));
             }
+#endif
 
             // ensure this utility thread is not handling any signals
             // our host application may assume only one specific thread
@@ -593,7 +630,7 @@ private:
             }
 
             // the mask we set above will be inherited by the thread that we spawn below
-            timerThread = thread([&]() {
+            timerThread = std::thread([&]() {
                 RecursionGuard::isActive = true;
                 debugLog<MinimalOutput>("%s", "timer thread started");
 
@@ -658,7 +695,7 @@ private:
         TraceTree traceTree;
 
         atomic<bool> stopTimerThread{false};
-        thread timerThread;
+        std::thread timerThread;
 
         heaptrack_callback_t stopCallback = nullptr;
 

@@ -17,6 +17,10 @@ target_link_libraries(tst_trace heaptrack_unwind)
 add_test(NAME tst_trace COMMAND tst_trace)
 
 if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
+    if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+        set(LIBUTIL_LIBRARY "util")
+    endif()
+
     include_directories(
         ${Boost_INCLUDE_DIRS}
         ${CMAKE_CURRENT_BINARY_DIR}/../../src/
@@ -29,6 +33,7 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
         LINK_PRIVATE
             ${CMAKE_DL_LIBS}
             ${CMAKE_THREAD_LIBS_INIT}
+            ${LIBUTIL_LIBRARY}
             heaptrack_unwind
             rt
             ${Boost_SYSTEM_LIBRARY}

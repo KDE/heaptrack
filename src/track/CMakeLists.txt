@@ -20,6 +20,10 @@ else()
     add_library(heaptrack_unwind STATIC trace_unwind_tables.cpp)
 endif()
 
+if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
+    set(LIBUTIL_LIBRARY "util")
+endif()
+
 set_property(TARGET heaptrack_unwind PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # heaptrack_preload: track a newly started process
@@ -31,6 +35,7 @@ add_library(heaptrack_preload MODULE
 target_link_libraries(heaptrack_preload LINK_PRIVATE
     ${CMAKE_DL_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
+    ${LIBUTIL_LIBRARY}
     heaptrack_unwind
     rt
 )
@@ -54,6 +59,7 @@ add_library(heaptrack_inject MODULE
 target_link_libraries(heaptrack_inject LINK_PRIVATE
     ${CMAKE_DL_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
+    ${LIBUTIL_LIBRARY}
     heaptrack_unwind
     rt
 )
