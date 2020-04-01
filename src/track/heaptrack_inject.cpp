@@ -38,12 +38,14 @@
  * @brief Experimental support for symbol overloading after runtime injection.
  */
 
+#ifndef ELF_R_SYM
 #if __WORDSIZE == 64
 #define ELF_R_SYM(i) ELF64_R_SYM(i)
 #elif __WORDSIZE == 32
 #define ELF_R_SYM(i) ELF32_R_SYM(i)
 #else
 #error unsupported word size
+#endif
 #endif
 
 #ifndef ElfW
