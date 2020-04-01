@@ -7,6 +7,8 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/3rdparty/
 )
 
+add_definitions("-DHAVE_STDINT_H")
+
 add_executable(heaptrack_interpret
     heaptrack_interpret.cpp
 )

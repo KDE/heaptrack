@@ -37,6 +37,8 @@ project (libbacktrace)
 
 set (BACKTRACE_SUPPORTED 1)
 
+add_definitions("-DHAVE_STDINT_H")
+
 include (CheckSymbolExists)
 if (true)
     # When unwind.h is in /usr/local/include, check_symbol_exists() is failing. But
