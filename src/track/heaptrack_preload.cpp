@@ -142,10 +142,11 @@ void* dummy_calloc(size_t num, size_t size) noexcept
 
 void init()
 {
+    // heaptrack_init itself calls calloc via std::mutex/_libpthread_init on FreeBSD
+    hooks::calloc.original = &dummy_calloc;
+    hooks::calloc.init();
     heaptrack_init(getenv("DUMP_HEAPTRACK_OUTPUT"),
                    [] {
-                       hooks::calloc.original = &dummy_calloc;
-                       hooks::calloc.init();
                        hooks::dlopen.init();
                        hooks::dlclose.init();
                        hooks::malloc.init();
