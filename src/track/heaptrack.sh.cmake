@@ -117,7 +117,14 @@ while true; do
                 echo "Missing PID argument."
                 exit 1
             fi
-            client=$(cat /proc/$pid/comm)
+            case $(uname) in
+                Linux*)
+                    client=$(cat "/proc/$pid/comm")
+                ;;
+                FreeBSD*)
+                    client=$(awk '{print $1}' < "/proc/$pid/cmdline")
+                ;;
+            esac
             if [ -z "$client" ]; then
                 echo "Cannot attach to unknown process with PID $pid."
                 exit 1
@@ -197,7 +204,14 @@ mkfifo $pipe
 # if root is profiling a process for non root
 # give profiled process write access to the pipe
 if [ ! -z "$pid" ]; then
-  pid_user=$(stat -c %U /proc/"$pid")
+  case $(uname) in
+    Linux*)
+      pid_user=$(stat -c %U "/proc/$pid")
+    ;;
+    FreeBSD*)
+      pid_user=$(stat -f %Su "/proc/$pid")
+    ;;
+  esac
   if [ -z "$pid_user" ]; then
     exit 1
   fi
@@ -255,17 +269,25 @@ else
         --eval-command="run" --args "$client" "$@"
   else
     echo "injecting heaptrack into application via GDB, this might take some time..."
+    case $(uname) in
+        Linux*)
+            dlopen=__libc_dlopen_mode
+        ;;
+        FreeBSD*)
+            dlopen=dlopen@plt
+        ;;
+    esac
     if [ -z "$debug" ]; then
         gdb --batch-silent -n -iex="set auto-solib-add off" -p $pid \
             --eval-command="sharedlibrary libc.so" \
-            --eval-command="call (void) __libc_dlopen_mode(\"$LIBHEAPTRACK_INJECT\", 0x80000000 | 0x002)" \
+            --eval-command="call (void) '$dlopen'(\"$LIBHEAPTRACK_INJECT\", 0x80000000 | 0x002)" \
             --eval-command="sharedlibrary libheaptrack_inject" \
             --eval-command="call (void) heaptrack_inject(\"$pipe\")" \
             --eval-command="detach"
     else
         gdb --quiet -p $pid \
             --eval-command="sharedlibrary libc.so" \
-            --eval-command="call (void) __libc_dlopen_mode(\"$LIBHEAPTRACK_INJECT\", 0x80000000 | 0x002)" \
+            --eval-command="call (void) '$dlopen'(\"$LIBHEAPTRACK_INJECT\", 0x80000000 | 0x002)" \
             --eval-command="sharedlibrary libheaptrack_inject" \
             --eval-command="call (void) heaptrack_inject(\"$pipe\")"
     fi
