@@ -32,9 +32,12 @@
 #include <signal.h>
 #ifdef __linux__
 #include <stdio_ext.h>
+#include <syscall.h>
+#endif
+#ifdef __FreeBSD__
+#include <pthread_np.h>
 #endif
 #include <sys/file.h>
-#include <syscall.h>
 
 #include <atomic>
 #include <cinttypes>
@@ -83,7 +86,11 @@ chrono::milliseconds elapsedTime()
 
 __pid_t gettid()
 {
+#ifdef __linux__
     return syscall(SYS_gettid);
+#elif defined(__FreeBSD__)
+    return pthread_getthreadid_np();
+#endif
 }
 
 /**
