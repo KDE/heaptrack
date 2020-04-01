@@ -256,10 +256,21 @@ template <typename Table>
 void try_overwrite_elftable(const Table& jumps, const elf_string_table& strings, const elf_symbol_table& symbols,
                             const Elf::Addr base, const bool restore) noexcept
 {
-    const auto rela_end = reinterpret_cast<typename Table::type*>(reinterpret_cast<char*>(jumps.table) + jumps.size);
-    for (auto rela = jumps.table; rela < rela_end; rela++) {
+    const auto elf_base =
+#ifdef __linux__
+        0; // Already has memory addresses
+#elif defined(__FreeBSD__)
+        base; // Only has ELF offsets
+#else
+#error port me
+#endif
+    const auto rela_start = reinterpret_cast<typename Table::type*>(reinterpret_cast<char*>(jumps.table) + elf_base);
+    const auto rela_end = reinterpret_cast<typename Table::type*>(reinterpret_cast<char*>(jumps.table) + jumps.size + elf_base);
+    const auto sym_start = reinterpret_cast<Elf::Sym*>(reinterpret_cast<char*>(symbols.table) + elf_base);
+    const auto str_start = reinterpret_cast<const char*>(strings.table) + elf_base;
+    for (auto rela = rela_start; rela < rela_end; rela++) {
         const auto index = ELF_R_SYM(rela->r_info);
-        const char* symname = strings.table + symbols.table[index].st_name;
+        const char* symname = str_start + sym_start[index].st_name;
         auto addr = rela->r_offset + base;
         hooks::apply(symname, addr, restore);
     }
@@ -291,6 +302,7 @@ int iterate_phdrs(dl_phdr_info* info, size_t /*size*/, void* data) noexcept
         return 0;
     } else if (strstr(info->dlpi_name, "/ld-linux")) {
         // prevent strange crashes due to overwriting the free symbol in ld-linux
+        // (doesn't seem to be necessary in FreeBSD's ld-elf)
         return 0;
     }
 
