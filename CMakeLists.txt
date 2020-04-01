@@ -32,7 +32,7 @@ if (${Boost_IOSTREAMS_FOUND})
 endif()
 set_package_properties(Zstd PROPERTIES TYPE RECOMMENDED PURPOSE "Zstandard offers better (de)compression performance compared with gzip/zlib, making heaptrack faster and datafiles smaller.")
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     set(HEAPTRACK_BUILD_TRACK_DEFAULT ON)
     set(HEAPTRACK_BUILD_INTERPRET_DEFAULT ON)
 else()
