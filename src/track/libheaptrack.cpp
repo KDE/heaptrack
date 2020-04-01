@@ -30,7 +30,9 @@
 #include <link.h>
 #include <pthread.h>
 #include <signal.h>
+#ifdef __linux__
 #include <stdio_ext.h>
+#endif
 #include <sys/file.h>
 #include <syscall.h>
 

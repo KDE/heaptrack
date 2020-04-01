@@ -26,7 +26,9 @@
 #include <cinttypes>
 #include <iostream>
 #include <sstream>
+#ifdef __linux__
 #include <stdio_ext.h>
+#endif
 #include <tuple>
 #include <unordered_map>
 #include <vector>
@@ -409,8 +411,10 @@ int main(int /*argc*/, char** /*argv*/)
 {
     // optimize: we only have a single thread
     ios_base::sync_with_stdio(false);
+#ifdef __linux__
     __fsetlocking(stdout, FSETLOCKING_BYCALLER);
     __fsetlocking(stdin, FSETLOCKING_BYCALLER);
+#endif
 
     // output data at end, even when we get terminated
     std::atexit(exitHandler);

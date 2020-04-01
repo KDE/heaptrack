@@ -132,7 +132,9 @@ if (HEAPTRACK_BUILD_TRACK)
     endif()
 
     check_cxx_source_compiles(
-        "#include <stdio_ext.h>
+        "#ifdef __linux__
+        #include <stdio_ext.h>
+        #endif
         #include <fcntl.h>
         #include <dlfcn.h>
         #include <link.h>
@@ -140,7 +142,7 @@ if (HEAPTRACK_BUILD_TRACK)
         HAVE_LINUX_HEADERS)
 
     if (NOT HAVE_LINUX_HEADERS)
-        message(FATAL_ERROR "You are missing some Linux headers required to compile heaptrack.")
+        message(FATAL_ERROR "You are missing some Linux/BSD headers required to compile heaptrack.")
     endif()
 endif()
 
