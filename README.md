@@ -114,7 +114,7 @@ On macOS the dependencies can be installed easily using [homebrew](http://brew.s
 
     # prepare tap
     brew tap kde-mac/kde
-    "$(brew --repo)/Library/Taps/kde-mac/homebrew-kde/tools/all-fixes.sh"
+    "$(brew --repo kde-mac/kde)/tools/do-caveats.sh"
     
     # install dependencies
     brew install kde-mac/kde/kf5-extra-cmake-modules kde-mac/kde/kf5-kcoreaddons kde-mac/kde/kf5-ki18n \
