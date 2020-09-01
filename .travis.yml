@@ -11,7 +11,7 @@ install:
   - sudo apt-get -y install qt510base qt510svg qt510x11extras libdwarf-dev libboost-iostreams-dev libboost-program-options-dev
   - source /opt/qt*/bin/qt*-env.sh
   - # ecm
-  - git clone git://anongit.kde.org/extra-cmake-modules
+  - git clone https://invent.kde.org/frameworks/extra-cmake-modules
   - cd extra-cmake-modules && mkdir build && cd build && cmake .. && make -j$(nproc) && sudo make install && cd ../..
   - # zstd
   - git clone https://github.com/facebook/zstd.git
@@ -21,7 +21,7 @@ install:
   - tar xf kf5-gcc6-linux64-release.tar.xz
   - sudo cp -Rf root/kf5-release/* /opt/qt*/
   - # kdiagram
-  - git clone git://anongit.kde.org/kdiagram
+  - git clone https://invent.kde.org/graphics/kdiagram
   - cd kdiagram && mkdir build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/qt510 -DBUILD_KGantt=OFF -DBUILD_TESTING=OFF .. && make -j$(nproc) && sudo make install && cd ../../
   - # Precompiled version of libunwind in newer version (1.)2
   - wget -nv -c "https://swanson.kdab.com/owncloud/index.php/s/ZETvRRZ7J5Nllo5/download" -O libunwind.tar.bz2

@@ -220,7 +220,7 @@ needed for a simple heap profiler.
 As a FOSS project, we welcome contributions of any form. You can help improve the project by:
 
 - submitting bug reports at https://bugs.kde.org/enter_bug.cgi?product=Heaptrack
-- contributing patches via https://phabricator.kde.org/dashboard/view/28/
+- contributing patches via https://invent.kde.org/sdk/heaptrack
 - translating the GUI with the help of https://l10n.kde.org/
 - writing documentation on https://userbase.kde.org/Heaptrack
 

@@ -40,7 +40,7 @@ ENV PATH="/opt/bin:/opt/qt510/bin:${PATH}" \
 
 RUN git clone git://git.sv.gnu.org/libunwind.git && \
     git clone https://github.com/facebook/zstd.git && \
-    git clone git://anongit.kde.org/kdiagram
+    git clone https://invent.kde.org/graphics/kdiagram
 
 # build libunwind
 
