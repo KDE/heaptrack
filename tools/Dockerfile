@@ -9,9 +9,13 @@ RUN apt-get update && \
     apt-get install -y software-properties-common build-essential curl git wget \
         autotools-dev autoconf libtool liblzma-dev libz-dev gettext && \
     add-apt-repository ppa:beineri/opt-qt-5.10.1-trusty -y && \
+    add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
     apt-get update && \
     apt-get install -y qt510base qt510svg qt510x11extras cmake3 libdwarf-dev mesa-common-dev \
-        libboost-iostreams-dev libboost-program-options-dev libboost-system-dev libboost-filesystem-dev
+        libboost-iostreams-dev libboost-program-options-dev libboost-system-dev libboost-filesystem-dev \
+        gcc-4.9 g++-4.9 && \
+    apt-get -y upgrade && \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.9
 
 WORKDIR /opt
 
@@ -40,7 +44,8 @@ ENV PATH="/opt/bin:/opt/qt510/bin:${PATH}" \
 
 RUN git clone git://git.sv.gnu.org/libunwind.git && \
     git clone https://github.com/facebook/zstd.git && \
-    git clone git://anongit.kde.org/kdiagram
+    wget -c "https://invent.kde.org/graphics/kdiagram/-/archive/2.6/kdiagram-2.6.tar.bz2" && \
+    tar -xf kdiagram-2.6.tar.bz2 && mv kdiagram-2.6 kdiagram
 
 # build libunwind
 
@@ -48,7 +53,7 @@ WORKDIR /opt/libunwind
 
 COPY tools/elf.h /usr/include/
 RUN autoreconf -vfi && \
-    ./configure --prefix /usr/local --enable-debug-frame --enable-minidebuginfo && \
+    ./configure --prefix /usr/local --enable-debug-frame --enable-minidebuginfo --disable-coredump && \
     make -j$(nproc) && make install
 
 # build zstd
