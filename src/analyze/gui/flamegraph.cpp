@@ -408,8 +408,8 @@ SearchResults applySearch(FrameGraphicsItem* item, const QString& searchValue)
 }
 }
 
-FlameGraph::FlameGraph(QWidget* parent, Qt::WindowFlags flags)
-    : QWidget(parent, flags)
+FlameGraph::FlameGraph(QWidget* parent)
+    : QWidget(parent)
     , m_costSource(new QComboBox(this))
     , m_scene(new QGraphicsScene(this))
     , m_view(new QGraphicsView(this))
