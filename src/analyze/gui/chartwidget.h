@@ -40,8 +40,25 @@ public:
 
     QSize sizeHint() const override;
 
+protected:
+    void paintEvent(QPaintEvent* event) override;
+
 private:
+    bool eventFilter(QObject* watched, QEvent* event) override;
+
     KChart::Chart* m_chart;
+
+    struct Range
+    {
+        float start = -1;
+        float end = -1;
+
+        explicit operator bool() const
+        {
+            return start != end;
+        }
+    };
+    Range m_selection;
 };
 
 #endif // CHARTWIDGET_H

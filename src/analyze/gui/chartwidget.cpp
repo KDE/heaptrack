@@ -18,6 +18,8 @@
 
 #include "chartwidget.h"
 
+#include <QPainter>
+#include <QToolTip>
 #include <QVBoxLayout>
 
 #include <KChartChart>
@@ -38,6 +40,8 @@
 #include "chartmodel.h"
 #include "chartproxy.h"
 #include "util.h"
+
+#include <cmath>
 
 using namespace KChart;
 
@@ -85,6 +89,8 @@ ChartWidget::ChartWidget(QWidget* parent)
     auto* coordinatePlane = dynamic_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
     Q_ASSERT(coordinatePlane);
     coordinatePlane->setAutoAdjustGridToZoom(true);
+
+    m_chart->installEventFilter(this);
 }
 
 ChartWidget::~ChartWidget() = default;
@@ -175,6 +181,62 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
 QSize ChartWidget::sizeHint() const
 {
     return {400, 50};
+}
+
+void ChartWidget::paintEvent(QPaintEvent* event)
+{
+    QWidget::paintEvent(event);
+
+    if (!m_selection)
+        return;
+
+    auto* coordinatePlane = static_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
+    const auto delta = m_chart->pos().x();
+    const auto pixelStart = coordinatePlane->translate({m_selection.start, 0}).x() - delta;
+    const auto pixelEnd = coordinatePlane->translate({m_selection.end, 0}).x() - delta;
+    auto selectionRect = QRect(QPoint(pixelStart, 0), QPoint(pixelEnd, height()));
+
+    auto brush = palette().highlight();
+    auto color = brush.color();
+    color.setAlpha(128);
+    brush.setColor(color);
+
+    QPainter painter(this);
+    painter.fillRect(selectionRect, brush);
+}
+
+bool ChartWidget::eventFilter(QObject* watched, QEvent* event)
+{
+    Q_ASSERT(watched == m_chart);
+
+    if (auto* mouseEvent = dynamic_cast<QMouseEvent*>(event)) {
+        auto* coordinatePlane = static_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
+        const auto time = coordinatePlane->translateBack(mouseEvent->pos()).x();
+
+        m_selection.end = time;
+        if (event->type() == QEvent::MouseButtonPress) {
+            m_selection.start = time;
+        }
+
+        if (m_selection) {
+            const auto startTime = std::min(m_selection.start, m_selection.end);
+            const auto endTime = std::max(m_selection.start, m_selection.end);
+            setToolTip(i18n("Start Time: %1\n"
+                            "End Time: %2\n"
+                            "ΔT: %3",
+                            Util::formatTime(startTime), Util::formatTime(endTime),
+                            Util::formatTime(endTime - startTime)));
+            QToolTip::showText(mouseEvent->globalPos(), toolTip(), this);
+            update();
+        }
+    } else if (auto* keyEvent = dynamic_cast<QKeyEvent*>(event)) {
+        // reset selection when escape is pressed
+        if (keyEvent->key() == Qt::Key_Escape && m_selection) {
+            m_selection = {};
+            return true;
+        }
+    }
+    return false;
 }
 
 #include "chartwidget.moc"
