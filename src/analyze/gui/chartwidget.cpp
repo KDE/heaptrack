@@ -84,7 +84,6 @@ ChartWidget::ChartWidget(QWidget* parent)
 
     auto* coordinatePlane = dynamic_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
     Q_ASSERT(coordinatePlane);
-    coordinatePlane->setRubberBandZoomingEnabled(true);
     coordinatePlane->setAutoAdjustGridToZoom(true);
 }
 
