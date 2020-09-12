@@ -69,6 +69,8 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
+    qint64 totalCostAt(qint64 timeStamp) const;
+
 public slots:
     void resetData(const ChartData& data);
     void clearData();

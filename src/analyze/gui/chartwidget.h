@@ -71,6 +71,7 @@ private:
     bool eventFilter(QObject* watched, QEvent* event) override;
 
     KChart::Chart* m_chart;
+    ChartModel* m_model = nullptr;
     Range m_selection;
 };
 

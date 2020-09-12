@@ -19,6 +19,7 @@
 #include "chartwidget.h"
 
 #include <QPainter>
+#include <QTextStream>
 #include <QToolTip>
 #include <QVBoxLayout>
 
@@ -97,6 +98,10 @@ ChartWidget::~ChartWidget() = default;
 
 void ChartWidget::setModel(ChartModel* model, bool minimalMode)
 {
+    if (m_model == model)
+        return;
+    m_model = model;
+
     auto* coordinatePlane = dynamic_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
     Q_ASSERT(coordinatePlane);
     foreach (auto diagram, coordinatePlane->diagrams()) {
@@ -185,17 +190,40 @@ QSize ChartWidget::sizeHint() const
 
 void ChartWidget::setSelection(const Range& selection)
 {
-    if (selection == m_selection)
+    if (selection == m_selection || !m_model)
         return;
 
     m_selection = selection;
 
     const auto startTime = std::min(m_selection.start, m_selection.end);
     const auto endTime = std::max(m_selection.start, m_selection.end);
-    setToolTip(i18n("Start Time: %1\n"
-                    "End Time: %2\n"
-                    "ΔT: %3",
-                    Util::formatTime(startTime), Util::formatTime(endTime), Util::formatTime(endTime - startTime)));
+
+    const auto startCost = m_model->totalCostAt(startTime);
+    const auto endCost = m_model->totalCostAt(endTime);
+
+    QString toolTip;
+    QTextStream stream(&toolTip);
+    stream << "<qt><table cellpadding=2>";
+    stream << i18n("<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>");
+    stream << i18n("<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>", Util::formatTime(startTime),
+                   Util::formatTime(endTime), Util::formatTime(endTime - startTime));
+    switch (m_model->type()) {
+    case ChartModel::Consumed:
+        stream << i18n("<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>", Util::formatBytes(startCost),
+                       Util::formatBytes(endCost), Util::formatBytes(endCost - startCost));
+        break;
+    case ChartModel::Allocations:
+        stream << i18n("<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>", startCost, endCost,
+                       (endCost - startCost));
+        break;
+    case ChartModel::Temporary:
+        stream << i18n("<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>", startCost, endCost,
+                       (endCost - startCost));
+        break;
+    }
+    stream << "</table></qt>";
+
+    setToolTip(toolTip);
     update();
 
     emit selectionChanged(m_selection);
@@ -205,7 +233,7 @@ void ChartWidget::paintEvent(QPaintEvent* event)
 {
     QWidget::paintEvent(event);
 
-    if (!m_selection)
+    if (!m_selection || !m_model)
         return;
 
     auto* coordinatePlane = static_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
@@ -227,22 +255,22 @@ bool ChartWidget::eventFilter(QObject* watched, QEvent* event)
 {
     Q_ASSERT(watched == m_chart);
 
+    if (!m_model)
+        return false;
+
     if (auto* mouseEvent = dynamic_cast<QMouseEvent*>(event)) {
-        auto* coordinatePlane = static_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
-        const auto time = coordinatePlane->translateBack(mouseEvent->pos()).x();
+        if (mouseEvent->buttons() == Qt::LeftButton) {
+            auto* coordinatePlane = static_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
+            const auto time = coordinatePlane->translateBack(mouseEvent->pos()).x();
 
-        auto selection = m_selection;
-        selection.end = time;
-        if (event->type() == QEvent::MouseButtonPress) {
-            selection.start = time;
-        }
+            auto selection = m_selection;
+            selection.end = time;
+            if (event->type() == QEvent::MouseButtonPress) {
+                selection.start = time;
+            }
 
-        setSelection(selection);
-        QToolTip::showText(mouseEvent->globalPos(), toolTip(), this);
-    } else if (auto* keyEvent = dynamic_cast<QKeyEvent*>(event)) {
-        // reset selection when escape is pressed
-        if (keyEvent->key() == Qt::Key_Escape && m_selection) {
-            m_selection = {};
+            setSelection(selection);
+            QToolTip::showText(mouseEvent->globalPos(), toolTip(), this);
             return true;
         }
     }

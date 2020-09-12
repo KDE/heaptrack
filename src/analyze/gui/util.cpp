@@ -48,7 +48,11 @@ QString Util::formatTime(qint64 ms)
 QString Util::formatBytes(qint64 bytes)
 {
     static const KFormat format;
-    return format.formatByteSize(bytes, 1, KFormat::MetricBinaryDialect);
+    auto ret = format.formatByteSize(bytes, 1, KFormat::MetricBinaryDialect);
+    // remove spaces, otherwise HTML might break between the unit and the cost
+    // note that we also don't add a space before our time units above
+    ret.remove(QLatin1Char(' '));
+    return ret;
 }
 
 QString Util::formatCostRelative(qint64 selfCost, qint64 totalCost, bool addPercentSign)

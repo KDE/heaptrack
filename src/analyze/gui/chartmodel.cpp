@@ -29,6 +29,8 @@
 
 #include "util.h"
 
+#include <algorithm>
+
 namespace {
 QColor colorForColumn(int column, int columnCount)
 {
@@ -198,4 +200,24 @@ void ChartModel::clearData()
     m_columnDataSetBrushes = {};
     m_columnDataSetPens = {};
     endResetModel();
+}
+
+struct CompareClosestToTime
+{
+    bool operator()(const qint64& lhs, const ChartRows& rhs) const
+    {
+        return lhs > rhs.timeStamp;
+    }
+    bool operator()(const ChartRows& lhs, const qint64& rhs) const
+    {
+        return lhs.timeStamp > rhs;
+    }
+};
+
+qint64 ChartModel::totalCostAt(qint64 timeStamp) const
+{
+    auto it = std::lower_bound(m_data.rows.rbegin(), m_data.rows.rend(), timeStamp, CompareClosestToTime());
+    if (it == m_data.rows.rend())
+        return 0;
+    return it->cost[0];
 }
