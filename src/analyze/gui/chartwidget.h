@@ -40,6 +40,30 @@ public:
 
     QSize sizeHint() const override;
 
+    struct Range
+    {
+        float start = -1;
+        float end = -1;
+
+        bool operator==(const Range& rhs) const
+        {
+            return start == rhs.start && end == rhs.end;
+        }
+
+        explicit operator bool() const
+        {
+            return start != end;
+        }
+    };
+    void setSelection(const Range& range);
+    Range selection() const
+    {
+        return m_selection;
+    }
+
+signals:
+    void selectionChanged(const Range& range);
+
 protected:
     void paintEvent(QPaintEvent* event) override;
 
@@ -47,17 +71,6 @@ private:
     bool eventFilter(QObject* watched, QEvent* event) override;
 
     KChart::Chart* m_chart;
-
-    struct Range
-    {
-        float start = -1;
-        float end = -1;
-
-        explicit operator bool() const
-        {
-            return start != end;
-        }
-    };
     Range m_selection;
 };
 

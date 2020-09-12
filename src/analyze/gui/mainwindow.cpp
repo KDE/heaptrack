@@ -184,8 +184,8 @@ void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type, T cal
 }
 
 #if KChart_FOUND
-void addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel::Type type, const Parser* parser,
-                 void (Parser::*dataReady)(const ChartData&), MainWindow* window)
+ChartWidget* addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel::Type type, const Parser* parser,
+                         void (Parser::*dataReady)(const ChartData&), MainWindow* window)
 {
     auto tab = new ChartWidget(tabWidget->parentWidget());
     tabWidget->addTab(tab, title);
@@ -197,6 +197,7 @@ void addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel::Type t
         tabWidget->setTabEnabled(tabWidget->indexOf(tab), true);
     });
     QObject::connect(window, &MainWindow::clearData, model, &ChartModel::clearData);
+    return tab;
 }
 #endif
 
@@ -414,12 +415,20 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->messages->hide();
 
 #if KChart_FOUND
-    addChartTab(m_ui->tabWidget, i18n("Consumed"), ChartModel::Consumed, m_parser, &Parser::consumedChartDataAvailable,
-                this);
-    addChartTab(m_ui->tabWidget, i18n("Allocations"), ChartModel::Allocations, m_parser,
-                &Parser::allocationsChartDataAvailable, this);
-    addChartTab(m_ui->tabWidget, i18n("Temporary Allocations"), ChartModel::Temporary, m_parser,
-                &Parser::temporaryChartDataAvailable, this);
+    auto consumedTab = addChartTab(m_ui->tabWidget, i18n("Consumed"), ChartModel::Consumed, m_parser,
+                                   &Parser::consumedChartDataAvailable, this);
+    auto allocationsTab = addChartTab(m_ui->tabWidget, i18n("Allocations"), ChartModel::Allocations, m_parser,
+                                      &Parser::allocationsChartDataAvailable, this);
+    auto temporaryAllocationsTab = addChartTab(m_ui->tabWidget, i18n("Temporary Allocations"), ChartModel::Temporary,
+                                               m_parser, &Parser::temporaryChartDataAvailable, this);
+    auto syncSelection = [=](const ChartWidget::Range& selection) {
+        consumedTab->setSelection(selection);
+        allocationsTab->setSelection(selection);
+        temporaryAllocationsTab->setSelection(selection);
+    };
+    connect(consumedTab, &ChartWidget::selectionChanged, syncSelection);
+    connect(allocationsTab, &ChartWidget::selectionChanged, syncSelection);
+    connect(temporaryAllocationsTab, &ChartWidget::selectionChanged, syncSelection);
 
     auto sizesTab = new HistogramWidget(this);
     m_ui->tabWidget->addTab(sizesTab, i18n("Sizes"));

@@ -183,6 +183,24 @@ QSize ChartWidget::sizeHint() const
     return {400, 50};
 }
 
+void ChartWidget::setSelection(const Range& selection)
+{
+    if (selection == m_selection)
+        return;
+
+    m_selection = selection;
+
+    const auto startTime = std::min(m_selection.start, m_selection.end);
+    const auto endTime = std::max(m_selection.start, m_selection.end);
+    setToolTip(i18n("Start Time: %1\n"
+                    "End Time: %2\n"
+                    "ΔT: %3",
+                    Util::formatTime(startTime), Util::formatTime(endTime), Util::formatTime(endTime - startTime)));
+    update();
+
+    emit selectionChanged(m_selection);
+}
+
 void ChartWidget::paintEvent(QPaintEvent* event)
 {
     QWidget::paintEvent(event);
@@ -213,22 +231,14 @@ bool ChartWidget::eventFilter(QObject* watched, QEvent* event)
         auto* coordinatePlane = static_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
         const auto time = coordinatePlane->translateBack(mouseEvent->pos()).x();
 
-        m_selection.end = time;
+        auto selection = m_selection;
+        selection.end = time;
         if (event->type() == QEvent::MouseButtonPress) {
-            m_selection.start = time;
+            selection.start = time;
         }
 
-        if (m_selection) {
-            const auto startTime = std::min(m_selection.start, m_selection.end);
-            const auto endTime = std::max(m_selection.start, m_selection.end);
-            setToolTip(i18n("Start Time: %1\n"
-                            "End Time: %2\n"
-                            "ΔT: %3",
-                            Util::formatTime(startTime), Util::formatTime(endTime),
-                            Util::formatTime(endTime - startTime)));
-            QToolTip::showText(mouseEvent->globalPos(), toolTip(), this);
-            update();
-        }
+        setSelection(selection);
+        QToolTip::showText(mouseEvent->globalPos(), toolTip(), this);
     } else if (auto* keyEvent = dynamic_cast<QKeyEvent*>(event)) {
         // reset selection when escape is pressed
         if (keyEvent->key() == Qt::Key_Escape && m_selection) {
