@@ -26,6 +26,10 @@
 #include "histogrammodel.h"
 #include "treemodel.h"
 
+#include <memory>
+
+struct ParserData;
+
 class Parser : public QObject
 {
     Q_OBJECT
@@ -48,6 +52,9 @@ signals:
     void sizeHistogramDataAvailable(const HistogramData& data);
     void finished();
     void failedToOpen(const QString& path);
+
+private:
+    std::shared_ptr<ParserData> m_data;
 };
 
 #endif // PARSER_H

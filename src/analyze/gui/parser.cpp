@@ -22,6 +22,7 @@
 #include <ThreadWeaver/ThreadWeaver>
 
 #include <QDebug>
+#include <QThread>
 
 #include "analyze/accumulatedtracedata.h"
 
@@ -45,6 +46,8 @@ struct hash<QString>
 }
 #endif
 
+namespace {
+
 // Only use this hash when filling in the cache
 struct CacheSymbolHash
 {
@@ -57,8 +60,6 @@ struct CacheSymbolHash
         return seed;
     }
 };
-
-namespace {
 
 struct Location
 {
@@ -141,6 +142,7 @@ struct ChartMergeData
 };
 
 const uint64_t MAX_CHART_DATAPOINTS = 500; // TODO: make this configurable via the GUI
+}
 
 struct ParserData final : public AccumulatedTraceData
 {
@@ -274,6 +276,20 @@ struct ParserData final : public AccumulatedTraceData
         debuggee = command;
     }
 
+    void clearForReparse()
+    {
+        // data moved to size histogram
+        allocationInfoCounter.clear();
+        // data moved to chart models
+        consumedChartData = {};
+        allocationsChartData = {};
+        temporaryChartData = {};
+        labelIds.clear();
+        maxConsumedSinceLastTimeStamp = 0;
+        lastTimeStamp = 0;
+        buildCharts = false;
+    }
+
     string debuggee;
 
     struct CountedAllocationInfo
@@ -311,6 +327,7 @@ struct ParserData final : public AccumulatedTraceData
     bool buildCharts = false;
 };
 
+namespace {
 void setParents(QVector<RowData>& children, const RowData* parent)
 {
     children.squeeze();
@@ -667,7 +684,14 @@ void Parser::parse(const QString& path, const QString& diffBase)
         }
 
         auto sequential = new Sequence;
-        *sequential << parallel << make_job([this]() { emit finished(); });
+        *sequential << parallel << make_job([this, data]() {
+            QMetaObject::invokeMethod(this, [this, data]() {
+                Q_ASSERT(QThread::currentThread() == thread());
+                m_data = data;
+                m_data->clearForReparse();
+                emit finished();
+            });
+        });
 
         stream() << sequential;
     });
