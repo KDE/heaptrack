@@ -285,6 +285,8 @@ struct ParserData final : public AccumulatedTraceData
             return tie(info.size, allocations) < tie(rhs.info.size, rhs.allocations);
         }
     };
+    /// counts how often a given allocation info is encountered based on its index
+    /// used to build the size histogram
     vector<CountedAllocationInfo> allocationInfoCounter;
 
     ChartData consumedChartData;
