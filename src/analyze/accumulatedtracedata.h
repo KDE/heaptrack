@@ -101,7 +101,7 @@ struct AccumulatedTraceData
     AccumulatedTraceData();
     virtual ~AccumulatedTraceData() = default;
 
-    virtual void handleTimeStamp(int64_t oldStamp, int64_t newStamp) = 0;
+    virtual void handleTimeStamp(int64_t oldStamp, int64_t newStamp, bool isFinalTimeStamp) = 0;
     virtual void handleAllocation(const AllocationInfo& info, const AllocationInfoIndex index) = 0;
     virtual void handleDebuggee(const char* command) = 0;
 

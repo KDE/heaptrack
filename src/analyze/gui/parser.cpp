@@ -207,14 +207,14 @@ struct ParserData final : public AccumulatedTraceData
         findTopChartEntries(&ChartMergeData::temporary, &LabelIds::temporary, &temporaryChartData);
     }
 
-    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp) override
+    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp, bool isFinalTimeStamp) override
     {
         if (!buildCharts || stringCache.diffMode) {
             return;
         }
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, totalCost.leaked);
         const int64_t diffBetweenTimeStamps = totalTime / MAX_CHART_DATAPOINTS;
-        if (newStamp != totalTime && newStamp - lastTimeStamp < diffBetweenTimeStamps) {
+        if (!isFinalTimeStamp && newStamp - lastTimeStamp < diffBetweenTimeStamps) {
             return;
         }
         const auto nowConsumed = maxConsumedSinceLastTimeStamp;

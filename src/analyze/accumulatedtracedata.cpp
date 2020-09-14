@@ -363,7 +363,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 continue;
             }
             if (pass != FirstPass) {
-                handleTimeStamp(timeStamp, newStamp);
+                handleTimeStamp(timeStamp, newStamp, false);
             }
             timeStamp = newStamp;
         } else if (reader.mode() == 'R') { // RSS timestamp
@@ -413,7 +413,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
     if (pass == FirstPass) {
         totalTime = timeStamp + 1;
     } else {
-        handleTimeStamp(timeStamp, totalTime);
+        handleTimeStamp(timeStamp, totalTime, true);
     }
 
     return true;
