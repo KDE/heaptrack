@@ -61,8 +61,14 @@ public:
         return m_selection;
     }
 
+    void setIsFiltered(bool isFiltered)
+    {
+        m_isFiltered = isFiltered;
+    }
+
 signals:
     void selectionChanged(const Range& range);
+    void filterRequested(int64_t minTime, int64_t maxTime);
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -73,6 +79,7 @@ private:
     KChart::Chart* m_chart;
     ChartModel* m_model = nullptr;
     Range m_selection;
+    bool m_isFiltered = false;
 };
 
 #endif // CHARTWIDGET_H

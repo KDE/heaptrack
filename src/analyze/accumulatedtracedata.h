@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Milian Wolff <mail@milianw.de>
+ * Copyright 2015-2020 Milian Wolff <mail@milianw.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,6 +31,7 @@
 #include <boost/functional/hash.hpp>
 
 #include "allocationdata.h"
+#include "filterparameters.h"
 #include "util/indices.h"
 
 struct Frame
@@ -109,7 +110,7 @@ struct AccumulatedTraceData
 
     std::string prettyFunction(const std::string& function) const;
 
-    bool read(const std::string& inputFile);
+    bool read(const std::string& inputFile, bool isReparsing);
     enum ParsePass
     {
         // find time of total peak cost
@@ -119,13 +120,14 @@ struct AccumulatedTraceData
         // GUI only: graph-building
         ThirdPass
     };
-    bool read(const std::string& inputFile, const ParsePass pass);
-    bool read(std::istream& in, const ParsePass pass);
+    bool read(const std::string& inputFile, const ParsePass pass, bool isReparsing);
+    bool read(std::istream& in, const ParsePass pass, bool isReparsing);
 
     void diff(const AccumulatedTraceData& base);
 
     bool shortenTemplates = false;
     bool fromAttached = false;
+    FilterParameters filterParameters;
 
     std::vector<Allocation> allocations;
     AllocationData totalCost;

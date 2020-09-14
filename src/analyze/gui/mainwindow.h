@@ -40,6 +40,7 @@ public:
 
 public slots:
     void loadFile(const QString& path, const QString& diffBase = {});
+    void reparse(int64_t minTime, int64_t maxTime);
     void openNewFile();
     void closeFile();
 

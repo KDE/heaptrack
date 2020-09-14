@@ -669,14 +669,14 @@ int main(int argc, char** argv)
     if (!diffFile.empty()) {
         cout << "reading diff file \"" << diffFile << "\" - please wait, this might take some time..." << endl;
         Printer diffData;
-        auto diffRead = async(launch::async, [&diffData, diffFile]() { return diffData.read(diffFile); });
+        auto diffRead = async(launch::async, [&diffData, diffFile]() { return diffData.read(diffFile, false); });
 
-        if (!data.read(inputFile) || !diffRead.get()) {
+        if (!data.read(inputFile, false) || !diffRead.get()) {
             return 1;
         }
 
         data.diff(diffData);
-    } else if (!data.read(inputFile)) {
+    } else if (!data.read(inputFile, false)) {
         return 1;
     }
 

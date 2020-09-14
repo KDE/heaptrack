@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Milian Wolff <mail@milianw.de>
+ * Copyright 2015-2020 Milian Wolff <mail@milianw.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -121,16 +121,12 @@ string AccumulatedTraceData::prettyFunction(const string& function) const
     return ret;
 }
 
-bool AccumulatedTraceData::read(const string& inputFile)
+bool AccumulatedTraceData::read(const string& inputFile, bool isReparsing)
 {
-    if (totalTime == 0) {
-        return read(inputFile, FirstPass) && read(inputFile, SecondPass);
-    } else {
-        return read(inputFile, ThirdPass);
-    }
+    return read(inputFile, FirstPass, isReparsing) && read(inputFile, SecondPass, isReparsing);
 }
 
-bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass)
+bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass, bool isReparsing)
 {
     const bool isGzCompressed = boost::algorithm::ends_with(inputFile, ".gz");
     const bool isZstdCompressed = boost::algorithm::ends_with(inputFile, ".zst");
@@ -155,10 +151,10 @@ bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass)
     }
     in.push(file);
 
-    return read(in, pass);
+    return read(in, pass, isReparsing);
 }
 
-bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
+bool AccumulatedTraceData::read(istream& in, const ParsePass pass, bool isReparsing)
 {
     LineReader reader;
     int64_t timeStamp = 0;
@@ -188,6 +184,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
     }
     unsigned int fileVersion = 0;
     bool debuggeeEncountered = false;
+    bool inFilteredTime = !filterParameters.minTime;
 
     // required for backwards compatibility
     // newer versions handle this in heaptrack_interpret already
@@ -198,9 +195,9 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
     // allocations, i.e. when a deallocation follows with the same data
     uint64_t lastAllocationPtr = 0;
 
-    while (reader.getLine(in)) {
+    while (timeStamp < filterParameters.maxTime && reader.getLine(in)) {
         if (reader.mode() == 's') {
-            if (pass != FirstPass) {
+            if (pass != FirstPass || isReparsing) {
                 continue;
             }
             strings.push_back(reader.line().substr(2));
@@ -219,7 +216,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 }
             }
         } else if (reader.mode() == 't') {
-            if (pass != FirstPass) {
+            if (pass != FirstPass || isReparsing) {
                 continue;
             }
             TraceNode node;
@@ -231,7 +228,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
             }
             traces.push_back(node);
         } else if (reader.mode() == 'i') {
-            if (pass != FirstPass) {
+            if (pass != FirstPass || isReparsing) {
                 continue;
             }
             InstructionPointer ip;
@@ -254,11 +251,14 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 opNewIpIndices.push_back(index);
             }
         } else if (reader.mode() == '+') {
+            if (!inFilteredTime) {
+                continue;
+            }
             AllocationInfo info;
             AllocationInfoIndex allocationIndex;
             if (fileVersion >= 1) {
                 if (!(reader >> allocationIndex)) {
-                    cerr << "failed to parse line: " << reader.line() << endl;
+                    cerr << "failed to parse line: " << reader.line() << ' ' << __LINE__ << endl;
                     continue;
                 } else if (allocationIndex.index >= allocationInfos.size()) {
                     cerr << "allocation index out of bounds: " << allocationIndex
@@ -271,7 +271,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 uint64_t ptr = 0;
                 TraceIndex traceIndex;
                 if (!(reader >> info.size) || !(reader >> traceIndex) || !(reader >> ptr)) {
-                    cerr << "failed to parse line: " << reader.line() << endl;
+                    cerr << "failed to parse line: " << reader.line() << ' ' << __LINE__ << endl;
                     continue;
                 }
                 info.allocationIndex = mapToAllocationIndex(traceIndex);
@@ -303,6 +303,9 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 }
             }
         } else if (reader.mode() == '-') {
+            if (!inFilteredTime) {
+                continue;
+            }
             AllocationInfoIndex allocationInfoIndex;
             bool temporary = false;
             if (fileVersion >= 1) {
@@ -341,7 +344,7 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 }
             }
         } else if (reader.mode() == 'a') {
-            if (pass != FirstPass) {
+            if (pass != FirstPass || isReparsing) {
                 continue;
             }
             AllocationInfo info;
@@ -362,11 +365,15 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 cerr << "Failed to read time stamp: " << reader.line() << endl;
                 continue;
             }
-            if (pass != FirstPass) {
+            inFilteredTime = newStamp >= filterParameters.minTime && newStamp <= filterParameters.maxTime;
+            if (pass != FirstPass && inFilteredTime) {
                 handleTimeStamp(timeStamp, newStamp, false);
             }
             timeStamp = newStamp;
         } else if (reader.mode() == 'R') { // RSS timestamp
+            if (!inFilteredTime) {
+                continue;
+            }
             int64_t rss = 0;
             reader >> rss;
             if (rss > peakRSS) {
@@ -378,10 +385,12 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 return false;
             }
             debuggeeEncountered = true;
-            if (pass != FirstPass) {
+            if (pass != FirstPass && !isReparsing) {
                 handleDebuggee(reader.line().c_str() + 2);
             }
         } else if (reader.mode() == 'A') {
+            if (pass != FirstPass || isReparsing)
+                continue;
             totalCost = {};
             fromAttached = true;
         } else if (reader.mode() == 'v') {
@@ -403,6 +412,8 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
                 return false;
             }
         } else if (reader.mode() == 'I') { // system information
+            if (pass != FirstPass || isReparsing)
+                continue;
             reader >> systemInfo.pageSize;
             reader >> systemInfo.pages;
         } else {
@@ -410,10 +421,11 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass)
         }
     }
 
-    if (pass == FirstPass) {
+    if (pass == FirstPass && !isReparsing) {
         totalTime = timeStamp + 1;
+        filterParameters.maxTime = totalTime;
     } else {
-        handleTimeStamp(timeStamp, totalTime, true);
+        handleTimeStamp(timeStamp, timeStamp + 1, true);
     }
 
     return true;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Milian Wolff <mail@milianw.de>
+ * Copyright 2015-2020 Milian Wolff <mail@milianw.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -164,9 +164,12 @@ struct ParserData final : public AccumulatedTraceData
         allocationsChartData.rows.reserve(MAX_CHART_DATAPOINTS);
         temporaryChartData.rows.reserve(MAX_CHART_DATAPOINTS);
         // start off with null data at the origin
-        consumedChartData.rows.push_back({});
-        allocationsChartData.rows.push_back({});
-        temporaryChartData.rows.push_back({});
+        lastTimeStamp = filterParameters.minTime;
+        ChartRows origin;
+        origin.timeStamp = lastTimeStamp;
+        consumedChartData.rows.push_back(origin);
+        allocationsChartData.rows.push_back(origin);
+        temporaryChartData.rows.push_back(origin);
         // index 0 indicates the total row
         consumedChartData.labels[0] = i18n("total");
         allocationsChartData.labels[0] = i18n("total");
@@ -191,8 +194,9 @@ struct ParserData final : public AccumulatedTraceData
         // find the top hot spots for the individual data members and remember their
         // IP and store the label
         auto findTopChartEntries = [&](qint64 ChartMergeData::*member, int LabelIds::*label, ChartData* data) {
-            sort(merged.begin(), merged.end(),
-                 [=](const ChartMergeData& left, const ChartMergeData& right) { return left.*member > right.*member; });
+            sort(merged.begin(), merged.end(), [=](const ChartMergeData& left, const ChartMergeData& right) {
+                return std::abs(left.*member) > std::abs(right.*member);
+            });
             for (size_t i = 0; i < min(size_t(ChartRows::MAX_NUM_COST - 1), merged.size()); ++i) {
                 const auto& alloc = merged[i];
                 if (!(alloc.*member)) {
@@ -215,8 +219,9 @@ struct ParserData final : public AccumulatedTraceData
             return;
         }
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, totalCost.leaked);
-        const int64_t diffBetweenTimeStamps = totalTime / MAX_CHART_DATAPOINTS;
-        if (!isFinalTimeStamp && newStamp - lastTimeStamp < diffBetweenTimeStamps) {
+        const auto timeSpan = (filterParameters.maxTime - filterParameters.minTime);
+        const int64_t diffBetweenTimeStamps = timeSpan / MAX_CHART_DATAPOINTS;
+        if (!isFinalTimeStamp && (newStamp - lastTimeStamp) < diffBetweenTimeStamps) {
             return;
         }
         const auto nowConsumed = maxConsumedSinceLastTimeStamp;
@@ -224,15 +229,15 @@ struct ParserData final : public AccumulatedTraceData
         lastTimeStamp = newStamp;
 
         // create the rows
-        auto createRow = [](int64_t timeStamp, int64_t totalCost) {
+        auto createRow = [newStamp](int64_t totalCost) {
             ChartRows row;
-            row.timeStamp = timeStamp;
+            row.timeStamp = newStamp;
             row.cost[0] = totalCost;
             return row;
         };
-        auto consumed = createRow(newStamp, nowConsumed);
-        auto allocs = createRow(newStamp, totalCost.allocations);
-        auto temporary = createRow(newStamp, totalCost.temporary);
+        auto consumed = createRow(nowConsumed);
+        auto allocs = createRow(totalCost.allocations);
+        auto temporary = createRow(totalCost.temporary);
 
         // if the cost is non-zero and the ip corresponds to a hotspot function
         // selected in the labels,
@@ -616,19 +621,37 @@ Parser::Parser(QObject* parent)
 
 Parser::~Parser() = default;
 
+bool Parser::isFiltered() const
+{
+    if (!m_data)
+        return false;
+    return m_data->filterParameters.minTime != 0 || m_data->filterParameters.maxTime < m_data->totalTime;
+}
+
 void Parser::parse(const QString& path, const QString& diffBase)
 {
+    parseImpl(path, diffBase, {});
+}
+
+void Parser::parseImpl(const QString& path, const QString& diffBase, const FilterParameters& filterParameters)
+{
+    auto oldData = std::move(m_data);
     using namespace ThreadWeaver;
-    stream() << make_job([this, path, diffBase]() {
+    stream() << make_job([this, oldData, path, diffBase, filterParameters]() {
         const auto stdPath = path.toStdString();
-        auto data = make_shared<ParserData>();
-        emit progressMessageAvailable(i18n("parsing data..."));
+        auto data = (path == m_path && oldData && diffBase.isEmpty()) ? oldData : make_shared<ParserData>();
+        data->filterParameters = filterParameters;
+
+        const auto isReparsing = data == oldData;
+
+        emit progressMessageAvailable(isReparsing ? i18n("reparsing data...") : i18n("parsing data..."));
 
         if (!diffBase.isEmpty()) {
             ParserData diffData;
-            auto readBase =
-                async(launch::async, [&diffData, diffBase]() { return diffData.read(diffBase.toStdString()); });
-            if (!data->read(stdPath)) {
+            auto readBase = async(launch::async, [&diffData, diffBase, isReparsing]() {
+                return diffData.read(diffBase.toStdString(), isReparsing);
+            });
+            if (!data->read(stdPath, isReparsing)) {
                 emit failedToOpen(path);
                 return;
             }
@@ -638,16 +661,17 @@ void Parser::parse(const QString& path, const QString& diffBase)
             }
             data->diff(diffData);
             data->stringCache.diffMode = true;
-        } else if (!data->read(stdPath)) {
+        } else if (!data->read(stdPath, isReparsing)) {
             emit failedToOpen(path);
             return;
         }
 
-        data->updateStringCache();
-
-        emit summaryAvailable({QString::fromStdString(data->debuggee), data->totalCost, data->totalTime, data->peakTime,
-                               data->peakRSS * data->systemInfo.pageSize,
-                               data->systemInfo.pages * data->systemInfo.pageSize, data->fromAttached});
+        if (!isReparsing) {
+            data->updateStringCache();
+            emit summaryAvailable({QString::fromStdString(data->debuggee), data->totalCost, data->totalTime,
+                                   data->peakTime, data->peakRSS * data->systemInfo.pageSize,
+                                   data->systemInfo.pages * data->systemInfo.pageSize, data->fromAttached});
+        }
 
         emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again
@@ -672,11 +696,11 @@ void Parser::parse(const QString& path, const QString& diffBase)
         });
         if (!data->stringCache.diffMode) {
             // only build charts when we are not diffing
-            *parallel << make_job([this, data, stdPath]() {
+            *parallel << make_job([this, data, stdPath, isReparsing]() {
                 // this mutates data, and thus anything running in parallel must
                 // not access data
                 data->prepareBuildCharts();
-                data->read(stdPath);
+                data->read(stdPath, AccumulatedTraceData::ThirdPass, isReparsing);
                 emit consumedChartDataAvailable(data->consumedChartData);
                 emit allocationsChartDataAvailable(data->allocationsChartData);
                 emit temporaryChartDataAvailable(data->temporaryChartData);
@@ -684,15 +708,28 @@ void Parser::parse(const QString& path, const QString& diffBase)
         }
 
         auto sequential = new Sequence;
-        *sequential << parallel << make_job([this, data]() {
-            QMetaObject::invokeMethod(this, [this, data]() {
+        *sequential << parallel << make_job([this, data, path]() {
+            QMetaObject::invokeMethod(this, [this, data, path]() {
                 Q_ASSERT(QThread::currentThread() == thread());
                 m_data = data;
                 m_data->clearForReparse();
+                m_path = path;
                 emit finished();
             });
         });
 
         stream() << sequential;
     });
+}
+
+void Parser::reparse(const FilterParameters& parameters_)
+{
+    if (!m_data || m_data->stringCache.diffMode)
+        return;
+
+    auto filterParameters = parameters_;
+    filterParameters.minTime = std::max(int64_t(0), filterParameters.minTime);
+    filterParameters.maxTime = std::min(m_data->totalTime, filterParameters.maxTime);
+
+    parseImpl(m_path, {}, filterParameters);
 }

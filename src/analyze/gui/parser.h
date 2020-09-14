@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Milian Wolff <mail@milianw.de>
+ * Copyright 2015-2020 Milian Wolff <mail@milianw.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,6 +21,7 @@
 
 #include <QObject>
 
+#include "../filterparameters.h"
 #include "callercalleemodel.h"
 #include "chartmodel.h"
 #include "histogrammodel.h"
@@ -37,8 +38,11 @@ public:
     explicit Parser(QObject* parent = nullptr);
     virtual ~Parser();
 
+    bool isFiltered() const;
+
 public slots:
     void parse(const QString& path, const QString& diffBase);
+    void reparse(const FilterParameters& filterParameters);
 
 signals:
     void progressMessageAvailable(const QString& progress);
@@ -54,6 +58,9 @@ signals:
     void failedToOpen(const QString& path);
 
 private:
+    void parseImpl(const QString& path, const QString& diffBase, const FilterParameters& filterParameters);
+
+    QString m_path;
     std::shared_ptr<ParserData> m_data;
 };
 

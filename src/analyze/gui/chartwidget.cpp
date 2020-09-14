@@ -18,6 +18,7 @@
 
 #include "chartwidget.h"
 
+#include <QMenu>
 #include <QPainter>
 #include <QTextStream>
 #include <QToolTip>
@@ -43,6 +44,7 @@
 #include "util.h"
 
 #include <cmath>
+#include <limits>
 
 using namespace KChart;
 
@@ -92,6 +94,35 @@ ChartWidget::ChartWidget(QWidget* parent)
     coordinatePlane->setAutoAdjustGridToZoom(true);
 
     m_chart->installEventFilter(this);
+
+    m_chart->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_chart, &QWidget::customContextMenuRequested, this, [this](const QPoint& point) {
+        if (!m_model)
+            return;
+
+        if (!m_selection && !m_isFiltered)
+            return;
+
+        auto* menu = new QMenu(this);
+        menu->setAttribute(Qt::WA_DeleteOnClose, true);
+
+        if (m_selection) {
+            auto* reparse = menu->addAction(QIcon(QStringLiteral("view-filter")), i18n("Filter In On Selection"));
+            connect(reparse, &QAction::triggered, this, [this]() {
+                const auto startTime = std::min(m_selection.start, m_selection.end);
+                const auto endTime = std::max(m_selection.start, m_selection.end);
+                emit filterRequested(startTime, endTime);
+            });
+        }
+
+        if (m_isFiltered) {
+            auto* reset = menu->addAction(QIcon(QStringLiteral("edit-reset")), i18n("Reset Filter"));
+            connect(reset, &QAction::triggered, this,
+                    [this]() { emit filterRequested(0, std::numeric_limits<int64_t>::max()); });
+        }
+
+        menu->popup(m_chart->mapToGlobal(point));
+    });
 }
 
 ChartWidget::~ChartWidget() = default;

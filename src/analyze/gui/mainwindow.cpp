@@ -188,6 +188,9 @@ ChartWidget* addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel
                          void (Parser::*dataReady)(const ChartData&), MainWindow* window)
 {
     auto tab = new ChartWidget(tabWidget->parentWidget());
+    auto updateFiltered = [tab, parser]() { tab->setIsFiltered(parser->isFiltered()); };
+    QObject::connect(parser, &Parser::finished, tab, updateFiltered);
+    updateFiltered();
     tabWidget->addTab(tab, title);
     tabWidget->setTabEnabled(tabWidget->indexOf(tab), false);
     auto model = new ChartModel(type, tab);
@@ -198,6 +201,7 @@ ChartWidget* addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel
     });
     QObject::connect(window, &MainWindow::clearData, model, &ChartModel::clearData);
     QObject::connect(window, &MainWindow::clearData, tab, [tab]() { tab->setSelection({}); });
+    QObject::connect(tab, &ChartWidget::filterRequested, window, &MainWindow::reparse);
     return tab;
 }
 #endif
@@ -585,6 +589,18 @@ void MainWindow::loadFile(const QString& file, const QString& diffBase)
     }
     m_ui->pages->setCurrentWidget(m_ui->loadingPage);
     m_parser->parse(file, diffBase);
+}
+
+void MainWindow::reparse(int64_t minTime, int64_t maxTime)
+{
+    m_closeAction->setEnabled(false);
+    m_ui->flameGraphTab->clearData();
+    m_ui->loadingLabel->setText(i18n("Reparsing file, please wait..."));
+    m_ui->pages->setCurrentWidget(m_ui->loadingPage);
+    FilterParameters filterParameters;
+    filterParameters.minTime = minTime;
+    filterParameters.maxTime = maxTime;
+    m_parser->reparse(filterParameters);
 }
 
 void MainWindow::openNewFile()
