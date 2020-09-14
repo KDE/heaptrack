@@ -197,6 +197,7 @@ ChartWidget* addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel
         tabWidget->setTabEnabled(tabWidget->indexOf(tab), true);
     });
     QObject::connect(window, &MainWindow::clearData, model, &ChartModel::clearData);
+    QObject::connect(window, &MainWindow::clearData, tab, [tab]() { tab->setSelection({}); });
     return tab;
 }
 #endif
