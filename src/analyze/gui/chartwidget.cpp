@@ -20,6 +20,7 @@
 
 #include <QMenu>
 #include <QPainter>
+#include <QRubberBand>
 #include <QTextStream>
 #include <QToolTip>
 #include <QVBoxLayout>
@@ -79,11 +80,45 @@ public:
         return format.formatByteSize(label.toDouble(), 1, KFormat::MetricBinaryDialect);
     }
 };
+
+/// see also ProxyStyle which is responsible for unsetting SH_RubberBand_Mask
+class ChartRubberBand : public QRubberBand
+{
+    Q_OBJECT
+public:
+    explicit ChartRubberBand(QWidget* parent)
+        : QRubberBand(QRubberBand::Rectangle, parent)
+    {
+    }
+    ~ChartRubberBand() = default;
+
+protected:
+    void paintEvent(QPaintEvent* event) override
+    {
+        auto brush = palette().highlight();
+        if (brush != m_lastBrush) {
+            auto color = brush.color();
+            color.setAlpha(128);
+            brush.setColor(color);
+            m_cachedBrush = brush;
+        } else {
+            brush = m_cachedBrush;
+        }
+
+        QPainter painter(this);
+        painter.fillRect(event->rect(), brush);
+    }
+
+private:
+    QBrush m_lastBrush;
+    QBrush m_cachedBrush;
+};
 }
 
 ChartWidget::ChartWidget(QWidget* parent)
     : QWidget(parent)
     , m_chart(new Chart(this))
+    , m_rubberBand(new ChartRubberBand(this))
 {
     auto layout = new QVBoxLayout(this);
     layout->addWidget(m_chart);
@@ -255,31 +290,31 @@ void ChartWidget::setSelection(const Range& selection)
     stream << "</table></qt>";
 
     setToolTip(toolTip);
-    update();
+    updateRubberBand();
 
     emit selectionChanged(m_selection);
 }
 
-void ChartWidget::paintEvent(QPaintEvent* event)
+void ChartWidget::resizeEvent(QResizeEvent* event)
 {
-    QWidget::paintEvent(event);
+    QWidget::resizeEvent(event);
+    updateRubberBand();
+}
 
-    if (!m_selection || !m_model)
+void ChartWidget::updateRubberBand()
+{
+    if (!m_selection || !m_model) {
+        m_rubberBand->hide();
         return;
+    }
 
     auto* coordinatePlane = static_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
     const auto delta = m_chart->pos().x();
     const auto pixelStart = coordinatePlane->translate({m_selection.start, 0}).x() - delta;
     const auto pixelEnd = coordinatePlane->translate({m_selection.end, 0}).x() - delta;
-    auto selectionRect = QRect(QPoint(pixelStart, 0), QPoint(pixelEnd, height()));
-
-    auto brush = palette().highlight();
-    auto color = brush.color();
-    color.setAlpha(128);
-    brush.setColor(color);
-
-    QPainter painter(this);
-    painter.fillRect(selectionRect, brush);
+    auto selectionRect = QRect(QPoint(pixelStart, 0), QPoint(pixelEnd, height() - 1));
+    m_rubberBand->setGeometry(selectionRect.normalized());
+    m_rubberBand->show();
 }
 
 bool ChartWidget::eventFilter(QObject* watched, QEvent* event)

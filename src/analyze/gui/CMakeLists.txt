@@ -52,6 +52,7 @@ set(SRCFILES
     stacksmodel.cpp
     topproxy.cpp
     callercalleemodel.cpp
+    proxystyle.cpp
     resources.qrc
 )
 

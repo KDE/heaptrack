@@ -21,6 +21,7 @@
 
 #include <QWidget>
 
+class QRubberBand;
 class ChartModel;
 
 namespace KChart {
@@ -71,13 +72,15 @@ signals:
     void filterRequested(int64_t minTime, int64_t maxTime);
 
 protected:
-    void paintEvent(QPaintEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
 private:
+    void updateRubberBand();
     bool eventFilter(QObject* watched, QEvent* event) override;
 
     KChart::Chart* m_chart;
     ChartModel* m_model = nullptr;
+    QRubberBand* m_rubberBand = nullptr;
     Range m_selection;
     bool m_isFiltered = false;
 };

@@ -23,12 +23,14 @@
 #include <KAboutData>
 #include <KLocalizedString>
 
-#include "mainwindow.h"
 #include "gui_config.h"
+#include "mainwindow.h"
+#include "proxystyle.h"
 
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
+    app.setStyle(new ProxyStyle);
 
 #if APPIMAGE_BUILD
     QIcon::setThemeSearchPaths({app.applicationDirPath() + QLatin1String("/../share/icons/")});
