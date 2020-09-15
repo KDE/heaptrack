@@ -350,8 +350,6 @@ MainWindow::MainWindow(QWidget* parent)
         QString textLeft;
         QString textCenter;
         QString textRight;
-        const double totalTimeS = 0.001 * data.totalTime;
-        const double peakTimeS = 0.001 * data.peakTime;
         {
             QTextStream stream(&textLeft);
             const auto debuggee = insertWordWrapMarkers(data.debuggee);
@@ -363,13 +361,14 @@ MainWindow::MainWindow(QWidget* parent)
                                                 "style='font-family:monospace;'>%1</dd>",
                                                 debuggee))
                    // xgettext:no-c-format
-                   << i18n("<dt><b>total runtime</b>:</dt><dd>%1s</dd>", totalTimeS)
+                   << i18n("<dt><b>total runtime</b>:</dt><dd>%1s</dd>", Util::formatTime(data.totalTime))
                    << i18n("<dt><b>total system memory</b>:</dt><dd>%1</dd>",
                            format.formatByteSize(data.totalSystemMemory, 1, KFormat::MetricBinaryDialect))
                    << "</dl></qt>";
         }
         {
             QTextStream stream(&textCenter);
+            const double totalTimeS = 0.001 * data.totalTime;
             stream << "<qt><dl>"
                    << i18n("<dt><b>calls to allocation functions</b>:</dt><dd>%1 "
                            "(%2/s)</dd>",
@@ -386,7 +385,8 @@ MainWindow::MainWindow(QWidget* parent)
             stream << "<qt><dl>"
                    << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1 "
                            "after %2s</dd>",
-                           format.formatByteSize(data.cost.peak, 1, KFormat::MetricBinaryDialect), peakTimeS)
+                           format.formatByteSize(data.cost.peak, 1, KFormat::MetricBinaryDialect),
+                           Util::formatTime(data.peakTime))
                    << i18n("<dt><b>peak RSS</b> (including heaptrack "
                            "overhead):</dt><dd>%1</dd>",
                            format.formatByteSize(data.peakRSS, 1, KFormat::MetricBinaryDialect))
