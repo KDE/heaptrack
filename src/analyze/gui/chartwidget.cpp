@@ -310,8 +310,8 @@ void ChartWidget::updateRubberBand()
 
     auto* coordinatePlane = static_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
     const auto delta = m_chart->pos().x();
-    const auto pixelStart = coordinatePlane->translate({m_selection.start, 0}).x() - delta;
-    const auto pixelEnd = coordinatePlane->translate({m_selection.end, 0}).x() - delta;
+    const auto pixelStart = coordinatePlane->translate({m_selection.start, 0}).x() + delta;
+    const auto pixelEnd = coordinatePlane->translate({m_selection.end, 0}).x() + delta;
     auto selectionRect = QRect(QPoint(pixelStart, 0), QPoint(pixelEnd, height() - 1));
     m_rubberBand->setGeometry(selectionRect.normalized());
     m_rubberBand->show();
