@@ -23,6 +23,14 @@
 #include <KFormat>
 #include <KLocalizedString>
 
+namespace {
+const KFormat& format()
+{
+    static const KFormat format;
+    return format;
+}
+}
+
 QString Util::basename(const QString& path)
 {
     int idx = path.lastIndexOf(QLatin1Char('/'));
@@ -36,19 +44,38 @@ QString Util::formatString(const QString& input)
 
 QString Util::formatTime(qint64 ms)
 {
-    if (ms > 60000) {
-        // minutes
-        return QString::number(double(ms) / 60000, 'g', 3) + QLatin1String("min");
-    } else {
-        // seconds
-        return QString::number(double(ms) / 1000, 'g', 3) + QLatin1Char('s');
+    auto format = [](quint64 fragment, int precision) -> QString {
+        return QString::number(fragment).rightJustified(precision, QLatin1Char('0'));
+    };
+
+    if (ms < 1000) {
+        return QString::number(ms) + QLatin1String("ms");
     }
+
+    qint64 totalSeconds = ms / 1000;
+    qint64 days = totalSeconds / 60 / 60 / 24;
+    qint64 hours = (totalSeconds / 60 / 60) % 24;
+    qint64 minutes = (totalSeconds / 60) % 60;
+    qint64 seconds = totalSeconds % 60;
+
+    auto optional = [](quint64 fragment, const char* unit) -> QString {
+        if (fragment > 0)
+            return QString::number(fragment) + QLatin1String(unit);
+        return QString();
+    };
+
+    QString ret = optional(days, "d") + optional(hours, "h") + optional(minutes, "min");
+    const auto showMs = ret.isEmpty();
+    ret += format(seconds, 2);
+    if (showMs)
+        ret += QLatin1Char('.') + format(showMs ? ms : 0, 3);
+    ret += QLatin1Char('s');
+    return ret;
 }
 
 QString Util::formatBytes(qint64 bytes)
 {
-    static const KFormat format;
-    auto ret = format.formatByteSize(bytes, 1, KFormat::MetricBinaryDialect);
+    auto ret = format().formatByteSize(bytes, 1, KFormat::MetricBinaryDialect);
     // remove spaces, otherwise HTML might break between the unit and the cost
     // note that we also don't add a space before our time units above
     ret.remove(QLatin1Char(' '));
