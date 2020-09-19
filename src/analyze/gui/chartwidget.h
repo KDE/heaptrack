@@ -21,15 +21,17 @@
 
 #include <QWidget>
 
+#include "summarydata.h"
+
 class QRubberBand;
+class QAbstractItemModel;
+
 class ChartModel;
 
 namespace KChart {
 class Chart;
 class CartesianAxis;
 }
-
-class QAbstractItemModel;
 
 class ChartWidget : public QWidget
 {
@@ -63,7 +65,7 @@ public:
         return m_selection;
     }
 
-    void setIsFiltered(bool isFiltered);
+    void setSummaryData(const SummaryData& summaryData);
 
 signals:
     void selectionChanged(const Range& range);
@@ -83,7 +85,7 @@ private:
     ChartModel* m_model = nullptr;
     QRubberBand* m_rubberBand = nullptr;
     Range m_selection;
-    bool m_isFiltered = false;
+    SummaryData m_summaryData;
 };
 
 #endif // CHARTWIDGET_H

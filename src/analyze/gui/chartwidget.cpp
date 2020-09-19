@@ -60,8 +60,22 @@ public:
 
     const QString customizedLabel(const QString& label) const override
     {
-        return Util::formatTime(label.toLongLong());
+        const auto time = label.toLongLong();
+        if (m_summaryData.filterParameters.isFiltered(m_summaryData.totalTime)) {
+            return Util::formatTime(time) + QLatin1Char('\n')
+                + Util::formatTime(time - m_summaryData.filterParameters.minTime);
+        }
+        return Util::formatTime(time);
     }
+
+    void setSummaryData(const SummaryData& summaryData)
+    {
+        m_summaryData = summaryData;
+        update();
+    }
+
+private:
+    SummaryData m_summaryData;
 };
 
 class SizeAxis : public CartesianAxis
@@ -133,7 +147,8 @@ ChartWidget::ChartWidget(QWidget* parent)
         if (!m_model)
             return;
 
-        if (!m_selection && !m_isFiltered)
+        const auto isFiltered = m_summaryData.filterParameters.isFiltered(m_summaryData.totalTime);
+        if (!m_selection && !isFiltered)
             return;
 
         auto* menu = new QMenu(this);
@@ -149,7 +164,7 @@ ChartWidget::ChartWidget(QWidget* parent)
             });
         }
 
-        if (m_isFiltered) {
+        if (isFiltered) {
             auto* reset =
                 menu->addAction(QIcon::fromTheme(QStringLiteral("timeline-use-zone-off")), i18n("Reset Filter"));
             connect(reset, &QAction::triggered, this,
@@ -162,10 +177,13 @@ ChartWidget::ChartWidget(QWidget* parent)
 
 ChartWidget::~ChartWidget() = default;
 
-void ChartWidget::setIsFiltered(bool isFiltered)
+void ChartWidget::setSummaryData(const SummaryData& summaryData)
 {
-    m_isFiltered = isFiltered;
+    m_summaryData = summaryData;
     updateAxesTitle();
+    if (m_bottomAxis) {
+        static_cast<TimeAxis*>(m_bottomAxis)->setSummaryData(summaryData);
+    }
 }
 
 void ChartWidget::setModel(ChartModel* model, bool minimalMode)
@@ -262,9 +280,13 @@ void ChartWidget::updateAxesTitle()
     m_bottomAxis->setTitleText(m_model->headerData(0).toString());
     m_rightAxis->setTitleText(m_model->headerData(1).toString());
 
-    if (m_isFiltered) {
-        m_bottomAxis->setTitleText(i18n("%1 (filtered)", m_bottomAxis->titleText()));
-        m_rightAxis->setTitleText(i18n("%1 (delta)", m_rightAxis->titleText()));
+    if (m_summaryData.filterParameters.isFiltered(m_summaryData.totalTime)) {
+        m_bottomAxis->setTitleText(
+            i18n("%1 (filtered from %2 to %3, Δ%4)", m_bottomAxis->titleText(),
+                 Util::formatTime(m_summaryData.filterParameters.minTime),
+                 Util::formatTime(m_summaryData.filterParameters.maxTime),
+                 Util::formatTime(m_summaryData.filterParameters.maxTime - m_summaryData.filterParameters.minTime)));
+        m_rightAxis->setTitleText(i18n("%1 (filtered delta)", m_rightAxis->titleText()));
     }
 }
 

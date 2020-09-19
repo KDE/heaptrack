@@ -188,9 +188,7 @@ ChartWidget* addChartTab(QTabWidget* tabWidget, const QString& title, ChartModel
                          void (Parser::*dataReady)(const ChartData&), MainWindow* window)
 {
     auto tab = new ChartWidget(tabWidget->parentWidget());
-    auto updateFiltered = [tab, parser]() { tab->setIsFiltered(parser->isFiltered()); };
-    QObject::connect(parser, &Parser::finished, tab, updateFiltered);
-    updateFiltered();
+    QObject::connect(parser, &Parser::summaryAvailable, tab, &ChartWidget::setSummaryData);
     tabWidget->addTab(tab, title);
     tabWidget->setTabEnabled(tabWidget->indexOf(tab), false);
     auto model = new ChartModel(type, tab);
