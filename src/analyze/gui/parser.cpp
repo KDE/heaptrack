@@ -625,7 +625,7 @@ bool Parser::isFiltered() const
 {
     if (!m_data)
         return false;
-    return m_data->filterParameters.minTime != 0 || m_data->filterParameters.maxTime < m_data->totalTime;
+    return m_data->filterParameters.isFiltered(m_data->totalTime);
 }
 
 void Parser::parse(const QString& path, const QString& diffBase)
@@ -668,10 +668,11 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
 
         if (!isReparsing) {
             data->updateStringCache();
-            emit summaryAvailable({QString::fromStdString(data->debuggee), data->totalCost, data->totalTime,
-                                   data->peakTime, data->peakRSS * data->systemInfo.pageSize,
-                                   data->systemInfo.pages * data->systemInfo.pageSize, data->fromAttached});
         }
+
+        emit summaryAvailable({QString::fromStdString(data->debuggee), data->totalCost, data->totalTime,
+                               data->filterParameters, data->peakTime, data->peakRSS * data->systemInfo.pageSize,
+                               data->systemInfo.pages * data->systemInfo.pageSize, data->fromAttached});
 
         emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again

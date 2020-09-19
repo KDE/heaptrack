@@ -20,6 +20,7 @@
 #define SUMMARYDATA_H
 
 #include "../allocationdata.h"
+#include "../filterparameters.h"
 #include <QMetaType>
 #include <QString>
 
@@ -28,6 +29,7 @@ struct SummaryData
     QString debuggee;
     AllocationData cost;
     int64_t totalTime;
+    FilterParameters filterParameters;
     int64_t peakTime;
     int64_t peakRSS;
     int64_t totalSystemMemory;
