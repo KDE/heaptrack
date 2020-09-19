@@ -142,7 +142,8 @@ ChartWidget::ChartWidget(QWidget* parent)
         menu->setAttribute(Qt::WA_DeleteOnClose, true);
 
         if (m_selection) {
-            auto* reparse = menu->addAction(QIcon(QStringLiteral("view-filter")), i18n("Filter In On Selection"));
+            auto* reparse = menu->addAction(QIcon::fromTheme(QStringLiteral("timeline-use-zone-on")),
+                                            i18n("Filter In On Selection"));
             connect(reparse, &QAction::triggered, this, [this]() {
                 const auto startTime = std::min(m_selection.start, m_selection.end);
                 const auto endTime = std::max(m_selection.start, m_selection.end);
@@ -151,7 +152,8 @@ ChartWidget::ChartWidget(QWidget* parent)
         }
 
         if (m_isFiltered) {
-            auto* reset = menu->addAction(QIcon(QStringLiteral("edit-reset")), i18n("Reset Filter"));
+            auto* reset =
+                menu->addAction(QIcon::fromTheme(QStringLiteral("timeline-use-zone-off")), i18n("Reset Filter"));
             connect(reset, &QAction::triggered, this,
                     [this]() { emit filterRequested(0, std::numeric_limits<int64_t>::max()); });
         }
