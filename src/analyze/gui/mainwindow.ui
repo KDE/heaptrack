@@ -798,7 +798,7 @@
      <x>0</x>
      <y>0</y>
      <width>1332</width>
-     <height>29</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -811,20 +811,36 @@
      <string>Setti&amp;ngs</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuFilter">
+    <property name="title">
+     <string>Filter</string>
+    </property>
+    <addaction name="actionResetFilter"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menuFilter"/>
    <addaction name="menu_Settings"/>
   </widget>
+  <action name="actionResetFilter">
+   <property name="icon">
+    <iconset theme="timeline-use-zone-off">
+     <normaloff>.</normaloff>.</iconset>
+   </property>
+   <property name="text">
+    <string>Reset Filter</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>KMessageWidget</class>
-   <extends>QFrame</extends>
-   <header>kmessagewidget.h</header>
-  </customwidget>
   <customwidget>
    <class>KUrlRequester</class>
    <extends>QWidget</extends>
    <header>kurlrequester.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KMessageWidget</class>
+   <extends>QFrame</extends>
+   <header>kmessagewidget.h</header>
   </customwidget>
   <customwidget>
    <class>FlameGraph</class>

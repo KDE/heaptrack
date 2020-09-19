@@ -565,6 +565,12 @@ MainWindow::MainWindow(QWidget* parent)
     });
 
     setupCodeNavigationMenu();
+
+    m_ui->actionResetFilter->setEnabled(false);
+    connect(m_ui->actionResetFilter, &QAction::triggered, this,
+            [this]() { reparse(0, std::numeric_limits<int64_t>::max()); });
+    QObject::connect(m_parser, &Parser::finished, this,
+                     [this]() { m_ui->actionResetFilter->setEnabled(m_parser->isFiltered()); });
 }
 
 MainWindow::~MainWindow()
