@@ -26,6 +26,7 @@ class ChartModel;
 
 namespace KChart {
 class Chart;
+class CartesianAxis;
 }
 
 class QAbstractItemModel;
@@ -62,10 +63,7 @@ public:
         return m_selection;
     }
 
-    void setIsFiltered(bool isFiltered)
-    {
-        m_isFiltered = isFiltered;
-    }
+    void setIsFiltered(bool isFiltered);
 
 signals:
     void selectionChanged(const Range& range);
@@ -75,10 +73,13 @@ protected:
     void resizeEvent(QResizeEvent* event) override;
 
 private:
+    void updateAxesTitle();
     void updateRubberBand();
     bool eventFilter(QObject* watched, QEvent* event) override;
 
-    KChart::Chart* m_chart;
+    KChart::Chart* m_chart = nullptr;
+    KChart::CartesianAxis* m_bottomAxis = nullptr;
+    KChart::CartesianAxis* m_rightAxis = nullptr;
     ChartModel* m_model = nullptr;
     QRubberBand* m_rubberBand = nullptr;
     Range m_selection;

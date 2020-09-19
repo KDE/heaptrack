@@ -162,6 +162,12 @@ ChartWidget::ChartWidget(QWidget* parent)
 
 ChartWidget::~ChartWidget() = default;
 
+void ChartWidget::setIsFiltered(bool isFiltered)
+{
+    m_isFiltered = isFiltered;
+    updateAxesTitle();
+}
+
 void ChartWidget::setModel(ChartModel* model, bool minimalMode)
 {
     if (m_model == model)
@@ -206,11 +212,11 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
 
         KColorScheme scheme(QPalette::Active, KColorScheme::Window);
         const QPen foreground(scheme.foreground().color());
-        auto bottomAxis = new TimeAxis(totalPlotter);
-        auto axisTextAttributes = bottomAxis->textAttributes();
+        m_bottomAxis = new TimeAxis(totalPlotter);
+        auto axisTextAttributes = m_bottomAxis->textAttributes();
         axisTextAttributes.setPen(foreground);
-        bottomAxis->setTextAttributes(axisTextAttributes);
-        auto axisTitleTextAttributes = bottomAxis->titleTextAttributes();
+        m_bottomAxis->setTextAttributes(axisTextAttributes);
+        auto axisTitleTextAttributes = m_bottomAxis->titleTextAttributes();
         axisTitleTextAttributes.setPen(foreground);
         auto fontSize = axisTitleTextAttributes.fontSize();
         fontSize.setCalculationMode(KChartEnums::MeasureCalculationModeAbsolute);
@@ -220,19 +226,17 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
             fontSize.setValue(font().pointSizeF() + 2);
         }
         axisTitleTextAttributes.setFontSize(fontSize);
-        bottomAxis->setTitleTextAttributes(axisTitleTextAttributes);
-        bottomAxis->setTitleText(model->headerData(0).toString());
-        bottomAxis->setPosition(CartesianAxis::Bottom);
-        totalPlotter->addAxis(bottomAxis);
+        m_bottomAxis->setTitleTextAttributes(axisTitleTextAttributes);
+        m_bottomAxis->setPosition(CartesianAxis::Bottom);
+        totalPlotter->addAxis(m_bottomAxis);
 
-        CartesianAxis* rightAxis = model->type() == ChartModel::Allocations || model->type() == ChartModel::Temporary
+        m_rightAxis = model->type() == ChartModel::Allocations || model->type() == ChartModel::Temporary
             ? new CartesianAxis(totalPlotter)
             : new SizeAxis(totalPlotter);
-        rightAxis->setTextAttributes(axisTextAttributes);
-        rightAxis->setTitleTextAttributes(axisTitleTextAttributes);
-        rightAxis->setTitleText(model->headerData(1).toString());
-        rightAxis->setPosition(CartesianAxis::Right);
-        totalPlotter->addAxis(rightAxis);
+        m_rightAxis->setTextAttributes(axisTextAttributes);
+        m_rightAxis->setTitleTextAttributes(axisTitleTextAttributes);
+        m_rightAxis->setPosition(CartesianAxis::Right);
+        totalPlotter->addAxis(m_rightAxis);
 
         coordinatePlane->addDiagram(totalPlotter);
     }
@@ -246,6 +250,21 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
         proxy->setSourceModel(model);
         plotter->setModel(proxy);
         coordinatePlane->addDiagram(plotter);
+    }
+    updateAxesTitle();
+}
+
+void ChartWidget::updateAxesTitle()
+{
+    if (!m_model)
+        return;
+
+    m_bottomAxis->setTitleText(m_model->headerData(0).toString());
+    m_rightAxis->setTitleText(m_model->headerData(1).toString());
+
+    if (m_isFiltered) {
+        m_bottomAxis->setTitleText(i18n("%1 (filtered)", m_bottomAxis->titleText()));
+        m_rightAxis->setTitleText(i18n("%1 (delta)", m_rightAxis->titleText()));
     }
 }
 
