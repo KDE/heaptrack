@@ -21,7 +21,6 @@
 #include <QDebug>
 #include <QTextStream>
 
-#include <KFormat>
 #include <KLocalizedString>
 
 #include <cmath>
@@ -150,13 +149,13 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             if (role == SortRole || role == MaxCostRole) {
                 return static_cast<qint64>(abs(row->cost.peak));
             } else {
-                return m_format.formatByteSize(row->cost.peak, 1, KFormat::MetricBinaryDialect);
+                return Util::formatBytes(row->cost.peak);
             }
         case LeakedColumn:
             if (role == SortRole || role == MaxCostRole) {
                 return static_cast<qint64>(abs(row->cost.leaked));
             } else {
-                return m_format.formatByteSize(row->cost.leaked, 1, KFormat::MetricBinaryDialect);
+                return Util::formatBytes(row->cost.leaked);
             }
         case FunctionColumn:
             return row->symbol.symbol;
@@ -176,16 +175,13 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
                         row->symbol.path.toHtmlEscaped());
         stream << '\n';
         stream << '\n';
-        KFormat format;
         const auto peakFraction = Util::formatCostRelative(row->cost.peak, m_maxCost.cost.peak);
         const auto leakedFraction = Util::formatCostRelative(row->cost.leaked, m_maxCost.cost.leaked);
         const auto allocationsFraction = Util::formatCostRelative(row->cost.allocations, m_maxCost.cost.allocations);
         const auto temporaryFraction = Util::formatCostRelative(row->cost.temporary, row->cost.allocations);
         const auto temporaryFractionTotal = Util::formatCostRelative(row->cost.temporary, m_maxCost.cost.temporary);
-        stream << i18n("peak contribution: %1 (%2% of total)\n",
-                       format.formatByteSize(row->cost.peak, 1, KFormat::MetricBinaryDialect), peakFraction);
-        stream << i18n("leaked: %1 (%2% of total)\n",
-                       format.formatByteSize(row->cost.leaked, 1, KFormat::MetricBinaryDialect), leakedFraction);
+        stream << i18n("peak contribution: %1 (%2% of total)\n", Util::formatBytes(row->cost.peak), peakFraction);
+        stream << i18n("leaked: %1 (%2% of total)\n", Util::formatBytes(row->cost.leaked), leakedFraction);
         stream << i18n("allocations: %1 (%2% of total)\n", row->cost.allocations, allocationsFraction);
         stream << i18n("temporary: %1 (%2% of allocations, %3% of total)\n", row->cost.temporary, temporaryFraction,
                        temporaryFractionTotal);

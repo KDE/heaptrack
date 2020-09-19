@@ -347,7 +347,6 @@ MainWindow::MainWindow(QWidget* parent)
         bottomUpModel->setSummary(data);
         topDownModel->setSummary(data);
         const auto isFiltered = data.filterParameters.isFiltered(data.totalTime);
-        KFormat format;
         QString textLeft;
         QString textCenter;
         QString textRight;
@@ -369,8 +368,7 @@ MainWindow::MainWindow(QWidget* parent)
             } else {
                 stream << i18n("<dt><b>total runtime</b>:</dt><dd>%1</dd>", Util::formatTime(data.totalTime));
             }
-            stream << i18n("<dt><b>total system memory</b>:</dt><dd>%1</dd>",
-                           format.formatByteSize(data.totalSystemMemory, 1, KFormat::MetricBinaryDialect))
+            stream << i18n("<dt><b>total system memory</b>:</dt><dd>%1</dd>", Util::formatBytes(data.totalSystemMemory))
                    << "</dl></qt>";
         }
         {
@@ -392,11 +390,10 @@ MainWindow::MainWindow(QWidget* parent)
             stream << "<qt><dl>"
                    << i18n("<dt><b>peak heap memory consumption</b>:</dt><dd>%1 "
                            "after %2</dd>",
-                           format.formatByteSize(data.cost.peak, 1, KFormat::MetricBinaryDialect),
-                           Util::formatTime(data.peakTime))
+                           Util::formatBytes(data.cost.peak), Util::formatTime(data.peakTime))
                    << i18n("<dt><b>peak RSS</b> (including heaptrack "
                            "overhead):</dt><dd>%1</dd>",
-                           format.formatByteSize(data.peakRSS, 1, KFormat::MetricBinaryDialect));
+                           Util::formatBytes(data.peakRSS));
             if (isFiltered) {
                 stream << i18n("<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>",
                                Util::formatBytes(data.cost.leaked));

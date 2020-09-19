@@ -37,7 +37,6 @@
 #include <KChartLegend>
 
 #include <KColorScheme>
-#include <KFormat>
 #include <KLocalizedString>
 
 #include "chartmodel.h"
@@ -76,8 +75,7 @@ public:
 
     const QString customizedLabel(const QString& label) const override
     {
-        KFormat format(QLocale::system());
-        return format.formatByteSize(label.toDouble(), 1, KFormat::MetricBinaryDialect);
+        return Util::formatBytes(label.toLongLong());
     }
 };
 

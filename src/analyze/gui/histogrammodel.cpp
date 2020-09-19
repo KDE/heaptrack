@@ -20,7 +20,6 @@
 
 #include <KChartGlobal>
 
-#include <KFormat>
 #include <KLocalizedString>
 
 #include <QBrush>

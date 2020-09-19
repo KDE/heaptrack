@@ -20,7 +20,6 @@
 
 #include <KChartGlobal>
 #include <KChartLineAttributes>
-#include <KFormat>
 #include <KLocalizedString>
 
 #include <QBrush>
@@ -122,8 +121,7 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
     if (role == Qt::ToolTipRole) {
         const QString time = Util::formatTime(data.timeStamp);
         auto byteCost = [cost]() -> QString {
-            KFormat format;
-            const auto formatted = format.formatByteSize(cost, 1, KFormat::MetricBinaryDialect);
+            const auto formatted = Util::formatBytes(cost);
             if (cost > 1024) {
                 return i18nc("%1: the formatted byte size, e.g. \"1.2KB\", %2: the raw byte size, e.g. \"1300\"",
                              "%1 (%2 bytes)", formatted, cost);

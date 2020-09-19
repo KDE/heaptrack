@@ -198,7 +198,6 @@ QString FrameGraphicsItem::description() const
         return m_symbol.symbol;
     }
 
-    KFormat format;
     qint64 totalCost = 0;
     {
         auto item = this;
@@ -223,12 +222,12 @@ QString FrameGraphicsItem::description() const
     case Peak:
         tooltip = i18nc("%1: peak consumption in bytes, %2: relative number, %3: "
                         "function label",
-                        "%1 (%2%) contribution to peak consumption in %3 and below.",
-                        format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, symbol);
+                        "%1 (%2%) contribution to peak consumption in %3 and below.", Util::formatBytes(m_cost),
+                        fraction, symbol);
         break;
     case Leaked:
         tooltip = i18nc("%1: leaked bytes, %2: relative number, %3: function label", "%1 (%2%) leaked in %3 and below.",
-                        format.formatByteSize(m_cost, 1, KFormat::MetricBinaryDialect), fraction, symbol);
+                        Util::formatBytes(m_cost), fraction, symbol);
         break;
     }
 
@@ -352,7 +351,6 @@ FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type,
     KColorScheme scheme(QPalette::Active);
     const QPen pen(scheme.foreground().color());
 
-    KFormat format;
     QString label;
     switch (type) {
     case Allocations:
@@ -362,10 +360,10 @@ FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type,
         label = i18n("%1 temporary allocations in total", totalCost);
         break;
     case Peak:
-        label = i18n("%1 peak memory consumption", format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
+        label = i18n("%1 peak memory consumption", Util::formatBytes(totalCost));
         break;
     case Leaked:
-        label = i18n("%1 leaked in total", format.formatByteSize(totalCost, 1, KFormat::MetricBinaryDialect));
+        label = i18n("%1 leaked in total", Util::formatBytes(totalCost));
         break;
     }
     auto rootItem = new FrameGraphicsItem(totalCost, type, label);
@@ -736,7 +734,6 @@ void FlameGraph::setSearchValue(const QString& value)
         m_searchResultsLabel->hide();
     } else {
         QString label;
-        KFormat format;
         const auto costFraction = Util::formatCostRelative(match.directCost, m_rootItem->cost());
         switch (m_costSource->currentData().value<CostType>()) {
         case Allocations:
@@ -746,9 +743,8 @@ void FlameGraph::setSearchValue(const QString& value)
             break;
         case Peak:
         case Leaked:
-            label = i18n("%1 (%2% of total of %3) matched by search.",
-                         format.formatByteSize(match.directCost, 1, KFormat::MetricBinaryDialect), costFraction,
-                         format.formatByteSize(m_rootItem->cost(), 1, KFormat::MetricBinaryDialect));
+            label = i18n("%1 (%2% of total of %3) matched by search.", Util::formatBytes(match.directCost),
+                         costFraction, Util::formatBytes(m_rootItem->cost()));
             break;
         }
         m_searchResultsLabel->setText(label);
