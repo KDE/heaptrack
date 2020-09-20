@@ -48,11 +48,15 @@ QString Util::formatTime(qint64 ms)
         return QString::number(fragment).rightJustified(precision, QLatin1Char('0'));
     };
 
-    if (ms < 1000) {
-        return QString::number(ms) + QLatin1String("ms");
+    if (std::abs(ms) < 1000) {
+        QString ret = QString::number(ms) + QLatin1String("ms");
     }
 
+    const auto isNegative = ms < 0;
+    if (isNegative)
+        ms = -ms;
     qint64 totalSeconds = ms / 1000;
+    ms = ms % 1000;
     qint64 days = totalSeconds / 60 / 60 / 24;
     qint64 hours = (totalSeconds / 60 / 60) % 24;
     qint64 minutes = (totalSeconds / 60) % 60;
@@ -70,6 +74,8 @@ QString Util::formatTime(qint64 ms)
     if (showMs)
         ret += QLatin1Char('.') + format(showMs ? ms : 0, 3);
     ret += QLatin1Char('s');
+    if (isNegative)
+        ret.prepend(QLatin1Char('-'));
     return ret;
 }
 
