@@ -344,7 +344,7 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_parser, &Parser::summaryAvailable, this, [=](const SummaryData& data) {
         bottomUpModel->setSummary(data);
         topDownModel->setSummary(data);
-        const auto isFiltered = data.filterParameters.isFiltered(data.totalTime);
+        const auto isFiltered = data.filterParameters.isFilteredByTime(data.totalTime);
         QString textLeft;
         QString textCenter;
         QString textRight;

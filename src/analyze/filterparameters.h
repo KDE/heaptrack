@@ -26,7 +26,7 @@ struct FilterParameters
 {
     int64_t minTime = 0;
     int64_t maxTime = std::numeric_limits<int64_t>::max();
-    bool isFiltered(int64_t totalTime) const
+    bool isFilteredByTime(int64_t totalTime) const
     {
         return minTime != 0 || maxTime < totalTime;
     }

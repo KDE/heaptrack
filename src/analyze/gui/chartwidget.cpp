@@ -62,7 +62,7 @@ public:
     const QString customizedLabel(const QString& label) const override
     {
         const auto time = label.toLongLong();
-        if (m_summaryData.filterParameters.isFiltered(m_summaryData.totalTime)) {
+        if (m_summaryData.filterParameters.isFilteredByTime(m_summaryData.totalTime)) {
             return Util::formatTime(time) + QLatin1Char('\n')
                 + Util::formatTime(time - m_summaryData.filterParameters.minTime);
         }
@@ -151,7 +151,7 @@ ChartWidget::ChartWidget(QWidget* parent)
         if (!m_model)
             return;
 
-        const auto isFiltered = m_summaryData.filterParameters.isFiltered(m_summaryData.totalTime);
+        const auto isFiltered = m_summaryData.filterParameters.isFilteredByTime(m_summaryData.totalTime);
         if (!m_selection && !isFiltered)
             return;
 
@@ -326,7 +326,7 @@ void ChartWidget::updateAxesTitle()
     m_bottomAxis->setTitleText(m_model->headerData(0).toString());
     m_rightAxis->setTitleText(m_model->headerData(1).toString());
 
-    if (m_summaryData.filterParameters.isFiltered(m_summaryData.totalTime)) {
+    if (m_summaryData.filterParameters.isFilteredByTime(m_summaryData.totalTime)) {
         m_bottomAxis->setTitleText(
             i18n("%1 (filtered from %2 to %3, Δ%4)", m_bottomAxis->titleText(),
                  Util::formatTime(m_summaryData.filterParameters.minTime),

@@ -625,7 +625,7 @@ bool Parser::isFiltered() const
 {
     if (!m_data)
         return false;
-    return m_data->filterParameters.isFiltered(m_data->totalTime);
+    return m_data->filterParameters.isFilteredByTime(m_data->totalTime);
 }
 
 void Parser::parse(const QString& path, const QString& diffBase)
