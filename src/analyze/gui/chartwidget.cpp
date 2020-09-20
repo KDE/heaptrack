@@ -139,6 +139,7 @@ ChartWidget::ChartWidget(QWidget* parent)
     auto* coordinatePlane = dynamic_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
     Q_ASSERT(coordinatePlane);
     coordinatePlane->setAutoAdjustGridToZoom(true);
+    connect(coordinatePlane, &CartesianCoordinatePlane::needUpdate, this, &ChartWidget::updateRubberBand);
 
     m_chart->installEventFilter(this);
 
@@ -334,12 +335,6 @@ void ChartWidget::setSelection(const Range& selection)
     updateRubberBand();
 
     emit selectionChanged(m_selection);
-}
-
-void ChartWidget::resizeEvent(QResizeEvent* event)
-{
-    QWidget::resizeEvent(event);
-    updateRubberBand();
 }
 
 void ChartWidget::updateRubberBand()

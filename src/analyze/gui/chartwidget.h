@@ -71,9 +71,6 @@ signals:
     void selectionChanged(const Range& range);
     void filterRequested(int64_t minTime, int64_t maxTime);
 
-protected:
-    void resizeEvent(QResizeEvent* event) override;
-
 private:
     void updateAxesTitle();
     void updateRubberBand();
