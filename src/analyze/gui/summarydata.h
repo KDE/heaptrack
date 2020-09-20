@@ -26,14 +26,28 @@
 
 struct SummaryData
 {
+    SummaryData() = default;
+    SummaryData(const QString& debuggee, const AllocationData& cost, int64_t totalTime,
+                const FilterParameters& filterParameters, int64_t peakTime, int64_t peakRSS, int64_t totalSystemMemory,
+                bool fromAttached)
+        : debuggee(debuggee)
+        , cost(cost)
+        , totalTime(totalTime)
+        , filterParameters(filterParameters)
+        , peakTime(peakTime)
+        , peakRSS(peakRSS)
+        , totalSystemMemory(totalSystemMemory)
+        , fromAttached(fromAttached)
+    {
+    }
     QString debuggee;
     AllocationData cost;
-    int64_t totalTime;
+    int64_t totalTime = 0;
     FilterParameters filterParameters;
-    int64_t peakTime;
-    int64_t peakRSS;
-    int64_t totalSystemMemory;
-    bool fromAttached;
+    int64_t peakTime = 0;
+    int64_t peakRSS = 0;
+    int64_t totalSystemMemory = 0;
+    bool fromAttached = false;
 };
 Q_DECLARE_METATYPE(SummaryData)
 

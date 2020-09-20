@@ -84,7 +84,7 @@ private:
     ChartModel* m_model = nullptr;
     QRubberBand* m_rubberBand = nullptr;
     Range m_selection;
-    SummaryData m_summaryData = {{}, {}, 0, {}, 0, 0, 0, false};
+    SummaryData m_summaryData;
     QPixmap m_cachedChart;
 };
 
