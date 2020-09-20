@@ -18,6 +18,7 @@
 
 #include "chartwidget.h"
 
+#include <QApplication>
 #include <QMenu>
 #include <QPainter>
 #include <QRubberBand>
@@ -142,8 +143,8 @@ ChartWidget::ChartWidget(QWidget* parent)
     connect(coordinatePlane, &CartesianCoordinatePlane::needUpdate, this, &ChartWidget::updateRubberBand);
 
     m_chart->setCursor(Qt::IBeamCursor);
+    m_chart->setMouseTracking(true);
     m_chart->installEventFilter(this);
-    setStatusTip(i18n("Click and drag to select time range for filtering."));
 
     m_chart->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_chart, &QWidget::customContextMenuRequested, this, [this](const QPoint& point) {
@@ -376,10 +377,14 @@ bool ChartWidget::eventFilter(QObject* watched, QEvent* event)
     if (!m_model)
         return false;
 
+    auto mapPosToTime = [this](const QPointF& pos) {
+        auto* coordinatePlane = static_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
+        return coordinatePlane->translateBack(pos).x();
+    };
+
     if (auto* mouseEvent = dynamic_cast<QMouseEvent*>(event)) {
         if (mouseEvent->button() == Qt::LeftButton || mouseEvent->buttons() == Qt::LeftButton) {
-            auto* coordinatePlane = static_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
-            const auto time = coordinatePlane->translateBack(mouseEvent->pos()).x();
+            const auto time = mapPosToTime(mouseEvent->localPos());
 
             auto selection = m_selection;
             selection.end = time;
@@ -393,9 +398,45 @@ bool ChartWidget::eventFilter(QObject* watched, QEvent* event)
             setSelection(selection);
             QToolTip::showText(mouseEvent->globalPos(), toolTip(), this);
             return true;
+        } else if (event->type() == QEvent::MouseMove && !mouseEvent->buttons()) {
+            updateStatusTip(mapPosToTime(mouseEvent->localPos()));
         }
     }
     return false;
+}
+
+void ChartWidget::updateStatusTip(qint64 time)
+{
+    if (!m_model)
+        return;
+
+    const auto text = [=]() {
+        if (time < 0 || time > m_summaryData.filterParameters.maxTime) {
+            return i18n("Click and drag to select time range for filtering.");
+        }
+
+        const auto cost = m_model->totalCostAt(time);
+        switch (m_model->type()) {
+        case ChartModel::Consumed:
+            return i18n("T = %1, Consumed: %2. Click and drag to select time range for filtering.",
+                        Util::formatTime(time), Util::formatBytes(cost));
+            break;
+        case ChartModel::Allocations:
+            return i18n("T = %1, Allocations: %2. Click and drag to select time range for filtering.",
+                        Util::formatTime(time), cost);
+            break;
+        case ChartModel::Temporary:
+            return i18n("T = %1, Temporary Allocations: %2. Click and drag to select time range for filtering.",
+                        Util::formatTime(time), cost);
+            break;
+        }
+        Q_UNREACHABLE();
+    }();
+    setStatusTip(text);
+
+    // force update
+    QStatusTipEvent event(text);
+    QApplication::sendEvent(this, &event);
 }
 
 #include "chartwidget.moc"

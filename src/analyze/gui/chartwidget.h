@@ -73,6 +73,7 @@ signals:
 
 private:
     void updateToolTip();
+    void updateStatusTip(qint64 time);
     void updateAxesTitle();
     void updateRubberBand();
     bool eventFilter(QObject* watched, QEvent* event) override;
