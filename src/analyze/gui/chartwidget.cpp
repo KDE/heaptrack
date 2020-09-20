@@ -141,7 +141,9 @@ ChartWidget::ChartWidget(QWidget* parent)
     coordinatePlane->setAutoAdjustGridToZoom(true);
     connect(coordinatePlane, &CartesianCoordinatePlane::needUpdate, this, &ChartWidget::updateRubberBand);
 
+    m_chart->setCursor(Qt::IBeamCursor);
     m_chart->installEventFilter(this);
+    setStatusTip(i18n("Click and drag to select time range for filtering."));
 
     m_chart->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_chart, &QWidget::customContextMenuRequested, this, [this](const QPoint& point) {
@@ -206,21 +208,6 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
         coordinatePlane->setGlobalGridAttributes(grid);
     }
 
-    switch (model->type()) {
-    case ChartModel::Consumed:
-        setToolTip(i18n("<qt>Shows the heap memory consumption over time.</qt>"));
-        break;
-    case ChartModel::Allocations:
-        setToolTip(i18n("<qt>Shows number of memory allocations over time.</qt>"));
-        break;
-    case ChartModel::Temporary:
-        setToolTip(i18n("<qt>Shows number of temporary memory allocations over time. "
-                        "A temporary allocation is one that is followed immediately by its "
-                        "corresponding deallocation, without other allocations happening "
-                        "in-between.</qt>"));
-        break;
-    }
-
     {
         auto totalPlotter = new Plotter(this);
         totalPlotter->setAntiAliasing(true);
@@ -270,7 +257,64 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
         plotter->setModel(proxy);
         coordinatePlane->addDiagram(plotter);
     }
+
+    updateToolTip();
     updateAxesTitle();
+}
+
+void ChartWidget::updateToolTip()
+{
+    if (!m_model)
+        return;
+
+    const auto startTime = std::min(m_selection.start, m_selection.end);
+    const auto endTime = std::max(m_selection.start, m_selection.end);
+
+    const auto startCost = m_model->totalCostAt(startTime);
+    const auto endCost = m_model->totalCostAt(endTime);
+
+    QString toolTip;
+    if (!qFuzzyCompare(startTime, endTime)) {
+        QTextStream stream(&toolTip);
+        stream << "<qt><table cellpadding=2>";
+        stream << i18n("<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>");
+        stream << i18n("<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>", Util::formatTime(startTime),
+                       Util::formatTime(endTime), Util::formatTime(endTime - startTime));
+        switch (m_model->type()) {
+        case ChartModel::Consumed:
+            stream << i18n("<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>", Util::formatBytes(startCost),
+                           Util::formatBytes(endCost), Util::formatBytes(endCost - startCost));
+            break;
+        case ChartModel::Allocations:
+            stream << i18n("<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>", startCost, endCost,
+                           (endCost - startCost));
+            break;
+        case ChartModel::Temporary:
+            stream << i18n("<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>", startCost,
+                           endCost, (endCost - startCost));
+            break;
+        }
+        stream << "</table></qt>";
+    } else {
+        switch (m_model->type()) {
+        case ChartModel::Consumed:
+            toolTip = i18n("<qt>Shows the heap memory consumption over time.<br>Click and drag to select a time range "
+                           "for filtering.</qt>");
+            break;
+        case ChartModel::Allocations:
+            toolTip = i18n("<qt>Shows number of memory allocations over time.<br>Click and drag to select a time range "
+                           "for filtering.</qt>");
+            break;
+        case ChartModel::Temporary:
+            toolTip = i18n("<qt>Shows number of temporary memory allocations over time. "
+                           "A temporary allocation is one that is followed immediately by its "
+                           "corresponding deallocation, without other allocations happening "
+                           "in-between.<br>Click and drag to select a time range for filtering.</qt>");
+            break;
+        }
+    }
+
+    setToolTip(toolTip);
 }
 
 void ChartWidget::updateAxesTitle()
@@ -303,35 +347,7 @@ void ChartWidget::setSelection(const Range& selection)
 
     m_selection = selection;
 
-    const auto startTime = std::min(m_selection.start, m_selection.end);
-    const auto endTime = std::max(m_selection.start, m_selection.end);
-
-    const auto startCost = m_model->totalCostAt(startTime);
-    const auto endCost = m_model->totalCostAt(endTime);
-
-    QString toolTip;
-    QTextStream stream(&toolTip);
-    stream << "<qt><table cellpadding=2>";
-    stream << i18n("<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>");
-    stream << i18n("<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>", Util::formatTime(startTime),
-                   Util::formatTime(endTime), Util::formatTime(endTime - startTime));
-    switch (m_model->type()) {
-    case ChartModel::Consumed:
-        stream << i18n("<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>", Util::formatBytes(startCost),
-                       Util::formatBytes(endCost), Util::formatBytes(endCost - startCost));
-        break;
-    case ChartModel::Allocations:
-        stream << i18n("<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>", startCost, endCost,
-                       (endCost - startCost));
-        break;
-    case ChartModel::Temporary:
-        stream << i18n("<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>", startCost, endCost,
-                       (endCost - startCost));
-        break;
-    }
-    stream << "</table></qt>";
-
-    setToolTip(toolTip);
+    updateToolTip();
     updateRubberBand();
 
     emit selectionChanged(m_selection);
@@ -361,7 +377,7 @@ bool ChartWidget::eventFilter(QObject* watched, QEvent* event)
         return false;
 
     if (auto* mouseEvent = dynamic_cast<QMouseEvent*>(event)) {
-        if (mouseEvent->buttons() == Qt::LeftButton) {
+        if (mouseEvent->button() == Qt::LeftButton || mouseEvent->buttons() == Qt::LeftButton) {
             auto* coordinatePlane = static_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
             const auto time = coordinatePlane->translateBack(mouseEvent->pos()).x();
 
@@ -369,6 +385,9 @@ bool ChartWidget::eventFilter(QObject* watched, QEvent* event)
             selection.end = time;
             if (event->type() == QEvent::MouseButtonPress) {
                 selection.start = time;
+                m_chart->setCursor(Qt::SizeHorCursor);
+            } else if (event->type() == QEvent::MouseButtonRelease) {
+                m_chart->setCursor(Qt::IBeamCursor);
             }
 
             setSelection(selection);

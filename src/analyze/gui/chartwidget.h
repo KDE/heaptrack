@@ -72,6 +72,7 @@ signals:
     void filterRequested(int64_t minTime, int64_t maxTime);
 
 private:
+    void updateToolTip();
     void updateAxesTitle();
     void updateRubberBand();
     bool eventFilter(QObject* watched, QEvent* event) override;
