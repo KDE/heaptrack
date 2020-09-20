@@ -391,8 +391,10 @@ bool ChartWidget::eventFilter(QObject* watched, QEvent* event)
             if (event->type() == QEvent::MouseButtonPress) {
                 selection.start = time;
                 m_chart->setCursor(Qt::SizeHorCursor);
+                m_cachedChart = m_chart->grab();
             } else if (event->type() == QEvent::MouseButtonRelease) {
                 m_chart->setCursor(Qt::IBeamCursor);
+                m_cachedChart = {};
             }
 
             setSelection(selection);
@@ -401,6 +403,13 @@ bool ChartWidget::eventFilter(QObject* watched, QEvent* event)
         } else if (event->type() == QEvent::MouseMove && !mouseEvent->buttons()) {
             updateStatusTip(mapPosToTime(mouseEvent->localPos()));
         }
+    } else if (event->type() == QEvent::Paint && !m_cachedChart.isNull()) {
+        // use the cached chart while interacting with the rubber band
+        // otherwise, use the normal paint even as that one is required for
+        // the mouse mapping etc. to work correctly...
+        QPainter painter(m_chart);
+        painter.drawPixmap(m_chart->rect(), m_cachedChart);
+        return true;
     }
     return false;
 }

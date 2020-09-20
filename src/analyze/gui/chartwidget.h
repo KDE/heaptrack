@@ -85,6 +85,7 @@ private:
     QRubberBand* m_rubberBand = nullptr;
     Range m_selection;
     SummaryData m_summaryData = {{}, {}, 0, {}, 0, 0, 0, false};
+    QPixmap m_cachedChart;
 };
 
 #endif // CHARTWIDGET_H
