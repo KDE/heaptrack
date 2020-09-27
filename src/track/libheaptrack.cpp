@@ -592,10 +592,9 @@ private:
     HeapTrack(AdditionalLockCheck lockCheck)
     {
         debugLog<VeryVerboseOutput>("%s", "trying to acquire lock");
-        while (!s_lock.try_lock()) {
+        while (!s_lock.try_lock_for(chrono::microseconds(1))) {
             if (!lockCheck())
                 throw LockCheckFailed();
-            this_thread::sleep_for(chrono::microseconds(1));
         }
         debugLog<VeryVerboseOutput>("%s", "lock acquired");
     }
@@ -703,14 +702,14 @@ private:
 #endif
     };
 
-    static std::mutex s_lock;
+    static std::timed_mutex s_lock;
     static LockedData* s_data;
 
 private:
     static std::atomic<bool> s_paused;
 };
 
-std::mutex HeapTrack::s_lock;
+std::timed_mutex HeapTrack::s_lock;
 HeapTrack::LockedData* HeapTrack::s_data{nullptr};
 std::atomic<bool> HeapTrack::s_paused{false};
 }
