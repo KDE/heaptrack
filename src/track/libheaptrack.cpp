@@ -223,8 +223,7 @@ int createFile(const char* fileName)
  * Thread-Safe heaptrack API
  *
  * The only critical section in libheaptrack is the output of the data,
- * dl_iterate_phdr
- * calls, as well as initialization and shutdown.
+ * dl_iterate_phdr calls, as well as initialization and shutdown.
  */
 class HeapTrack
 {
