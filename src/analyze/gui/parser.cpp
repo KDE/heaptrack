@@ -284,7 +284,16 @@ struct ParserData final : public AccumulatedTraceData
     void clearForReparse()
     {
         // data moved to size histogram
-        allocationInfoCounter.clear();
+        {
+            // we have to reset the allocation count
+            for (auto& info : allocationInfoCounter)
+                info.allocations = 0;
+            // and restore the order to allow fast direct access
+            std::sort(allocationInfoCounter.begin(), allocationInfoCounter.end(),
+                      [](const ParserData::CountedAllocationInfo& lhs, const ParserData::CountedAllocationInfo& rhs) {
+                          return lhs.info.allocationIndex < rhs.info.allocationIndex;
+                      });
+        }
         // data moved to chart models
         consumedChartData = {};
         allocationsChartData = {};
