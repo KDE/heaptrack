@@ -24,6 +24,7 @@
 
 #include <KConfigGroup>
 #include <KLocalizedString>
+#include <KShell>
 #include <KStandardAction>
 
 #include <QAction>
@@ -782,7 +783,8 @@ void MainWindow::navigateToCode(const QString& filePath, int lineNumber, int col
         command.replace(QStringLiteral("%l"), QString::number(std::max(1, lineNumber)));
         command.replace(QStringLiteral("%c"), QString::number(std::max(1, columnNumber)));
 
-        QProcess::startDetached(command);
+        auto splitted = KShell::splitArgs(command);
+        QProcess::startDetached(splitted.takeFirst(), splitted);
     } else {
         QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
     }
