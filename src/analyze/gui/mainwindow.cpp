@@ -157,6 +157,11 @@ void addLocationContextMenu(QTreeView* treeView, MainWindow* window)
         menu->addAction(openFile);
         menu->popup(treeView->mapToGlobal(pos));
     });
+    QObject::connect(treeView, &QTreeView::activated, window, [window](const QModelIndex& index) {
+        const auto location = index.data(SourceMapModel::LocationRole).value<FileLine>();
+        if (QFile::exists(location.file))
+            window->navigateToCode(location.file, location.line);
+    });
 }
 
 Qt::SortOrder defaultSortOrder(QAbstractItemModel* model, int column)
