@@ -668,11 +668,15 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             auto totalRemainingTime_s = (spentTime_s / totalCompletion) * (1.0 - totalCompletion);
             auto message = QString(
                 parsingMsg
+                    + i18n("\npass #: ") +  QString::number(data->parsingState.pass + 1)
+                    + i18n("/ ") + QString::number(numPasses)
                     + i18n("\ntime spent: ") + Util::formatTime(spentTime_s * 1000)
                     + i18n("\ntime remaing: ") + Util::formatTime(totalRemainingTime_s * 1000)
-                    + i18n("\n%/s: ") + QString::number(totalCompletionPerSec * 100)
-                    + i18n("\npass #:   ") +  QString::number(data->parsingState.pass + 1)
-                    + i18n("/ ") + QString::number(numPasses)
+                parsingMsg + i18n("\ntime remaing: ") + Util::formatTime(totalRemainingTime_s * 1000)
+            );
+
+            auto extraStats = QString(
+                i18n("\n%/s: ") + QString::number(totalCompletionPerSec * 100)
                     + i18n("\ncurrent pass %: ") + QString::number(static_cast<int>(passCompletion * 100))
                     + i18n("\npass time remaining: ") + Util::formatTime(passRemainingTime_s * 1000)
                     + i18n("\npass compressed progress: ") + Util::formatBytes(data->parsingState.readCompressed_b)
@@ -683,6 +687,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             );
 
             emit progressMessageAvailable(message);
+            emit progressExtraStatsAvailable(message);
             emit progress(1000 * totalCompletion); // range is set as 0 to 1000 for fractional % bar display
         };
 
