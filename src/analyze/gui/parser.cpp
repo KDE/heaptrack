@@ -678,7 +678,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
                     + i18n("\npass #:   ") +  QString::number(data->parsingState.pass + 1)
                     + i18n("/ ") + QString::number(numPasses)
                     + i18n("\ncurrent pass %: ") + QString::number(static_cast<int>(passCompletion * 100))
-                    + i18n("\npass seconds remaing: ") + QString::number(static_cast<int>(passRemainingTime_s))
+                    + i18n("\npass seconds remaining: ") + QString::number(static_cast<int>(passRemainingTime_s))
                     + i18n("\npass MiB(comp): ") + QString::number(data->parsingState.compressedByte / (1024 * 1024))
                     + i18n(" / ") + QString::number(data->parsingState.fileSize / (1024 * 1024))
                     + i18n("\npass MiB(uncomp): ") + QString::number(data->parsingState.uncompressedByte / (1024 * 1024))
