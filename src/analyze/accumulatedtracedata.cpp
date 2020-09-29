@@ -198,7 +198,7 @@ bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass, b
     return read(in, pass, isReparsing);
 }
 
-bool AccumulatedTraceData::read(istream& in, const ParsePass pass, bool isReparsing)
+bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const ParsePass pass, bool isReparsing)
 {
     LineReader reader;
     int64_t timeStamp = 0;
@@ -239,9 +239,8 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass, bool isRepars
     // allocations, i.e. when a deallocation follows with the same data
     uint64_t lastAllocationPtr = 0;
 
-    auto const & filterIn = dynamic_cast<boost::iostreams::filtering_istream &>(in);
-    auto const uncompressedCount = filterIn.component<byte_counter>(0);
-    auto const compressedCount   = filterIn.component<byte_counter>(2);
+    auto const uncompressedCount = in.component<byte_counter>(0);
+    auto const compressedCount   = in.component<byte_counter>(2);
 
     while (timeStamp < filterParameters.maxTime && reader.getLine(in)) {
         parsingState.pass = pass;

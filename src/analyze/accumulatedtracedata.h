@@ -29,6 +29,7 @@
 #include <unordered_set>
 
 #include <boost/functional/hash.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
 
 #include "allocationdata.h"
 #include "filterparameters.h"
@@ -121,7 +122,7 @@ struct AccumulatedTraceData
         ThirdPass
     };
     bool read(const std::string& inputFile, const ParsePass pass, bool isReparsing);
-    bool read(std::istream& in, const ParsePass pass, bool isReparsing);
+    bool read(boost::iostreams::filtering_istream& in, const ParsePass pass, bool isReparsing);
 
     void diff(const AccumulatedTraceData& base);
 
