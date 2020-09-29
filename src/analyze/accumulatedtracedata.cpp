@@ -173,7 +173,7 @@ bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass, b
     const bool isCompressed = isGzCompressed || isZstdCompressed;
     ifstream file(inputFile, isCompressed ? ios_base::in | ios_base::binary : ios_base::in);
 
-    parsingState.fileSize = boost::filesystem::file_size(inputFile);
+    parsingState.fileSize_b = boost::filesystem::file_size(inputFile);
 
     if (!file.is_open()) {
         cerr << "Failed to open heaptrack log file: " << inputFile << endl;
