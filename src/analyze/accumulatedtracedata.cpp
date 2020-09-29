@@ -247,7 +247,7 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
         parsingState.reparsing = isReparsing;
         parsingState.compressedByte = compressedCount->bytes();
         parsingState.uncompressedByte = uncompressedCount->bytes();
-        parsingState.timestamp = timeStamp;
+        parsingState.timestamp_ms = timeStamp;
 
         if (reader.mode() == 's') {
             if (pass != FirstPass || isReparsing) {

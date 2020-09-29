@@ -175,10 +175,10 @@ struct AccumulatedTraceData
     std::vector<AllocationInfo> allocationInfos;
 
     struct ParsingState {
-        int64_t fileSize = 0;
+        int64_t fileSize_b = 0;
         int64_t compressedByte = 0;
         int64_t uncompressedByte = 0;
-        int64_t timestamp = 0;
+        int64_t timestamp_ms = 0;
         ParsePass pass = ParsePass::FirstPass;
         bool reparsing = false;
     };
