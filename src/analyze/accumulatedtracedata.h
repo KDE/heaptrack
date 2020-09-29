@@ -29,6 +29,7 @@
 #include <unordered_set>
 
 #include <boost/functional/hash.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
 
 #include "allocationdata.h"
 #include "filterparameters.h"
@@ -102,15 +103,6 @@ struct AccumulatedTraceData
     AccumulatedTraceData();
     virtual ~AccumulatedTraceData() = default;
 
-    virtual void handleTimeStamp(int64_t oldStamp, int64_t newStamp, bool isFinalTimeStamp) = 0;
-    virtual void handleAllocation(const AllocationInfo& info, const AllocationInfoIndex index) = 0;
-    virtual void handleDebuggee(const char* command) = 0;
-
-    const std::string& stringify(const StringIndex stringId) const;
-
-    std::string prettyFunction(const std::string& function) const;
-
-    bool read(const std::string& inputFile, bool isReparsing);
     enum ParsePass
     {
         // find time of total peak cost
@@ -120,8 +112,18 @@ struct AccumulatedTraceData
         // GUI only: graph-building
         ThirdPass
     };
+
+    virtual void handleTimeStamp(int64_t oldStamp, int64_t newStamp, bool isFinalTimeStamp, const ParsePass pass) = 0;
+    virtual void handleAllocation(const AllocationInfo& info, const AllocationInfoIndex index) = 0;
+    virtual void handleDebuggee(const char* command) = 0;
+
+    const std::string& stringify(const StringIndex stringId) const;
+
+    std::string prettyFunction(const std::string& function) const;
+
+    bool read(const std::string& inputFile, bool isReparsing);
     bool read(const std::string& inputFile, const ParsePass pass, bool isReparsing);
-    bool read(std::istream& in, const ParsePass pass, bool isReparsing);
+    bool read(boost::iostreams::filtering_istream& in, const ParsePass pass, bool isReparsing);
 
     void diff(const AccumulatedTraceData& base);
 
@@ -173,6 +175,18 @@ struct AccumulatedTraceData
     std::vector<IpIndex> opNewIpIndices;
 
     std::vector<AllocationInfo> allocationInfos;
+
+    struct ParsingState
+    {
+        int64_t fileSize = 0; // bytes
+        int64_t readCompressedByte = 0;
+        int64_t readUncompressedByte = 0;
+        int64_t timestamp = 0; // ms
+        ParsePass pass = ParsePass::FirstPass;
+        bool reparsing = false;
+    };
+
+    ParsingState parsingState;
 };
 
 #endif // ACCUMULATEDTRACEDATA_H

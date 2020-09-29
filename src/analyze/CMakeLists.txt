@@ -2,7 +2,7 @@ if (ECM_FOUND)
     include(ECMEnableSanitizers)
 endif()
 
-find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options)
+find_package(Boost 1.41.0 REQUIRED COMPONENTS iostreams program_options system filesystem)
 
 configure_file(analyze_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/analyze_config.h)
 

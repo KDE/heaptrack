@@ -28,6 +28,8 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 
+#include <boost/filesystem.hpp>
+
 #include "util/config.h"
 #include "util/linereader.h"
 #include "util/pointermap.h"
@@ -56,6 +58,41 @@ ostream& operator<<(ostream& out, const Index<Base> index)
     out << index.index;
     return out;
 }
+
+// boost's counter filter uses an int for the count which overflows for large streams; so replace it with a work alike.
+class byte_counter
+{
+public:
+    using char_type = char;
+    struct category : boost::iostreams::input,
+                      boost::iostreams::filter_tag,
+                      boost::iostreams::multichar_tag,
+                      boost::iostreams::optimally_buffered_tag
+    {
+    };
+
+    uint64_t bytes() const
+    {
+        return m_bytes;
+    }
+    std::streamsize optimal_buffer_size() const
+    {
+        return 0;
+    }
+
+    template <typename Source>
+    std::streamsize read(Source& src, char* str, std::streamsize size)
+    {
+        auto const readsize = boost::iostreams::read(src, str, size);
+        if (readsize == -1)
+            return -1;
+        m_bytes += readsize;
+        return readsize;
+    }
+
+private:
+    uint64_t m_bytes = 0;
+};
 }
 
 AccumulatedTraceData::AccumulatedTraceData()
@@ -133,12 +170,15 @@ bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass, b
     const bool isCompressed = isGzCompressed || isZstdCompressed;
     ifstream file(inputFile, isCompressed ? ios_base::in | ios_base::binary : ios_base::in);
 
+    parsingState.fileSize = boost::filesystem::file_size(inputFile);
+
     if (!file.is_open()) {
         cerr << "Failed to open heaptrack log file: " << inputFile << endl;
         return false;
     }
 
     boost::iostreams::filtering_istream in;
+    in.push(byte_counter()); // caution, ::read dependant on filter order
     if (isGzCompressed) {
         in.push(boost::iostreams::gzip_decompressor());
     } else if (isZstdCompressed) {
@@ -149,12 +189,13 @@ bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass, b
         return false;
 #endif
     }
+    in.push(byte_counter()); // caution, ::read dependant on filter order
     in.push(file);
 
     return read(in, pass, isReparsing);
 }
 
-bool AccumulatedTraceData::read(istream& in, const ParsePass pass, bool isReparsing)
+bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const ParsePass pass, bool isReparsing)
 {
     LineReader reader;
     int64_t timeStamp = 0;
@@ -195,7 +236,17 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass, bool isRepars
     // allocations, i.e. when a deallocation follows with the same data
     uint64_t lastAllocationPtr = 0;
 
+    auto const uncompressedCount = in.component<byte_counter>(0);
+    auto const compressedCount = in.component<byte_counter>(2);
+
+    parsingState.pass = pass;
+    parsingState.reparsing = isReparsing;
+
     while (timeStamp < filterParameters.maxTime && reader.getLine(in)) {
+        parsingState.readCompressedByte = compressedCount->bytes();
+        parsingState.readUncompressedByte = uncompressedCount->bytes();
+        parsingState.timestamp = timeStamp;
+
         if (reader.mode() == 's') {
             if (pass != FirstPass || isReparsing) {
                 continue;
@@ -366,8 +417,8 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass, bool isRepars
                 continue;
             }
             inFilteredTime = newStamp >= filterParameters.minTime && newStamp <= filterParameters.maxTime;
-            if (pass != FirstPass && inFilteredTime) {
-                handleTimeStamp(timeStamp, newStamp, false);
+            if (inFilteredTime) {
+                handleTimeStamp(timeStamp, newStamp, false, pass);
             }
             timeStamp = newStamp;
         } else if (reader.mode() == 'R') { // RSS timestamp
@@ -424,9 +475,9 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass, bool isRepars
     if (pass == FirstPass && !isReparsing) {
         totalTime = timeStamp + 1;
         filterParameters.maxTime = totalTime;
-    } else {
-        handleTimeStamp(timeStamp, timeStamp + 1, true);
     }
+
+    handleTimeStamp(timeStamp, timeStamp + 1, true, pass);
 
     return true;
 }

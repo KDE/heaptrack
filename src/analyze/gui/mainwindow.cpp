@@ -305,7 +305,8 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->pages->setCurrentWidget(m_ui->openPage);
     // TODO: proper progress report
     m_ui->loadingProgress->setMinimum(0);
-    m_ui->loadingProgress->setMaximum(0);
+    m_ui->loadingProgress->setMaximum(1000); // range is set as 0 to 1000 for fractional % bar display
+    m_ui->loadingProgress->setValue(0);
 
     auto bottomUpModel = new TreeModel(this);
     auto topDownModel = new TreeModel(this);
@@ -408,6 +409,7 @@ MainWindow::MainWindow(QWidget* parent)
         m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->summaryTab), true);
     });
     connect(m_parser, &Parser::progressMessageAvailable, m_ui->progressLabel, &QLabel::setText);
+    connect(m_parser, &Parser::progress, m_ui->loadingProgress, &QProgressBar::setValue);
     auto removeProgress = [this] {
         auto layout = qobject_cast<QVBoxLayout*>(m_ui->loadingPage->layout());
         Q_ASSERT(layout);

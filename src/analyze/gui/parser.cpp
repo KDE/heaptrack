@@ -22,6 +22,7 @@
 #include <ThreadWeaver/ThreadWeaver>
 
 #include <QDebug>
+#include <QElapsedTimer>
 #include <QThread>
 
 #include "analyze/accumulatedtracedata.h"
@@ -146,7 +147,9 @@ const uint64_t MAX_CHART_DATAPOINTS = 500; // TODO: make this configurable via t
 
 struct ParserData final : public AccumulatedTraceData
 {
-    ParserData()
+    using TimestampCallback = std::function<void(const ParserData& data)>;
+    ParserData(TimestampCallback timestampCallback)
+        : timestampCallback(std::move(timestampCallback))
     {
     }
 
@@ -215,8 +218,14 @@ struct ParserData final : public AccumulatedTraceData
         findTopChartEntries(&ChartMergeData::temporary, &LabelIds::temporary, &temporaryChartData);
     }
 
-    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp, bool isFinalTimeStamp) override
+    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp, bool isFinalTimeStamp, ParsePass pass) override
     {
+        if (timestampCallback) {
+            timestampCallback(*this);
+        }
+        if (pass == ParsePass::FirstPass) {
+            return;
+        }
         if (!buildCharts || stringCache.diffMode) {
             return;
         }
@@ -341,6 +350,8 @@ struct ParserData final : public AccumulatedTraceData
     StringCache stringCache;
 
     bool buildCharts = false;
+    TimestampCallback timestampCallback;
+    QElapsedTimer parseTimer;
 };
 
 namespace {
@@ -649,16 +660,29 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
     auto oldData = std::move(m_data);
     using namespace ThreadWeaver;
     stream() << make_job([this, oldData, path, diffBase, filterParameters]() {
+        const auto isReparsing = (path == m_path && oldData && diffBase.isEmpty());
+        auto parsingMsg = isReparsing ? i18n("reparsing data") : i18n("parsing data");
+        emit progressMessageAvailable(parsingMsg);
+
+        auto updateProgress = [this, parsingMsg](const ParserData& data) {
+            const auto numPasses = data.stringCache.diffMode ? 2 : 3;
+            auto passCompletion = 1.0 * data.parsingState.readCompressedByte / data.parsingState.fileSize;
+            auto totalCompletion = (data.parsingState.pass + passCompletion) / numPasses;
+            auto spentTime_ms = data.parseTimer.elapsed();
+            auto totalRemainingTime_ms = (spentTime_ms / totalCompletion) * (1.0 - totalCompletion);
+            auto message = i18n("%1 pass: %2/%3  spent: %4  remaining: %5", parsingMsg, data.parsingState.pass + 1,
+                                numPasses, Util::formatTime(spentTime_ms), Util::formatTime(totalRemainingTime_ms));
+
+            emit progressMessageAvailable(message);
+            emit progress(1000 * totalCompletion); // range is set as 0 to 1000 for fractional % bar display
+        };
+
         const auto stdPath = path.toStdString();
-        auto data = (path == m_path && oldData && diffBase.isEmpty()) ? oldData : make_shared<ParserData>();
+        auto data = isReparsing ? oldData : make_shared<ParserData>(updateProgress);
         data->filterParameters = filterParameters;
 
-        const auto isReparsing = data == oldData;
-
-        emit progressMessageAvailable(isReparsing ? i18n("reparsing data...") : i18n("parsing data..."));
-
         if (!diffBase.isEmpty()) {
-            ParserData diffData;
+            ParserData diffData(nullptr); // currently we don't track the progress of diff parsing
             auto readBase = async(launch::async, [&diffData, diffBase, isReparsing]() {
                 return diffData.read(diffBase.toStdString(), isReparsing);
             });
@@ -672,9 +696,13 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             }
             data->diff(diffData);
             data->stringCache.diffMode = true;
-        } else if (!data->read(stdPath, isReparsing)) {
-            emit failedToOpen(path);
-            return;
+        } else {
+            data->parseTimer.start();
+
+            if (!data->read(stdPath, isReparsing)) {
+                emit failedToOpen(path);
+                return;
+            }
         }
 
         if (!isReparsing) {
@@ -695,6 +723,8 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         const auto sizeHistogram = buildSizeHistogram(*data);
         emit sizeHistogramDataAvailable(sizeHistogram);
         // now data can be modified again for the chart data evaluation
+
+        emit progress(0);
 
         const auto diffMode = data->stringCache.diffMode;
         emit progressMessageAvailable(i18n("building charts..."));
@@ -718,6 +748,8 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
                 emit temporaryChartDataAvailable(data->temporaryChartData);
             });
         }
+
+        emit progress(0);
 
         auto sequential = new Sequence;
         *sequential << parallel << make_job([this, data, path]() {
