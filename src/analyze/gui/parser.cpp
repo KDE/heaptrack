@@ -644,6 +644,11 @@ void Parser::parse(const QString& path, const QString& diffBase)
 
 void Parser::parseImpl(const QString& path, const QString& diffBase, const FilterParameters& filterParameters)
 {
+    using std::chrono::steady_clock;
+    using time_point = std::chrono::steady_clock::time_point;
+    using std::chrono::duration_cast;
+    using std::chrono::duration;
+
     auto oldData = std::move(m_data);
     using namespace ThreadWeaver;
     stream() << make_job([this, oldData, path, diffBase, filterParameters]() {
@@ -653,7 +658,37 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
 
         const auto isReparsing = data == oldData;
 
-        emit progressMessageAvailable(isReparsing ? i18n("reparsing data...") : i18n("parsing data..."));
+        auto parsingMsg = isReparsing ? i18n("reparsing data...") : i18n("parsing data...");
+        emit progressMessageAvailable(parsingMsg);
+
+        const auto numPasses = data->stringCache.diffMode ? 2 : 3;
+        auto updateProgress = [this, numPasses, parsingMsg](std::shared_ptr<const ParserData> const & data, time_point start){
+            auto passCompletion = 1.0*data->parsingState.compressedByte/data->parsingState.fileSize;
+            auto totalCompletion = ((data->parsingState.pass + passCompletion)/numPasses);
+            auto spentTime = steady_clock::now() - start;
+            auto spentTime_s = duration_cast<duration<double>>(spentTime).count();
+            auto totalCompletionPerSec = totalCompletion / spentTime_s;
+            auto passCompletionPerSec = passCompletion / (spentTime_s - (data->parsingState.pass/totalCompletionPerSec)) ;
+            auto passRemainingTime_s = (1.0 - passCompletion) / passCompletionPerSec;
+            auto totalRemainingTime_s = (spentTime_s / totalCompletion) * (1.0 - totalCompletion);
+            auto message = QString(
+                parsingMsg
+                    + i18n("\nseconds remaing: ") + QString::number(static_cast<int>(totalRemainingTime_s))
+                    + i18n("\n%/s: ") + QString::number(totalCompletionPerSec*100)
+                    + i18n("\npass #:   ") +  QString::number(data->parsingState.pass + 1)
+                    + i18n("/ ") + QString::number(numPasses)
+                    + i18n("\ncurrent pass %: ") + QString::number(static_cast<int>(passCompletion * 100))
+                    + i18n("\npass seconds remaing: ") + QString::number(static_cast<int>(passRemainingTime_s))
+                    + i18n("\npass MiB(comp): ") + QString::number(data->parsingState.compressedByte/(1024*1024))
+                    + i18n(" / ") + QString::number(data->parsingState.fileSize/(1024*1024))
+                    + i18n("\npass MiB(uncomp): ") + QString::number(data->parsingState.uncompressedByte/(1024*1024))
+                    + i18n(" / ???")
+                    + i18n("\nlatest log timestamp: ") +  Util::formatTime(data->parsingState.timestamp)
+            );
+
+            emit progressMessageAvailable(message);
+            emit progress(1000 * totalCompletion); // range is set as 0 to 1000 for fractional % bar display
+        };
 
         if (!diffBase.isEmpty()) {
             ParserData diffData;
@@ -670,9 +705,20 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             }
             data->diff(diffData);
             data->stringCache.diffMode = true;
-        } else if (!data->read(stdPath, isReparsing)) {
-            emit failedToOpen(path);
-            return;
+        } else {
+            auto start = steady_clock::now();
+            auto read = async(launch::async, [&data, stdPath, isReparsing]() {
+                return data->read(stdPath, isReparsing);
+            });
+            while(read.wait_for(std::chrono::milliseconds(500)) == std::future_status::timeout)
+            {
+                updateProgress(data, start);
+            }
+            if (!read.get())
+            {
+                emit failedToOpen(path);
+                return;
+            }
         }
 
         if (!isReparsing) {
@@ -694,6 +740,8 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         emit sizeHistogramDataAvailable(sizeHistogram);
         // now data can be modified again for the chart data evaluation
 
+        emit progress(0);
+
         const auto diffMode = data->stringCache.diffMode;
         emit progressMessageAvailable(i18n("building charts..."));
         auto parallel = new Collection;
@@ -706,16 +754,26 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         });
         if (!data->stringCache.diffMode) {
             // only build charts when we are not diffing
-            *parallel << make_job([this, data, stdPath, isReparsing]() {
+            *parallel << make_job([this, data, stdPath, isReparsing, updateProgress]() {
                 // this mutates data, and thus anything running in parallel must
                 // not access data
+                emit progress(0);
                 data->prepareBuildCharts();
-                data->read(stdPath, AccumulatedTraceData::ThirdPass, isReparsing);
+                auto read = async(launch::async, [&data, stdPath, isReparsing]() {
+                    return data->read(stdPath, AccumulatedTraceData::ThirdPass, isReparsing);
+                });
+                while(read.wait_for(std::chrono::milliseconds(1000)) == std::future_status::timeout)
+                {
+                    auto completion = 1.0*data->parsingState.compressedByte/data->parsingState.fileSize;
+                    emit progress(1000 * completion);
+                }
                 emit consumedChartDataAvailable(data->consumedChartData);
                 emit allocationsChartDataAvailable(data->allocationsChartData);
                 emit temporaryChartDataAvailable(data->temporaryChartData);
             });
         }
+
+        emit progress(0);
 
         auto sequential = new Sequence;
         *sequential << parallel << make_job([this, data, path]() {

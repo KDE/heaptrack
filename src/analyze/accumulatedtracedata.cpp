@@ -28,6 +28,8 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 
+#include <boost/filesystem.hpp>
+
 #include "util/config.h"
 #include "util/linereader.h"
 #include "util/pointermap.h"
@@ -56,6 +58,44 @@ ostream& operator<<(ostream& out, const Index<Base> index)
     out << index.index;
     return out;
 }
+
+// boost's counter filter uses an int for the count which overflows for large streams; so replace it with a work alike.
+class byte_counter {
+public:
+    using char_type = char;
+    struct category
+        : boost::iostreams::dual_use
+        , boost::iostreams::filter_tag
+        , boost::iostreams::multichar_tag
+        , boost::iostreams::optimally_buffered_tag
+    {};
+
+    uint64_t bytes() const { return bytes_; }
+    std::streamsize optimal_buffer_size() const { return 0; }
+
+    template<typename Source>
+    std::streamsize read(Source& src, char* str, std::streamsize size)
+    {
+        auto const readsize = boost::iostreams::read(src, str, size);
+        if (readsize == -1)
+            return -1;
+        bytes_ += readsize;
+        return readsize;
+    }
+
+    template<typename Sink>
+    std::streamsize write(Sink& sink, const char* str, std::streamsize size)
+    {
+        auto const writesize = boost::iostreams::write(sink, str, size);
+        bytes_ += writesize;
+        return writesize;
+    }
+
+private:
+    uint64_t bytes_ = 0;
+};
+
+
 }
 
 AccumulatedTraceData::AccumulatedTraceData()
@@ -133,12 +173,15 @@ bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass, b
     const bool isCompressed = isGzCompressed || isZstdCompressed;
     ifstream file(inputFile, isCompressed ? ios_base::in | ios_base::binary : ios_base::in);
 
+    parsingState.fileSize = boost::filesystem::file_size(inputFile);
+
     if (!file.is_open()) {
         cerr << "Failed to open heaptrack log file: " << inputFile << endl;
         return false;
     }
 
     boost::iostreams::filtering_istream in;
+    in.push(byte_counter()); // caution, ::read dependant on filter order
     if (isGzCompressed) {
         in.push(boost::iostreams::gzip_decompressor());
     } else if (isZstdCompressed) {
@@ -149,6 +192,7 @@ bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass, b
         return false;
 #endif
     }
+    in.push(byte_counter()); // caution, ::read dependant on filter order
     in.push(file);
 
     return read(in, pass, isReparsing);
@@ -195,7 +239,17 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass, bool isRepars
     // allocations, i.e. when a deallocation follows with the same data
     uint64_t lastAllocationPtr = 0;
 
+    auto const & filtIn = dynamic_cast<boost::iostreams::filtering_istream &>(in);
+    auto const uncompCount = filtIn.component<byte_counter>(0);
+    auto const compCount   = filtIn.component<byte_counter>(2);
+
     while (timeStamp < filterParameters.maxTime && reader.getLine(in)) {
+        parsingState.pass = pass;
+        parsingState.reparsing = isReparsing;
+        parsingState.compressedByte = compCount->bytes();
+        parsingState.uncompressedByte = uncompCount->bytes();
+        parsingState.timestamp = timeStamp;
+
         if (reader.mode() == 's') {
             if (pass != FirstPass || isReparsing) {
                 continue;

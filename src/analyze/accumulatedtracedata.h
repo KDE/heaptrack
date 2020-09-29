@@ -172,6 +172,17 @@ struct AccumulatedTraceData
     std::vector<IpIndex> opNewIpIndices;
 
     std::vector<AllocationInfo> allocationInfos;
+
+    struct ParsingState {
+        boost::uintmax_t fileSize = -1;
+        ParsePass pass = ParsePass::FirstPass;
+        bool reparsing = false;
+        int64_t compressedByte = -1;
+        int64_t uncompressedByte = -1;
+        int64_t timestamp = -1;
+    };
+
+    ParsingState parsingState;
 };
 
 #endif // ACCUMULATEDTRACEDATA_H

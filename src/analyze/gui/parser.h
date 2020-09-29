@@ -46,6 +46,7 @@ public slots:
 
 signals:
     void progressMessageAvailable(const QString& progress);
+    void progress(const int progress);
     void summaryAvailable(const SummaryData& summary);
     void bottomUpDataAvailable(const TreeData& data);
     void topDownDataAvailable(const TreeData& data);
