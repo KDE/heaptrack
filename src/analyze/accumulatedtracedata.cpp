@@ -239,15 +239,15 @@ bool AccumulatedTraceData::read(istream& in, const ParsePass pass, bool isRepars
     // allocations, i.e. when a deallocation follows with the same data
     uint64_t lastAllocationPtr = 0;
 
-    auto const & filtIn = dynamic_cast<boost::iostreams::filtering_istream &>(in);
-    auto const uncompCount = filtIn.component<byte_counter>(0);
-    auto const compCount   = filtIn.component<byte_counter>(2);
+    auto const & filterIn = dynamic_cast<boost::iostreams::filtering_istream &>(in);
+    auto const uncompressedCount = filterIn.component<byte_counter>(0);
+    auto const compressedCount   = filterIn.component<byte_counter>(2);
 
     while (timeStamp < filterParameters.maxTime && reader.getLine(in)) {
         parsingState.pass = pass;
         parsingState.reparsing = isReparsing;
-        parsingState.compressedByte = compCount->bytes();
-        parsingState.uncompressedByte = uncompCount->bytes();
+        parsingState.compressedByte = compressedCount->bytes();
+        parsingState.uncompressedByte = uncompressedCount->bytes();
         parsingState.timestamp = timeStamp;
 
         if (reader.mode() == 's') {
