@@ -242,11 +242,12 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
     auto const uncompressedCount = in.component<byte_counter>(0);
     auto const compressedCount   = in.component<byte_counter>(2);
 
+    parsingState.pass = pass;
+    parsingState.reparsing = isReparsing;
+
     while (timeStamp < filterParameters.maxTime && reader.getLine(in)) {
-        parsingState.pass = pass;
-        parsingState.reparsing = isReparsing;
-        parsingState.compressedByte = compressedCount->bytes();
-        parsingState.uncompressedByte = uncompressedCount->bytes();
+        parsingState.readCompressed_b = compressedCount->bytes();
+        parsingState.readUncompressed_b = uncompressedCount->bytes();
         parsingState.timestamp_ms = timeStamp;
 
         if (reader.mode() == 's') {

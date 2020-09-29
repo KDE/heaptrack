@@ -663,7 +663,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
 
         const auto numPasses = data->stringCache.diffMode ? 2 : 3;
         auto updateProgress = [this, numPasses, parsingMsg](std::shared_ptr<const ParserData> const & data, time_point start){
-            auto passCompletion = 1.0 * data->parsingState.compressedByte/data->parsingState.fileSize_b;
+            auto passCompletion = 1.0 * data->parsingState.readCompressed_b/data->parsingState.fileSize_b;
             auto totalCompletion = ((data->parsingState.pass + passCompletion)/numPasses);
             auto spentTime = steady_clock::now() - start;
             auto spentTime_s = duration_cast<duration<double>>(spentTime).count();
@@ -679,9 +679,9 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
                     + i18n("/ ") + QString::number(numPasses)
                     + i18n("\ncurrent pass %: ") + QString::number(static_cast<int>(passCompletion * 100))
                     + i18n("\npass time remaining: ") + Util::formatTime(passRemainingTime_s * 1000)
-                    + i18n("\npass compressed progress: ") + Util::formatBytes(data->parsingState.compressedByte)
+                    + i18n("\npass compressed progress: ") + Util::formatBytes(data->parsingState.readCompressed_b)
                     + i18n(" / ") + Util::formatBytes(data->parsingState.fileSize_b)
-                    + i18n("\npass uncompressed progress: ") + Util::formatBytes(data->parsingState.uncompressedByte)
+                    + i18n("\npass uncompressed progress: ") + Util::formatBytes(data->parsingState.readUncompressed_b)
                     + i18n(" / ???")
                     + i18n("\nlatest log timestamp: ") +  Util::formatTime(data->parsingState.timestamp_ms)
             );
@@ -764,7 +764,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
                 });
                 while(read.wait_for(std::chrono::milliseconds(1000)) == std::future_status::timeout)
                 {
-                    auto completion = 1.0*data->parsingState.compressedByte/data->parsingState.fileSize;
+                    auto completion = 1.0*data->parsingState.readCompressed_b/data->parsingState.fileSize_b;
                     emit progress(1000 * completion);
                 }
                 emit consumedChartDataAvailable(data->consumedChartData);
