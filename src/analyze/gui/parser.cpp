@@ -645,11 +645,6 @@ void Parser::parse(const QString& path, const QString& diffBase)
 
 void Parser::parseImpl(const QString& path, const QString& diffBase, const FilterParameters& filterParameters)
 {
-    using std::chrono::steady_clock;
-    using time_point = std::chrono::steady_clock::time_point;
-    using std::chrono::duration_cast;
-    using std::chrono::duration;
-
     auto oldData = std::move(m_data);
     using namespace ThreadWeaver;
     stream() << make_job([this, oldData, path, diffBase, filterParameters]() {
