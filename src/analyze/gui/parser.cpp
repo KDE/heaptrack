@@ -23,6 +23,7 @@
 
 #include <QDebug>
 #include <QThread>
+#include <QElapsedTimer>
 
 #include "analyze/accumulatedtracedata.h"
 
@@ -662,11 +663,10 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         emit progressMessageAvailable(parsingMsg);
 
         const auto numPasses = data->stringCache.diffMode ? 2 : 3;
-        auto updateProgress = [this, numPasses, parsingMsg](std::shared_ptr<const ParserData> const & data, time_point start){
+        auto updateProgress = [this, numPasses, parsingMsg](std::shared_ptr<const ParserData> const & data, const QElapsedTimer & timer){
             auto passCompletion = 1.0 * data->parsingState.readCompressed_b/data->parsingState.fileSize_b;
             auto totalCompletion = ((data->parsingState.pass + passCompletion)/numPasses);
-            auto spentTime = steady_clock::now() - start;
-            auto spentTime_s = duration_cast<duration<double>>(spentTime).count();
+            auto spentTime_s = timer.msecsSinceReference()/1000.0;
             auto totalCompletionPerSec = totalCompletion / spentTime_s;
             auto passCompletionPerSec = passCompletion / (spentTime_s - (data->parsingState.pass / totalCompletionPerSec)) ;
             auto passRemainingTime_s = (1.0 - passCompletion) / passCompletionPerSec;
@@ -706,13 +706,15 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             data->diff(diffData);
             data->stringCache.diffMode = true;
         } else {
-            auto start = steady_clock::now();
+            auto timer = QElapsedTimer();
+            timer.start();
+
             auto read = async(launch::async, [&data, stdPath, isReparsing]() {
                 return data->read(stdPath, isReparsing);
             });
             while(read.wait_for(std::chrono::milliseconds(500)) == std::future_status::timeout)
             {
-                updateProgress(data, start);
+                updateProgress(data, timer);
             }
             if (!read.get())
             {
