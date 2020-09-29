@@ -654,7 +654,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
 
         const auto isReparsing = data == oldData;
 
-        auto parsingMsg = isReparsing ? i18n("reparsing data...") : i18n("parsing data...");
+        auto parsingMsg = isReparsing ? i18n("reparsing data") : i18n("parsing data");
         emit progressMessageAvailable(parsingMsg);
 
         const auto numPasses = data->stringCache.diffMode ? 2 : 3;
@@ -668,15 +668,18 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             auto totalRemainingTime_s = (spentTime_s / totalCompletion) * (1.0 - totalCompletion);
             auto message = QString(
                 parsingMsg
-                    + i18n("\npass #: ") +  QString::number(data->parsingState.pass + 1)
-                    + i18n("/ ") + QString::number(numPasses)
-                    + i18n("\ntime spent: ") + Util::formatTime(spentTime_s * 1000)
-                    + i18n("\ntime remaing: ") + Util::formatTime(totalRemainingTime_s * 1000)
-                parsingMsg + i18n("\ntime remaing: ") + Util::formatTime(totalRemainingTime_s * 1000)
+                    + i18n(
+                        " pass: %1/%2  spent: %3  remaining: %4",
+                        data->parsingState.pass + 1,
+                        numPasses,
+                        Util::formatTime(spentTime_s * 1000),
+                        Util::formatTime(totalRemainingTime_s * 1000)
+                    )
             );
 
+#ifdef DEBUG
             auto extraStats = QString(
-                i18n("\n%/s: ") + QString::number(totalCompletionPerSec * 100)
+                i18n("\ns/%: ") + QString::number(1/(totalCompletionPerSec * 100))
                     + i18n("\ncurrent pass %: ") + QString::number(static_cast<int>(passCompletion * 100))
                     + i18n("\npass time remaining: ") + Util::formatTime(passRemainingTime_s * 1000)
                     + i18n("\npass compressed progress: ") + Util::formatBytes(data->parsingState.readCompressed_b)
@@ -685,9 +688,10 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
                     + i18n(" / ???")
                     + i18n("\nlatest log timestamp: ") +  Util::formatTime(data->parsingState.timestamp_ms)
             );
+            emit progressExtraStatsAvailable(extraStats);
+#endif
 
             emit progressMessageAvailable(message);
-            emit progressExtraStatsAvailable(message);
             emit progress(1000 * totalCompletion); // range is set as 0 to 1000 for fractional % bar display
         };
 

@@ -188,12 +188,14 @@
            <bool>true</bool>
           </property>
          </widget>
+        </item>
+        <item>
          <widget class="QLabel" name="progressExtraStats">
           <property name="text">
-           <string notr="true">Progress Extra Stats...</string>
+           <string notr="true"></string>
           </property>
           <property name="alignment">
-           <set>Qt::AlignRight</set>
+           <set>Qt::AlignLeft</set>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
