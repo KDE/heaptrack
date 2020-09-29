@@ -661,13 +661,14 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         auto updateProgress = [this, numPasses, parsingMsg](std::shared_ptr<const ParserData> const & data, const QElapsedTimer & timer){
             auto passCompletion = 1.0 * data->parsingState.readCompressed_b/data->parsingState.fileSize_b;
             auto totalCompletion = ((data->parsingState.pass + passCompletion)/numPasses);
-            auto spentTime_s = timer.msecsSinceReference()/1000.0;
+            auto spentTime_s = timer.elapsed()/1000.0; // elapsed is in ms
             auto totalCompletionPerSec = totalCompletion / spentTime_s;
             auto passCompletionPerSec = passCompletion / (spentTime_s - (data->parsingState.pass / totalCompletionPerSec)) ;
             auto passRemainingTime_s = (1.0 - passCompletion) / passCompletionPerSec;
             auto totalRemainingTime_s = (spentTime_s / totalCompletion) * (1.0 - totalCompletion);
             auto message = QString(
                 parsingMsg
+                    + i18n("\ntime spent: ") + Util::formatTime(spentTime_s * 1000)
                     + i18n("\ntime remaing: ") + Util::formatTime(totalRemainingTime_s * 1000)
                     + i18n("\n%/s: ") + QString::number(totalCompletionPerSec * 100)
                     + i18n("\npass #:   ") +  QString::number(data->parsingState.pass + 1)
