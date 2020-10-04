@@ -68,7 +68,7 @@
     <p xml:lang="id">Heaptrack melacak semua alokasi memori dan membubuhi keterangan peristiwa ini dengan jejak tumpukan. Alat analisis khusus kemudian memungkinkan kamu untuk menginterpretasikan profil memori tumpukan untuk:</p>
     <p xml:lang="it">Heaptrack traccia tutte le allocazioni di memoria e le annota con tracciati dello stack. Degli strumenti dedicati di analisi ti permettono quindi di interpretare il profilo della memoria heap in modo da:</p>
     <p xml:lang="ko">힙 추적은 모든 메모리 할당을 추적하고 스택 추적과 메모리 할당을 연결합니다. 분석 도구를 사용하여 힙 메모리 프로필을 해석할 수 있습니다:</p>
-    <p xml:lang="nl">Heaptrack traceert alle toewijzigingen van geheugen en annoteert deze gebeurtenissen met stacktraces. Specifieke hulpmiddelen voor analyse bieden u de mogelijkheid om het geheugenprofiel van de heap te interpreteren:</p>
+    <p xml:lang="nl">Heaptrack traceert alle toewijzingen van geheugen en annoteert deze gebeurtenissen met stacktraces. Specifieke hulpmiddelen voor analyse bieden u de mogelijkheid om het geheugenprofiel van de heap te interpreteren:</p>
     <p xml:lang="nn">Heaptrack sporar alle minnereserveringar og merkjer dei med tilhøyrande stabelspor. Analyseverktøyet lèt deg så tolka minneprofilen for å:</p>
     <p xml:lang="pl">Heaptrack rejestruje wszystkie przydziały pamięci i przypisuje tym zdarzeniom ślady stosu. Dedykowane narzędzia analizy, które umożliwiają interpretację profilu pamięcy aby:</p>
     <p xml:lang="pt">O Heaptrack faz uma análise de todas as alocações de memória e anota esses eventos com os registos de chamadas. As ferramentas de análise dedicadas permitem-lhe então interpretar o perfil da memória de dados para:</p>
