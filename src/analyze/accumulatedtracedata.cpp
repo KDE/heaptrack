@@ -698,14 +698,15 @@ AllocationIndex AccumulatedTraceData::mapToAllocationIndex(const TraceIndex trac
         allocations.push_back(allocation);
     } else if (traceIndex == m_maxAllocationTraceIndex && !allocations.empty()) {
         // reuse the last allocation
-        assert(allocations.back().traceIndex == traceIndex);
-        allocationIndex.index = allocations.size() - 1;
+        assert(allocations[m_maxAllocationIndex.index].traceIndex == traceIndex);
+        allocationIndex = m_maxAllocationIndex;
     } else {
         // new allocation
         allocationIndex.index = allocations.size();
         traceIndexToAllocationIndex.push_back(make_pair(traceIndex, allocationIndex));
         Allocation allocation;
         allocation.traceIndex = traceIndex;
+        m_maxAllocationIndex.index = allocations.size();
         allocations.push_back(allocation);
         m_maxAllocationTraceIndex = traceIndex;
     }
