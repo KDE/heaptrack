@@ -155,7 +155,13 @@ while true; do
                     openHeaptrackDataFiles $ORIG_CMDLINE
                     exit
                 fi
-                echo "Error: Debuggee \"$1\" is not an executable."
+
+                if [ ! -e "$1" ]; then
+                    echo "Error: Debuggee \"$1\" was not found."
+                else
+                    echo "Error: Debuggee \"$1\" is not an executable."
+                fi
+
                 echo
                 echo "Usage: $0 [--debug|-d] [--help|-h] DEBUGGEE [ARGS...]"
                 exit 1
