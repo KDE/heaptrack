@@ -204,7 +204,8 @@ struct ParserData final : public AccumulatedTraceData
                 }
                 const auto ip = alloc.ip;
                 (labelIds[ip].*label) = i + 1;
-                const auto function = stringCache.func(findIp(ip).frame);
+                const auto function = QString(stringCache.func(findIp(ip).frame) + 
+                    QLatin1String(" in ") + stringCache.location(findIp(ip)).symbol.binary + QLatin1String(" (") + stringCache.location(findIp(ip)).symbol.path + QLatin1String(")"));
                 data->labels[i + 1] = function;
             }
         };
