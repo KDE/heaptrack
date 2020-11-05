@@ -204,8 +204,10 @@ struct ParserData final : public AccumulatedTraceData
                 }
                 const auto ip = alloc.ip;
                 (labelIds[ip].*label) = i + 1;
-                const auto function = stringCache.func(findIp(ip).frame);
-                data->labels[i + 1] = function;
+                const auto& ipInfo = findIp(ip);
+                data->labels[i + 1] =
+                    i18n("%1 in %2 (%3)", stringCache.func(ipInfo.frame), stringCache.location(ipInfo).symbol.binary,
+                         stringCache.location(ipInfo).symbol.path);
             }
         };
         findTopChartEntries(&ChartMergeData::consumed, &LabelIds::consumed, &consumedChartData);
