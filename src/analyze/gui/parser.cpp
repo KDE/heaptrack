@@ -744,19 +744,11 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         });
         if (!data->stringCache.diffMode) {
             // only build charts when we are not diffing
-            *parallel << make_job([this, data, stdPath, isReparsing, updateProgress]() {
+            *parallel << make_job([this, data, stdPath, isReparsing]() {
                 // this mutates data, and thus anything running in parallel must
                 // not access data
-                emit progress(0);
                 data->prepareBuildCharts();
-                auto read = async(launch::async, [&data, stdPath, isReparsing]() {
-                    return data->read(stdPath, AccumulatedTraceData::ThirdPass, isReparsing);
-                });
-                while(read.wait_for(std::chrono::milliseconds(1000)) == std::future_status::timeout)
-                {
-                    auto completion = 1.0*data->parsingState.readCompressedByte / data->parsingState.fileSize;
-                    emit progress(1000 * completion);
-                }
+                data->read(stdPath, AccumulatedTraceData::ThirdPass, isReparsing);
                 emit consumedChartDataAvailable(data->consumedChartData);
                 emit allocationsChartDataAvailable(data->allocationsChartData);
                 emit temporaryChartDataAvailable(data->temporaryChartData);
