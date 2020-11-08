@@ -652,17 +652,17 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         auto parsingMsg = isReparsing ? i18n("reparsing data") : i18n("parsing data");
         emit progressMessageAvailable(parsingMsg);
 
-        auto updateProgress = [this, parsingMsg](std::shared_ptr<const ParserData> const & data, const QElapsedTimer & timer){
-            const auto numPasses = data->stringCache.diffMode ? 2 : 3;
-            auto passCompletion = 1.0 * data->parsingState.readCompressedByte / data->parsingState.fileSize;
-            auto totalCompletion = ((data->parsingState.pass + passCompletion)/numPasses);
+        auto updateProgress = [this, parsingMsg](const ParserData & data, const QElapsedTimer & timer){
+            const auto numPasses = data.stringCache.diffMode ? 2 : 3;
+            auto passCompletion = 1.0 * data.parsingState.readCompressedByte / data.parsingState.fileSize;
+            auto totalCompletion = (data.parsingState.pass + passCompletion)/numPasses;
             auto spentTime_s = timer.elapsed() / 1000.0; // elapsed is in ms
             auto totalRemainingTime_s = (spentTime_s / totalCompletion) * (1.0 - totalCompletion);
             auto message = QString(
                 parsingMsg
                     + i18n(
                         " pass: %1/%2  spent: %3  remaining: %4",
-                        data->parsingState.pass + 1,
+                        data.parsingState.pass + 1,
                         numPasses,
                         Util::formatTime(spentTime_s * 1000),
                         Util::formatTime(totalRemainingTime_s * 1000)
@@ -717,7 +717,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             });
             while(read.wait_for(std::chrono::milliseconds(500)) == std::future_status::timeout)
             {
-                updateProgress(data, timer);
+                updateProgress(*data, timer);
             }
             if (!read.get())
             {
