@@ -648,17 +648,12 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
     auto oldData = std::move(m_data);
     using namespace ThreadWeaver;
     stream() << make_job([this, oldData, path, diffBase, filterParameters]() {
-        const auto stdPath = path.toStdString();
-        auto data = (path == m_path && oldData && diffBase.isEmpty()) ? oldData : make_shared<ParserData>();
-        data->filterParameters = filterParameters;
-
-        const auto isReparsing = data == oldData;
-
+        const auto isReparsing = (path == m_path && oldData && diffBase.isEmpty());
         auto parsingMsg = isReparsing ? i18n("reparsing data") : i18n("parsing data");
         emit progressMessageAvailable(parsingMsg);
 
-        const auto numPasses = data->stringCache.diffMode ? 2 : 3;
-        auto updateProgress = [this, numPasses, parsingMsg](std::shared_ptr<const ParserData> const & data, const QElapsedTimer & timer){
+        auto updateProgress = [this, parsingMsg](std::shared_ptr<const ParserData> const & data, const QElapsedTimer & timer){
+            const auto numPasses = data->stringCache.diffMode ? 2 : 3;
             auto passCompletion = 1.0 * data->parsingState.readCompressedByte / data->parsingState.fileSize;
             auto totalCompletion = ((data->parsingState.pass + passCompletion)/numPasses);
             auto spentTime_s = timer.elapsed() / 1000.0; // elapsed is in ms
@@ -690,10 +685,13 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             );
             emit progressExtraStatsAvailable(extraStats);
 #endif
-
             emit progressMessageAvailable(message);
             emit progress(1000 * totalCompletion); // range is set as 0 to 1000 for fractional % bar display
         };
+
+        const auto stdPath = path.toStdString();
+        auto data = isReparsing ? oldData : make_shared<ParserData>();
+        data->filterParameters = filterParameters;
 
         if (!diffBase.isEmpty()) {
             ParserData diffData;
