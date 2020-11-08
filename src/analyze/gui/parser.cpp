@@ -662,9 +662,6 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             auto passCompletion = 1.0 * data->parsingState.readCompressed_b/data->parsingState.fileSize_b;
             auto totalCompletion = ((data->parsingState.pass + passCompletion)/numPasses);
             auto spentTime_s = timer.elapsed()/1000.0; // elapsed is in ms
-            auto totalCompletionPerSec = totalCompletion / spentTime_s;
-            auto passCompletionPerSec = passCompletion / (spentTime_s - (data->parsingState.pass / totalCompletionPerSec)) ;
-            auto passRemainingTime_s = (1.0 - passCompletion) / passCompletionPerSec;
             auto totalRemainingTime_s = (spentTime_s / totalCompletion) * (1.0 - totalCompletion);
             auto message = QString(
                 parsingMsg
@@ -678,6 +675,9 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             );
 
 #ifdef DEBUG
+            auto totalCompletionPerSec = totalCompletion / spentTime_s;
+            auto passCompletionPerSec = passCompletion / (spentTime_s - (data->parsingState.pass / totalCompletionPerSec)) ;
+            auto passRemainingTime_s = (1.0 - passCompletion) / passCompletionPerSec;
             auto extraStats = QString(
                 i18n("\ns/%: ") + QString::number(1/(totalCompletionPerSec * 100))
                     + i18n("\ncurrent pass %: ") + QString::number(static_cast<int>(passCompletion * 100))
