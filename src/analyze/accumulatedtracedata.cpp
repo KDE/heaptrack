@@ -64,13 +64,13 @@ class byte_counter {
 public:
     using char_type = char;
     struct category
-        : boost::iostreams::dual_use
+        : boost::iostreams::input
         , boost::iostreams::filter_tag
         , boost::iostreams::multichar_tag
         , boost::iostreams::optimally_buffered_tag
     {};
 
-    uint64_t bytes() const { return bytes_; }
+    uint64_t bytes() const { return m_bytes; }
     std::streamsize optimal_buffer_size() const { return 0; }
 
     template<typename Source>
@@ -79,20 +79,12 @@ public:
         auto const readsize = boost::iostreams::read(src, str, size);
         if (readsize == -1)
             return -1;
-        bytes_ += readsize;
+        m_bytes += readsize;
         return readsize;
     }
 
-    template<typename Sink>
-    std::streamsize write(Sink& sink, const char* str, std::streamsize size)
-    {
-        auto const writesize = boost::iostreams::write(sink, str, size);
-        bytes_ += writesize;
-        return writesize;
-    }
-
 private:
-    uint64_t bytes_ = 0;
+    uint64_t m_bytes = 0;
 };
 
 
