@@ -659,9 +659,9 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
 
         const auto numPasses = data->stringCache.diffMode ? 2 : 3;
         auto updateProgress = [this, numPasses, parsingMsg](std::shared_ptr<const ParserData> const & data, const QElapsedTimer & timer){
-            auto passCompletion = 1.0 * data->parsingState.readCompressed_b/data->parsingState.fileSize_b;
+            auto passCompletion = 1.0 * data->parsingState.readCompressedByte / data->parsingState.fileSize;
             auto totalCompletion = ((data->parsingState.pass + passCompletion)/numPasses);
-            auto spentTime_s = timer.elapsed()/1000.0; // elapsed is in ms
+            auto spentTime_s = timer.elapsed() / 1000.0; // elapsed is in ms
             auto totalRemainingTime_s = (spentTime_s / totalCompletion) * (1.0 - totalCompletion);
             auto message = QString(
                 parsingMsg
@@ -682,11 +682,11 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
                 i18n("\ns/%: ") + QString::number(1/(totalCompletionPerSec * 100))
                     + i18n("\ncurrent pass %: ") + QString::number(static_cast<int>(passCompletion * 100))
                     + i18n("\npass time remaining: ") + Util::formatTime(passRemainingTime_s * 1000)
-                    + i18n("\npass compressed progress: ") + Util::formatBytes(data->parsingState.readCompressed_b)
-                    + i18n(" / ") + Util::formatBytes(data->parsingState.fileSize_b)
-                    + i18n("\npass uncompressed progress: ") + Util::formatBytes(data->parsingState.readUncompressed_b)
+                    + i18n("\npass compressed progress: ") + Util::formatBytes(data->parsingState.readCompressedByte)
+                    + i18n(" / ") + Util::formatBytes(data->parsingState.fileSize)
+                    + i18n("\npass uncompressed progress: ") + Util::formatBytes(data->parsingState.readUncompressedByte)
                     + i18n(" / ???")
-                    + i18n("\nlatest log timestamp: ") +  Util::formatTime(data->parsingState.timestamp_ms)
+                    + i18n("\nlatest log timestamp: ") + Util::formatTime(data->parsingState.timestamp)
             );
             emit progressExtraStatsAvailable(extraStats);
 #endif
@@ -771,7 +771,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
                 });
                 while(read.wait_for(std::chrono::milliseconds(1000)) == std::future_status::timeout)
                 {
-                    auto completion = 1.0*data->parsingState.readCompressed_b/data->parsingState.fileSize_b;
+                    auto completion = 1.0*data->parsingState.readCompressedByte / data->parsingState.fileSize;
                     emit progress(1000 * completion);
                 }
                 emit consumedChartDataAvailable(data->consumedChartData);

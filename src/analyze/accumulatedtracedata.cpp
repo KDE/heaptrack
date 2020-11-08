@@ -165,7 +165,7 @@ bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass, b
     const bool isCompressed = isGzCompressed || isZstdCompressed;
     ifstream file(inputFile, isCompressed ? ios_base::in | ios_base::binary : ios_base::in);
 
-    parsingState.fileSize_b = boost::filesystem::file_size(inputFile);
+    parsingState.fileSize = boost::filesystem::file_size(inputFile);
 
     if (!file.is_open()) {
         cerr << "Failed to open heaptrack log file: " << inputFile << endl;
@@ -238,9 +238,9 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
     parsingState.reparsing = isReparsing;
 
     while (timeStamp < filterParameters.maxTime && reader.getLine(in)) {
-        parsingState.readCompressed_b = compressedCount->bytes();
-        parsingState.readUncompressed_b = uncompressedCount->bytes();
-        parsingState.timestamp_ms = timeStamp;
+        parsingState.readCompressedByte = compressedCount->bytes();
+        parsingState.readUncompressedByte = uncompressedCount->bytes();
+        parsingState.timestamp = timeStamp;
 
         if (reader.mode() == 's') {
             if (pass != FirstPass || isReparsing) {
