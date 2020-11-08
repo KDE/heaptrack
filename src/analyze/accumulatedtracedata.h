@@ -103,15 +103,6 @@ struct AccumulatedTraceData
     AccumulatedTraceData();
     virtual ~AccumulatedTraceData() = default;
 
-    virtual void handleTimeStamp(int64_t oldStamp, int64_t newStamp, bool isFinalTimeStamp) = 0;
-    virtual void handleAllocation(const AllocationInfo& info, const AllocationInfoIndex index) = 0;
-    virtual void handleDebuggee(const char* command) = 0;
-
-    const std::string& stringify(const StringIndex stringId) const;
-
-    std::string prettyFunction(const std::string& function) const;
-
-    bool read(const std::string& inputFile, bool isReparsing);
     enum ParsePass
     {
         // find time of total peak cost
@@ -121,6 +112,16 @@ struct AccumulatedTraceData
         // GUI only: graph-building
         ThirdPass
     };
+
+    virtual void handleTimeStamp(int64_t oldStamp, int64_t newStamp, bool isFinalTimeStamp, const ParsePass pass) = 0;
+    virtual void handleAllocation(const AllocationInfo& info, const AllocationInfoIndex index) = 0;
+    virtual void handleDebuggee(const char* command) = 0;
+
+    const std::string& stringify(const StringIndex stringId) const;
+
+    std::string prettyFunction(const std::string& function) const;
+
+    bool read(const std::string& inputFile, bool isReparsing);
     bool read(const std::string& inputFile, const ParsePass pass, bool isReparsing);
     bool read(boost::iostreams::filtering_istream& in, const ParsePass pass, bool isReparsing);
 

@@ -147,7 +147,9 @@ const uint64_t MAX_CHART_DATAPOINTS = 500; // TODO: make this configurable via t
 
 struct ParserData final : public AccumulatedTraceData
 {
-    ParserData()
+    using TimestampCallback = std::function<void (const ParserData & data)>;
+    ParserData(TimestampCallback timestampCallback)
+        : timestampCallback(std::move(timestampCallback))
     {
     }
 
@@ -214,8 +216,14 @@ struct ParserData final : public AccumulatedTraceData
         findTopChartEntries(&ChartMergeData::temporary, &LabelIds::temporary, &temporaryChartData);
     }
 
-    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp, bool isFinalTimeStamp) override
+    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp, bool isFinalTimeStamp, ParsePass pass) override
     {
+        if (timestampCallback) {
+            timestampCallback(*this);
+        }
+        if (pass != ParsePass::FirstPass) {
+            return;
+        }
         if (!buildCharts || stringCache.diffMode) {
             return;
         }
@@ -340,6 +348,8 @@ struct ParserData final : public AccumulatedTraceData
     StringCache stringCache;
 
     bool buildCharts = false;
+    TimestampCallback timestampCallback;
+    QElapsedTimer parseTimer;
 };
 
 namespace {
@@ -652,11 +662,11 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         auto parsingMsg = isReparsing ? i18n("reparsing data") : i18n("parsing data");
         emit progressMessageAvailable(parsingMsg);
 
-        auto updateProgress = [this, parsingMsg](const ParserData & data, const QElapsedTimer & timer){
+        auto updateProgress = [this, parsingMsg](const ParserData & data){
             const auto numPasses = data.stringCache.diffMode ? 2 : 3;
             auto passCompletion = 1.0 * data.parsingState.readCompressedByte / data.parsingState.fileSize;
             auto totalCompletion = (data.parsingState.pass + passCompletion)/numPasses;
-            auto spentTime_s = timer.elapsed() / 1000.0; // elapsed is in ms
+            auto spentTime_s = data.parseTimer.elapsed() / 1000.0; // elapsed is in ms
             auto totalRemainingTime_s = (spentTime_s / totalCompletion) * (1.0 - totalCompletion);
             auto message = QString(
                 parsingMsg
@@ -674,11 +684,11 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         };
 
         const auto stdPath = path.toStdString();
-        auto data = isReparsing ? oldData : make_shared<ParserData>();
+        auto data = isReparsing ? oldData : make_shared<ParserData>(updateProgress);
         data->filterParameters = filterParameters;
 
         if (!diffBase.isEmpty()) {
-            ParserData diffData;
+            ParserData diffData(nullptr); // currently we don't track the progress of diff parsing
             auto readBase = async(launch::async, [&diffData, diffBase, isReparsing]() {
                 return diffData.read(diffBase.toStdString(), isReparsing);
             });
@@ -693,18 +703,9 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             data->diff(diffData);
             data->stringCache.diffMode = true;
         } else {
-            auto timer = QElapsedTimer();
-            timer.start();
+            data->parseTimer.start();
 
-            auto read = async(launch::async, [&data, stdPath, isReparsing]() {
-                return data->read(stdPath, isReparsing);
-            });
-            while(read.wait_for(std::chrono::milliseconds(500)) == std::future_status::timeout)
-            {
-                updateProgress(*data, timer);
-            }
-            if (!read.get())
-            {
+            if (!data->read(stdPath, isReparsing)) {
                 emit failedToOpen(path);
                 return;
             }

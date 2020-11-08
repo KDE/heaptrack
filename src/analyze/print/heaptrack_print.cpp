@@ -512,8 +512,11 @@ struct Printer final : public AccumulatedTraceData
         }
     }
 
-    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp, bool isFinalTimeStamp) override
+    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp, bool isFinalTimeStamp, ParsePass pass) override
     {
+        if (pass != ParsePass::FirstPass) {
+            return;
+        }
         if (massifOut.is_open()) {
             writeMassifSnapshot(newStamp, isFinalTimeStamp);
         }

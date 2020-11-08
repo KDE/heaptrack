@@ -412,8 +412,8 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
                 continue;
             }
             inFilteredTime = newStamp >= filterParameters.minTime && newStamp <= filterParameters.maxTime;
-            if (pass != FirstPass && inFilteredTime) {
-                handleTimeStamp(timeStamp, newStamp, false);
+            if (inFilteredTime) {
+                handleTimeStamp(timeStamp, newStamp, false, pass);
             }
             timeStamp = newStamp;
         } else if (reader.mode() == 'R') { // RSS timestamp
@@ -470,9 +470,9 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
     if (pass == FirstPass && !isReparsing) {
         totalTime = timeStamp + 1;
         filterParameters.maxTime = totalTime;
-    } else {
-        handleTimeStamp(timeStamp, timeStamp + 1, true);
     }
+
+    handleTimeStamp(timeStamp, timeStamp + 1, true, pass);
 
     return true;
 }
