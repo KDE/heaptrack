@@ -221,7 +221,7 @@ struct ParserData final : public AccumulatedTraceData
         if (timestampCallback) {
             timestampCallback(*this);
         }
-        if (pass != ParsePass::FirstPass) {
+        if (pass == ParsePass::FirstPass) {
             return;
         }
         if (!buildCharts || stringCache.diffMode) {
