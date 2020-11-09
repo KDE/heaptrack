@@ -190,19 +190,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="progressExtraStats">
-          <property name="text">
-           <string notr="true"></string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignLeft</set>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
          <spacer name="verticalSpacer_2">
           <property name="orientation">
            <enum>Qt::Vertical</enum>

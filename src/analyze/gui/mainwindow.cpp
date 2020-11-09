@@ -414,7 +414,6 @@ MainWindow::MainWindow(QWidget* parent)
         m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->summaryTab), true);
     });
     connect(m_parser, &Parser::progressMessageAvailable, m_ui->progressLabel, &QLabel::setText);
-    connect(m_parser, &Parser::progressExtraStatsAvailable, m_ui->progressExtraStats, &QLabel::setText);
     connect(m_parser, &Parser::progress, m_ui->loadingProgress, &QProgressBar::setValue);
     auto removeProgress = [this] {
         auto layout = qobject_cast<QVBoxLayout*>(m_ui->loadingPage->layout());
