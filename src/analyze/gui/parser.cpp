@@ -666,18 +666,15 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             const auto numPasses = data.stringCache.diffMode ? 2 : 3;
             auto passCompletion = 1.0 * data.parsingState.readCompressedByte / data.parsingState.fileSize;
             auto totalCompletion = (data.parsingState.pass + passCompletion)/numPasses;
-            auto spentTime_s = data.parseTimer.elapsed() / 1000.0; // elapsed is in ms
-            auto totalRemainingTime_s = (spentTime_s / totalCompletion) * (1.0 - totalCompletion);
-            auto message = QString(
+            auto spentTime_ms = data.parseTimer.elapsed();
+            auto totalRemainingTime_ms = (spentTime_ms / totalCompletion) * (1.0 - totalCompletion);
+            auto message = i18n(
+                "%1 pass: %2/%3  spent: %4  remaining: %5",
                 parsingMsg
-                    + i18n(
-                        " pass: %1/%2  spent: %3  remaining: %4",
-                        data.parsingState.pass + 1,
-                        numPasses,
-                        Util::formatTime(spentTime_s * 1000),
-                        Util::formatTime(totalRemainingTime_s * 1000)
-                    )
-            );
+                data.parsingState.pass + 1,
+                numPasses,
+                Util::formatTime(spentTime_ms),
+                Util::formatTime(totalRemainingTime_ms));
 
             emit progressMessageAvailable(message);
             emit progress(1000 * totalCompletion); // range is set as 0 to 1000 for fractional % bar display
