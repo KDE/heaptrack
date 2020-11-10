@@ -60,20 +60,27 @@ ostream& operator<<(ostream& out, const Index<Base> index)
 }
 
 // boost's counter filter uses an int for the count which overflows for large streams; so replace it with a work alike.
-class byte_counter {
+class byte_counter
+{
 public:
     using char_type = char;
-    struct category
-        : boost::iostreams::input
-        , boost::iostreams::filter_tag
-        , boost::iostreams::multichar_tag
-        , boost::iostreams::optimally_buffered_tag
-    {};
+    struct category : boost::iostreams::input,
+                      boost::iostreams::filter_tag,
+                      boost::iostreams::multichar_tag,
+                      boost::iostreams::optimally_buffered_tag
+    {
+    };
 
-    uint64_t bytes() const { return m_bytes; }
-    std::streamsize optimal_buffer_size() const { return 0; }
+    uint64_t bytes() const
+    {
+        return m_bytes;
+    }
+    std::streamsize optimal_buffer_size() const
+    {
+        return 0;
+    }
 
-    template<typename Source>
+    template <typename Source>
     std::streamsize read(Source& src, char* str, std::streamsize size)
     {
         auto const readsize = boost::iostreams::read(src, str, size);
@@ -86,8 +93,6 @@ public:
 private:
     uint64_t m_bytes = 0;
 };
-
-
 }
 
 AccumulatedTraceData::AccumulatedTraceData()
@@ -232,7 +237,7 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
     uint64_t lastAllocationPtr = 0;
 
     auto const uncompressedCount = in.component<byte_counter>(0);
-    auto const compressedCount   = in.component<byte_counter>(2);
+    auto const compressedCount = in.component<byte_counter>(2);
 
     parsingState.pass = pass;
     parsingState.reparsing = isReparsing;

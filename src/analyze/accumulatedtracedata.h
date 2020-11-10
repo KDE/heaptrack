@@ -175,7 +175,8 @@ struct AccumulatedTraceData
 
     std::vector<AllocationInfo> allocationInfos;
 
-    struct ParsingState {
+    struct ParsingState
+    {
         int64_t fileSize = 0; // bytes
         int64_t readCompressedByte = 0;
         int64_t readUncompressedByte = 0;

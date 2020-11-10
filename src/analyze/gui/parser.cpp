@@ -22,8 +22,8 @@
 #include <ThreadWeaver/ThreadWeaver>
 
 #include <QDebug>
-#include <QThread>
 #include <QElapsedTimer>
+#include <QThread>
 
 #include "analyze/accumulatedtracedata.h"
 
@@ -147,7 +147,7 @@ const uint64_t MAX_CHART_DATAPOINTS = 500; // TODO: make this configurable via t
 
 struct ParserData final : public AccumulatedTraceData
 {
-    using TimestampCallback = std::function<void (const ParserData & data)>;
+    using TimestampCallback = std::function<void(const ParserData& data)>;
     ParserData(TimestampCallback timestampCallback)
         : timestampCallback(std::move(timestampCallback))
     {
@@ -662,19 +662,14 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         auto parsingMsg = isReparsing ? i18n("reparsing data") : i18n("parsing data");
         emit progressMessageAvailable(parsingMsg);
 
-        auto updateProgress = [this, parsingMsg](const ParserData & data){
+        auto updateProgress = [this, parsingMsg](const ParserData& data) {
             const auto numPasses = data.stringCache.diffMode ? 2 : 3;
             auto passCompletion = 1.0 * data.parsingState.readCompressedByte / data.parsingState.fileSize;
-            auto totalCompletion = (data.parsingState.pass + passCompletion)/numPasses;
+            auto totalCompletion = (data.parsingState.pass + passCompletion) / numPasses;
             auto spentTime_ms = data.parseTimer.elapsed();
             auto totalRemainingTime_ms = (spentTime_ms / totalCompletion) * (1.0 - totalCompletion);
-            auto message = i18n(
-                "%1 pass: %2/%3  spent: %4  remaining: %5",
-                parsingMsg
-                data.parsingState.pass + 1,
-                numPasses,
-                Util::formatTime(spentTime_ms),
-                Util::formatTime(totalRemainingTime_ms));
+            auto message = i18n("%1 pass: %2/%3  spent: %4  remaining: %5", parsingMsg data.parsingState.pass + 1,
+                                numPasses, Util::formatTime(spentTime_ms), Util::formatTime(totalRemainingTime_ms));
 
             emit progressMessageAvailable(message);
             emit progress(1000 * totalCompletion); // range is set as 0 to 1000 for fractional % bar display
