@@ -30,34 +30,25 @@
 #include <future>
 #include <tuple>
 #include <vector>
-#include <unordered_map>
 
 using namespace std;
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-namespace std {
-template <>
-struct hash<QString>
-{
-    std::size_t operator()(const QString &v) const noexcept
-    {
-        return qHash(v);
-    }
-};
-}
-#endif
-
 namespace {
-
-// Only use this hash when filling in the cache
-struct CacheSymbolHash
+struct SymbolKey
 {
-    std::size_t operator()(const Symbol &symbol) const noexcept
+    FunctionIndex functionIndex;
+    ModuleIndex moduleIndex;
+
+    bool operator==(const SymbolKey& rhs) const
     {
-        size_t seed = 0;
-        boost::hash_combine(seed, std::hash<QString>{}(symbol.symbol));
-        boost::hash_combine(seed, std::hash<QString>{}(symbol.binary));
-        boost::hash_combine(seed, std::hash<QString>{}(symbol.path));
+        return functionIndex == rhs.functionIndex && moduleIndex == rhs.moduleIndex;
+    }
+
+    friend uint qHash(const SymbolKey& symbolKey, uint seed = 0)
+    {
+        QtPrivate::QHashCombine hash;
+        seed = hash(seed, symbolKey.functionIndex);
+        seed = hash(seed, symbolKey.moduleIndex);
         return seed;
     }
 };
@@ -101,16 +92,17 @@ struct StringCache
 
     Location frameLocation(const Frame& frame, const ModuleIndex& moduleIndex) const
     {
-        const auto module = stringify(moduleIndex);
-        auto binaryIt = m_pathToBinaries.find(module);
-        if (binaryIt == m_pathToBinaries.end()) {
-            binaryIt = m_pathToBinaries.insert(module, Util::basename(module));
+        auto& symbol = m_symbols[{frame.functionIndex, moduleIndex}];
+        if (!symbol.isValid()) {
+            const auto module = stringify(moduleIndex);
+            auto binaryIt = m_pathToBinaries.find(module);
+            if (binaryIt == m_pathToBinaries.end()) {
+                binaryIt = m_pathToBinaries.insert(module, Util::basename(module));
+            }
+            symbol = Symbol {func(frame), *binaryIt, module, ++m_nextSymbolId};
         }
-        const SymbolId id = ++m_nextSymbolId;
-        auto symbol = Symbol{func(frame), *binaryIt, module, id};
-        // Insert symbol into the hash, or use existing one (in which case the new ID won't be used)
-        const auto it = m_symbols.emplace(std::make_pair(std::move(symbol), id)).first;
-        return {it->first, {file(frame), frame.line}};
+
+        return {symbol, {file(frame), frame.line}};
     }
 
     void update(const vector<string>& strings)
@@ -123,7 +115,7 @@ struct StringCache
     // interned module basenames
     mutable QHash<QString, QString> m_pathToBinaries;
     // existing symbols
-    mutable std::unordered_map<Symbol, SymbolId, CacheSymbolHash, Symbol::FullEqual> m_symbols;
+    mutable QHash<SymbolKey, Symbol> m_symbols;
 
     bool diffMode = false;
 
