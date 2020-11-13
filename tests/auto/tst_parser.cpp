@@ -36,6 +36,7 @@ TEST_CASE ("parse sample file", "[parser]") {
     QSignalSpy spyCCD(&parser, &Parser::callerCalleeDataAvailable);
     QSignalSpy spyBottomUp(&parser, &Parser::bottomUpDataAvailable);
     QSignalSpy spyTopDown(&parser, &Parser::topDownDataAvailable);
+    QSignalSpy spyFinished(&parser, &Parser::finished);
 
     parser.parse(SRC_DIR "/heaptrack.david.18594.gz", QString());
 
@@ -100,4 +101,7 @@ TEST_CASE ("parse sample file", "[parser]") {
     REQUIRE(topDownData.at(0).children.size() == 1);
     REQUIRE(topDownData.at(0).cost.allocations == 15);
     REQUIRE(topDownData.at(0).cost.peak == 94496);
+
+    if (spyFinished.isEmpty())
+        REQUIRE(spyFinished.wait());
 }
