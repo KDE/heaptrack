@@ -48,6 +48,7 @@ set(SRCFILES
     treemodel.cpp
     treeproxy.cpp
     costdelegate.cpp
+    costheaderview.cpp
     flamegraph.cpp
     stacksmodel.cpp
     topproxy.cpp

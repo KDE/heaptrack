@@ -43,16 +43,12 @@ void CallerCalleeModel::clearData()
 QVariant CallerCalleeModel::headerCell(int column, int role) const
 {
     if (role == Qt::InitialSortOrderRole) {
-        return (column > BinaryColumn) ? Qt::DescendingOrder : Qt::AscendingOrder;
+        return (column > LocationColumn) ? Qt::DescendingOrder : Qt::AscendingOrder;
     }
     if (role == Qt::DisplayRole) {
         switch (static_cast<Columns>(column)) {
         case LocationColumn:
             return i18n("Location");
-        case SymbolColumn:
-            return i18n("Symbol");
-        case BinaryColumn:
-            return i18n("Binary");
         case SelfAllocationsColumn:
             return i18n("Allocations (Self)");
         case SelfTemporaryColumn:
@@ -77,12 +73,6 @@ QVariant CallerCalleeModel::headerCell(int column, int role) const
         case LocationColumn:
             return i18n("<qt>The parent symbol that called an allocation function. "
                         "The function name may be unresolved when debug information is missing.</qt>");
-        case SymbolColumn:
-            return i18n("<qt>The parent function that called an allocation function. "
-                        "May be unresolved when debug information is missing.</qt>");
-        case BinaryColumn:
-            return i18n("<qt>The module, i.e. executable or shared library, from "
-                        "which an allocation function was called.</qt>");
         case SelfAllocationsColumn:
             return i18n("<qt>The number of times an allocation function was directly "
                         "called from this location.</qt>");
@@ -130,10 +120,6 @@ QVariant CallerCalleeModel::cell(int column, int role, const Symbol& symbol, con
         case LocationColumn:
             // TODO: optimize this
             return QString(symbol.symbol + symbol.binary);
-        case SymbolColumn:
-            return symbol.symbol;
-        case BinaryColumn:
-            return symbol.binary;
         case SelfAllocationsColumn:
             // NOTE: we sort by unsigned absolute value
             return QVariant::fromValue<quint64>(std::abs(entry.selfCost.allocations));
@@ -169,8 +155,6 @@ QVariant CallerCalleeModel::cell(int column, int role, const Symbol& symbol, con
         case InclusiveLeakedColumn:
             return QVariant::fromValue<qint64>(m_results.totalCosts.leaked);
         case LocationColumn:
-        case SymbolColumn:
-        case BinaryColumn:
         case NUM_COLUMNS:
             break;
         }
@@ -181,10 +165,6 @@ QVariant CallerCalleeModel::cell(int column, int role, const Symbol& symbol, con
         switch (static_cast<Columns>(column)) {
         case LocationColumn:
             return i18nc("%1: function name, %2: binary basename", "%1 in %2", symbol.symbol, symbol.binary);
-        case SymbolColumn:
-            return symbol.symbol;
-        case BinaryColumn:
-            return symbol.binary;
         case SelfAllocationsColumn:
             return QVariant::fromValue<qint64>(entry.selfCost.allocations);
         case SelfTemporaryColumn:

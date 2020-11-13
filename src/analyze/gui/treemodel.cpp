@@ -72,10 +72,6 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
     }
     if (role == Qt::DisplayRole) {
         switch (static_cast<Columns>(section)) {
-        case FunctionColumn:
-            return i18n("Function");
-        case ModuleColumn:
-            return i18n("Module");
         case AllocationsColumn:
             return i18n("Allocations");
         case TemporaryColumn:
@@ -91,13 +87,6 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
         }
     } else if (role == Qt::ToolTipRole) {
         switch (static_cast<Columns>(section)) {
-        case FunctionColumn:
-            return i18n("<qt>The parent function that called an allocation function. "
-                        "May be unknown when debug information is missing.</qt>");
-        case ModuleColumn:
-            return i18n("<qt>The module, i.e. executable or shared library, from "
-                        "which an allocation function was "
-                        "called.</qt>");
         case AllocationsColumn:
             return i18n("<qt>The number of times an allocation function was called "
                         "from this location.</qt>");
@@ -157,10 +146,6 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             } else {
                 return Util::formatBytes(row->cost.leaked);
             }
-        case FunctionColumn:
-            return row->symbol.symbol;
-        case ModuleColumn:
-            return row->symbol.binary;
         case LocationColumn:
             return i18n("%1 in %2 (%3)", row->symbol.symbol, row->symbol.binary, row->symbol.path);
         case NUM_COLUMNS:

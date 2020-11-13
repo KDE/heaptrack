@@ -112,9 +112,7 @@ public:
 
     enum Columns
     {
-        SymbolColumn = 0,
-        BinaryColumn,
-        LocationColumn,
+        LocationColumn = 0,
         InclusivePeakColumn,
         InclusiveLeakedColumn,
         InclusiveAllocationsColumn,
@@ -170,9 +168,7 @@ public:
 
     enum Columns
     {
-        SymbolColumn = 0,
-        BinaryColumn,
-        LocationColumn,
+        LocationColumn = 0,
         PeakColumn,
         LeakedColumn,
         AllocationsColumn,
@@ -194,15 +190,12 @@ public:
 
     QVariant headerCell(int column, int role) const final override
     {
-        if (role == Qt::InitialSortOrderRole && column > BinaryColumn) {
+        if (role == Qt::InitialSortOrderRole && column != LocationColumn) {
             return Qt::DescendingOrder;
         } else if (role == Qt::DisplayRole) {
             switch (static_cast<Columns>(column)) {
             case LocationColumn:
-            case SymbolColumn:
                 return symbolHeader();
-            case BinaryColumn:
-                return i18n("Binary");
             case PeakColumn:
                 return i18n("Peak");
             case LeakedColumn:
@@ -220,11 +213,6 @@ public:
                 return i18n(
                     "The location of the %1. The function name may be unresolved when debug information is missing.",
                     symbolHeader());
-            case SymbolColumn:
-                return i18n("The function name of the %1. May be unresolved when debug information is missing.",
-                            symbolHeader());
-            case BinaryColumn:
-                return i18n("The name of the executable the symbol resides in.");
             case PeakColumn:
                 return i18n("<qt>The inclusive maximum heap memory in bytes consumed "
                             "from allocations originating at this "
@@ -254,10 +242,7 @@ public:
         if (role == SortRole) {
             switch (static_cast<Columns>(column)) {
             case LocationColumn:
-            case SymbolColumn:
-                return symbol.symbol;
-            case BinaryColumn:
-                return symbol.binary;
+                return QVariant::fromValue(symbol);
             case PeakColumn:
                 // NOTE: we sort by unsigned absolute value
                 return QVariant::fromValue<quint64>(std::abs(costs.peak));
@@ -281,8 +266,6 @@ public:
             case TemporaryColumn:
                 return QVariant::fromValue<qint64>(costs.temporary);
             case LocationColumn:
-            case SymbolColumn:
-            case BinaryColumn:
             case NUM_COLUMNS:
                 break;
             }
@@ -293,10 +276,6 @@ public:
             switch (static_cast<Columns>(column)) {
             case LocationColumn:
                 return i18nc("%1: function name, %2: binary basename", "%1 in %2", symbol.symbol, symbol.binary);
-            case SymbolColumn:
-                return symbol.symbol;
-            case BinaryColumn:
-                return symbol.binary;
             case PeakColumn:
                 return Util::formatBytes(costs.peak);
             case LeakedColumn:

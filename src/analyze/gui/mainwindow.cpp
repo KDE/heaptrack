@@ -40,6 +40,7 @@
 
 #include "callercalleemodel.h"
 #include "costdelegate.h"
+#include "costheaderview.h"
 #include "parser.h"
 #include "stacksmodel.h"
 #include "topproxy.h"
@@ -214,7 +215,7 @@ template <typename T>
 void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegate, QLineEdit* filterFunction,
                     QLineEdit* filterModule, T callback)
 {
-    auto proxy = new TreeProxy(TreeModel::FunctionColumn, TreeModel::ModuleColumn, model);
+    auto proxy = new TreeProxy(TreeModel::SymbolRole, model);
     proxy->setSourceModel(model);
     proxy->setSortRole(TreeModel::SortRole);
 
@@ -223,8 +224,7 @@ void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegat
     view->setItemDelegateForColumn(TreeModel::LeakedColumn, costDelegate);
     view->setItemDelegateForColumn(TreeModel::AllocationsColumn, costDelegate);
     view->setItemDelegateForColumn(TreeModel::TemporaryColumn, costDelegate);
-    view->hideColumn(TreeModel::FunctionColumn);
-    view->hideColumn(TreeModel::ModuleColumn);
+    view->setHeader(new CostHeaderView(view));
 
     QObject::connect(filterFunction, &QLineEdit::textChanged, proxy, &TreeProxy::setFunctionFilter);
     QObject::connect(filterModule, &QLineEdit::textChanged, proxy, &TreeProxy::setModuleFilter);
@@ -234,7 +234,7 @@ void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegat
 void setupCallerCallee(CallerCalleeModel* model, QTreeView* view, QLineEdit* filterFunction, QLineEdit* filterModule)
 {
     auto costDelegate = new CostDelegate(CallerCalleeModel::SortRole, CallerCalleeModel::TotalCostRole, view);
-    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::SymbolColumn, CallerCalleeModel::BinaryColumn, model);
+    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::SymbolRole, model);
     callerCalleeProxy->setSourceModel(model);
     callerCalleeProxy->setSortRole(CallerCalleeModel::SortRole);
     view->setModel(callerCalleeProxy);
@@ -247,14 +247,13 @@ void setupCallerCallee(CallerCalleeModel* model, QTreeView* view, QLineEdit* fil
     view->setItemDelegateForColumn(CallerCalleeModel::InclusiveLeakedColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::InclusiveAllocationsColumn, costDelegate);
     view->setItemDelegateForColumn(CallerCalleeModel::InclusiveTemporaryColumn, costDelegate);
-    view->hideColumn(CallerCalleeModel::SymbolColumn);
-    view->hideColumn(CallerCalleeModel::BinaryColumn);
+    view->setHeader(new CostHeaderView(view));
     QObject::connect(filterFunction, &QLineEdit::textChanged, callerCalleeProxy, &TreeProxy::setFunctionFilter);
     QObject::connect(filterModule, &QLineEdit::textChanged, callerCalleeProxy, &TreeProxy::setModuleFilter);
 }
 
 template <typename Model>
-Model* setupModelAndProxyForView(QTreeView* view, int nonCostColumns)
+Model* setupModelAndProxyForView(QTreeView* view)
 {
     auto model = new Model(view);
     auto proxy = new QSortFilterProxyModel(model);
@@ -262,17 +261,12 @@ Model* setupModelAndProxyForView(QTreeView* view, int nonCostColumns)
     proxy->setSortRole(Model::SortRole);
     view->setModel(proxy);
     sortByColumn(view, Model::InitialSortColumn);
-    view->header()->setStretchLastSection(false);
-    view->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-    for (int i = 0; i < nonCostColumns; ++i) {
-        if (i != Model::LocationColumn) {
-            view->hideColumn(i);
-        }
-    }
     auto costDelegate = new CostDelegate(Model::SortRole, Model::TotalCostRole, view);
-    for (int i = nonCostColumns; i < Model::NUM_COLUMNS; ++i) {
+    for (int i = 1; i < Model::NUM_COLUMNS; ++i) {
         view->setItemDelegateForColumn(i, costDelegate);
     }
+
+    view->setHeader(new CostHeaderView(view));
 
     return model;
 }
@@ -460,9 +454,9 @@ MainWindow::MainWindow(QWidget* parent)
     });
 #endif
 
-    auto calleesModel = setupModelAndProxyForView<CalleeModel>(m_ui->calleeView, 2);
-    auto callersModel = setupModelAndProxyForView<CallerModel>(m_ui->callerView, 2);
-    auto sourceMapModel = setupModelAndProxyForView<SourceMapModel>(m_ui->locationView, 1);
+    auto calleesModel = setupModelAndProxyForView<CalleeModel>(m_ui->calleeView);
+    auto callersModel = setupModelAndProxyForView<CallerModel>(m_ui->callerView);
+    auto sourceMapModel = setupModelAndProxyForView<SourceMapModel>(m_ui->locationView);
 
     auto selectCallerCaleeeIndex = [calleesModel, callersModel, sourceMapModel, this](const QModelIndex& index) {
         const auto costs = index.data(CallerCalleeModel::TotalCostsRole).value<AllocationData>();

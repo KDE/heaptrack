@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Milian Wolff <mail@milianw.de>
+ * Copyright 2020 Milian Wolff <mail@milianw.de>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,29 +16,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef TREEPROXY_H
-#define TREEPROXY_H
+#pragma once
 
-#include <QSortFilterProxyModel>
+#include <QHeaderView>
 
-class TreeProxy final : public QSortFilterProxyModel
+class CostHeaderView : public QHeaderView
 {
     Q_OBJECT
 public:
-    explicit TreeProxy(int symbolRole, QObject* parent = nullptr);
-    virtual ~TreeProxy();
-
-public slots:
-    void setFunctionFilter(const QString& functionFilter);
-    void setModuleFilter(const QString& moduleFilter);
+    explicit CostHeaderView(QWidget* parent = nullptr);
+    ~CostHeaderView();
 
 private:
-    bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
+    void resizeEvent(QResizeEvent* event) override;
+    void resizeColumns(bool reset);
 
-    int m_symbolRole;
-
-    QString m_functionFilter;
-    QString m_moduleFilter;
+    bool m_isResizing = false;
 };
-
-#endif // TREEPROXY_H

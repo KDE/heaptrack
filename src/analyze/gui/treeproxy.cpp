@@ -17,13 +17,13 @@
  */
 
 #include "treeproxy.h"
+#include "locationdata.h"
 
 #include <QDebug>
 
-TreeProxy::TreeProxy(int functionColumn, int moduleColumn, QObject* parent)
+TreeProxy::TreeProxy(int symbolRole, QObject* parent)
     : QSortFilterProxyModel(parent)
-    , m_functionColumn(functionColumn)
-    , m_moduleColumn(moduleColumn)
+    , m_symbolRole(symbolRole)
 {
     setRecursiveFilteringEnabled(true);
     setSortLocaleAware(false);
@@ -49,17 +49,17 @@ bool TreeProxy::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent)
     if (!source) {
         return false;
     }
-    if (!m_functionFilter.isEmpty()) {
-        const auto& function = source->index(sourceRow, m_functionColumn, sourceParent).data().toString();
-        if (!function.contains(m_functionFilter, Qt::CaseInsensitive)) {
-            return false;
-        }
+
+    if (m_functionFilter.isEmpty() && m_moduleFilter.isEmpty()) {
+        return true;
     }
-    if (!m_moduleFilter.isEmpty()) {
-        const auto& module = source->index(sourceRow, m_moduleColumn, sourceParent).data().toString();
-        if (!module.contains(m_moduleFilter, Qt::CaseInsensitive)) {
-            return false;
-        }
+
+    const auto& symbol = source->index(sourceRow, 0, sourceParent).data(m_symbolRole).value<Symbol>();
+    if (!m_functionFilter.isEmpty() && !symbol.symbol.contains(m_functionFilter, Qt::CaseInsensitive)) {
+        return false;
+    }
+    if (!m_moduleFilter.isEmpty() && !symbol.binary.contains(m_moduleFilter, Qt::CaseInsensitive)) {
+        return false;
     }
     return true;
 }
