@@ -632,6 +632,18 @@ private:
                 RecursionGuard::isActive = true;
                 debugLog<MinimalOutput>("%s", "timer thread started");
 
+                // HACK: throw the exception once and directly catch it
+                //       without this, tst_inject reproducibly calls
+                //       std::terminate instead of catching the exception
+                //       in the loop below
+                //       I suspect it's some strange side-effect of heaptrack
+                //       intercepting the memory allocations that happen when
+                //       an exception is thrown?
+                try {
+                    throw LockCheckFailed {};
+                } catch (LockCheckFailed) {
+                }
+
                 // now loop and repeatedly print the timestamp and RSS usage to the data stream
                 while (!stopTimerThread) {
                     // TODO: make interval customizable
