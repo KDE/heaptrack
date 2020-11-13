@@ -118,6 +118,13 @@ file(RELATIVE_PATH LIB_REL_PATH
 
 set(ECM_ENABLE_SANITIZERS "" CACHE STRING "semicolon-separated list of sanitizers to enable for code that is not injected into client applications")
 
+if (ECM_ENABLE_SANITIZERS)
+    find_package(ECM 1.0.0 NO_MODULE)
+    if (ECM_FOUND)
+        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
+    endif()
+endif()
+
 if (HEAPTRACK_BUILD_TRACK)
     if (HEAPTRACK_USE_LIBUNWIND)
         find_package(Libunwind REQUIRED)
