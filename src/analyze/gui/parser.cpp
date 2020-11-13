@@ -664,8 +664,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         auto parsingMsg = isReparsing ? i18n("reparsing data") : i18n("parsing data");
         emit progressMessageAvailable(parsingMsg);
 
-        float lastPassCompletion = 0;
-        auto updateProgress = [&](const ParserData& data) {
+        auto updateProgress = [this, parsingMsg, lastPassCompletion = 0.f](const ParserData& data) mutable {
             auto passCompletion = 1.0 * data.parsingState.readCompressedByte / data.parsingState.fileSize;
             if (std::abs(lastPassCompletion - passCompletion) < 0.001) {
                 // don't spam the progress bar
