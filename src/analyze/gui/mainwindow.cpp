@@ -220,6 +220,7 @@ void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegat
     proxy->setSortRole(TreeModel::SortRole);
 
     view->setModel(proxy);
+    sortByColumn(view, TreeModel::PeakColumn);
     view->setItemDelegateForColumn(TreeModel::PeakColumn, costDelegate);
     view->setItemDelegateForColumn(TreeModel::LeakedColumn, costDelegate);
     view->setItemDelegateForColumn(TreeModel::AllocationsColumn, costDelegate);
