@@ -89,21 +89,13 @@ option(
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if (NOT MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Wpedantic")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic")
 endif()
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 include (CheckCXXSourceCompiles)
-check_cxx_source_compiles(
-    "#include <unordered_map>
-    #include <atomic>
-    thread_local int tls;
-    int main() { return 0; }"
-    HAVE_CXX11_SUPPORT)
-
-if (NOT HAVE_CXX11_SUPPORT)
-    message(FATAL_ERROR "Your compiler is too old and does not support the required C++11 features.")
-endif()
-
 
 # cfree() does not exist in glibc 2.26+.
 # See: https://bugs.kde.org/show_bug.cgi?id=383889
