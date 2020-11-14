@@ -642,16 +642,17 @@ bool Parser::isFiltered() const
     return m_data->filterParameters.isFilteredByTime(m_data->totalTime);
 }
 
-void Parser::parse(const QString& path, const QString& diffBase)
+void Parser::parse(const QString& path, const QString& diffBase, StopAfter stopAfter)
 {
-    parseImpl(path, diffBase, {});
+    parseImpl(path, diffBase, {}, stopAfter);
 }
 
-void Parser::parseImpl(const QString& path, const QString& diffBase, const FilterParameters& filterParameters)
+void Parser::parseImpl(const QString& path, const QString& diffBase, const FilterParameters& filterParameters,
+                       StopAfter stopAfter)
 {
     auto oldData = std::move(m_data);
     using namespace ThreadWeaver;
-    stream() << make_job([this, oldData, path, diffBase, filterParameters]() {
+    stream() << make_job([this, oldData, path, diffBase, filterParameters, stopAfter]() {
         const auto isReparsing = (path == m_path && oldData && diffBase.isEmpty());
         auto parsingMsg = isReparsing ? i18n("reparsing data") : i18n("parsing data");
         emit progressMessageAvailable(parsingMsg);
@@ -711,16 +712,31 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
                                data->filterParameters, data->peakTime, data->peakRSS * data->systemInfo.pageSize,
                                data->systemInfo.pages * data->systemInfo.pageSize, data->fromAttached});
 
+        if (stopAfter == StopAfter::Summary) {
+            emit finished();
+            return;
+        }
+
         emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again
         const auto mergedAllocations = mergeAllocations(this, *data);
         emit bottomUpDataAvailable(mergedAllocations.first);
+
+        if (stopAfter == StopAfter::BottomUp) {
+            emit finished();
+            return;
+        }
 
         // also calculate the size histogram
         emit progressMessageAvailable(i18n("building size histogram..."));
         const auto sizeHistogram = buildSizeHistogram(*data);
         emit sizeHistogramDataAvailable(sizeHistogram);
         // now data can be modified again for the chart data evaluation
+
+        if (stopAfter == StopAfter::SizeHistogram) {
+            emit finished();
+            return;
+        }
 
         emit progress(0);
 
@@ -730,11 +746,12 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         *parallel << make_job([this, mergedAllocations]() {
             const auto topDownData = toTopDownData(mergedAllocations.first);
             emit topDownDataAvailable(topDownData);
+
         }) << make_job([this, mergedAllocations, diffMode]() {
             emit callerCalleeDataAvailable(
                 toCallerCalleeData(mergedAllocations.first, mergedAllocations.second, diffMode));
         });
-        if (!data->stringCache.diffMode) {
+        if (!data->stringCache.diffMode && stopAfter != StopAfter::TopDownAndCallerCallee) {
             // only build charts when we are not diffing
             *parallel << make_job([this, data, stdPath, isReparsing]() {
                 // this mutates data, and thus anything running in parallel must
@@ -773,5 +790,5 @@ void Parser::reparse(const FilterParameters& parameters_)
     filterParameters.minTime = std::max(int64_t(0), filterParameters.minTime);
     filterParameters.maxTime = std::min(m_data->totalTime, filterParameters.maxTime);
 
-    parseImpl(m_path, {}, filterParameters);
+    parseImpl(m_path, {}, filterParameters, StopAfter::Finished);
 }
