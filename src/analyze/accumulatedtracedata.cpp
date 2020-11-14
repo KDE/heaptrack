@@ -64,20 +64,11 @@ class byte_counter
 {
 public:
     using char_type = char;
-    struct category : boost::iostreams::input,
-                      boost::iostreams::filter_tag,
-                      boost::iostreams::multichar_tag,
-                      boost::iostreams::optimally_buffered_tag
-    {
-    };
+    using category = boost::iostreams::multichar_input_filter_tag;
 
     uint64_t bytes() const
     {
         return m_bytes;
-    }
-    std::streamsize optimal_buffer_size() const
-    {
-        return 0;
     }
 
     template <typename Source>
