@@ -227,8 +227,8 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
     // allocations, i.e. when a deallocation follows with the same data
     uint64_t lastAllocationPtr = 0;
 
-    auto const uncompressedCount = in.component<byte_counter>(0);
-    auto const compressedCount = in.component<byte_counter>(2);
+    const auto uncompressedCount = in.component<byte_counter>(0);
+    const auto compressedCount = in.component<byte_counter>(in.size() - 2);
 
     parsingState.pass = pass;
     parsingState.reparsing = isReparsing;
