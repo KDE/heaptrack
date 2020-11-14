@@ -18,3 +18,5 @@ endif()
 
 add_executable(bench_parser bench_parser.cpp)
 target_link_libraries(bench_parser sharedprint heaptrack_gui_private)
+
+add_executable(bench_linereader bench_linereader.cpp)
