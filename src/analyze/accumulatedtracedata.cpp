@@ -760,10 +760,11 @@ Allocation& AccumulatedTraceData::findAllocation(const TraceIndex traceIndex)
     return allocations[mapToAllocationIndex(traceIndex).index];
 }
 
-InstructionPointer AccumulatedTraceData::findIp(const IpIndex ipIndex) const
+const InstructionPointer& AccumulatedTraceData::findIp(const IpIndex ipIndex) const
 {
+    static const InstructionPointer invalid;
     if (!ipIndex || ipIndex.index > instructionPointers.size()) {
-        return {};
+        return invalid;
     } else {
         return instructionPointers[ipIndex.index - 1];
     }

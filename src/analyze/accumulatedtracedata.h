@@ -160,7 +160,7 @@ struct AccumulatedTraceData
     /// map the trace index to an allocation and return a reference to it
     Allocation& findAllocation(const TraceIndex traceIndex);
 
-    InstructionPointer findIp(const IpIndex ipIndex) const;
+    const InstructionPointer& findIp(const IpIndex ipIndex) const;
 
     TraceNode findTrace(const TraceIndex traceIndex) const;
 
