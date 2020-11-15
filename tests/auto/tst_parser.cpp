@@ -47,7 +47,9 @@ TEST_CASE ("parse sample file", "[parser]") {
 
     const CallerCalleeResults ccr = spyCCD.at(0).at(0).value<CallerCalleeResults>();
     auto ccrSymbolList = ccr.entries.keys();
-    std::sort(ccrSymbolList.begin(), ccrSymbolList.end(), Symbol::FullLessThan());
+    std::sort(ccrSymbolList.begin(), ccrSymbolList.end(), [](const Symbol& lhs, const Symbol& rhs) {
+        return std::tie(lhs.symbol, lhs.binary, lhs.path) < std::tie(rhs.symbol, rhs.binary, rhs.path);
+    });
     if (!qgetenv("HEAPTRACK_DEBUG").isEmpty()) {
         for (const Symbol &sym : ccrSymbolList) {
             qDebug() << sym.symbol << sym.binary << sym.path;

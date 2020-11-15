@@ -68,19 +68,6 @@ struct Symbol
     {
         return symbolId > 0;
     }
-
-    struct FullEqual {
-        bool operator()(const Symbol &lhs, const Symbol &rhs) const {
-            return lhs.symbol == rhs.symbol &&
-                    lhs.binary == rhs.binary &&
-                    lhs.path == rhs.path;
-        }
-    };
-    struct FullLessThan {
-        bool operator()(const Symbol &lhs, const Symbol &rhs) const {
-            return std::tie(lhs.symbol, lhs.binary, lhs.path) < std::tie(rhs.symbol, rhs.binary, rhs.path);
-        }
-    };
 };
 
 Q_DECLARE_TYPEINFO(Symbol, Q_MOVABLE_TYPE);
