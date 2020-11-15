@@ -453,14 +453,10 @@ std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser *parser, const 
     return {topRows, callerCalleeResults};
 }
 
-RowData* findBySymbol(const RowData& row, QVector<RowData>* data)
+RowData* findBySymbol(const Symbol& symbol, QVector<RowData>* data)
 {
-    for (int i = 0; i < data->size(); ++i) {
-        if (data->at(i).symbol == row.symbol) {
-            return data->data() + i;
-        }
-    }
-    return nullptr;
+    auto it = std::find_if(data->begin(), data->end(), [&symbol](const RowData& row) { return row.symbol == symbol; });
+    return it == data->end() ? nullptr : &(*it);
 }
 
 AllocationData buildTopDown(const TreeData& bottomUpData, TreeData* topDownData)
@@ -477,7 +473,7 @@ AllocationData buildTopDown(const TreeData& bottomUpData, TreeData* topDownData)
             auto node = &row;
             auto stack = topDownData;
             while (node) {
-                auto data = findBySymbol(*node, stack);
+                auto data = findBySymbol(node->symbol, stack);
                 if (!data) {
                     // create an empty top-down item for this bottom-up node
                     *stack << RowData {{}, node->symbol, nullptr, {}};
