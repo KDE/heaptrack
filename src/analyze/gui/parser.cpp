@@ -488,12 +488,31 @@ QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
     return topRows;
 }
 
-AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResults* callerCalleeResults)
+struct ReusableGuardBuffer
+{
+    ReusableGuardBuffer()
+    {
+        recursionGuard.reserve(128);
+        callerCalleeRecursionGuard.reserve(128);
+    }
+
+    void reset()
+    {
+        recursionGuard.clear();
+        callerCalleeRecursionGuard.clear();
+    }
+
+    QSet<SymbolId> recursionGuard;
+    QSet<QPair<SymbolId, SymbolId>> callerCalleeRecursionGuard;
+};
+
+AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResults* callerCalleeResults,
+                                 ReusableGuardBuffer* guardBuffer)
 {
     AllocationData totalCost;
     for (const auto& row : bottomUpData) {
         // recurse to find a leaf
-        const auto childCost = buildCallerCallee(row.children, callerCalleeResults);
+        const auto childCost = buildCallerCallee(row.children, callerCalleeResults, guardBuffer);
         if (childCost != row.cost) {
             // this row is (partially) a leaf
             const auto cost = row.cost - childCost;
@@ -501,21 +520,20 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResul
             // leaf node found, bubble up the parent chain to add cost for all frames
             // to the caller/callee data. this is done top-down since we must not count
             // symbols more than once in the caller-callee data
-            QSet<Symbol> recursionGuard;
+            guardBuffer->reset();
             auto node = &row;
 
-            QSet<QPair<Symbol, Symbol>> callerCalleeRecursionGuard;
-            Symbol lastSymbol;
+            const Symbol* lastSymbol = nullptr;
             CallerCalleeEntry* lastEntry = nullptr;
 
             while (node) {
                 const auto& symbol = node->symbol;
                 // aggregate caller-callee data
                 auto& entry = callerCalleeResults->entry(symbol);
-                if (!recursionGuard.contains(symbol)) {
+                if (!guardBuffer->recursionGuard.contains(symbol.symbolId)) {
                     // only increment inclusive cost once for a given stack
                     entry.inclusiveCost += cost;
-                    recursionGuard.insert(symbol);
+                    guardBuffer->recursionGuard.insert(symbol.symbolId);
                 }
                 if (!node->parent) {
                     // always increment the self cost
@@ -524,16 +542,16 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResul
                 // add current entry as callee to last entry
                 // and last entry as caller to current entry
                 if (lastEntry) {
-                    const auto callerCalleePair = qMakePair(symbol, lastSymbol);
-                    if (!callerCalleeRecursionGuard.contains(callerCalleePair)) {
+                    const auto callerCalleePair = qMakePair(symbol.symbolId, lastSymbol->symbolId);
+                    if (!guardBuffer->callerCalleeRecursionGuard.contains(callerCalleePair)) {
                         lastEntry->callee(symbol) += cost;
-                        entry.caller(lastSymbol) += cost;
-                        callerCalleeRecursionGuard.insert(callerCalleePair);
+                        entry.caller(*lastSymbol) += cost;
+                        guardBuffer->callerCalleeRecursionGuard.insert(callerCalleePair);
                     }
                 }
 
                 node = node->parent;
-                lastSymbol = symbol;
+                lastSymbol = &symbol;
                 lastEntry = &entry;
             }
         }
@@ -546,7 +564,8 @@ CallerCalleeResults toCallerCalleeData(const TreeData& bottomUpData, const Calle
 {
     // copy the source map and continue from there
     auto callerCalleeResults = results;
-    callerCalleeResults.totalCosts = buildCallerCallee(bottomUpData, &callerCalleeResults);
+    ReusableGuardBuffer guardBuffer;
+    callerCalleeResults.totalCosts = buildCallerCallee(bottomUpData, &callerCalleeResults, &guardBuffer);
 
     if (diffMode) {
         // remove rows without cost
