@@ -212,6 +212,7 @@ struct ParserData final : public AccumulatedTraceData
                 data->labels[i + 1] = i18n("%1 in %2 (%3)", symbol.symbol, symbol.binary, symbol.path);
             }
         };
+        labelIds.reserve(3 * ChartRows::MAX_NUM_COST);
         findTopChartEntries(&ChartMergeData::consumed, &LabelIds::consumed, &consumedChartData);
         findTopChartEntries(&ChartMergeData::allocations, &LabelIds::allocations, &allocationsChartData);
         findTopChartEntries(&ChartMergeData::temporary, &LabelIds::temporary, &temporaryChartData);
