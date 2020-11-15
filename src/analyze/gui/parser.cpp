@@ -85,12 +85,12 @@ struct StringCache
         }
     }
 
-    Location location(const InstructionPointer& ip) const
+    const Symbol& symbol(const InstructionPointer& ip) const
     {
-        return frameLocation(ip.frame, ip.moduleIndex);
+        return symbol(ip.frame, ip.moduleIndex);
     }
 
-    Location frameLocation(const Frame& frame, const ModuleIndex& moduleIndex) const
+    const Symbol& symbol(const Frame& frame, const ModuleIndex& moduleIndex) const
     {
         auto& symbol = m_symbols[{frame.functionIndex, moduleIndex}];
         if (!symbol.isValid()) {
@@ -101,8 +101,17 @@ struct StringCache
             }
             symbol = Symbol {func(frame), *binaryIt, module, ++m_nextSymbolId};
         }
+        return symbol;
+    }
 
-        return {symbol, {file(frame), frame.line}};
+    Location location(const InstructionPointer& ip) const
+    {
+        return frameLocation(ip.frame, ip.moduleIndex);
+    }
+
+    Location frameLocation(const Frame& frame, const ModuleIndex& moduleIndex) const
+    {
+        return {symbol(frame, moduleIndex), {file(frame), frame.line}};
     }
 
     void update(const vector<string>& strings)
@@ -199,10 +208,8 @@ struct ParserData final : public AccumulatedTraceData
                 }
                 const auto ip = alloc.ip;
                 (labelIds[ip].*label) = i + 1;
-                const auto& ipInfo = findIp(ip);
-                data->labels[i + 1] =
-                    i18n("%1 in %2 (%3)", stringCache.func(ipInfo.frame), stringCache.location(ipInfo).symbol.binary,
-                         stringCache.location(ipInfo).symbol.path);
+                const auto& symbol = stringCache.symbol(findIp(ip));
+                data->labels[i + 1] = i18n("%1 in %2 (%3)", symbol.symbol, symbol.binary, symbol.path);
             }
         };
         findTopChartEntries(&ChartMergeData::consumed, &LabelIds::consumed, &consumedChartData);
@@ -402,10 +409,10 @@ std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser *parser, const 
         while (traceIndex) {
             const auto& trace = data.findTrace(traceIndex);
             const auto& ip = data.findIp(trace.ipIndex);
-            auto location = data.stringCache.location(ip);
+            const auto& location = data.stringCache.location(ip);
             rows = addRow(rows, location, allocation);
             for (const auto& inlined : ip.inlined) {
-                auto inlinedLocation = data.stringCache.frameLocation(inlined, ip.moduleIndex);
+                const auto& inlinedLocation = data.stringCache.frameLocation(inlined, ip.moduleIndex);
                 rows = addRow(rows, inlinedLocation, allocation);
             }
             if (data.isStopIndex(ip.frame.functionIndex)) {
@@ -611,9 +618,9 @@ HistogramData buildSizeHistogram(ParserData& data)
             row.columns[0].allocations += info.allocations;
         }
         const auto& allocation = data.allocations[info.info.allocationIndex.index];
-        const auto ipIndex = data.findTrace(allocation.traceIndex).ipIndex;
-        const auto ip = data.findIp(ipIndex);
-        const auto location = data.stringCache.location(ip);
+        const auto& ipIndex = data.findTrace(allocation.traceIndex).ipIndex;
+        const auto& ip = data.findIp(ipIndex);
+        const auto& location = data.stringCache.location(ip);
         auto it = lower_bound(columnData.begin(), columnData.end(), location.symbol);
         if (it == columnData.end() || it->symbol != location.symbol) {
             columnData.insert(it, {location.symbol, info.allocations});
