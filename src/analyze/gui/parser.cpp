@@ -384,8 +384,8 @@ void addCallerCalleeEvent(const Location& location, const AllocationData& cost, 
         return;
     }
 
-    auto& entry = callerCalleeResult->entry(location.symbol);
-    auto& locationCost = entry.source(location.fileLine);
+    auto& entry = callerCalleeResult->entries[location.symbol];
+    auto& locationCost = entry.sourceMap[location.fileLine];
 
     locationCost.inclusiveCost += cost;
     if (isLeaf) {
@@ -545,7 +545,7 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResul
             while (node) {
                 const auto& symbol = node->symbol;
                 // aggregate caller-callee data
-                auto& entry = callerCalleeResults->entry(symbol);
+                auto& entry = callerCalleeResults->entries[symbol];
                 if (tryInsert(&guardBuffer->recursionGuard, symbol.symbolId)) {
                     // only increment inclusive cost once for a given stack
                     entry.inclusiveCost += cost;
@@ -558,8 +558,8 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResul
                 // and last entry as caller to current entry
                 if (lastEntry) {
                     if (tryInsert(&guardBuffer->callerCalleeRecursionGuard, {symbol.symbolId, lastSymbol->symbolId})) {
-                        lastEntry->callee(symbol) += cost;
-                        entry.caller(*lastSymbol) += cost;
+                        lastEntry->callees[symbol] += cost;
+                        entry.callers[*lastSymbol] += cost;
                     }
                 }
 

@@ -46,33 +46,6 @@ Q_DECLARE_METATYPE(LocationCostMap)
 
 struct CallerCalleeEntry : EntryCost
 {
-    EntryCost& source(const FileLine& location)
-    {
-        auto it = sourceMap.find(location);
-        if (it == sourceMap.end()) {
-            it = sourceMap.insert(location, {});
-        }
-        return *it;
-    }
-
-    AllocationData& callee(const Symbol& symbol)
-    {
-        auto it = callees.find(symbol);
-        if (it == callees.end()) {
-            it = callees.insert(symbol, {});
-        }
-        return *it;
-    }
-
-    AllocationData& caller(const Symbol& symbol)
-    {
-        auto it = callers.find(symbol);
-        if (it == callers.end()) {
-            it = callers.insert(symbol, {});
-        }
-        return *it;
-    }
-
     // callers, i.e. other symbols and locations that called this symbol
     CallerMap callers;
     // callees, i.e. symbols being called from this symbol
@@ -85,16 +58,6 @@ using CallerCalleeEntryMap = QHash<Symbol, CallerCalleeEntry>;
 struct CallerCalleeResults
 {
     CallerCalleeEntryMap entries;
-
-    CallerCalleeEntry& entry(const Symbol& symbol)
-    {
-        auto it = entries.find(symbol);
-        if (it == entries.end()) {
-            it = entries.insert(symbol, {});
-        }
-        return *it;
-    }
-
     AllocationData totalCosts;
 };
 Q_DECLARE_TYPEINFO(CallerCalleeResults, Q_MOVABLE_TYPE);
