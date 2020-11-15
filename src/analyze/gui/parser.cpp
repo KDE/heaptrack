@@ -107,11 +107,11 @@ struct StringCache
         auto& symbol = m_symbols[{frame.functionIndex, moduleIndex}];
         if (!symbol.isValid()) {
             const auto module = stringify(moduleIndex);
-            auto binaryIt = m_pathToBinaries.find(module);
-            if (binaryIt == m_pathToBinaries.end()) {
-                binaryIt = m_pathToBinaries.insert(module, Util::basename(module));
+            auto& binary = m_pathToBinaries[module];
+            if (binary.isEmpty()) {
+                binary = Util::basename(module);
             }
-            symbol = Symbol {func(frame), *binaryIt, module, ++m_nextSymbolId};
+            symbol = {func(frame), binary, module, ++m_nextSymbolId};
         }
         return symbol;
     }
