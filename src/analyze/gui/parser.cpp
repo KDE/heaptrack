@@ -34,6 +34,18 @@
 using namespace std;
 
 namespace {
+// sadly QSet does not have API to check if an insert would overwrite
+// still, QSet seems to be faster than std::unorderd_set
+// so instead of doing a lookup+insert, just insert and check if the size
+// changed. If not, then the value existed already
+template <typename T>
+bool tryInsert(QSet<T>* set, T value)
+{
+    const auto oldSize = set->size();
+    set->insert(std::move(value));
+    return oldSize != set->size();
+}
+
 struct SymbolKey
 {
     FunctionIndex functionIndex;
@@ -364,20 +376,21 @@ void setParents(QVector<RowData>& children, const RowData* parent)
     }
 }
 
-void addCallerCalleeEvent(const Location& location, const AllocationData& cost, QSet<Symbol>* recursionGuard,
+void addCallerCalleeEvent(const Location& location, const AllocationData& cost, QSet<SymbolId>* recursionGuard,
                           CallerCalleeResults* callerCalleeResult)
 {
-    auto recursionIt = recursionGuard->find(location.symbol);
-    if (recursionIt == recursionGuard->end()) {
-        auto& entry = callerCalleeResult->entry(location.symbol);
-        auto& locationCost = entry.source(location.fileLine);
+    const auto isLeaf = recursionGuard->isEmpty();
+    if (!tryInsert(recursionGuard, location.symbol.symbolId)) {
+        return;
+    }
 
-        locationCost.inclusiveCost += cost;
-        if (recursionGuard->isEmpty()) {
-            // increment self cost for leaf
-            locationCost.selfCost += cost;
-        }
-        recursionGuard->insert(location.symbol);
+    auto& entry = callerCalleeResult->entry(location.symbol);
+    auto& locationCost = entry.source(location.fileLine);
+
+    locationCost.inclusiveCost += cost;
+    if (isLeaf) {
+        // increment self cost for leaf
+        locationCost.selfCost += cost;
     }
 }
 
@@ -385,7 +398,10 @@ std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser *parser, const 
 {
     CallerCalleeResults callerCalleeResults;
     TreeData topRows;
-    QSet<Symbol> symbolRecursionGuard;
+    QSet<TraceIndex> traceRecursionGuard;
+    traceRecursionGuard.reserve(128);
+    QSet<SymbolId> symbolRecursionGuard;
+    symbolRecursionGuard.reserve(128);
     auto addRow = [&symbolRecursionGuard, &callerCalleeResults](TreeData* rows, const Location& location,
                                                                 const Allocation& cost) -> TreeData* {
         auto it = lower_bound(rows->begin(), rows->end(), location.symbol);
@@ -404,8 +420,8 @@ std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser *parser, const 
     for (const auto& allocation : data.allocations) {
         auto traceIndex = allocation.traceIndex;
         auto rows = &topRows;
-        unordered_set<uint32_t> recursionGuard;
-        recursionGuard.insert(traceIndex.index);
+        traceRecursionGuard.clear();
+        traceRecursionGuard.insert(traceIndex);
         symbolRecursionGuard.clear();
         while (traceIndex) {
             const auto& trace = data.findTrace(traceIndex);
@@ -420,7 +436,7 @@ std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser *parser, const 
                 break;
             }
             traceIndex = trace.parentIndex;
-            if (!recursionGuard.insert(traceIndex.index).second) {
+            if (!tryInsert(&traceRecursionGuard, traceIndex)) {
                 qWarning() << "Trace recursion detected - corrupt data file?";
                 break;
             }
@@ -530,10 +546,9 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResul
                 const auto& symbol = node->symbol;
                 // aggregate caller-callee data
                 auto& entry = callerCalleeResults->entry(symbol);
-                if (!guardBuffer->recursionGuard.contains(symbol.symbolId)) {
+                if (tryInsert(&guardBuffer->recursionGuard, symbol.symbolId)) {
                     // only increment inclusive cost once for a given stack
                     entry.inclusiveCost += cost;
-                    guardBuffer->recursionGuard.insert(symbol.symbolId);
                 }
                 if (!node->parent) {
                     // always increment the self cost
@@ -542,11 +557,9 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResul
                 // add current entry as callee to last entry
                 // and last entry as caller to current entry
                 if (lastEntry) {
-                    const auto callerCalleePair = qMakePair(symbol.symbolId, lastSymbol->symbolId);
-                    if (!guardBuffer->callerCalleeRecursionGuard.contains(callerCalleePair)) {
+                    if (tryInsert(&guardBuffer->callerCalleeRecursionGuard, {symbol.symbolId, lastSymbol->symbolId})) {
                         lastEntry->callee(symbol) += cost;
                         entry.caller(*lastSymbol) += cost;
-                        guardBuffer->callerCalleeRecursionGuard.insert(callerCalleePair);
                     }
                 }
 
