@@ -96,7 +96,7 @@ struct FileLine
 Q_DECLARE_TYPEINFO(FileLine, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(FileLine)
 
-inline QString unresolvedFunctionName()
+inline const QString& unresolvedFunctionName()
 {
     static QString msg = i18n("<unresolved function>");
     return msg;

@@ -73,7 +73,7 @@ struct Location
 
 struct StringCache
 {
-    QString func(const Frame& frame) const
+    const QString& func(const Frame& frame) const
     {
         if (frame.functionIndex) {
             // TODO: support removal of template arguments
@@ -83,15 +83,16 @@ struct StringCache
         }
     }
 
-    QString file(const Frame& frame) const
+    const QString& file(const Frame& frame) const
     {
         return stringify(frame.fileIndex);
     }
 
-    QString stringify(const StringIndex index) const
+    const QString& stringify(const StringIndex index) const
     {
+        static const QString invalid;
         if (!index || index.index > m_strings.size()) {
-            return {};
+            return invalid;
         } else {
             return m_strings.at(index.index - 1);
         }
@@ -263,8 +264,7 @@ struct ParserData final : public AccumulatedTraceData
         auto temporary = createRow(totalCost.temporary);
 
         // if the cost is non-zero and the ip corresponds to a hotspot function
-        // selected in the labels,
-        // we add the cost to the rows column
+        // selected in the labels, we add the cost to the rows column
         auto addDataToRow = [](int64_t cost, int labelId, ChartRows* rows) {
             if (!cost || labelId == -1) {
                 return;
