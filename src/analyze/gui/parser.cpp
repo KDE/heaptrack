@@ -210,6 +210,7 @@ struct ParserData final : public AccumulatedTraceData
         }
         // find the top hot spots for the individual data members and remember their
         // IP and store the label
+        QHash<IpIndex, LabelIds> ipToLabelIds;
         auto findTopChartEntries = [&](qint64 ChartMergeData::*member, int LabelIds::*label, ChartData* data) {
             sort(merged.begin(), merged.end(), [=](const ChartMergeData& left, const ChartMergeData& right) {
                 return std::abs(left.*member) > std::abs(right.*member);
@@ -220,15 +221,28 @@ struct ParserData final : public AccumulatedTraceData
                     break;
                 }
                 const auto ip = alloc.ip;
-                (labelIds[ip].*label) = i + 1;
+                (ipToLabelIds[ip].*label) = i + 1;
                 const auto& symbol = stringCache.symbol(findIp(ip));
                 data->labels[i + 1] = i18n("%1 in %2 (%3)", symbol.symbol, symbol.binary, symbol.path);
             }
         };
-        labelIds.reserve(3 * ChartRows::MAX_NUM_COST);
+        ipToLabelIds.reserve(3 * ChartRows::MAX_NUM_COST);
         findTopChartEntries(&ChartMergeData::consumed, &LabelIds::consumed, &consumedChartData);
         findTopChartEntries(&ChartMergeData::allocations, &LabelIds::allocations, &allocationsChartData);
         findTopChartEntries(&ChartMergeData::temporary, &LabelIds::temporary, &temporaryChartData);
+
+        // now iterate the allocations once to build the list of allocations
+        // we need to look at when we are building the charts in handleTimeStamp
+        // instead of doing this lookup every time we are handling a time stamp
+        for (uint32_t i = 0, c = allocations.size(); i < c; ++i) {
+            const auto ip = findTrace(allocations[i].traceIndex).ipIndex;
+            auto it = ipToLabelIds.constFind(ip);
+            if (it == ipToLabelIds.constEnd())
+                continue;
+            auto ids = *it;
+            ids.allocationIndex.index = i;
+            labelIds.push_back(ids);
+        }
     }
 
     void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp, bool isFinalTimeStamp, ParsePass pass) override
@@ -271,16 +285,11 @@ struct ParserData final : public AccumulatedTraceData
             }
             rows->cost[labelId] += cost;
         };
-        for (const auto& alloc : allocations) {
-            const auto ip = findTrace(alloc.traceIndex).ipIndex;
-            auto it = labelIds.constFind(ip);
-            if (it == labelIds.constEnd()) {
-                continue;
-            }
-            const auto& labelIds = *it;
-            addDataToRow(alloc.leaked, labelIds.consumed, &consumed);
-            addDataToRow(alloc.allocations, labelIds.allocations, &allocs);
-            addDataToRow(alloc.temporary, labelIds.temporary, &temporary);
+        for (const auto& ids : labelIds) {
+            const auto alloc = allocations[ids.allocationIndex.index];
+            addDataToRow(alloc.leaked, ids.consumed, &consumed);
+            addDataToRow(alloc.allocations, ids.allocations, &allocs);
+            addDataToRow(alloc.temporary, ids.temporary, &temporary);
         }
         // add the rows for this time stamp
         consumedChartData.rows << consumed;
@@ -351,11 +360,12 @@ struct ParserData final : public AccumulatedTraceData
     // in a per-ChartData hash.
     struct LabelIds
     {
+        AllocationIndex allocationIndex;
         int consumed = -1;
         int allocations = -1;
         int temporary = -1;
     };
-    QHash<IpIndex, LabelIds> labelIds;
+    vector<LabelIds> labelIds;
     int64_t maxConsumedSinceLastTimeStamp = 0;
     int64_t lastTimeStamp = 0;
 
