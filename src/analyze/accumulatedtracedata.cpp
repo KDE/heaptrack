@@ -585,24 +585,28 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     // step 2: while at it, also merge equal allocations
     vector<TraceIndex> allocationTraceNodes;
     allocationTraceNodes.reserve(allocations.size());
-    for (auto it = allocations.begin(); it != allocations.end();) {
-        const auto& allocation = *it;
-        auto sortedIt =
-            lower_bound(allocationTraceNodes.begin(), allocationTraceNodes.end(), allocation.traceIndex,
-                        [this](const TraceIndex& lhs, const TraceIndex& rhs) -> bool {
-                            return compareTraceIndices(lhs, *this, rhs, *this, identity<InstructionPointer>) < 0;
-                        });
-        if (sortedIt == allocationTraceNodes.end()
-            || compareTraceIndices(allocation.traceIndex, *this, *sortedIt, *this, identity<InstructionPointer>) != 0) {
-            allocationTraceNodes.insert(sortedIt, allocation.traceIndex);
-            ++it;
-        } else if (*sortedIt != allocation.traceIndex) {
-            findAllocation(*sortedIt) += allocation;
-            it = allocations.erase(it);
-        } else {
-            ++it;
-        }
-    }
+    allocations.erase(
+        std::remove_if(allocations.begin(), allocations.end(),
+                       [&](const Allocation& allocation) {
+                           auto sortedIt = lower_bound(
+                               allocationTraceNodes.begin(), allocationTraceNodes.end(), allocation.traceIndex,
+                               [this](const TraceIndex& lhs, const TraceIndex& rhs) -> bool {
+                                   return compareTraceIndices(lhs, *this, rhs, *this, identity<InstructionPointer>) < 0;
+                               });
+                           if (sortedIt == allocationTraceNodes.end()
+                               || compareTraceIndices(allocation.traceIndex, *this, *sortedIt, *this,
+                                                      identity<InstructionPointer>)
+                                   != 0) {
+                               allocationTraceNodes.insert(sortedIt, allocation.traceIndex);
+                               return false;
+                           } else if (*sortedIt != allocation.traceIndex) {
+                               findAllocation(*sortedIt) += allocation;
+                               return true;
+                           } else {
+                               return false;
+                           }
+                       }),
+        allocations.end());
 
     // step 3: map string indices from rhs to lhs data
 
