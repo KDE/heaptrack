@@ -517,11 +517,21 @@ vector<StringIndex> remapStrings(vector<string>& lhs, const vector<string>& rhs)
     return map;
 }
 
-template <typename T>
-inline T identity(const T& t)
+// replace by std::identity once we can leverage C++20
+struct identity
 {
-    return t;
-}
+    template <typename T>
+    const T& operator()(const T& t) const
+    {
+        return t;
+    }
+
+    template <typename T>
+    T operator()(T&& t) const
+    {
+        return std::move(t);
+    }
+};
 
 template <typename IpMapper>
 int compareTraceIndices(const TraceIndex& lhs, const AccumulatedTraceData& lhsData, const TraceIndex& rhs,
@@ -586,26 +596,25 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     vector<TraceIndex> allocationTraceNodes;
     allocationTraceNodes.reserve(allocations.size());
     allocations.erase(
-        std::remove_if(allocations.begin(), allocations.end(),
-                       [&](const Allocation& allocation) {
-                           auto sortedIt = lower_bound(
-                               allocationTraceNodes.begin(), allocationTraceNodes.end(), allocation.traceIndex,
-                               [this](const TraceIndex& lhs, const TraceIndex& rhs) -> bool {
-                                   return compareTraceIndices(lhs, *this, rhs, *this, identity<InstructionPointer>) < 0;
-                               });
-                           if (sortedIt == allocationTraceNodes.end()
-                               || compareTraceIndices(allocation.traceIndex, *this, *sortedIt, *this,
-                                                      identity<InstructionPointer>)
-                                   != 0) {
-                               allocationTraceNodes.insert(sortedIt, allocation.traceIndex);
-                               return false;
-                           } else if (*sortedIt != allocation.traceIndex) {
-                               findAllocation(*sortedIt) += allocation;
-                               return true;
-                           } else {
-                               return false;
-                           }
-                       }),
+        std::remove_if(
+            allocations.begin(), allocations.end(),
+            [&](const Allocation& allocation) {
+                auto sortedIt =
+                    lower_bound(allocationTraceNodes.begin(), allocationTraceNodes.end(), allocation.traceIndex,
+                                [this](const TraceIndex& lhs, const TraceIndex& rhs) -> bool {
+                                    return compareTraceIndices(lhs, *this, rhs, *this, identity {}) < 0;
+                                });
+                if (sortedIt == allocationTraceNodes.end()
+                    || compareTraceIndices(allocation.traceIndex, *this, *sortedIt, *this, identity {}) != 0) {
+                    allocationTraceNodes.insert(sortedIt, allocation.traceIndex);
+                    return false;
+                } else if (*sortedIt != allocation.traceIndex) {
+                    findAllocation(*sortedIt) += allocation;
+                    return true;
+                } else {
+                    return false;
+                }
+            }),
         allocations.end());
 
     // step 3: map string indices from rhs to lhs data
