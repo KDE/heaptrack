@@ -30,7 +30,6 @@
 #include <stdio_ext.h>
 #endif
 #include <tuple>
-#include <unordered_map>
 #include <vector>
 
 #include <cxxabi.h>
@@ -265,18 +264,16 @@ struct AccumulatedTraceData
             return 0;
         }
 
-        auto it = m_internedData.find(str);
-        if (it != m_internedData.end()) {
-            if (internedString) {
-                *internedString = it->first.data();
-            }
-            return it->second;
-        }
         const size_t id = m_internedData.size() + 1;
-        it = m_internedData.insert(it, make_pair(str, id));
+        auto inserted = m_internedData.insert({str, id});
         if (internedString) {
-            *internedString = it->first.data();
+            *internedString = inserted.first->first.data();
         }
+
+        if (!inserted.second) {
+            return inserted.first->second;
+        }
+
         out.write("s ");
         out.write(str);
         out.write("\n");
@@ -303,13 +300,11 @@ struct AccumulatedTraceData
             return 0;
         }
 
-        auto it = m_encounteredIps.find(instructionPointer);
-        if (it != m_encounteredIps.end()) {
-            return it->second;
-        }
-
         const size_t ipId = m_encounteredIps.size() + 1;
-        m_encounteredIps.insert(it, make_pair(instructionPointer, ipId));
+        auto inserted = m_encounteredIps.insert({instructionPointer, ipId});
+        if (!inserted.second) {
+            return inserted.first->second;
+        }
 
         const auto ip = resolve(instructionPointer);
         out.write("i %zx %zx", instructionPointer, ip.moduleIndex);
@@ -381,11 +376,11 @@ struct AccumulatedTraceData
 
 private:
     vector<Module> m_modules;
-    unordered_map<std::string, backtrace_state*> m_backtraceStates;
+    tsl::robin_map<std::string, backtrace_state*> m_backtraceStates;
     bool m_modulesDirty = false;
 
-    unordered_map<string, size_t> m_internedData;
-    unordered_map<uintptr_t, size_t> m_encounteredIps;
+    tsl::robin_map<string, size_t> m_internedData;
+    tsl::robin_map<uintptr_t, size_t> m_encounteredIps;
 };
 
 struct Stats
