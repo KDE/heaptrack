@@ -30,7 +30,7 @@
 #include <iomanip>
 #include <iostream>
 
-#include <unordered_set>
+#include <tsl/robin_set.h>
 
 #include "util/config.h"
 
@@ -276,7 +276,7 @@ struct Printer final : public AccumulatedTraceData
 
     void printBacktrace(TraceNode node, ostream& out, const size_t indent = 0, bool skipFirst = false) const
     {
-        unordered_set<uint32_t> recursionGuard;
+        tsl::robin_set<uint32_t> recursionGuard;
         recursionGuard.insert(node.ipIndex.index);
         while (node.ipIndex) {
             const auto& ip = findIp(node.ipIndex);
