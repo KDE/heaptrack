@@ -24,6 +24,10 @@
 #include <QAbstractTableModel>
 #include <QVector>
 
+#include "resultdata.h"
+
+#include <memory>
+
 struct ChartRows
 {
     ChartRows()
@@ -43,7 +47,8 @@ Q_DECLARE_TYPEINFO(ChartRows, Q_MOVABLE_TYPE);
 struct ChartData
 {
     QVector<ChartRows> rows;
-    QHash<int, QString> labels;
+    QHash<int, Symbol> labels;
+    std::shared_ptr<const ResultData> resultData;
 };
 Q_DECLARE_METATYPE(ChartData)
 Q_DECLARE_TYPEINFO(ChartData, Q_MOVABLE_TYPE);

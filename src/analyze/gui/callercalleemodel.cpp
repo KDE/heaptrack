@@ -30,6 +30,7 @@ CallerCalleeModel::~CallerCalleeModel() = default;
 
 void CallerCalleeModel::setResults(const CallerCalleeResults& results)
 {
+    Q_ASSERT(results.resultData);
     m_results = results;
     setRows(results.entries);
 }
@@ -118,8 +119,7 @@ QVariant CallerCalleeModel::cell(int column, int role, const Symbol& symbol, con
     } else if (role == SortRole) {
         switch (static_cast<Columns>(column)) {
         case LocationColumn:
-            // TODO: optimize this
-            return QString(symbol.symbol + symbol.binary);
+            return Util::toString(symbol, *m_results.resultData, Util::Short);
         case SelfAllocationsColumn:
             // NOTE: we sort by unsigned absolute value
             return QVariant::fromValue<quint64>(std::abs(entry.selfCost.allocations));
@@ -141,30 +141,28 @@ QVariant CallerCalleeModel::cell(int column, int role, const Symbol& symbol, con
             break;
         }
     } else if (role == TotalCostRole) {
+        const auto& totalCosts = m_results.resultData->totalCosts();
         switch (static_cast<Columns>(column)) {
         case SelfAllocationsColumn:
         case InclusiveAllocationsColumn:
-            return QVariant::fromValue<qint64>(m_results.totalCosts.allocations);
+            return QVariant::fromValue<qint64>(totalCosts.allocations);
         case SelfTemporaryColumn:
         case InclusiveTemporaryColumn:
-            return QVariant::fromValue<qint64>(m_results.totalCosts.temporary);
+            return QVariant::fromValue<qint64>(totalCosts.temporary);
         case SelfPeakColumn:
         case InclusivePeakColumn:
-            return QVariant::fromValue<qint64>(m_results.totalCosts.peak);
+            return QVariant::fromValue<qint64>(totalCosts.peak);
         case SelfLeakedColumn:
         case InclusiveLeakedColumn:
-            return QVariant::fromValue<qint64>(m_results.totalCosts.leaked);
+            return QVariant::fromValue<qint64>(totalCosts.leaked);
         case LocationColumn:
         case NUM_COLUMNS:
             break;
         }
-    } else if (role == FilterRole) {
-        // TODO: optimize this
-        return QString(symbol.symbol + symbol.binary);
     } else if (role == Qt::DisplayRole) {
         switch (static_cast<Columns>(column)) {
         case LocationColumn:
-            return i18nc("%1: function name, %2: binary basename", "%1 in %2", symbol.symbol, symbol.binary);
+            return Util::toString(symbol, *m_results.resultData, Util::Short);
         case SelfAllocationsColumn:
             return QVariant::fromValue<qint64>(entry.selfCost.allocations);
         case SelfTemporaryColumn:
@@ -191,9 +189,9 @@ QVariant CallerCalleeModel::cell(int column, int role, const Symbol& symbol, con
     } else if (role == SourceMapRole) {
         return QVariant::fromValue(entry.sourceMap);
     } else if (role == Qt::ToolTipRole) {
-        return Util::formatTooltip(symbol, entry.selfCost, entry.inclusiveCost, m_results.totalCosts);
-    } else if (role == TotalCostsRole) {
-        return QVariant::fromValue(m_results.totalCosts);
+        return Util::formatTooltip(symbol, entry.selfCost, entry.inclusiveCost, *m_results.resultData);
+    } else if (role == ResultDataRole) {
+        return QVariant::fromValue(m_results.resultData.get());
     }
 
     return {};

@@ -145,23 +145,28 @@ void addLocationContextMenu(QTreeView* treeView, MainWindow* window)
         if (!index.isValid()) {
             return;
         }
+        const auto resultData = index.data(SourceMapModel::ResultDataRole).value<const ResultData*>();
+        Q_ASSERT(resultData);
         const auto location = index.data(SourceMapModel::LocationRole).value<FileLine>();
-        if (!QFile::exists(location.file)) {
+        const auto file = resultData->string(location.fileId);
+        if (!QFile::exists(file)) {
             return;
         }
         auto menu = new QMenu(treeView);
         auto openFile =
             new QAction(QIcon::fromTheme(QStringLiteral("document-open")), i18n("Open file in editor"), menu);
-        QObject::connect(openFile, &QAction::triggered, openFile, [location, window] {
-            window->navigateToCode(location.file, location.line);
-        });
+        QObject::connect(openFile, &QAction::triggered, openFile,
+                         [file, line = location.line, window] { window->navigateToCode(file, line); });
         menu->addAction(openFile);
         menu->popup(treeView->mapToGlobal(pos));
     });
     QObject::connect(treeView, &QTreeView::activated, window, [window](const QModelIndex& index) {
+        const auto resultData = index.data(SourceMapModel::ResultDataRole).value<const ResultData*>();
+        Q_ASSERT(resultData);
         const auto location = index.data(SourceMapModel::LocationRole).value<FileLine>();
-        if (QFile::exists(location.file))
-            window->navigateToCode(location.file, location.line);
+        const auto file = resultData->string(location.fileId);
+        if (QFile::exists(file))
+            window->navigateToCode(file, location.line);
     });
 }
 
@@ -215,7 +220,7 @@ template <typename T>
 void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegate, QLineEdit* filterFunction,
                     QLineEdit* filterModule, T callback)
 {
-    auto proxy = new TreeProxy(TreeModel::SymbolRole, model);
+    auto proxy = new TreeProxy(TreeModel::SymbolRole, TreeModel::ResultDataRole, model);
     proxy->setSourceModel(model);
     proxy->setSortRole(TreeModel::SortRole);
 
@@ -235,7 +240,7 @@ void setupTreeModel(TreeModel* model, QTreeView* view, CostDelegate* costDelegat
 void setupCallerCallee(CallerCalleeModel* model, QTreeView* view, QLineEdit* filterFunction, QLineEdit* filterModule)
 {
     auto costDelegate = new CostDelegate(CallerCalleeModel::SortRole, CallerCalleeModel::TotalCostRole, view);
-    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::SymbolRole, model);
+    auto callerCalleeProxy = new TreeProxy(CallerCalleeModel::SymbolRole, CallerCalleeModel::ResultDataRole, model);
     callerCalleeProxy->setSourceModel(model);
     callerCalleeProxy->setSortRole(CallerCalleeModel::SortRole);
     view->setModel(callerCalleeProxy);
@@ -461,14 +466,15 @@ MainWindow::MainWindow(QWidget* parent)
     auto callersModel = setupModelAndProxyForView<CallerModel>(m_ui->callerView);
     auto sourceMapModel = setupModelAndProxyForView<SourceMapModel>(m_ui->locationView);
 
-    auto selectCallerCaleeeIndex = [calleesModel, callersModel, sourceMapModel, this](const QModelIndex& index) {
-        const auto costs = index.data(CallerCalleeModel::TotalCostsRole).value<AllocationData>();
+    auto selectCallerCaleeeIndex = [callerCalleeModel, calleesModel, callersModel, sourceMapModel,
+                                    this](const QModelIndex& index) {
+        const auto resultData = callerCalleeModel->results().resultData;
         const auto callees = index.data(CallerCalleeModel::CalleesRole).value<CalleeMap>();
-        calleesModel->setResults(callees, costs);
+        calleesModel->setResults(callees, resultData);
         const auto callers = index.data(CallerCalleeModel::CallersRole).value<CallerMap>();
-        callersModel->setResults(callers, costs);
+        callersModel->setResults(callers, resultData);
         const auto sourceMap = index.data(CallerCalleeModel::SourceMapRole).value<LocationCostMap>();
-        sourceMapModel->setResults(sourceMap, costs);
+        sourceMapModel->setResults(sourceMap, resultData);
         if (index.model() != m_ui->callerCalleeResults->model()) {
             m_ui->callerCalleeResults->setCurrentIndex(
                 qobject_cast<QSortFilterProxyModel*>(m_ui->callerCalleeResults->model())->mapFromSource(index));

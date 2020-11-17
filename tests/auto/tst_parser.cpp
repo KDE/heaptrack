@@ -46,18 +46,30 @@ TEST_CASE ("parse sample file", "[parser]") {
         REQUIRE(spyCCD.wait());
 
     const CallerCalleeResults ccr = spyCCD.at(0).at(0).value<CallerCalleeResults>();
+    REQUIRE(ccr.resultData);
+
+    auto symbolToString = [&](const Symbol& sym) {
+        const auto module = ccr.resultData->string(sym.moduleId);
+        return ccr.resultData->string(sym.functionId) + '|' + Util::basename(module) + '|' + module;
+    };
+
     auto ccrSymbolList = ccr.entries.keys();
-    std::sort(ccrSymbolList.begin(), ccrSymbolList.end(), [](const Symbol& lhs, const Symbol& rhs) {
-        return std::tie(lhs.symbol, lhs.binary, lhs.path) < std::tie(rhs.symbol, rhs.binary, rhs.path);
+    std::sort(ccrSymbolList.begin(), ccrSymbolList.end(), [&](const Symbol& lhs, const Symbol& rhs) {
+        // keep unresolved functions up front
+        auto sortable = [&](const Symbol& symbol) {
+            auto str = [&](StringIndex stringId) { return ccr.resultData->string(stringId); };
+            return std::make_tuple(str(symbol.functionId), str(symbol.moduleId));
+        };
+        return sortable(lhs) < sortable(rhs);
     });
     if (!qgetenv("HEAPTRACK_DEBUG").isEmpty()) {
+        int i = 0;
         for (const Symbol &sym : ccrSymbolList) {
-            qDebug() << sym.symbol << sym.binary << sym.path;
+            qDebug() << i++ << symbolToString(sym);
         }
     }
 
     // Let's check a few items
-    auto symbolToString = [](const Symbol &sym) { return sym.symbol + '|' + sym.binary + '|' + sym.path; };
     REQUIRE(symbolToString(ccrSymbolList.at(0)) == "<unresolved function>||");
     REQUIRE(symbolToString(ccrSymbolList.at(1)) == "<unresolved function>|ld-linux-x86-64.so.2|/lib64/ld-linux-x86-64.so.2");
     REQUIRE(symbolToString(ccrSymbolList.at(25)) == "QByteArray::constData() const|libQt5Core.so.5|/d/qt/5/kde/build/qtbase/lib/libQt5Core.so.5");
@@ -65,7 +77,7 @@ TEST_CASE ("parse sample file", "[parser]") {
     REQUIRE(symbolToString(ccrSymbolList.at(lastIndx)) == "~QVarLengthArray|libQt5Core.so.5|/d/qt/5/kde/build/qtbase/lib/libQt5Core.so.5");
 
     REQUIRE(ccr.entries.count() == 365);
-    REQUIRE(ccr.totalCosts.allocations == 2896);
+    REQUIRE(ccr.resultData->totalCosts().allocations == 2896);
 
     // ---- Check Bottom Up Data
 
@@ -73,18 +85,21 @@ TEST_CASE ("parse sample file", "[parser]") {
         REQUIRE(spyBottomUp.wait());
 
     const TreeData bottomUpData = spyBottomUp.at(0).at(0).value<TreeData>();
+    REQUIRE(bottomUpData.resultData == ccr.resultData);
     if (!qgetenv("HEAPTRACK_DEBUG").isEmpty()) {
         qDebug() << "Bottom Up Data:";
-        for (const RowData &row : bottomUpData) {
+        for (const RowData& row : bottomUpData.rows) {
             qDebug() << symbolToString(row.symbol);
         }
     }
-    REQUIRE(bottomUpData.size() == 54);
-    REQUIRE(symbolToString(bottomUpData.at(0).symbol) == "<unresolved function>|libglib-2.0.so.0|/usr/lib64/libglib-2.0.so.0");
-    REQUIRE(bottomUpData.at(0).children.size() == 2);
-    REQUIRE(bottomUpData.at(0).cost.allocations == 17);
-    REQUIRE(bottomUpData.at(0).cost.peak == 2020);
-    REQUIRE(symbolToString(bottomUpData.at(53).symbol) == "QThreadPool::QThreadPool(QObject*)|libQt5Core.so.5|/d/qt/5/kde/build/qtbase/lib/libQt5Core.so.5");
+    REQUIRE(bottomUpData.rows.size() == 54);
+    REQUIRE(symbolToString(bottomUpData.rows.at(3).symbol)
+            == "<unresolved function>|libglib-2.0.so.0|/usr/lib64/libglib-2.0.so.0");
+    REQUIRE(bottomUpData.rows.at(3).children.size() == 2);
+    REQUIRE(bottomUpData.rows.at(3).cost.allocations == 17);
+    REQUIRE(bottomUpData.rows.at(3).cost.peak == 2020);
+    REQUIRE(symbolToString(bottomUpData.rows.at(53).symbol)
+            == "QThreadPool::QThreadPool(QObject*)|libQt5Core.so.5|/d/qt/5/kde/build/qtbase/lib/libQt5Core.so.5");
 
     // ---- Check Top Down Data
 
@@ -92,17 +107,19 @@ TEST_CASE ("parse sample file", "[parser]") {
         REQUIRE(spyTopDown.wait());
 
     const TreeData topDownData = spyTopDown.at(0).at(0).value<TreeData>();
+    REQUIRE(topDownData.resultData == ccr.resultData);
     if (!qgetenv("HEAPTRACK_DEBUG").isEmpty()) {
         qDebug() << "Top Down Data:";
-        for (const RowData &row : topDownData) {
+        for (const RowData& row : topDownData.rows) {
             qDebug() << symbolToString(row.symbol);
         }
     }
-    REQUIRE(topDownData.size() == 5);
-    REQUIRE(symbolToString(topDownData.at(0).symbol) == "<unresolved function>|ld-linux-x86-64.so.2|/lib64/ld-linux-x86-64.so.2");
-    REQUIRE(topDownData.at(0).children.size() == 1);
-    REQUIRE(topDownData.at(0).cost.allocations == 15);
-    REQUIRE(topDownData.at(0).cost.peak == 94496);
+    REQUIRE(topDownData.rows.size() == 5);
+    REQUIRE(symbolToString(topDownData.rows.at(2).symbol)
+            == "<unresolved function>|ld-linux-x86-64.so.2|/lib64/ld-linux-x86-64.so.2");
+    REQUIRE(topDownData.rows.at(2).children.size() == 1);
+    REQUIRE(topDownData.rows.at(2).cost.allocations == 15);
+    REQUIRE(topDownData.rows.at(2).cost.peak == 94496);
 
     if (spyFinished.isEmpty())
         REQUIRE(spyFinished.wait());

@@ -19,39 +19,25 @@
 #ifndef LOCATIONDATA_H
 #define LOCATIONDATA_H
 
+#include <QHashFunctions>
 #include <QMetaType>
-#include <QString>
 
-#include <memory>
+#include <util/indices.h>
 
-#include <boost/functional/hash.hpp>
-
-#include <KLocalizedString>
-
-using SymbolId = uint64_t;
+Q_DECLARE_METATYPE(ModuleIndex)
+Q_DECLARE_METATYPE(FunctionIndex)
+Q_DECLARE_METATYPE(FileIndex)
 
 struct Symbol
 {
-    Symbol(const QString& symbol = {}, const QString& binary = {}, const QString& path = {}, SymbolId symbolId = 0)
-        : symbol(symbol)
-        , binary(binary)
-        , path(path)
-        , symbolId(symbolId)
-    {
-    }
-
     // function name
-    QString symbol;
-    // dso / executable name
-    QString binary;
+    FunctionIndex functionId;
     // path to dso / executable
-    QString path;
-    // ID
-    SymbolId symbolId;
+    ModuleIndex moduleId;
 
     bool operator==(const Symbol& rhs) const
     {
-        return symbolId == rhs.symbolId;
+        return functionId == rhs.functionId && moduleId == rhs.moduleId;
     }
 
     bool operator!=(const Symbol& rhs) const
@@ -61,12 +47,12 @@ struct Symbol
 
     bool operator<(const Symbol& rhs) const
     {
-        return symbolId < rhs.symbolId;
+        return std::tie(functionId, moduleId) < std::tie(rhs.functionId, rhs.moduleId);
     }
 
     bool isValid() const
     {
-        return symbolId > 0;
+        return *this != Symbol {};
     }
 };
 
@@ -75,43 +61,32 @@ Q_DECLARE_METATYPE(Symbol)
 
 struct FileLine
 {
-    QString file;
+    FileIndex fileId;
     int line;
 
     bool operator==(const FileLine& rhs) const
     {
-        return file == rhs.file && line == rhs.line;
-    }
-
-    bool operator<(const FileLine& rhs) const
-    {
-        return std::tie(file, line) < std::tie(rhs.file, rhs.line);
-    }
-
-    QString toString() const
-    {
-        return file.isEmpty() ? QStringLiteral("??") : (file + QLatin1Char(':') + QString::number(line));
+        return fileId == rhs.fileId && line == rhs.line;
     }
 };
 Q_DECLARE_TYPEINFO(FileLine, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(FileLine)
 
-inline const QString& unresolvedFunctionName()
+const QString& unresolvedFunctionName();
+
+inline uint qHash(const Symbol& symbol, uint seed = 0)
 {
-    static QString msg = i18n("<unresolved function>");
-    return msg;
+    QtPrivate::QHashCombine hash;
+    seed = hash(seed, symbol.functionId);
+    seed = hash(seed, symbol.moduleId);
+    return seed;
 }
 
-inline uint qHash(const Symbol& symbol, uint seed_ = 0)
+inline uint qHash(const FileLine& location, uint seed = 0)
 {
-    return qHash(symbol.symbolId, seed_);
-}
-
-inline uint qHash(const FileLine& location, uint seed_ = 0)
-{
-    size_t seed = seed_;
-    boost::hash_combine(seed, qHash(location.file));
-    boost::hash_combine(seed, location.line);
+    QtPrivate::QHashCombine hash;
+    seed = hash(seed, location.fileId);
+    seed = hash(seed, location.line);
     return seed;
 }
 

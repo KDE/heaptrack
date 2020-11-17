@@ -19,11 +19,13 @@
 #include "treeproxy.h"
 #include "locationdata.h"
 
+#include <resultdata.h>
 #include <QDebug>
 
-TreeProxy::TreeProxy(int symbolRole, QObject* parent)
+TreeProxy::TreeProxy(int symbolRole, int resultDataRole, QObject* parent)
     : QSortFilterProxyModel(parent)
     , m_symbolRole(symbolRole)
+    , m_resultDataRole(resultDataRole)
 {
     setRecursiveFilteringEnabled(true);
     setSortLocaleAware(false);
@@ -54,11 +56,16 @@ bool TreeProxy::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent)
         return true;
     }
 
-    const auto& symbol = source->index(sourceRow, 0, sourceParent).data(m_symbolRole).value<Symbol>();
-    if (!m_functionFilter.isEmpty() && !symbol.symbol.contains(m_functionFilter, Qt::CaseInsensitive)) {
-        return false;
-    }
-    if (!m_moduleFilter.isEmpty() && !symbol.binary.contains(m_moduleFilter, Qt::CaseInsensitive)) {
+    const auto index = source->index(sourceRow, 0, sourceParent);
+    const auto* resultData = index.data(m_resultDataRole).value<const ResultData*>();
+    Q_ASSERT(resultData);
+
+    auto filterOut = [&](StringIndex stringId, const QString& filter) {
+        return !filter.isEmpty() && !resultData->string(stringId).contains(filter, Qt::CaseInsensitive);
+    };
+
+    const auto symbol = index.data(m_symbolRole).value<Symbol>();
+    if (filterOut(symbol.functionId, m_functionFilter) || filterOut(symbol.moduleId, m_moduleFilter)) {
         return false;
     }
     return true;

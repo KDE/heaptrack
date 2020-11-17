@@ -20,6 +20,8 @@
 
 #include <QString>
 
+#include <resultdata.h>
+
 #include <KFormat>
 #include <KLocalizedString>
 
@@ -101,10 +103,11 @@ QString Util::formatCostRelative(qint64 selfCost, qint64 totalCost, bool addPerc
     return ret;
 }
 
-QString Util::formatTooltip(const Symbol& symbol, const AllocationData& costs, const AllocationData& totalCosts)
+QString Util::formatTooltip(const Symbol& symbol, const AllocationData& costs, const ResultData& resultData)
 {
-    auto toolTip = i18n("symbol: <tt>%1</tt><br/>binary: <tt>%2 (%3)</tt>", symbol.symbol.toHtmlEscaped(),
-                        symbol.binary.toHtmlEscaped(), symbol.path.toHtmlEscaped());
+    const auto& totalCosts = resultData.totalCosts();
+
+    auto toolTip = Util::toString(symbol, resultData, Util::Long);
 
     auto formatCost = [&](const QString& label, int64_t AllocationData::*member) -> QString {
         const auto cost = costs.*member;
@@ -126,10 +129,10 @@ QString Util::formatTooltip(const Symbol& symbol, const AllocationData& costs, c
 }
 
 QString Util::formatTooltip(const Symbol& symbol, const AllocationData& selfCosts, const AllocationData& inclusiveCosts,
-                            const AllocationData& totalCosts)
+                            const ResultData& resultData)
 {
-    auto toolTip = i18n("symbol: <tt>%1</tt><br/>binary: <tt>%2 (%3)</tt>", symbol.symbol.toHtmlEscaped(),
-                        symbol.binary.toHtmlEscaped(), symbol.path.toHtmlEscaped());
+    const auto& totalCosts = resultData.totalCosts();
+    auto toolTip = Util::toString(symbol, resultData, Util::Long);
 
     auto formatCost = [&](const QString& label, int64_t AllocationData::*member) -> QString {
         const auto selfCost = selfCosts.*member;
@@ -155,9 +158,10 @@ QString Util::formatTooltip(const Symbol& symbol, const AllocationData& selfCost
 }
 
 QString Util::formatTooltip(const FileLine& location, const AllocationData& selfCosts,
-                            const AllocationData& inclusiveCosts, const AllocationData& totalCosts)
+                            const AllocationData& inclusiveCosts, const ResultData& resultData)
 {
-    QString toolTip = location.toString().toHtmlEscaped();
+    QString toolTip = toString(location, resultData, Util::Long).toHtmlEscaped();
+    const auto& totalCosts = resultData.totalCosts();
 
     auto formatCost = [&](const QString& label, int64_t AllocationData::*member) -> QString {
         const auto selfCost = selfCosts.*member;
@@ -180,4 +184,40 @@ QString Util::formatTooltip(const FileLine& location, const AllocationData& self
     toolTip += formatCost(i18n("Allocations"), &AllocationData::allocations);
     toolTip += formatCost(i18n("Temporary Allocations"), &AllocationData::temporary);
     return QString(QLatin1String("<qt>") + toolTip + QLatin1String("</qt>"));
+}
+
+QString Util::toString(const Symbol& symbol, const ResultData& resultData, FormatType formatType)
+{
+    const auto& binaryPath = resultData.string(symbol.moduleId);
+    const auto binaryName = Util::basename(binaryPath);
+    switch (formatType) {
+    case Long:
+        return i18n("symbol: <tt>%1</tt><br/>binary: <tt>%2 (%3)</tt>",
+                    resultData.string(symbol.functionId).toHtmlEscaped(), binaryName.toHtmlEscaped(),
+                    binaryPath.toHtmlEscaped());
+    case Short:
+        return i18nc("%1: function name, %2: binary basename", "%1 in %2", resultData.string(symbol.functionId),
+                     Util::basename(resultData.string(symbol.moduleId)));
+    }
+    Q_UNREACHABLE();
+}
+
+QString Util::toString(const FileLine& location, const ResultData& resultData, FormatType formatType)
+{
+    auto file = resultData.string(location.fileId);
+    switch (formatType) {
+    case Long:
+        break;
+    case Short:
+        file = Util::basename(file);
+        break;
+    }
+
+    return file.isEmpty() ? QStringLiteral("??") : (file + QLatin1Char(':') + QString::number(location.line));
+}
+
+const QString& Util::unresolvedFunctionName()
+{
+    static QString msg = i18n("<unresolved function>");
+    return msg;
 }

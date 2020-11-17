@@ -25,18 +25,19 @@
 
 #include <cmath>
 
+#include "resultdata.h"
 #include "util.h"
 
 namespace {
 
-int indexOf(const RowData* row, const TreeData& siblings)
+int indexOf(const RowData* row, const QVector<RowData>& siblings)
 {
     Q_ASSERT(siblings.data() <= row);
     Q_ASSERT(siblings.data() + siblings.size() > row);
     return row - siblings.data();
 }
 
-const RowData* rowAt(const TreeData& rows, int row)
+const RowData* rowAt(const QVector<RowData>& rows, int row)
 {
     Q_ASSERT(rows.size() > row);
     return rows.data() + row;
@@ -147,17 +148,19 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
                 return Util::formatBytes(row->cost.leaked);
             }
         case LocationColumn:
-            return i18n("%1 in %2 (%3)", row->symbol.symbol, row->symbol.binary, row->symbol.path);
+            return Util::toString(row->symbol, *m_data.resultData, Util::Short);
         case NUM_COLUMNS:
             break;
         }
     } else if (role == Qt::ToolTipRole) {
+        auto toStr = [this](StringIndex stringId) { return m_data.resultData->string(stringId); };
         QString tooltip;
         QTextStream stream(&tooltip);
         stream << "<qt><pre style='font-family:monospace;'>";
+        const auto module = toStr(row->symbol.moduleId);
         stream << i18nc("1: function, 2: module, 3: module path", "%1\n  in %2 (%3)",
-                        row->symbol.symbol.toHtmlEscaped(), row->symbol.binary.toHtmlEscaped(),
-                        row->symbol.path.toHtmlEscaped());
+                        toStr(row->symbol.functionId).toHtmlEscaped(), Util::basename(module).toHtmlEscaped(),
+                        module.toHtmlEscaped());
         stream << '\n';
         stream << '\n';
         const auto peakFraction = Util::formatCostRelative(row->cost.peak, m_maxCost.cost.peak);
@@ -178,9 +181,10 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
             }
             while (child->children.count() == 1 && max-- > 0) {
                 stream << "\n";
+                const auto module = toStr(child->symbol.moduleId);
                 stream << i18nc("1: function, 2: module, 3: module path", "%1\n  in %2 (%3)",
-                                child->symbol.symbol.toHtmlEscaped(), child->symbol.binary.toHtmlEscaped(),
-                                child->symbol.path.toHtmlEscaped());
+                                toStr(child->symbol.functionId).toHtmlEscaped(), Util::basename(module).toHtmlEscaped(),
+                                module.toHtmlEscaped());
                 child = child->children.data();
             }
             if (child->children.count() > 1) {
@@ -192,6 +196,8 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const
         return tooltip;
     } else if (role == SymbolRole) {
         return QVariant::fromValue(row->symbol);
+    } else if (role == ResultDataRole) {
+        return QVariant::fromValue(m_data.resultData.get());
     }
     return {};
 }
@@ -219,7 +225,7 @@ QModelIndex TreeModel::parent(const QModelIndex& child) const
 int TreeModel::rowCount(const QModelIndex& parent) const
 {
     if (!parent.isValid()) {
-        return m_data.size();
+        return m_data.rows.size();
     } else if (parent.column() != 0) {
         return 0;
     }
@@ -235,6 +241,7 @@ int TreeModel::columnCount(const QModelIndex& /*parent*/) const
 
 void TreeModel::resetData(const TreeData& data)
 {
+    Q_ASSERT(data.resultData);
     beginResetModel();
     m_data = data;
     endResetModel();
@@ -263,7 +270,7 @@ const RowData* TreeModel::toRow(const QModelIndex& index) const
     if (const auto parent = toParentRow(index)) {
         return rowAt(parent->children, index.row());
     } else {
-        return rowAt(m_data, index.row());
+        return rowAt(m_data.rows, index.row());
     }
 }
 
@@ -272,6 +279,6 @@ int TreeModel::rowOf(const RowData* row) const
     if (auto parent = row->parent) {
         return indexOf(row, parent->children);
     } else {
-        return indexOf(row, m_data);
+        return indexOf(row, m_data.rows);
     }
 }

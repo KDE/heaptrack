@@ -46,103 +46,30 @@ bool tryInsert(QSet<T>* set, T value)
     return oldSize != set->size();
 }
 
-struct SymbolKey
+Symbol symbol(const Frame& frame, ModuleIndex moduleIndex)
 {
-    FunctionIndex functionIndex;
-    ModuleIndex moduleIndex;
+    return {frame.functionIndex, moduleIndex};
+}
 
-    bool operator==(const SymbolKey& rhs) const
-    {
-        return functionIndex == rhs.functionIndex && moduleIndex == rhs.moduleIndex;
-    }
-
-    friend uint qHash(const SymbolKey& symbolKey, uint seed = 0)
-    {
-        QtPrivate::QHashCombine hash;
-        seed = hash(seed, symbolKey.functionIndex);
-        seed = hash(seed, symbolKey.moduleIndex);
-        return seed;
-    }
-};
+Symbol symbol(const InstructionPointer& ip)
+{
+    return symbol(ip.frame, ip.moduleIndex);
+}
 
 struct Location
 {
     Symbol symbol;
     FileLine fileLine;
 };
-
-struct StringCache
+Location frameLocation(const Frame& frame, ModuleIndex moduleIndex)
 {
-    const QString& func(const Frame& frame) const
-    {
-        if (frame.functionIndex) {
-            // TODO: support removal of template arguments
-            return stringify(frame.functionIndex);
-        } else {
-            return unresolvedFunctionName();
-        }
-    }
+    return {symbol(frame, moduleIndex), {frame.fileIndex, frame.line}};
+}
 
-    const QString& file(const Frame& frame) const
-    {
-        return stringify(frame.fileIndex);
-    }
-
-    const QString& stringify(const StringIndex index) const
-    {
-        static const QString invalid;
-        if (!index || index.index > m_strings.size()) {
-            return invalid;
-        } else {
-            return m_strings.at(index.index - 1);
-        }
-    }
-
-    const Symbol& symbol(const InstructionPointer& ip) const
-    {
-        return symbol(ip.frame, ip.moduleIndex);
-    }
-
-    const Symbol& symbol(const Frame& frame, const ModuleIndex& moduleIndex) const
-    {
-        auto& symbol = m_symbols[{frame.functionIndex, moduleIndex}];
-        if (!symbol.isValid()) {
-            const auto module = stringify(moduleIndex);
-            auto& binary = m_pathToBinaries[module];
-            if (binary.isEmpty()) {
-                binary = Util::basename(module);
-            }
-            symbol = {func(frame), binary, module, ++m_nextSymbolId};
-        }
-        return symbol;
-    }
-
-    Location location(const InstructionPointer& ip) const
-    {
-        return frameLocation(ip.frame, ip.moduleIndex);
-    }
-
-    Location frameLocation(const Frame& frame, const ModuleIndex& moduleIndex) const
-    {
-        return {symbol(frame, moduleIndex), {file(frame), frame.line}};
-    }
-
-    void update(const vector<string>& strings)
-    {
-        transform(strings.begin() + m_strings.size(), strings.end(), back_inserter(m_strings),
-                  [](const string& str) { return QString::fromStdString(str); });
-    }
-
-    vector<QString> m_strings;
-    // interned module basenames
-    mutable QHash<QString, QString> m_pathToBinaries;
-    // existing symbols
-    mutable QHash<SymbolKey, Symbol> m_symbols;
-
-    bool diffMode = false;
-
-    mutable SymbolId m_nextSymbolId = 0;
-};
+Location location(const InstructionPointer& ip)
+{
+    return frameLocation(ip.frame, ip.moduleIndex);
+}
 
 struct ChartMergeData
 {
@@ -167,18 +94,16 @@ struct ParserData final : public AccumulatedTraceData
     {
     }
 
-    void updateStringCache()
+    void prepareBuildCharts(const std::shared_ptr<const ResultData>& resultData)
     {
-        stringCache.update(strings);
-    }
-
-    void prepareBuildCharts()
-    {
-        if (stringCache.diffMode) {
+        if (diffMode) {
             return;
         }
+        consumedChartData.resultData = resultData;
         consumedChartData.rows.reserve(MAX_CHART_DATAPOINTS);
+        allocationsChartData.resultData = resultData;
         allocationsChartData.rows.reserve(MAX_CHART_DATAPOINTS);
+        temporaryChartData.resultData = resultData;
         temporaryChartData.rows.reserve(MAX_CHART_DATAPOINTS);
         // start off with null data at the origin
         lastTimeStamp = filterParameters.minTime;
@@ -188,9 +113,9 @@ struct ParserData final : public AccumulatedTraceData
         allocationsChartData.rows.push_back(origin);
         temporaryChartData.rows.push_back(origin);
         // index 0 indicates the total row
-        consumedChartData.labels[0] = i18n("total");
-        allocationsChartData.labels[0] = i18n("total");
-        temporaryChartData.labels[0] = i18n("total");
+        consumedChartData.labels[0] = {};
+        allocationsChartData.labels[0] = {};
+        temporaryChartData.labels[0] = {};
 
         buildCharts = true;
         maxConsumedSinceLastTimeStamp = 0;
@@ -220,10 +145,8 @@ struct ParserData final : public AccumulatedTraceData
                 if (!(alloc.*member)) {
                     break;
                 }
-                const auto ip = alloc.ip;
-                (ipToLabelIds[ip].*label) = i + 1;
-                const auto& symbol = stringCache.symbol(findIp(ip));
-                data->labels[i + 1] = i18n("%1 in %2 (%3)", symbol.symbol, symbol.binary, symbol.path);
+                (ipToLabelIds[alloc.ip].*label) = i + 1;
+                data->labels[i + 1] = symbol(findIp(alloc.ip));
             }
         };
         ipToLabelIds.reserve(3 * ChartRows::MAX_NUM_COST);
@@ -253,7 +176,7 @@ struct ParserData final : public AccumulatedTraceData
         if (pass == ParsePass::FirstPass) {
             return;
         }
-        if (!buildCharts || stringCache.diffMode) {
+        if (!buildCharts || diffMode) {
             return;
         }
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, totalCost.leaked);
@@ -369,11 +292,13 @@ struct ParserData final : public AccumulatedTraceData
     int64_t maxConsumedSinceLastTimeStamp = 0;
     int64_t lastTimeStamp = 0;
 
-    StringCache stringCache;
-
     bool buildCharts = false;
+    bool diffMode = false;
+
     TimestampCallback timestampCallback;
     QElapsedTimer parseTimer;
+
+    QVector<QString> qtStrings;
 };
 
 namespace {
@@ -386,11 +311,11 @@ void setParents(QVector<RowData>& children, const RowData* parent)
     }
 }
 
-void addCallerCalleeEvent(const Location& location, const AllocationData& cost, QSet<SymbolId>* recursionGuard,
+void addCallerCalleeEvent(const Location& location, const AllocationData& cost, QSet<Symbol>* recursionGuard,
                           CallerCalleeResults* callerCalleeResult)
 {
     const auto isLeaf = recursionGuard->isEmpty();
-    if (!tryInsert(recursionGuard, location.symbol.symbolId)) {
+    if (!tryInsert(recursionGuard, location.symbol)) {
         return;
     }
 
@@ -404,16 +329,17 @@ void addCallerCalleeEvent(const Location& location, const AllocationData& cost, 
     }
 }
 
-std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser *parser, const ParserData& data)
+std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser* parser, const ParserData& data,
+                                                          std::shared_ptr<const ResultData> resultData)
 {
     CallerCalleeResults callerCalleeResults;
     TreeData topRows;
     QSet<TraceIndex> traceRecursionGuard;
     traceRecursionGuard.reserve(128);
-    QSet<SymbolId> symbolRecursionGuard;
+    QSet<Symbol> symbolRecursionGuard;
     symbolRecursionGuard.reserve(128);
-    auto addRow = [&symbolRecursionGuard, &callerCalleeResults](TreeData* rows, const Location& location,
-                                                                const Allocation& cost) -> TreeData* {
+    auto addRow = [&symbolRecursionGuard, &callerCalleeResults](QVector<RowData>* rows, const Location& location,
+                                                                const Allocation& cost) -> QVector<RowData>* {
         auto it = lower_bound(rows->begin(), rows->end(), location.symbol);
         if (it != rows->end() && it->symbol == location.symbol) {
             it->cost += cost;
@@ -429,17 +355,16 @@ std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser *parser, const 
     // merge allocations, leave parent pointers invalid (their location may change)
     for (const auto& allocation : data.allocations) {
         auto traceIndex = allocation.traceIndex;
-        auto rows = &topRows;
+        auto rows = &topRows.rows;
         traceRecursionGuard.clear();
         traceRecursionGuard.insert(traceIndex);
         symbolRecursionGuard.clear();
         while (traceIndex) {
             const auto& trace = data.findTrace(traceIndex);
             const auto& ip = data.findIp(trace.ipIndex);
-            const auto& location = data.stringCache.location(ip);
-            rows = addRow(rows, location, allocation);
+            rows = addRow(rows, location(ip), allocation);
             for (const auto& inlined : ip.inlined) {
-                const auto& inlinedLocation = data.stringCache.frameLocation(inlined, ip.moduleIndex);
+                const auto& inlinedLocation = frameLocation(inlined, ip.moduleIndex);
                 rows = addRow(rows, inlinedLocation, allocation);
             }
             if (data.isStopIndex(ip.frame.functionIndex)) {
@@ -458,18 +383,19 @@ std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser *parser, const 
         }
     }
     // now set the parents, the data is constant from here on
-    setParents(topRows, nullptr);
+    setParents(topRows.rows, nullptr);
 
+    topRows.resultData = std::move(resultData);
     return {topRows, callerCalleeResults};
 }
 
-RowData* findBySymbol(const Symbol& symbol, QVector<RowData>* data)
+RowData* findBySymbol(Symbol symbol, QVector<RowData>* data)
 {
-    auto it = std::find_if(data->begin(), data->end(), [&symbol](const RowData& row) { return row.symbol == symbol; });
+    auto it = std::find_if(data->begin(), data->end(), [symbol](const RowData& row) { return row.symbol == symbol; });
     return it == data->end() ? nullptr : &(*it);
 }
 
-AllocationData buildTopDown(const TreeData& bottomUpData, TreeData* topDownData)
+AllocationData buildTopDown(const QVector<RowData>& bottomUpData, QVector<RowData>* topDownData)
 {
     AllocationData totalCost;
     for (const auto& row : bottomUpData) {
@@ -501,12 +427,13 @@ AllocationData buildTopDown(const TreeData& bottomUpData, TreeData* topDownData)
     return totalCost;
 }
 
-QVector<RowData> toTopDownData(const QVector<RowData>& bottomUpData)
+TreeData toTopDownData(const TreeData& bottomUpData)
 {
-    QVector<RowData> topRows;
-    buildTopDown(bottomUpData, &topRows);
+    TreeData topRows;
+    topRows.resultData = bottomUpData.resultData;
+    buildTopDown(bottomUpData.rows, &topRows.rows);
     // now set the parents, the data is constant from here on
-    setParents(topRows, nullptr);
+    setParents(topRows.rows, nullptr);
     return topRows;
 }
 
@@ -524,11 +451,11 @@ struct ReusableGuardBuffer
         callerCalleeRecursionGuard.clear();
     }
 
-    QSet<SymbolId> recursionGuard;
-    QSet<QPair<SymbolId, SymbolId>> callerCalleeRecursionGuard;
+    QSet<Symbol> recursionGuard;
+    QSet<QPair<Symbol, Symbol>> callerCalleeRecursionGuard;
 };
 
-AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResults* callerCalleeResults,
+AllocationData buildCallerCallee(const QVector<RowData>& bottomUpData, CallerCalleeResults* callerCalleeResults,
                                  ReusableGuardBuffer* guardBuffer)
 {
     AllocationData totalCost;
@@ -545,14 +472,14 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResul
             guardBuffer->reset();
             auto node = &row;
 
-            const Symbol* lastSymbol = nullptr;
+            Symbol lastSymbol;
             CallerCalleeEntry* lastEntry = nullptr;
 
             while (node) {
-                const auto& symbol = node->symbol;
+                const auto symbol = node->symbol;
                 // aggregate caller-callee data
                 auto& entry = callerCalleeResults->entries[symbol];
-                if (tryInsert(&guardBuffer->recursionGuard, symbol.symbolId)) {
+                if (tryInsert(&guardBuffer->recursionGuard, symbol)) {
                     // only increment inclusive cost once for a given stack
                     entry.inclusiveCost += cost;
                 }
@@ -563,14 +490,14 @@ AllocationData buildCallerCallee(const TreeData& bottomUpData, CallerCalleeResul
                 // add current entry as callee to last entry
                 // and last entry as caller to current entry
                 if (lastEntry) {
-                    if (tryInsert(&guardBuffer->callerCalleeRecursionGuard, {symbol.symbolId, lastSymbol->symbolId})) {
+                    if (tryInsert(&guardBuffer->callerCalleeRecursionGuard, {symbol, lastSymbol})) {
                         lastEntry->callees[symbol] += cost;
-                        entry.callers[*lastSymbol] += cost;
+                        entry.callers[lastSymbol] += cost;
                     }
                 }
 
                 node = node->parent;
-                lastSymbol = &symbol;
+                lastSymbol = symbol;
                 lastEntry = &entry;
             }
         }
@@ -584,7 +511,7 @@ CallerCalleeResults toCallerCalleeData(const TreeData& bottomUpData, const Calle
     // copy the source map and continue from there
     auto callerCalleeResults = results;
     ReusableGuardBuffer guardBuffer;
-    callerCalleeResults.totalCosts = buildCallerCallee(bottomUpData, &callerCalleeResults, &guardBuffer);
+    buildCallerCallee(bottomUpData.rows, &callerCalleeResults, &guardBuffer);
 
     if (diffMode) {
         // remove rows without cost
@@ -597,6 +524,7 @@ CallerCalleeResults toCallerCalleeData(const TreeData& bottomUpData, const Calle
         }
     }
 
+    callerCalleeResults.resultData = bottomUpData.resultData;
     return callerCalleeResults;
 }
 
@@ -610,7 +538,7 @@ struct MergedHistogramColumnData
     }
 };
 
-HistogramData buildSizeHistogram(ParserData& data)
+HistogramData buildSizeHistogram(ParserData& data, std::shared_ptr<const ResultData> resultData)
 {
     HistogramData ret;
     if (data.allocationInfoCounter.empty()) {
@@ -648,7 +576,7 @@ HistogramData buildSizeHistogram(ParserData& data)
         if (info.info.size > row.size) {
             insertColumns();
             columnData.clear();
-            ret << row;
+            ret.rows << row;
             ++bucketIndex;
             row.size = buckets[bucketIndex].first;
             row.sizeLabel = buckets[bucketIndex].second;
@@ -659,16 +587,17 @@ HistogramData buildSizeHistogram(ParserData& data)
         const auto& allocation = data.allocations[info.info.allocationIndex.index];
         const auto& ipIndex = data.findTrace(allocation.traceIndex).ipIndex;
         const auto& ip = data.findIp(ipIndex);
-        const auto& location = data.stringCache.location(ip);
-        auto it = lower_bound(columnData.begin(), columnData.end(), location.symbol);
-        if (it == columnData.end() || it->symbol != location.symbol) {
-            columnData.insert(it, {location.symbol, info.allocations});
+        const auto& sym = symbol(ip);
+        auto it = lower_bound(columnData.begin(), columnData.end(), sym);
+        if (it == columnData.end() || it->symbol != sym) {
+            columnData.insert(it, {sym, info.allocations});
         } else {
             it->allocations += info.allocations;
         }
     }
     insertColumns();
-    ret << row;
+    ret.rows << row;
+    ret.resultData = std::move(resultData);
     return ret;
 }
 }
@@ -711,7 +640,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             }
 
             lastPassCompletion = passCompletion;
-            const auto numPasses = data.stringCache.diffMode ? 2 : 3;
+            const auto numPasses = data.diffMode ? 2 : 3;
             auto totalCompletion = (data.parsingState.pass + passCompletion) / numPasses;
             auto spentTime_ms = data.parseTimer.elapsed();
             auto totalRemainingTime_ms = (spentTime_ms / totalCompletion) * (1.0 - totalCompletion);
@@ -740,7 +669,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
                 return;
             }
             data->diff(diffData);
-            data->stringCache.diffMode = true;
+            data->diffMode = true;
         } else {
             data->parseTimer.start();
 
@@ -751,8 +680,12 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         }
 
         if (!isReparsing) {
-            data->updateStringCache();
+            data->qtStrings.resize(data->strings.size());
+            std::transform(data->strings.begin(), data->strings.end(), data->qtStrings.begin(),
+                           [](const std::string& string) { return QString::fromStdString(string); });
         }
+
+        const auto resultData = std::make_shared<const ResultData>(data->totalCost, data->qtStrings);
 
         emit summaryAvailable({QString::fromStdString(data->debuggee), data->totalCost, data->totalTime,
                                data->filterParameters, data->peakTime, data->peakRSS * data->systemInfo.pageSize,
@@ -765,7 +698,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
 
         emit progressMessageAvailable(i18n("merging allocations..."));
         // merge allocations before modifying the data again
-        const auto mergedAllocations = mergeAllocations(this, *data);
+        const auto mergedAllocations = mergeAllocations(this, *data, resultData);
         emit bottomUpDataAvailable(mergedAllocations.first);
 
         if (stopAfter == StopAfter::BottomUp) {
@@ -775,7 +708,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
 
         // also calculate the size histogram
         emit progressMessageAvailable(i18n("building size histogram..."));
-        const auto sizeHistogram = buildSizeHistogram(*data);
+        const auto sizeHistogram = buildSizeHistogram(*data, resultData);
         emit sizeHistogramDataAvailable(sizeHistogram);
         // now data can be modified again for the chart data evaluation
 
@@ -786,23 +719,22 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
 
         emit progress(0);
 
-        const auto diffMode = data->stringCache.diffMode;
+        const auto diffMode = data->diffMode;
         emit progressMessageAvailable(i18n("building charts..."));
         auto parallel = new Collection;
-        *parallel << make_job([this, mergedAllocations]() {
+        *parallel << make_job([this, mergedAllocations, resultData]() {
             const auto topDownData = toTopDownData(mergedAllocations.first);
             emit topDownDataAvailable(topDownData);
-
         }) << make_job([this, mergedAllocations, diffMode]() {
             emit callerCalleeDataAvailable(
                 toCallerCalleeData(mergedAllocations.first, mergedAllocations.second, diffMode));
         });
-        if (!data->stringCache.diffMode && stopAfter != StopAfter::TopDownAndCallerCallee) {
+        if (!data->diffMode && stopAfter != StopAfter::TopDownAndCallerCallee) {
             // only build charts when we are not diffing
-            *parallel << make_job([this, data, stdPath, isReparsing]() {
+            *parallel << make_job([this, data, stdPath, isReparsing, resultData]() {
                 // this mutates data, and thus anything running in parallel must
                 // not access data
-                data->prepareBuildCharts();
+                data->prepareBuildCharts(resultData);
                 data->read(stdPath, AccumulatedTraceData::ThirdPass, isReparsing);
                 emit consumedChartDataAvailable(data->consumedChartData);
                 emit allocationsChartDataAvailable(data->allocationsChartData);
@@ -829,7 +761,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
 
 void Parser::reparse(const FilterParameters& parameters_)
 {
-    if (!m_data || m_data->stringCache.diffMode)
+    if (!m_data || m_data->diffMode)
         return;
 
     auto filterParameters = parameters_;

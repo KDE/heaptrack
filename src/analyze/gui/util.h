@@ -26,17 +26,28 @@
 
 class QString;
 
+class ResultData;
+
 namespace Util {
 QString basename(const QString& path);
 QString formatString(const QString& input);
 QString formatTime(qint64 ms);
 QString formatBytes(qint64 bytes);
 QString formatCostRelative(qint64 selfCost, qint64 totalCost, bool addPercentSign = false);
-QString formatTooltip(const Symbol& symbol, const AllocationData& costs, const AllocationData& totalCosts);
+QString formatTooltip(const Symbol& symbol, const AllocationData& costs, const ResultData& resultData);
 QString formatTooltip(const Symbol& symbol, const AllocationData& selfCosts, const AllocationData& inclusiveCosts,
-                      const AllocationData& totalCosts);
+                      const ResultData& resultDat);
 QString formatTooltip(const FileLine& location, const AllocationData& selfCosts, const AllocationData& inclusiveCosts,
-                      const AllocationData& totalCosts);
+                      const ResultData& resultDat);
+
+enum FormatType
+{
+    Long,
+    Short
+};
+QString toString(const Symbol& symbol, const ResultData& resultData, FormatType formatType);
+QString toString(const FileLine& location, const ResultData& resultData, FormatType formatType);
+const QString& unresolvedFunctionName();
 }
 
 Q_DECLARE_TYPEINFO(AllocationData, Q_MOVABLE_TYPE);

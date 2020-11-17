@@ -139,7 +139,7 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
                 return i18n("<qt>%1 consumed in total after %2</qt>", byteCost(), time);
             }
         } else {
-            const auto label = m_data.labels.value(column).toHtmlEscaped();
+            auto label = Util::toString(m_data.labels.value(column), *m_data.resultData, Util::Long);
             switch (m_type) {
             case Allocations:
                 return i18n("<qt>%2 allocations after %3 from:<p "
@@ -177,6 +177,7 @@ int ChartModel::rowCount(const QModelIndex& parent) const
 
 void ChartModel::resetData(const ChartData& data)
 {
+    Q_ASSERT(data.resultData);
     Q_ASSERT(m_data.labels.size() < ChartRows::MAX_NUM_COST);
     beginResetModel();
     m_data = data;

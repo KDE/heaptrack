@@ -61,6 +61,11 @@ struct Index
     {
         return index == o.index;
     }
+
+    void operator++()
+    {
+        ++index;
+    }
 };
 
 template <typename Base>

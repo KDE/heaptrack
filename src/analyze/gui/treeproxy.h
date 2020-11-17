@@ -25,7 +25,7 @@ class TreeProxy final : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    explicit TreeProxy(int symbolRole, QObject* parent = nullptr);
+    explicit TreeProxy(int symbolRole, int resultDataRole, QObject* parent = nullptr);
     virtual ~TreeProxy();
 
 public slots:
@@ -35,7 +35,8 @@ public slots:
 private:
     bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
 
-    int m_symbolRole;
+    const int m_symbolRole;
+    const int m_resultDataRole;
 
     QString m_functionFilter;
     QString m_moduleFilter;

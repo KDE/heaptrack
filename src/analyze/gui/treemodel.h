@@ -26,6 +26,10 @@
 #include "locationdata.h"
 #include "summarydata.h"
 
+#include <memory>
+
+class ResultData;
+
 struct RowData
 {
     AllocationData cost;
@@ -39,7 +43,11 @@ struct RowData
 };
 Q_DECLARE_TYPEINFO(RowData, Q_MOVABLE_TYPE);
 
-using TreeData = QVector<RowData>;
+struct TreeData
+{
+    QVector<RowData> rows;
+    std::shared_ptr<const ResultData> resultData;
+};
 Q_DECLARE_METATYPE(TreeData)
 
 class TreeModel : public QAbstractItemModel
@@ -63,7 +71,8 @@ public:
     {
         SortRole = Qt::UserRole,
         MaxCostRole,
-        SymbolRole
+        SymbolRole,
+        ResultDataRole,
     };
 
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;

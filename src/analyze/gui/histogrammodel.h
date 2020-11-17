@@ -47,7 +47,12 @@ struct HistogramRow
 Q_DECLARE_TYPEINFO(HistogramRow, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(HistogramRow)
 
-using HistogramData = QVector<HistogramRow>;
+struct HistogramData
+{
+    QVector<HistogramRow> rows;
+    std::shared_ptr<const ResultData> resultData;
+};
+Q_DECLARE_METATYPE(HistogramData)
 
 class HistogramModel : public QAbstractTableModel
 {

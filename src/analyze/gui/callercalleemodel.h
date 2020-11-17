@@ -22,10 +22,12 @@
 #include <QAbstractItemModel>
 #include <QVector>
 
+#include <KLocalizedString>
+
 #include "../allocationdata.h"
 #include "hashmodel.h"
 #include "locationdata.h"
-#include "summarydata.h"
+#include "resultdata.h"
 #include "util.h"
 
 using SymbolCostMap = QHash<Symbol, AllocationData>;
@@ -58,7 +60,7 @@ using CallerCalleeEntryMap = QHash<Symbol, CallerCalleeEntry>;
 struct CallerCalleeResults
 {
     CallerCalleeEntryMap entries;
-    AllocationData totalCosts;
+    std::shared_ptr<const ResultData> resultData;
 };
 Q_DECLARE_TYPEINFO(CallerCalleeResults, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(CallerCalleeResults)
@@ -71,6 +73,10 @@ public:
     ~CallerCalleeModel();
 
     void setResults(const CallerCalleeResults& results);
+    const CallerCalleeResults& results() const
+    {
+        return m_results;
+    }
     void clearData();
 
     enum Columns
@@ -95,12 +101,11 @@ public:
     {
         SortRole = Qt::UserRole,
         TotalCostRole,
-        FilterRole,
         CalleesRole,
         CallersRole,
         SourceMapRole,
         SymbolRole,
-        TotalCostsRole,
+        ResultDataRole,
     };
 
     QVariant headerCell(int column, int role) const final override;
@@ -123,9 +128,10 @@ public:
 
     virtual ~SymbolCostModelImpl() = default;
 
-    void setResults(const SymbolCostMap& map, const AllocationData& totalCost)
+    void setResults(const SymbolCostMap& map, std::shared_ptr<const ResultData> resultData)
     {
-        m_totalCosts = totalCost;
+        Q_ASSERT(resultData);
+        m_resultData = std::move(resultData);
         HashModel<SymbolCostMap, ModelImpl>::setRows(map);
     }
 
@@ -147,7 +153,6 @@ public:
     {
         SortRole = Qt::UserRole,
         TotalCostRole,
-        FilterRole,
         SymbolRole
     };
 
@@ -232,13 +237,10 @@ public:
             case NUM_COLUMNS:
                 break;
             }
-        } else if (role == FilterRole) {
-            // TODO: optimize this
-            return QString(symbol.symbol + symbol.binary);
         } else if (role == Qt::DisplayRole) {
             switch (static_cast<Columns>(column)) {
             case LocationColumn:
-                return i18nc("%1: function name, %2: binary basename", "%1 in %2", symbol.symbol, symbol.binary);
+                return Util::toString(symbol, *m_resultData, Util::Short);
             case PeakColumn:
                 return Util::formatBytes(costs.peak);
             case LeakedColumn:
@@ -253,7 +255,7 @@ public:
         } else if (role == SymbolRole) {
             return QVariant::fromValue(symbol);
         } else if (role == Qt::ToolTipRole) {
-            return Util::formatTooltip(symbol, costs, m_totalCosts);
+            return Util::formatTooltip(symbol, costs, *m_resultData);
         }
 
         return {};
@@ -267,7 +269,7 @@ public:
 private:
     virtual QString symbolHeader() const = 0;
 
-    AllocationData m_totalCosts;
+    std::shared_ptr<const ResultData> m_resultData;
 };
 
 class CallerModel : public SymbolCostModelImpl<CallerModel>
@@ -301,9 +303,9 @@ public:
 
     virtual ~LocationCostModelImpl() = default;
 
-    void setResults(const LocationCostMap& map, const AllocationData& totalCosts)
+    void setResults(const LocationCostMap& map, std::shared_ptr<const ResultData> resultData)
     {
-        m_totalCosts = totalCosts;
+        m_resultData = std::move(resultData);
         HashModel<LocationCostMap, ModelImpl>::setRows(map);
     }
 
@@ -329,7 +331,7 @@ public:
     {
         SortRole = Qt::UserRole,
         TotalCostRole,
-        FilterRole,
+        ResultDataRole,
         LocationRole
     };
 
@@ -409,7 +411,7 @@ public:
         if (role == SortRole) {
             switch (static_cast<Columns>(column)) {
             case LocationColumn:
-                return location.toString();
+                return Util::toString(location, *m_resultData, Util::Long);
             case SelfAllocationsColumn:
                 // NOTE: we sort by unsigned absolute value
                 return QVariant::fromValue<quint64>(std::abs(costs.selfCost.allocations));
@@ -434,26 +436,24 @@ public:
             switch (static_cast<Columns>(column)) {
             case SelfAllocationsColumn:
             case InclusiveAllocationsColumn:
-                return QVariant::fromValue<qint64>(m_totalCosts.allocations);
+                return QVariant::fromValue<qint64>(m_resultData->totalCosts().allocations);
             case SelfTemporaryColumn:
             case InclusiveTemporaryColumn:
-                return QVariant::fromValue<qint64>(m_totalCosts.temporary);
+                return QVariant::fromValue<qint64>(m_resultData->totalCosts().temporary);
             case SelfPeakColumn:
             case InclusivePeakColumn:
-                return QVariant::fromValue<qint64>(m_totalCosts.peak);
+                return QVariant::fromValue<qint64>(m_resultData->totalCosts().peak);
             case SelfLeakedColumn:
             case InclusiveLeakedColumn:
-                return QVariant::fromValue<qint64>(m_totalCosts.leaked);
+                return QVariant::fromValue<qint64>(m_resultData->totalCosts().leaked);
             case LocationColumn:
             case NUM_COLUMNS:
                 break;
             }
-        } else if (role == FilterRole) {
-            return location.toString();
         } else if (role == Qt::DisplayRole) {
             switch (static_cast<Columns>(column)) {
             case LocationColumn:
-                return Util::basename(location.toString());
+                return Util::toString(location, *m_resultData, Util::Short);
             case SelfAllocationsColumn:
                 return QVariant::fromValue<qint64>(costs.selfCost.allocations);
             case SelfTemporaryColumn:
@@ -475,8 +475,10 @@ public:
             }
         } else if (role == LocationRole) {
             return QVariant::fromValue(location);
+        } else if (role == ResultDataRole) {
+            return QVariant::fromValue(m_resultData.get());
         } else if (role == Qt::ToolTipRole) {
-            return Util::formatTooltip(location, costs.selfCost, costs.inclusiveCost, m_totalCosts);
+            return Util::formatTooltip(location, costs.selfCost, costs.inclusiveCost, *m_resultData);
         }
 
         return {};
@@ -488,7 +490,7 @@ public:
     }
 
 private:
-    AllocationData m_totalCosts;
+    std::shared_ptr<const ResultData> m_resultData;
 };
 
 class SourceMapModel : public LocationCostModelImpl<SourceMapModel>

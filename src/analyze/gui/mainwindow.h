@@ -30,6 +30,7 @@ class MainWindow;
 class TreeModel;
 class ChartModel;
 class Parser;
+class ResultData;
 
 class MainWindow : public QMainWindow
 {

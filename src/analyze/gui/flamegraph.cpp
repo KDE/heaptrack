@@ -43,6 +43,7 @@
 #include <KStandardAction>
 #include <ThreadWeaver/ThreadWeaver>
 
+#include "resultdata.h"
 #include "util.h"
 
 enum CostType
@@ -67,8 +68,10 @@ enum SearchMatchType
 class FrameGraphicsItem : public QGraphicsRectItem
 {
 public:
-    FrameGraphicsItem(const qint64 cost, CostType costType, const Symbol& symbol, FrameGraphicsItem* parent = nullptr);
-    FrameGraphicsItem(const qint64 cost, const Symbol& symbol, FrameGraphicsItem* parent);
+    FrameGraphicsItem(const qint64 cost, CostType costType, const Symbol& symbol,
+                      std::shared_ptr<const ResultData> resultData, FrameGraphicsItem* parent = nullptr);
+    FrameGraphicsItem(const qint64 cost, const Symbol& symbol, std::shared_ptr<const ResultData> resultData,
+                      FrameGraphicsItem* parent);
 
     qint64 cost() const;
     void setCost(qint64 cost);
@@ -77,6 +80,8 @@ public:
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget = nullptr) override;
 
     QString description() const;
+
+    bool match(const QString& searchValue) const;
     void setSearchMatchType(SearchMatchType matchType);
 
 protected:
@@ -84,6 +89,7 @@ protected:
     void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
 
 private:
+    std::shared_ptr<const ResultData> m_resultData;
     qint64 m_cost;
     Symbol m_symbol;
     CostType m_costType;
@@ -94,8 +100,9 @@ private:
 Q_DECLARE_METATYPE(FrameGraphicsItem*)
 
 FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, CostType costType, const Symbol& symbol,
-                                     FrameGraphicsItem* parent)
+                                     std::shared_ptr<const ResultData> resultData, FrameGraphicsItem* parent)
     : QGraphicsRectItem(parent)
+    , m_resultData(std::move(resultData))
     , m_cost(cost)
     , m_symbol(symbol)
     , m_costType(costType)
@@ -105,8 +112,9 @@ FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, CostType costType, const
     setAcceptHoverEvents(true);
 }
 
-FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, const Symbol& symbol, FrameGraphicsItem* parent)
-    : FrameGraphicsItem(cost, parent->m_costType, symbol, parent)
+FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, const Symbol& symbol,
+                                     std::shared_ptr<const ResultData> resultData, FrameGraphicsItem* parent)
+    : FrameGraphicsItem(cost, parent->m_costType, symbol, std::move(resultData), parent)
 {
 }
 
@@ -165,10 +173,29 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
         painter->setPen(pen);
     }
 
+    auto label = [this]() {
+        if (m_symbol.isValid()) {
+            return m_resultData->string(m_symbol.functionId);
+        }
+
+        // root
+        switch (m_costType) {
+        case Allocations:
+            return i18n("%1 allocations in total", m_cost);
+        case Temporary:
+            return i18n("%1 temporary allocations in total", m_cost);
+        case Peak:
+            return i18n("%1 peak memory consumption", Util::formatBytes(m_cost));
+        case Leaked:
+            return i18n("%1 leaked in total", Util::formatBytes(m_cost));
+        }
+        Q_UNREACHABLE();
+    }();
+
     const int height = rect().height();
     painter->drawText(margin + rect().x(), rect().y(), width, height,
                       Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
-                      option->fontMetrics.elidedText(m_symbol.symbol, Qt::ElideRight, width));
+                      option->fontMetrics.elidedText(label, Qt::ElideRight, width));
 
     if (m_searchMatch == NoMatch) {
         painter->setPen(oldPen);
@@ -191,11 +218,12 @@ void FrameGraphicsItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event)
 
 QString FrameGraphicsItem::description() const
 {
+    const auto symbol = Util::toString(m_symbol, *m_resultData, Util::Short);
+
     // we build the tooltip text on demand, which is much faster than doing that
     // for potentially thousands of items when we load the data
-    const auto symbol = i18nc("%1: function, %2: binary", "%1 (%2)", m_symbol.symbol, m_symbol.binary);
     if (!parentItem()) {
-        return m_symbol.symbol;
+        return symbol;
     }
 
     qint64 totalCost = 0;
@@ -232,6 +260,14 @@ QString FrameGraphicsItem::description() const
     }
 
     return tooltip;
+}
+
+bool FrameGraphicsItem::match(const QString& searchValue) const
+{
+    auto match = [&](StringIndex index) {
+        return m_resultData->string(index).contains(searchValue, Qt::CaseInsensitive);
+    };
+    return match(m_symbol.functionId) || match(m_symbol.moduleId);
 }
 
 void FrameGraphicsItem::setSearchMatchType(SearchMatchType matchType)
@@ -301,24 +337,25 @@ FrameGraphicsItem* findItemBySymbol(const QList<QGraphicsItem*>& items, const Sy
 /**
  * Convert the top-down graph into a tree of FrameGraphicsItem.
  */
-void toGraphicsItems(const QVector<RowData>& data, FrameGraphicsItem* parent, int64_t AllocationData::*member,
-                     const double costThreshold, bool collapseRecursion)
+void toGraphicsItems(const std::shared_ptr<const ResultData>& resultData, const QVector<RowData>& data,
+                     FrameGraphicsItem* parent, int64_t AllocationData::*member, const double costThreshold,
+                     bool collapseRecursion)
 {
     foreach (const auto& row, data) {
-        if (collapseRecursion && row.symbol.symbol != unresolvedFunctionName() && row.symbol == parent->symbol()) {
-            toGraphicsItems(row.children, parent, member, costThreshold, collapseRecursion);
+        if (collapseRecursion && row.symbol.functionId && row.symbol == parent->symbol()) {
+            toGraphicsItems(resultData, row.children, parent, member, costThreshold, collapseRecursion);
             continue;
         }
         auto item = findItemBySymbol(parent->childItems(), row.symbol);
         if (!item) {
-            item = new FrameGraphicsItem(row.cost.*member, row.symbol, parent);
+            item = new FrameGraphicsItem(row.cost.*member, row.symbol, resultData, parent);
             item->setPen(parent->pen());
             item->setBrush(brush());
         } else {
             item->setCost(item->cost() + row.cost.*member);
         }
         if (item->cost() > costThreshold) {
-            toGraphicsItems(row.children, item, member, costThreshold, collapseRecursion);
+            toGraphicsItems(resultData, row.children, item, member, costThreshold, collapseRecursion);
         }
     }
 }
@@ -338,38 +375,19 @@ int64_t AllocationData::*memberForType(CostType type)
     Q_UNREACHABLE();
 }
 
-FrameGraphicsItem* parseData(const QVector<RowData>& topDownData, CostType type, double costThreshold,
-                             bool collapseRecursion)
+FrameGraphicsItem* parseData(const TreeData& data, CostType type, double costThreshold, bool collapseRecursion)
 {
     auto member = memberForType(type);
 
-    double totalCost = 0;
-    foreach (const auto& frame, topDownData) {
-        totalCost += frame.cost.*member;
-    }
+    const auto totalCost = data.resultData->totalCosts().*member;
 
     KColorScheme scheme(QPalette::Active);
     const QPen pen(scheme.foreground().color());
 
-    QString label;
-    switch (type) {
-    case Allocations:
-        label = i18n("%1 allocations in total", totalCost);
-        break;
-    case Temporary:
-        label = i18n("%1 temporary allocations in total", totalCost);
-        break;
-    case Peak:
-        label = i18n("%1 peak memory consumption", Util::formatBytes(totalCost));
-        break;
-    case Leaked:
-        label = i18n("%1 leaked in total", Util::formatBytes(totalCost));
-        break;
-    }
-    auto rootItem = new FrameGraphicsItem(totalCost, type, label);
+    auto rootItem = new FrameGraphicsItem(totalCost, type, {}, data.resultData);
     rootItem->setBrush(scheme.background());
     rootItem->setPen(pen);
-    toGraphicsItems(topDownData, rootItem, member, totalCost * costThreshold / 100., collapseRecursion);
+    toGraphicsItems(data.resultData, data.rows, rootItem, member, totalCost * costThreshold / 100., collapseRecursion);
     return rootItem;
 }
 
@@ -384,8 +402,7 @@ SearchResults applySearch(FrameGraphicsItem* item, const QString& searchValue)
     SearchResults result;
     if (searchValue.isEmpty()) {
         result.matchType = NoSearch;
-    } else if (item->symbol().symbol.contains(searchValue, Qt::CaseInsensitive)
-               || item->symbol().binary.contains(searchValue, Qt::CaseInsensitive)) {
+    } else if (item->match(searchValue)) {
         result.directCost += item->cost();
         result.matchType = DirectMatch;
     }
