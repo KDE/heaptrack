@@ -30,6 +30,8 @@
 #include <iomanip>
 #include <iostream>
 
+#include <unordered_set>
+
 #include "util/config.h"
 
 using namespace std;

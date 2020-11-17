@@ -489,7 +489,7 @@ vector<IndexT> sortedIndices(size_t numIndices, SortF sorter)
 
 vector<StringIndex> remapStrings(vector<string>& lhs, const vector<string>& rhs)
 {
-    unordered_map<string, StringIndex> stringRemapping;
+    tsl::robin_map<string, StringIndex> stringRemapping;
     StringIndex stringIndex;
     {
         stringRemapping.reserve(lhs.size());

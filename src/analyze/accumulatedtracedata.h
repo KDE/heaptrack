@@ -24,9 +24,6 @@
 #include <vector>
 
 #include <fstream>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
 
 #include <boost/functional/hash.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
