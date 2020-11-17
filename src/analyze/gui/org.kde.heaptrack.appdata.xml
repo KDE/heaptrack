@@ -145,7 +145,7 @@
       <li xml:lang="fr">trouver les allocations transitoires, c'est-à-dire enchaînant une allocation suivie directement par une désallocation.</li>
       <li xml:lang="gl">Atopar asignacións temporais, asignacións que se liberan no momento.</li>
       <li xml:lang="id">menemukan alokasi sementara, yaitu alokasi yang langsung diikuti oleh alokasi mereka</li>
-      <li xml:lang="it">trovare allocazioni temporanee, cioè allocazioni che sono seguite direttamente dalle rispettivi de-allocazioni</li>
+      <li xml:lang="it">trovare allocazioni temporanee, cioè allocazioni che sono seguite direttamente dalle rispettive de-allocazioni</li>
       <li xml:lang="ko">메모리 할당 다음에 바로 해제가 나오는 임시 할당 확인</li>
       <li xml:lang="nl">zoek naar tijdelijke toewijzingen, die toewijzingen zijn die direct gevolgd worden door hun vrijgave</li>
       <li xml:lang="nn">Finna «mellombelse» reserveringar – reserveringar som umiddelbart vert etterfølgde av avreserveringar.</li>
