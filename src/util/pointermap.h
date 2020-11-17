@@ -22,10 +22,10 @@
 #include <algorithm>
 #include <iostream>
 #include <limits>
-#include <map>
-#include <unordered_map>
-#include <unordered_set>
 #include <vector>
+
+#include <tsl/robin_map.h>
+#include <tsl/robin_set.h>
 
 #include <boost/functional/hash.hpp>
 
@@ -81,7 +81,7 @@ struct AllocationInfoSet
             return true;
         }
     }
-    std::unordered_set<IndexedAllocationInfo> set;
+    tsl::robin_set<IndexedAllocationInfo> set;
 };
 
 /**
@@ -129,7 +129,7 @@ public:
         if (mapIt == map.end()) {
             mapIt = map.insert(mapIt, std::make_pair(pointer.big, Indices()));
         }
-        auto& indices = mapIt->second;
+        auto& indices = mapIt.value();
         auto pageIt = std::lower_bound(indices.smallPtrParts.begin(), indices.smallPtrParts.end(), pointer.small);
         auto allocationIt = indices.allocationIndices.begin() + distance(indices.smallPtrParts.begin(), pageIt);
         if (pageIt == indices.smallPtrParts.end() || *pageIt != pointer.small) {
@@ -148,7 +148,7 @@ public:
         if (mapIt == map.end()) {
             return {{}, false};
         }
-        auto& indices = mapIt->second;
+        auto& indices = mapIt.value();
         auto pageIt = std::lower_bound(indices.smallPtrParts.begin(), indices.smallPtrParts.end(), pointer.small);
         if (pageIt == indices.smallPtrParts.end() || *pageIt != pointer.small) {
             return {{}, false};
@@ -169,7 +169,7 @@ private:
         std::vector<uint16_t> smallPtrParts;
         std::vector<AllocationInfoIndex> allocationIndices;
     };
-    std::unordered_map<uint64_t, Indices> map;
+    tsl::robin_map<uint64_t, Indices> map;
 };
 
 #endif // POINTERMAP_H
