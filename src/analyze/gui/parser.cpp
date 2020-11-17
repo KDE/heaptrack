@@ -29,7 +29,22 @@
 
 #include <future>
 #include <tuple>
+#include <utility>
 #include <vector>
+
+#include <boost/functional/hash/hash.hpp>
+
+namespace std {
+template <>
+struct hash<std::pair<Symbol, Symbol>>
+{
+    std::size_t operator()(const std::pair<Symbol, Symbol>& pair) const
+    {
+        return boost::hash_value(std::tie(pair.first.functionId.index, pair.first.moduleId.index,
+                                          pair.second.functionId.index, pair.second.moduleId.index));
+    }
+};
+}
 
 using namespace std;
 
@@ -451,8 +466,8 @@ struct ReusableGuardBuffer
         callerCalleeRecursionGuard.clear();
     }
 
-    QSet<Symbol> recursionGuard;
-    QSet<QPair<Symbol, Symbol>> callerCalleeRecursionGuard;
+    std::unordered_set<Symbol> recursionGuard;
+    std::unordered_set<std::pair<Symbol, Symbol>> callerCalleeRecursionGuard;
 };
 
 AllocationData buildCallerCallee(const QVector<RowData>& bottomUpData, CallerCalleeResults* callerCalleeResults,
@@ -479,7 +494,7 @@ AllocationData buildCallerCallee(const QVector<RowData>& bottomUpData, CallerCal
                 const auto symbol = node->symbol;
                 // aggregate caller-callee data
                 auto& entry = callerCalleeResults->entries[symbol];
-                if (tryInsert(&guardBuffer->recursionGuard, symbol)) {
+                if (guardBuffer->recursionGuard.insert(symbol).second) {
                     // only increment inclusive cost once for a given stack
                     entry.inclusiveCost += cost;
                 }
@@ -490,7 +505,7 @@ AllocationData buildCallerCallee(const QVector<RowData>& bottomUpData, CallerCal
                 // add current entry as callee to last entry
                 // and last entry as caller to current entry
                 if (lastEntry) {
-                    if (tryInsert(&guardBuffer->callerCalleeRecursionGuard, {symbol, lastSymbol})) {
+                    if (guardBuffer->callerCalleeRecursionGuard.insert({symbol, lastSymbol}).second) {
                         lastEntry->callees[symbol] += cost;
                         entry.callers[lastSymbol] += cost;
                     }

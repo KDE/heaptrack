@@ -42,6 +42,7 @@ target_link_libraries(heaptrack_gui_private PUBLIC
 target_include_directories(heaptrack_gui_private PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../
+    ${Boost_INCLUDE_DIRS}
 )
 
 set(SRCFILES

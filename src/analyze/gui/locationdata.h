@@ -24,6 +24,8 @@
 
 #include <util/indices.h>
 
+#include <boost/functional/hash.hpp>
+
 Q_DECLARE_METATYPE(ModuleIndex)
 Q_DECLARE_METATYPE(FunctionIndex)
 Q_DECLARE_METATYPE(FileIndex)
@@ -73,6 +75,17 @@ Q_DECLARE_TYPEINFO(FileLine, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(FileLine)
 
 const QString& unresolvedFunctionName();
+
+namespace std {
+template <>
+struct hash<Symbol>
+{
+    std::size_t operator()(const Symbol symbol) const
+    {
+        return boost::hash_value(std::tie(symbol.functionId.index, symbol.moduleId.index));
+    }
+};
+}
 
 inline uint qHash(const Symbol& symbol, uint seed = 0)
 {
