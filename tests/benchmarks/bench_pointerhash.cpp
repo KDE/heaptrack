@@ -16,7 +16,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <unordered_map>
+#include <tsl/robin_map.h>
 
 #include "bench_pointers.h"
 #include "src/util/indices.h"
@@ -44,7 +44,7 @@ struct PointerHashMap
         return ret;
     }
 
-    std::unordered_map<uint64_t, AllocationInfoIndex> map;
+    tsl::robin_map<uint64_t, AllocationInfoIndex> map;
 };
 
 int main()
