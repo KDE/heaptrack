@@ -29,19 +29,16 @@
 
 #include <future>
 #include <tuple>
-#include <unordered_set>
 #include <utility>
 #include <vector>
+
+#define TSL_NO_EXCEPTIONS 1
+#include <tsl/robin_map.h>
+#include <tsl/robin_set.h>
 
 #include <boost/container/pmr/monotonic_buffer_resource.hpp>
 #include <boost/container/pmr/polymorphic_allocator.hpp>
 #include <boost/functional/hash/hash.hpp>
-
-template <typename T>
-struct pmr_set
-{
-    using type = std::unordered_set<T, std::hash<T>, std::equal_to<T>, boost::container::pmr::polymorphic_allocator<T>>;
-};
 
 namespace std {
 template <>
@@ -58,18 +55,6 @@ struct hash<std::pair<Symbol, Symbol>>
 using namespace std;
 
 namespace {
-// sadly QSet does not have API to check if an insert would overwrite
-// still, QSet seems to be faster than std::unorderd_set
-// so instead of doing a lookup+insert, just insert and check if the size
-// changed. If not, then the value existed already
-template <typename T>
-bool tryInsert(QSet<T>* set, T value)
-{
-    const auto oldSize = set->size();
-    set->insert(std::move(value));
-    return oldSize != set->size();
-}
-
 Symbol symbol(const Frame& frame, ModuleIndex moduleIndex)
 {
     return {frame.functionIndex, moduleIndex};
@@ -159,7 +144,7 @@ struct ParserData final : public AccumulatedTraceData
         }
         // find the top hot spots for the individual data members and remember their
         // IP and store the label
-        QHash<IpIndex, LabelIds> ipToLabelIds;
+        tsl::robin_map<IpIndex, LabelIds> ipToLabelIds;
         auto findTopChartEntries = [&](qint64 ChartMergeData::*member, int LabelIds::*label, ChartData* data) {
             sort(merged.begin(), merged.end(), [=](const ChartMergeData& left, const ChartMergeData& right) {
                 return std::abs(left.*member) > std::abs(right.*member);
@@ -183,10 +168,10 @@ struct ParserData final : public AccumulatedTraceData
         // instead of doing this lookup every time we are handling a time stamp
         for (uint32_t i = 0, c = allocations.size(); i < c; ++i) {
             const auto ip = findTrace(allocations[i].traceIndex).ipIndex;
-            auto it = ipToLabelIds.constFind(ip);
-            if (it == ipToLabelIds.constEnd())
+            auto it = ipToLabelIds.find(ip);
+            if (it == ipToLabelIds.end())
                 continue;
-            auto ids = *it;
+            auto ids = it->second;
             ids.allocationIndex.index = i;
             labelIds.push_back(ids);
         }
@@ -335,11 +320,11 @@ void setParents(QVector<RowData>& children, const RowData* parent)
     }
 }
 
-void addCallerCalleeEvent(const Location& location, const AllocationData& cost, QSet<Symbol>* recursionGuard,
+void addCallerCalleeEvent(const Location& location, const AllocationData& cost, tsl::robin_set<Symbol>* recursionGuard,
                           CallerCalleeResults* callerCalleeResult)
 {
-    const auto isLeaf = recursionGuard->isEmpty();
-    if (!tryInsert(recursionGuard, location.symbol)) {
+    const auto isLeaf = recursionGuard->empty();
+    if (!recursionGuard->insert(location.symbol).second) {
         return;
     }
 
@@ -358,9 +343,9 @@ std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser* parser, const 
 {
     CallerCalleeResults callerCalleeResults;
     TreeData topRows;
-    QSet<TraceIndex> traceRecursionGuard;
+    tsl::robin_set<TraceIndex> traceRecursionGuard;
     traceRecursionGuard.reserve(128);
-    QSet<Symbol> symbolRecursionGuard;
+    tsl::robin_set<Symbol> symbolRecursionGuard;
     symbolRecursionGuard.reserve(128);
     auto addRow = [&symbolRecursionGuard, &callerCalleeResults](QVector<RowData>* rows, const Location& location,
                                                                 const Allocation& cost) -> QVector<RowData>* {
@@ -395,7 +380,7 @@ std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser* parser, const 
                 break;
             }
             traceIndex = trace.parentIndex;
-            if (!tryInsert(&traceRecursionGuard, traceIndex)) {
+            if (!traceRecursionGuard.insert(traceIndex).second) {
                 qWarning() << "Trace recursion detected - corrupt data file?";
                 break;
             }
@@ -464,21 +449,19 @@ TreeData toTopDownData(const TreeData& bottomUpData)
 struct ReusableGuardBuffer
 {
     ReusableGuardBuffer()
-        : mbr(&buffer, sizeof(buffer))
     {
+        recursionGuard.reserve(128);
+        callerCalleeRecursionGuard.reserve(128);
     }
 
-    template <typename T>
-    auto makeGuard()
+    void reset()
     {
-        using Set = typename pmr_set<T>::type;
-        auto ret = Set(&mbr);
-        ret.reserve(128);
-        return ret;
+        recursionGuard.clear();
+        callerCalleeRecursionGuard.clear();
     }
 
-    char buffer[4096];
-    boost::container::pmr::monotonic_buffer_resource mbr;
+    tsl::robin_set<Symbol> recursionGuard;
+    tsl::robin_set<std::pair<Symbol, Symbol>> callerCalleeRecursionGuard;
 };
 
 AllocationData buildCallerCallee(const QVector<RowData>& bottomUpData, CallerCalleeResults* callerCalleeResults,
@@ -495,9 +478,9 @@ AllocationData buildCallerCallee(const QVector<RowData>& bottomUpData, CallerCal
             // leaf node found, bubble up the parent chain to add cost for all frames
             // to the caller/callee data. this is done top-down since we must not count
             // symbols more than once in the caller-callee data
-            guardBuffer->mbr.release();
-            auto recursionGuard = guardBuffer->makeGuard<Symbol>();
-            auto callerCalleeRecursionGuard = guardBuffer->makeGuard<std::pair<Symbol, Symbol>>();
+            guardBuffer->reset();
+            auto& recursionGuard = guardBuffer->recursionGuard;
+            auto& callerCalleeRecursionGuard = guardBuffer->callerCalleeRecursionGuard;
 
             auto node = &row;
 

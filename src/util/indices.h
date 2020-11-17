@@ -19,7 +19,7 @@
 #ifndef INDICES_H
 #define INDICES_H
 
-#include <unordered_map>
+#include <functional>
 
 // sadly, C++ doesn't yet have opaque typedefs
 template <typename Base>
@@ -111,6 +111,10 @@ struct IndexHasher
 namespace std {
 template <>
 struct hash<TraceIndex> : IndexHasher
+{
+};
+template <>
+struct hash<IpIndex> : IndexHasher
 {
 };
 }
