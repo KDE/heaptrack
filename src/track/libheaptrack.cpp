@@ -49,7 +49,6 @@
 #include <mutex>
 #include <string>
 #include <thread>
-#include <unordered_set>
 
 #include <boost/algorithm/string/replace.hpp>
 
@@ -71,6 +70,10 @@ __attribute__((weak)) extern void __freeres();
  * related to TLS and such I guess
  */
 // #define DEBUG_MALLOC_PTRS
+
+#ifdef DEBUG_MALLOC_PTRS
+#include <tsl/robin_set.h>
+#endif
 
 using namespace std;
 
@@ -710,7 +713,7 @@ private:
         heaptrack_callback_t stopCallback = nullptr;
 
 #ifdef DEBUG_MALLOC_PTRS
-        unordered_set<void*> known;
+        tsl::robin_set<void*> known;
 #endif
     };
 
