@@ -32,7 +32,15 @@
 #include <utility>
 #include <vector>
 
+#include <boost/container/pmr/monotonic_buffer_resource.hpp>
+#include <boost/container/pmr/polymorphic_allocator.hpp>
 #include <boost/functional/hash/hash.hpp>
+
+template <typename T>
+struct pmr_set
+{
+    using type = std::unordered_set<T, std::hash<T>, std::equal_to<T>, boost::container::pmr::polymorphic_allocator<T>>;
+};
 
 namespace std {
 template <>
@@ -455,19 +463,21 @@ TreeData toTopDownData(const TreeData& bottomUpData)
 struct ReusableGuardBuffer
 {
     ReusableGuardBuffer()
+        : mbr(&buffer, sizeof(buffer))
     {
-        recursionGuard.reserve(128);
-        callerCalleeRecursionGuard.reserve(128);
     }
 
-    void reset()
+    template <typename T>
+    auto makeGuard()
     {
-        recursionGuard.clear();
-        callerCalleeRecursionGuard.clear();
+        using Set = typename pmr_set<T>::type;
+        auto ret = Set(&mbr);
+        ret.reserve(128);
+        return ret;
     }
 
-    std::unordered_set<Symbol> recursionGuard;
-    std::unordered_set<std::pair<Symbol, Symbol>> callerCalleeRecursionGuard;
+    char buffer[4096];
+    boost::container::pmr::monotonic_buffer_resource mbr;
 };
 
 AllocationData buildCallerCallee(const QVector<RowData>& bottomUpData, CallerCalleeResults* callerCalleeResults,
@@ -484,7 +494,10 @@ AllocationData buildCallerCallee(const QVector<RowData>& bottomUpData, CallerCal
             // leaf node found, bubble up the parent chain to add cost for all frames
             // to the caller/callee data. this is done top-down since we must not count
             // symbols more than once in the caller-callee data
-            guardBuffer->reset();
+            guardBuffer->mbr.release();
+            auto recursionGuard = guardBuffer->makeGuard<Symbol>();
+            auto callerCalleeRecursionGuard = guardBuffer->makeGuard<std::pair<Symbol, Symbol>>();
+
             auto node = &row;
 
             Symbol lastSymbol;
@@ -494,7 +507,7 @@ AllocationData buildCallerCallee(const QVector<RowData>& bottomUpData, CallerCal
                 const auto symbol = node->symbol;
                 // aggregate caller-callee data
                 auto& entry = callerCalleeResults->entries[symbol];
-                if (guardBuffer->recursionGuard.insert(symbol).second) {
+                if (recursionGuard.insert(symbol).second) {
                     // only increment inclusive cost once for a given stack
                     entry.inclusiveCost += cost;
                 }
@@ -505,7 +518,7 @@ AllocationData buildCallerCallee(const QVector<RowData>& bottomUpData, CallerCal
                 // add current entry as callee to last entry
                 // and last entry as caller to current entry
                 if (lastEntry) {
-                    if (guardBuffer->callerCalleeRecursionGuard.insert({symbol, lastSymbol}).second) {
+                    if (callerCalleeRecursionGuard.insert({symbol, lastSymbol}).second) {
                         lastEntry->callees[symbol] += cost;
                         entry.callers[lastSymbol] += cost;
                     }

@@ -23,7 +23,7 @@ set(HEAPTRACK_FILE_FORMAT_VERSION 2)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 include(FeatureSummary)
-find_package(Boost 1.41.0 COMPONENTS system filesystem iostreams)
+find_package(Boost 1.60.0 COMPONENTS system filesystem iostreams container)
 find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 
