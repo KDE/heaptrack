@@ -26,6 +26,9 @@
 
 #include <QVector>
 
+#include <boost/container/pmr/monotonic_buffer_resource.hpp>
+#include <boost/container/pmr/polymorphic_allocator.hpp>
+#include <boost/container/pmr/slist.hpp>
 #include <boost/container/slist.hpp>
 
 #include "../../src/analyze/allocationdata.h"
@@ -102,18 +105,24 @@ void setParents(boost::container::slist<Node<boost::container::slist>>&, const N
     // nothing to do
 }
 
-template <template <typename...> class Container>
-Container<Node<Container>> buildTree(const std::vector<Trace>& traces)
+void setParents(boost::container::pmr::slist<Node<boost::container::pmr::slist>>&,
+                const Node<boost::container::pmr::slist>*)
 {
-    auto findNode = [](Container<Node<Container>>* nodes, uint64_t ip, const Node<Container>* parent) {
+    // nothing to do
+}
+
+template <template <typename...> class Container, typename... Allocator>
+Container<Node<Container>> buildTree(const std::vector<Trace>& traces, const Allocator&... allocator)
+{
+    auto findNode = [&](Container<Node<Container>>* nodes, uint64_t ip, const Node<Container>* parent) {
         auto it =
             std::find_if(nodes->begin(), nodes->end(), [ip](const Node<Container>& node) { return node.ip == ip; });
         if (it != nodes->end())
             return it;
-        return nodes->insert(it, Node<Container> {{}, ip, parent, {}});
+        return nodes->insert(it, Node<Container> {{}, ip, parent, Container<Node<Container>> {allocator...}});
     };
 
-    Container<Node<Container>> ret;
+    Container<Node<Container>> ret(allocator...);
     const Node<Container>* parent = nullptr;
     for (const auto& trace : traces) {
         auto* nodes = &ret;
@@ -150,6 +159,14 @@ std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces)
     const auto tree = buildTree<Container>(traces);
     return {tree.size(), numNodes(tree)};
 }
+
+template <>
+std::pair<uint64_t, uint64_t> run<boost::container::pmr::slist>(const std::vector<Trace>& traces)
+{
+    boost::container::pmr::monotonic_buffer_resource mbr;
+    const auto tree = buildTree<boost::container::pmr::slist>(traces, &mbr);
+    return {tree.size(), numNodes<boost::container::pmr::slist>(tree)};
+}
 }
 
 enum class Tag
@@ -158,6 +175,7 @@ enum class Tag
     StdVector,
     StdList,
     BoostSlist,
+    BoostPmrSlist,
 };
 
 std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces, Tag tag)
@@ -171,6 +189,8 @@ std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces, Tag tag)
         return Tree::run<std::list>(traces);
     case Tag::BoostSlist:
         return Tree::run<boost::container::slist>(traces);
+    case Tag::BoostPmrSlist:
+        return Tree::run<boost::container::pmr::slist>(traces);
     }
     Q_UNREACHABLE();
 }
@@ -178,7 +198,7 @@ std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces, Tag tag)
 int main(int argc, char** argv)
 {
     if (argc != 2) {
-        std::cerr << "usage: bench_tree [QVector|std::vector|std::list|boost::slist]\n";
+        std::cerr << "usage: bench_tree [QVector|std::vector|std::list|boost::slist|boost::pmr::slist]\n";
         return 1;
     }
 
@@ -192,6 +212,8 @@ int main(int argc, char** argv)
             return Tag::StdList;
         if (t == "boost::slist")
             return Tag::BoostSlist;
+        if (t == "boost::pmr::slist")
+            return Tag::BoostPmrSlist;
         std::cerr << "unhandled tag: " << t << "\n";
         exit(1);
     }();
