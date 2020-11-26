@@ -24,5 +24,7 @@ add_executable(bench_linereader bench_linereader.cpp)
 find_package(Qt5 5.10.0 CONFIG OPTIONAL_COMPONENTS Core)
 if (Qt5Core_FOUND)
     add_executable(bench_tree bench_tree.cpp)
-    target_link_libraries(bench_tree Qt5::Core)
+    target_include_directories(bench_tree PRIVATE ${Boost_INCLUDE_DIRS})
+    target_link_libraries(bench_tree Qt5::Core
+    ${Boost_CONTAINER_LIBRARY})
 endif()

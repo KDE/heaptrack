@@ -26,6 +26,8 @@
 
 #include <QVector>
 
+#include <boost/container/slist.hpp>
+
 #include "../../src/analyze/allocationdata.h"
 
 constexpr uint64_t MAX_TREE_DEPTH = 64;
@@ -116,7 +118,8 @@ enum class Tag
 {
     QVector,
     StdVector,
-    StdList
+    StdList,
+    BoostSlist,
 };
 
 std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces, Tag tag)
@@ -128,6 +131,8 @@ std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces, Tag tag)
         return Tree::run<std::vector>(traces);
     case Tag::StdList:
         return Tree::run<std::list>(traces);
+    case Tag::BoostSlist:
+        return Tree::run<boost::container::slist>(traces);
     }
     Q_UNREACHABLE();
 }
@@ -135,7 +140,7 @@ std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces, Tag tag)
 int main(int argc, char** argv)
 {
     if (argc != 2) {
-        std::cerr << "usage: bench_tree [QVector|std::vector|std::list]\n";
+        std::cerr << "usage: bench_tree [QVector|std::vector|std::list|boost::slist]\n";
         return 1;
     }
 
@@ -147,6 +152,8 @@ int main(int argc, char** argv)
             return Tag::StdVector;
         if (t == "std::list")
             return Tag::StdList;
+        if (t == "boost::slist")
+            return Tag::BoostSlist;
         std::cerr << "unhandled tag: " << t << "\n";
         exit(1);
     }();
