@@ -74,25 +74,59 @@ struct Node
 };
 
 template <template <typename...> class Container>
+void setParentsImpl(Container<Node<Container>>& nodes, const Node<Container>* parent)
+{
+    for (auto& node : nodes) {
+        node.parent = parent;
+        setParentsImpl(node.children, &node);
+    }
+}
+
+void setParents(QVector<Node<QVector>>& nodes, const Node<QVector>* parent)
+{
+    setParentsImpl(nodes, parent);
+}
+
+void setParents(std::vector<Node<std::vector>>& nodes, const Node<std::vector>* parent)
+{
+    setParentsImpl(nodes, parent);
+}
+
+void setParents(std::list<Node<std::list>>&, const Node<std::list>*)
+{
+    // nothing to do
+}
+
+void setParents(boost::container::slist<Node<boost::container::slist>>&, const Node<boost::container::slist>*)
+{
+    // nothing to do
+}
+
+template <template <typename...> class Container>
 Container<Node<Container>> buildTree(const std::vector<Trace>& traces)
 {
-    auto findNode = [](Container<Node<Container>>* nodes, uint64_t ip) {
+    auto findNode = [](Container<Node<Container>>* nodes, uint64_t ip, const Node<Container>* parent) {
         auto it =
             std::find_if(nodes->begin(), nodes->end(), [ip](const Node<Container>& node) { return node.ip == ip; });
         if (it != nodes->end())
             return it;
-        return nodes->insert(it, Node<Container> {{}, ip, nullptr, {}});
+        return nodes->insert(it, Node<Container> {{}, ip, parent, {}});
     };
 
     Container<Node<Container>> ret;
+    const Node<Container>* parent = nullptr;
     for (const auto& trace : traces) {
         auto* nodes = &ret;
         for (const auto& ip : trace) {
-            auto it = findNode(nodes, ip);
+            auto it = findNode(nodes, ip, parent);
             it->cost.allocations++;
             nodes = &it->children;
+            parent = &(*it);
         }
     }
+
+    setParents(ret, nullptr);
+
     return ret;
 }
 
