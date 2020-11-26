@@ -138,13 +138,17 @@ uint64_t numNodes(const Node<Container>& node)
 }
 
 template <template <typename...> class Container>
+uint64_t numNodes(const Container<Node<Container>>& tree)
+{
+    return std::accumulate(tree.begin(), tree.end(), uint64_t(0),
+                           [](uint64_t count, const Node<Container>& node) { return count + numNodes(node); });
+}
+
+template <template <typename...> class Container>
 std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces)
 {
     const auto tree = buildTree<Container>(traces);
-    const auto totalNodes =
-        std::accumulate(tree.begin(), tree.end(), uint64_t(0),
-                        [](uint64_t count, const Node<Container>& node) { return count + numNodes(node); });
-    return {tree.size(), totalNodes};
+    return {tree.size(), numNodes(tree)};
 }
 }
 
