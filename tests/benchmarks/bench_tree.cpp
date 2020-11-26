@@ -60,25 +60,28 @@ std::vector<Trace> generateTraces()
     return traces;
 }
 
-namespace QtTree {
+namespace Vector {
+template <template <typename...> class Container>
 struct VectorTree
 {
     AllocationData cost;
     uint64_t ip = 0;
     const VectorTree* parent = nullptr;
-    QVector<VectorTree> children;
+    Container<VectorTree> children;
 };
 
-QVector<VectorTree> buildTree(const std::vector<Trace>& traces)
+template <template <typename...> class Container>
+Container<VectorTree<Container>> buildTree(const std::vector<Trace>& traces)
 {
-    auto findNode = [](QVector<VectorTree>* nodes, uint64_t ip) {
-        auto it = std::find_if(nodes->begin(), nodes->end(), [ip](const VectorTree& node) { return node.ip == ip; });
+    auto findNode = [](Container<VectorTree<Container>>* nodes, uint64_t ip) {
+        auto it = std::find_if(nodes->begin(), nodes->end(),
+                               [ip](const VectorTree<Container>& node) { return node.ip == ip; });
         if (it != nodes->end())
             return it;
-        return nodes->insert(it, VectorTree {{}, ip, nullptr, {}});
+        return nodes->insert(it, VectorTree<Container> {{}, ip, nullptr, {}});
     };
 
-    QVector<VectorTree> ret;
+    Container<VectorTree<Container>> ret;
     for (const auto& trace : traces) {
         auto* nodes = &ret;
         for (const auto& ip : trace) {
@@ -90,25 +93,42 @@ QVector<VectorTree> buildTree(const std::vector<Trace>& traces)
     return ret;
 }
 
-uint64_t numNodes(const VectorTree& node)
+template <template <typename...> class Container>
+uint64_t numNodes(const VectorTree<Container>& node)
 {
     return std::accumulate(node.children.begin(), node.children.end(), uint64_t(1),
-                           [](uint64_t count, const VectorTree& node) { return count + numNodes(node); });
+                           [](uint64_t count, const VectorTree<Container>& node) { return count + numNodes(node); });
 }
 
+template <template <typename...> class Container>
 std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces)
 {
-    const auto tree = buildTree(traces);
+    const auto tree = buildTree<Container>(traces);
     const auto totalNodes =
         std::accumulate(tree.begin(), tree.end(), uint64_t(0),
-                        [](uint64_t count, const VectorTree& node) { return count + numNodes(node); });
+                        [](uint64_t count, const VectorTree<Container>& node) { return count + numNodes(node); });
     return {tree.size(), totalNodes};
+}
+}
+
+namespace QtTree {
+std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces)
+{
+    return Vector::run<QVector>(traces);
+}
+}
+
+namespace StdTree {
+std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces)
+{
+    return Vector::run<std::vector>(traces);
 }
 }
 
 enum class Tag
 {
     Qt,
+    Std
 };
 
 std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces, Tag tag)
@@ -116,6 +136,8 @@ std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces, Tag tag)
     switch (tag) {
     case Tag::Qt:
         return QtTree::run(traces);
+    case Tag::Std:
+        return StdTree::run(traces);
     }
     Q_UNREACHABLE();
 }
@@ -123,7 +145,7 @@ std::pair<uint64_t, uint64_t> run(const std::vector<Trace>& traces, Tag tag)
 int main(int argc, char** argv)
 {
     if (argc != 2) {
-        std::cerr << "usage: bench_tree [qt]\n";
+        std::cerr << "usage: bench_tree [qt|std]\n";
         return 1;
     }
 
@@ -131,6 +153,8 @@ int main(int argc, char** argv)
         auto t = std::string(argv[1]);
         if (t == "qt")
             return Tag::Qt;
+        if (t == "std")
+            return Tag::Std;
         std::cerr << "unhandled tag: " << t << "\n";
         exit(1);
     }();
