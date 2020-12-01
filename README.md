@@ -113,13 +113,13 @@ of the CMake command, as it will tell you about missing dependencies!
 On macOS the dependencies can be installed easily using [homebrew](http://brew.sh) and the [KDE homebrew tap](https://github.com/KDE-mac/homebrew-kde).
 
     # prepare tap
-    brew tap kde-mac/kde
+    brew tap kde-mac/kde https://invent.kde.org/packaging/homebrew-kde.git
     "$(brew --repo kde-mac/kde)/tools/do-caveats.sh"
     
     # install dependencies
-    brew install kde-mac/kde/kf5-extra-cmake-modules kde-mac/kde/kf5-kcoreaddons kde-mac/kde/kf5-ki18n \
-                 kde-mac/kde/kf5-kitemmodels kde-mac/kde/kf5-threadweaver kde-mac/kde/kf5-kconfigwidgets \
+    brew install kde-mac/kde/kf5-kcoreaddons kde-mac/kde/kf5-kitemmodels kde-mac/kde/kf5-kconfigwidgets \
                  kde-mac/kde/kf5-kio kde-mac/kde/kdiagram \
+                 kde-extra-cmake-modules kde-ki18n kde-threadweaver \
                  boost zstd gettext
     
     # run manual steps as printed by brew
