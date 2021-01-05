@@ -38,7 +38,6 @@ target_link_libraries(heaptrack_gui_private PUBLIC
     sharedprint
     pthread
     ${CMAKE_THREAD_LIBS_INIT}
-    ${Boost_CONTAINER_LIBRARY}
 )
 target_include_directories(heaptrack_gui_private PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}
