@@ -177,7 +177,7 @@
     <screenshot type="default">
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_summary.png</image>
       <caption>Summary of tracked heap memory allocation data.</caption>
-      <caption xml:lang="ca">Resum del seguiment de les dades d'assignació de la memòria en monticles.</caption>
+      <caption xml:lang="ca">Resum del seguiment de les dades d'assignació de la memòria en monticles</caption>
       <caption xml:lang="ca-valencia">Resum del seguiment de les dades d'assignació de la memòria en monticles.</caption>
       <caption xml:lang="da">Opsummering af sporet allokeringsdata for heap-hukommelse.</caption>
       <caption xml:lang="en-GB">Summary of tracked heap memory allocation data.</caption>
@@ -188,7 +188,7 @@
       <caption xml:lang="it">Riepilogo dei dati delle allocazioni di memoria heap tracciati.</caption>
       <caption xml:lang="ko">추적된 힙 메모리 할당 데이터 요약을 봅니다.</caption>
       <caption xml:lang="nl">Samenvatting van gevolgde gegevens voor heap-geheugen toewijzen.</caption>
-      <caption xml:lang="nn">Samandrag av minnereserveringsdata.</caption>
+      <caption xml:lang="nn">Samandrag av minnereserveringsdata</caption>
       <caption xml:lang="pl">podsumować dane przydzielone w pamięci</caption>
       <caption xml:lang="pt">Um resumo dos dados de alocação de memória registados.</caption>
       <caption xml:lang="pt-BR">Resumo dos dados rastreados de alocação de memória de dados.</caption>
@@ -202,7 +202,7 @@
     <screenshot>
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_flamegraph.png</image>
       <caption>Flamegraph visualization of number of heap memory allocations.</caption>
-      <caption xml:lang="ca">Visualització del gràfic de flames del nombre d'assignacions de memòria en monticles.</caption>
+      <caption xml:lang="ca">Visualització del gràfic de flames del nombre d'assignacions de memòria en monticles</caption>
       <caption xml:lang="ca-valencia">Visualització del gràfic de flames del nombre d'assignacions de memòria en monticles.</caption>
       <caption xml:lang="da">Flammegraf-visualisering af antallet af allokeringer for heap-hukommelse.</caption>
       <caption xml:lang="en-GB">Flamegraph visualisation of number of heap memory allocations.</caption>
@@ -213,7 +213,7 @@
       <caption xml:lang="it">Visualizzazione di tipo Flamegraph del totale di allocazioni di memoria heap.</caption>
       <caption xml:lang="ko">힙 메모리 할당 횟수를 플레임 그래프로 봅니다.</caption>
       <caption xml:lang="nl">Flamegraph visualisatie van het aantal toewijzingen van heap-geheugen.</caption>
-      <caption xml:lang="nn">Flammegraf-visualisering av talet på minnereserveringar.</caption>
+      <caption xml:lang="nn">Flammegraf-visualisering av talet på minnereserveringar</caption>
       <caption xml:lang="pl">zobrazować na wykresie płomieni przydzielnia pamięci.</caption>
       <caption xml:lang="pt">Uma visualização em mapa de calor das alocações de memória de dados.</caption>
       <caption xml:lang="pt-BR">Visualização em gráfico de chamas do número de alocações de memória de dados.</caption>
@@ -227,7 +227,7 @@
     <screenshot>
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_allocations_chart.png</image>
       <caption>Chart of heap memory allocations over time.</caption>
-      <caption xml:lang="ca">Gràfic de les assignacions de memòria en monticles al llarg del temps.</caption>
+      <caption xml:lang="ca">Gràfic de les assignacions de memòria en monticles al llarg del temps</caption>
       <caption xml:lang="ca-valencia">Gràfic de les assignacions de memòria en monticles al llarg del temps.</caption>
       <caption xml:lang="da">Skema af heap-hukommelsesallokeringer over tid.</caption>
       <caption xml:lang="en-GB">Chart of heap memory allocations over time.</caption>
@@ -238,7 +238,7 @@
       <caption xml:lang="it">Grafico delle allocazioni della memoria heap nel tempo.</caption>
       <caption xml:lang="ko">시간별 힙 메모리 할당 횟수를 그래프로 봅니다.</caption>
       <caption xml:lang="nl">Grafiek van toewijzingen van heap-geheugen in de tijd.</caption>
-      <caption xml:lang="nn">Diagram over minnereserveringar over tid.</caption>
+      <caption xml:lang="nn">Diagram over minnereserveringar over tid</caption>
       <caption xml:lang="pl">zobrazować przydzielenia pamięci w czasie.</caption>
       <caption xml:lang="pt">Gráfico das alocações de memória de dados ao longo do tempo.</caption>
       <caption xml:lang="pt-BR">Gráfico das alocações de memória de dado no período de tempo.</caption>
