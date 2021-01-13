@@ -51,7 +51,7 @@
   <summary xml:lang="sl">Analizator profila pomnilnika kopice za Linux</summary>
   <summary xml:lang="sv">Ett heap-profileringsverktyg för Linux</summary>
   <summary xml:lang="tr">Linux için yığın bellek profili</summary>
-  <summary xml:lang="uk">Засіб профілювання «купи» пам’яті для Linux</summary>
+  <summary xml:lang="uk">Засіб профілювання «купи» пам'яті для Linux</summary>
   <summary xml:lang="x-test">xxA heap memory profiler for Linuxxx</summary>
   <summary xml:lang="zh-CN">用于 Linux 的堆内存分析器</summary>
   <description>
@@ -77,7 +77,7 @@
     <p xml:lang="sl">Heaptrack zasleduje vse dodelitve pomnilnika in jim pripisuje dogodke v sklad sledi. Namenska orodja za analizo vam nato omogočajo razlago profila kopice pomnilnika:</p>
     <p xml:lang="sv">Heaptrack spårar alla minnestilldelningar och förser händelserna med noter om bakåtspårningar av stacken. Särskilda analysverktyg låter dig sedan tolka heap-minnesprofilen för att:</p>
     <p xml:lang="tr">Heaptrack, tüm bellek tahsislerini izler ve bu olayları yığın izleriyle açıklar. Ayrılmış analiz araçları daha sonra yığın bellek profilini yorumlamanıza izin verir:</p>
-    <p xml:lang="uk">Heaptrack трасує усі запити щодо розміщення даних у пам’яті і анотує ці події за допомогою трасування стека. Далі, спеціалізовані інструменти для аналізу надають вам змогу обробляти дані профілювання пам’яті з такою метою:</p>
+    <p xml:lang="uk">Heaptrack трасує усі запити щодо розміщення даних у пам'яті і анотує ці події за допомогою трасування стека. Далі, спеціалізовані інструменти для аналізу надають вам змогу обробляти дані профілювання пам'яті з такою метою:</p>
     <p xml:lang="x-test">xxHeaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:xx</p>
     <ul>
       <li>find hotspots that need to be optimized to reduce the memory footprint of your application</li>
@@ -100,7 +100,7 @@
       <li xml:lang="sl">poišče vroče točke, ki jih je treba optimizirati, da zmanjšate pomnilniški odtis vašega programa</li>
       <li xml:lang="sv">Hitta överbelastningsställen som behöver optimeras för att reducera programmets minnesanvändning.</li>
       <li xml:lang="tr">uygulamanızın belleğin kapladığı alanı azaltmak için optimize edilmesi gereken etkin noktaları bulun</li>
-      <li xml:lang="uk">Виявлення проблемних місць, які має бути оптимізовано з метою зменшення споживання пам’яті вашою програмою.</li>
+      <li xml:lang="uk">Виявлення проблемних місць, які має бути оптимізовано з метою зменшення споживання пам'яті вашою програмою.</li>
       <li xml:lang="x-test">xxfind hotspots that need to be optimized to reduce the memory footprint of your applicationxx</li>
       <li>find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
       <li xml:lang="ca">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai es desassignarà</li>
@@ -122,7 +122,7 @@
       <li xml:lang="sl">poiščite puščanje pomnilnika, to so lokacije, ki dodelijo pomnilnik, ki pa ga nikoli ne sprostijo</li>
       <li xml:lang="sv">Hitta minnesläckor, dvs. ställen där minne tilldelas som aldrig frigörs.</li>
       <li xml:lang="tr">bellek sızıntılarını, yani hiçbir zaman tahsis edilmemiş belleği tahsis eden yerleri bulun</li>
-      <li xml:lang="uk">Виявлення витоків пам’яті, тобто розміщень даних у пам’яті без відповідних вивільнень, коли дані стають непотрібними.</li>
+      <li xml:lang="uk">Виявлення витоків пам'яті, тобто розміщень даних у пам'яті без відповідних вивільнень, коли дані стають непотрібними.</li>
       <li xml:lang="x-test">xxfind memory leaks, i.e. locations that allocate memory which is never deallocatedxx</li>
       <li>find allocation hotspots, i.e. code locations that trigger a lot of memory allocation calls</li>
       <li xml:lang="ca">troba els punts d'accés d'assignació, és a dir, les ubicacions al codi que desencadenen un munt de crides d'assignació de memòria</li>
@@ -144,7 +144,7 @@
       <li xml:lang="sl">poiščite vroče točke dodeljevanja, to so lokacije kod, ki sprožijo veliko klicev po dodeljevanju pomnilnika</li>
       <li xml:lang="sv">Hitta överbelastningsställen för tilldelningar, dvs. ställen i koden som orsakar många anrop till minnestilldelning.</li>
       <li xml:lang="tr">tahsis edilen noktaları, yani bir çok bellek ayırma çağrısını tetikleyen kod yerlerini bulun</li>
-      <li xml:lang="uk">Виявлення проблемних місць розміщення, тобто місць у програмному коді, які призводять до багатьох викликів щодо розміщення у пам’яті.</li>
+      <li xml:lang="uk">Виявлення проблемних місць розміщення, тобто місць у програмному коді, які призводять до багатьох викликів щодо розміщення у пам'яті.</li>
       <li xml:lang="x-test">xxfind allocation hotspots, i.e. code locations that trigger a lot of memory allocation callsxx</li>
       <li>find temporary allocations, which are allocations that are directly followed by their deallocation</li>
       <li xml:lang="ca">troba les assignacions temporals, són les assignacions que són seguides directament per la cancel·lació de la seva assignació</li>
@@ -166,7 +166,7 @@
       <li xml:lang="sl">poiščite začasne dodelitve pomnilnika, ki jim neposredno sledijo njihove sprostitve</li>
       <li xml:lang="sv">Hitta tillfälliga tilldelningar, som är tilldelningar som direkt frigörs.</li>
       <li xml:lang="tr">tahsisin ardından bırakılacak olan, geçici tahsisleri bulun</li>
-      <li xml:lang="uk">Виявлення тимчасових розміщень, тобто розміщень даних у пам’яті, за якими одразу ж слідують вивільнення відповідних ділянок пам’яті.</li>
+      <li xml:lang="uk">Виявлення тимчасових розміщень, тобто розміщень даних у пам'яті, за якими одразу ж слідують вивільнення відповідних ділянок пам'яті.</li>
       <li xml:lang="x-test">xxfind temporary allocations, which are allocations that are directly followed by their deallocationxx</li>
     </ul>
   </description>
@@ -177,14 +177,38 @@
     <screenshot type="default">
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_summary.png</image>
       <caption>Summary of tracked heap memory allocation data</caption>
+      <caption xml:lang="ca">Resum del seguiment de les dades d'assignació de la memòria en monticles</caption>
+      <caption xml:lang="es">Sumario de datos de asignación de memoria de almacenamiento libre rastreada</caption>
+      <caption xml:lang="nl">Samenvatting van gevolgde gegevens voor heap-geheugen toewijzen</caption>
+      <caption xml:lang="nn">Samandrag av minnereserveringsdata</caption>
+      <caption xml:lang="pt">Um resumo dos dados de alocação de memória de dados registados</caption>
+      <caption xml:lang="sv">Sammanfattning av spårad heap-minnestilldelningsdata</caption>
+      <caption xml:lang="uk">Резюме щодо стеження за розміщенням даних у «купі» пам'яті</caption>
+      <caption xml:lang="x-test">xxSummary of tracked heap memory allocation dataxx</caption>
     </screenshot>
     <screenshot>
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_flamegraph.png</image>
       <caption>Flamegraph visualization of number of heap memory allocations</caption>
+      <caption xml:lang="ca">Visualització del gràfic de flames del nombre d'assignacions de memòria en monticles</caption>
+      <caption xml:lang="es">Visualización de gráfico de llamas del número de asignaciones de memoria de almacenamiento libre</caption>
+      <caption xml:lang="nl">Flamegraph visualisatie van het aantal toewijzingen van heap-geheugen</caption>
+      <caption xml:lang="nn">Flammegraf-visualisering av talet på minnereserveringar</caption>
+      <caption xml:lang="pt">Uma visualização em mapa de calor das alocações de memória de dados</caption>
+      <caption xml:lang="sv">Visualisering av antal heap-minnestilldelningar med Flamegraph</caption>
+      <caption xml:lang="uk">Інтерактивна гістограма кількості розміщень у «купі» пам'яті</caption>
+      <caption xml:lang="x-test">xxFlamegraph visualization of number of heap memory allocationsxx</caption>
     </screenshot>
     <screenshot>
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_allocations_chart.png</image>
       <caption>Chart of heap memory allocations over time</caption>
+      <caption xml:lang="ca">Gràfic de les assignacions de memòria en monticles al llarg del temps</caption>
+      <caption xml:lang="es">Gráfico de asignaciones de memoria del almacenamiento libre a lo largo del tiempo</caption>
+      <caption xml:lang="nl">Grafiek van toewijzingen van heap-geheugen in de tijd</caption>
+      <caption xml:lang="nn">Diagram over minnereserveringar over tid</caption>
+      <caption xml:lang="pt">Gráfico das alocações de memória de dados ao longo do tempo</caption>
+      <caption xml:lang="sv">Diagram över heap-minnestilldelningar över tiden</caption>
+      <caption xml:lang="uk">Діаграма розміщення даних у «купі» пам'яті за часом</caption>
+      <caption xml:lang="x-test">xxChart of heap memory allocations over timexx</caption>
     </screenshot>
   </screenshots>
   <project_group>KDE</project_group>
