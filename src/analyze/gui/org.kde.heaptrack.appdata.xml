@@ -178,10 +178,12 @@
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_summary.png</image>
       <caption>Summary of tracked heap memory allocation data</caption>
       <caption xml:lang="ca">Resum del seguiment de les dades d'assignació de la memòria en monticles</caption>
+      <caption xml:lang="ca-valencia">Resum del seguiment de les dades d'assignació de la memòria en monticles</caption>
       <caption xml:lang="es">Sumario de datos de asignación de memoria de almacenamiento libre rastreada</caption>
       <caption xml:lang="nl">Samenvatting van gevolgde gegevens voor heap-geheugen toewijzen</caption>
       <caption xml:lang="nn">Samandrag av minnereserveringsdata</caption>
       <caption xml:lang="pt">Um resumo dos dados de alocação de memória de dados registados</caption>
+      <caption xml:lang="sl">Povzetek podatkov o dodelitvi pomnilnika v kopici</caption>
       <caption xml:lang="sv">Sammanfattning av spårad heap-minnestilldelningsdata</caption>
       <caption xml:lang="uk">Резюме щодо стеження за розміщенням даних у «купі» пам'яті</caption>
       <caption xml:lang="x-test">xxSummary of tracked heap memory allocation dataxx</caption>
@@ -190,10 +192,12 @@
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_flamegraph.png</image>
       <caption>Flamegraph visualization of number of heap memory allocations</caption>
       <caption xml:lang="ca">Visualització del gràfic de flames del nombre d'assignacions de memòria en monticles</caption>
+      <caption xml:lang="ca-valencia">Visualització del gràfic de flames del nombre d'assignacions de memòria en monticles</caption>
       <caption xml:lang="es">Visualización de gráfico de llamas del número de asignaciones de memoria de almacenamiento libre</caption>
       <caption xml:lang="nl">Flamegraph visualisatie van het aantal toewijzingen van heap-geheugen</caption>
       <caption xml:lang="nn">Flammegraf-visualisering av talet på minnereserveringar</caption>
       <caption xml:lang="pt">Uma visualização em mapa de calor das alocações de memória de dados</caption>
+      <caption xml:lang="sl">Grafična vizualizacija števila dodelitev pomnilnika v kopici</caption>
       <caption xml:lang="sv">Visualisering av antal heap-minnestilldelningar med Flamegraph</caption>
       <caption xml:lang="uk">Інтерактивна гістограма кількості розміщень у «купі» пам'яті</caption>
       <caption xml:lang="x-test">xxFlamegraph visualization of number of heap memory allocationsxx</caption>
@@ -202,10 +206,12 @@
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_allocations_chart.png</image>
       <caption>Chart of heap memory allocations over time</caption>
       <caption xml:lang="ca">Gràfic de les assignacions de memòria en monticles al llarg del temps</caption>
+      <caption xml:lang="ca-valencia">Gràfic de les assignacions de memòria en monticles al llarg del temps</caption>
       <caption xml:lang="es">Gráfico de asignaciones de memoria del almacenamiento libre a lo largo del tiempo</caption>
       <caption xml:lang="nl">Grafiek van toewijzingen van heap-geheugen in de tijd</caption>
       <caption xml:lang="nn">Diagram over minnereserveringar over tid</caption>
       <caption xml:lang="pt">Gráfico das alocações de memória de dados ao longo do tempo</caption>
+      <caption xml:lang="sl">Tabela dodelitev pomnilnika za kopico skozi čas</caption>
       <caption xml:lang="sv">Diagram över heap-minnestilldelningar över tiden</caption>
       <caption xml:lang="uk">Діаграма розміщення даних у «купі» пам'яті за часом</caption>
       <caption xml:lang="x-test">xxChart of heap memory allocations over timexx</caption>
