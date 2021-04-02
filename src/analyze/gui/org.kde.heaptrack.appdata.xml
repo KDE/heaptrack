@@ -189,6 +189,7 @@
       <caption xml:lang="pt">Um resumo dos dados de alocação de memória registados.</caption>
       <caption xml:lang="pt-BR">Resumo dos dados rastreados de alocação de memória de dados.</caption>
       <caption xml:lang="sk">Sumár alokačných údajov sledovanej pamäťovej haldy.</caption>
+      <caption xml:lang="sl">Povzetek podatkov o dodelitvi pomnilnika v kopici.</caption>
       <caption xml:lang="sv">Sammanfattning av spårad heap-minnestilldelningsdata</caption>
       <caption xml:lang="tr">İzlenen yığın bellek tahsis verilerinin özeti.</caption>
       <caption xml:lang="uk">Резюме щодо стеження за розміщенням даних у «купі» пам’яті.</caption>
@@ -213,6 +214,7 @@
       <caption xml:lang="pt">Uma visualização em mapa de calor das alocações de memória de dados.</caption>
       <caption xml:lang="pt-BR">Visualização em gráfico de chamas do número de alocações de memória de dados.</caption>
       <caption xml:lang="sk">Plameňový graf vizualizácie počtu alokácií pamätovej hromady.</caption>
+      <caption xml:lang="sl">Grafična vizualizacija števila dodelitev pomnilnika v kopici.</caption>
       <caption xml:lang="sv">Visualisering av antal heap-minnestilldelningar med Flamegraph.</caption>
       <caption xml:lang="tr">Yığın bellek tahis etme sayısının Flamegraph görüntüsü.</caption>
       <caption xml:lang="uk">Інтерактивна гістограма кількості розміщень у «купі» пам’яті.</caption>
@@ -237,6 +239,7 @@
       <caption xml:lang="pt">Gráfico das alocações de memória de dados ao longo do tempo.</caption>
       <caption xml:lang="pt-BR">Gráfico das alocações de memória de dado no período de tempo.</caption>
       <caption xml:lang="sk">Graf alokácií pamäťovej hromady v čase.</caption>
+      <caption xml:lang="sl">Graf dodelitev pomnilnika za kopico skozi čas.</caption>
       <caption xml:lang="sv">Diagram över heap-minnestilldelningar över tiden.</caption>
       <caption xml:lang="tr">Zaman için yığın bellek tahsislerinin grafiği.</caption>
       <caption xml:lang="uk">Діаграма розміщення даних у «купі» пам’яті за часом.</caption>
