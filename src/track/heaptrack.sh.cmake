@@ -53,6 +53,12 @@ usage() {
     echo "  -h, --help     Show this help message and exit."
     echo "  -v, --version  Displays version information."
     echo "  -o, --output   Specifies the data-file for the captured data."
+    echo "                 %h in the file name string is replaced with the hostname of the system."
+    echo "                 %p in the file name string is replaced with the pid of the application being profiled."
+    echo "                 Parent directories will be created if output files are under non-existing directories."
+    echo "                 eg.,"
+    echo "                   ./%h/%g/outdat will be translated into ./<hostname>/<pid>/outdat."
+    echo "                   The directory ./<hostname>/<pid> will be created if it doesn't exist."
     echo
     echo "Alternatively, to analyze a recorded heaptrack data file:"
     echo "  -a, --analyze FILE    Open the heaptrack data file in heaptrack_gui, if available,"
@@ -100,11 +106,21 @@ while true; do
                 echo "Missing output argument."
                 exit 1
             fi
-            output=$(readlink -f $2)
+            output=$2
+            if [ -n "$(echo $output | grep '%h')" ]; then
+              output=$(echo $output | sed "s/%h/$(hostname)/g")
+            fi
+            if [ -n "$(echo $output | grep '%g')" ]; then
+              output=$(echo $output | sed "s/%g/$$/g")
+            fi
             if [ -d "$output" ]; then
                 echo "Please specify a file-name or a full path-name for output."
                 exit 1
             fi
+            if [ ! -d $(dirname $output) ]; then
+              mkdir -p $(dirname $output)
+            fi
+            output=$(readlink -f $2)
             shift 2
             ;;
         "-p" | "--pid")
