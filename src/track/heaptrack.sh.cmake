@@ -56,8 +56,8 @@ usage() {
     echo "                 %h in the file name string is replaced with the hostname of the system."
     echo "                 %p in the file name string is replaced with the pid of the application being profiled."
     echo "                 Parent directories will be created if output files are under non-existing directories."
-    echo "                 eg.,"
-    echo "                   ./%h/%g/outdat will be translated into ./<hostname>/<pid>/outdat."
+    echo "                 e.g.,"
+    echo "                   ./%h/%p/outdat will be translated into ./<hostname>/<pid>/outdat."
     echo "                   The directory ./<hostname>/<pid> will be created if it doesn't exist."
     echo
     echo "Alternatively, to analyze a recorded heaptrack data file:"
@@ -106,13 +106,7 @@ while true; do
                 echo "Missing output argument."
                 exit 1
             fi
-            output=$2
-            if [ -n "$(echo $output | grep '%h')" ]; then
-              output=$(echo $output | sed "s/%h/$(hostname)/g")
-            fi
-            if [ -n "$(echo $output | grep '%g')" ]; then
-              output=$(echo $output | sed "s/%g/$$/g")
-            fi
+            output=$(echo $2 | sed "s/%h/$(hostname)/g" | sed "s/%p/$$/g")
             if [ -d "$output" ]; then
                 echo "Please specify a file-name or a full path-name for output."
                 exit 1
