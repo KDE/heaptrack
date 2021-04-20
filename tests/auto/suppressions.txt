@@ -3,7 +3,8 @@
 # as shown above, we can deal with empty lines
 this line is invalid
 
-leak:ld-linux-x86-64.so.2
+leak:QEventDispatcherGlibPrivate::QEventDispatcherGlibPrivate
 # whitespace is trimmed
   leak:corelib/codecs/qicucodec.cpp  
-leak:QEventDispatcherGlibPrivate::QEventDispatcherGlibPrivate
+# we can wildcard-match and anchor
+leak:^/lib*/ld-linux-*.so.2$

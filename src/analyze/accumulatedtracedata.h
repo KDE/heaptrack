@@ -95,16 +95,6 @@ struct AllocationInfo
     }
 };
 
-struct Suppression
-{
-    bool matches(const std::string& haystack) const
-    {
-        // TODO: add support for ^ and $ constraints
-        return haystack.find(needle) != std::string::npos;
-    }
-    std::string needle;
-};
-
 struct AccumulatedTraceData
 {
     AccumulatedTraceData();
@@ -198,7 +188,7 @@ struct AccumulatedTraceData
     ParsingState parsingState;
 
     void applyLeakSuppressions();
-    std::vector<Suppression> suppressions;
+    std::vector<std::string> suppressions;
     int64_t totalLeakedSuppressed = 0;
 };
 
