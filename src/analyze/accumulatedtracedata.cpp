@@ -534,8 +534,6 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
                 return false;
             }
         } else if (reader.mode() == 'I') { // system information
-            if (pass != FirstPass || isReparsing)
-                continue;
             reader >> systemInfo.pageSize;
             reader >> systemInfo.pages;
         } else if (reader.mode() == 'S') { // embedded suppression
