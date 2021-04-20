@@ -139,22 +139,27 @@ bool matchesSuppression(const std::string& suppression, const std::string& hayst
     return suppression == haystack || TemplateMatch(suppression.c_str(), haystack.c_str());
 }
 
+std::string parseSuppression(std::string line)
+{
+    boost::trim(line, std::locale::classic());
+    if (line.empty() || line[0] == '#') {
+        // comment
+        return {};
+    } else if (line.compare(0, 5, "leak:") == 0) {
+        return line.substr(5);
+    }
+    std::cerr << "invalid suppression line: " << line << '\n';
+    return {};
+}
+
 std::vector<std::string> parseSuppressions(std::istream& input)
 {
     std::vector<std::string> ret;
     std::string line;
     while (std::getline(input, line)) {
-        boost::trim(line, std::locale::classic());
-        if (line.empty() || line[0] == '#') {
-            // comment
-            continue;
-        } else if (line.compare(0, 5, "leak:") == 0) {
-            auto needle = line.substr(5);
-            if (!needle.empty()) {
-                ret.push_back(std::move(needle));
-            }
-        } else {
-            std::cerr << "invalid suppression line: " << line << '\n';
+        auto suppression = parseSuppression(line);
+        if (!suppression.empty()) {
+            ret.push_back(std::move(suppression));
         }
     }
     return ret;
@@ -533,6 +538,14 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
                 continue;
             reader >> systemInfo.pageSize;
             reader >> systemInfo.pages;
+        } else if (reader.mode() == 'S') { // embedded suppression
+            if (pass != FirstPass || isReparsing) {
+                continue;
+            }
+            auto suppression = parseSuppression(reader.line().substr(2));
+            if (!suppression.empty()) {
+                suppressions.push_back(std::move(suppression));
+            }
         } else {
             cerr << "failed to parse line: " << reader.line() << endl;
         }

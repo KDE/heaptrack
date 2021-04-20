@@ -30,3 +30,5 @@ set_target_properties(peak PROPERTIES
 set(CMAKE_BUILD_TYPE RelWithDebInfo)
 
 add_executable(inlining inlining.cpp)
+
+add_executable(embedded_lsan_suppressions embedded_lsan_suppressions.c)

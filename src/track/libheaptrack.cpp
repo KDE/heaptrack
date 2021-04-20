@@ -47,6 +47,7 @@
 #include <cinttypes>
 #include <memory>
 #include <mutex>
+#include <sstream>
 #include <string>
 #include <thread>
 
@@ -59,6 +60,10 @@
 
 extern "C" {
 __attribute__((weak)) void __libc_freeres();
+
+// see upstream "documentation" at:
+// https://github.com/llvm-mirror/compiler-rt/blob/master/include/sanitizer/lsan_interface.h#L76
+__attribute__((weak)) const char* __lsan_default_suppressions();
 }
 namespace __gnu_cxx {
 __attribute__((weak)) extern void __freeres();
@@ -307,6 +312,7 @@ public:
         writeExe();
         writeCommandLine();
         writeSystemInfo();
+        writeSuppressions();
 
         if (initAfterCallback) {
             debugLog<MinimalOutput>("%s", "calling initAfterCallback");
@@ -465,6 +471,24 @@ public:
     {
         s_data->out.writeHexLine('I', static_cast<size_t>(sysconf(_SC_PAGESIZE)),
                                  static_cast<size_t>(sysconf(_SC_PHYS_PAGES)));
+    }
+
+    void writeSuppressions()
+    {
+        if (!__lsan_default_suppressions)
+            return;
+
+        const char* suppressions = __lsan_default_suppressions();
+        if (!suppressions)
+            return;
+
+        std::istringstream stream(suppressions);
+        std::string line;
+        while (std::getline(stream, line)) {
+            s_data->out.write("S ");
+            s_data->out.write(line);
+            s_data->out.write("\n");
+        }
     }
 
     void handleMalloc(void* ptr, size_t size, const Trace& trace)
