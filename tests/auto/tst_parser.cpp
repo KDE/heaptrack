@@ -26,13 +26,9 @@
 #include <QDebug>
 #include <QSignalSpy>
 
-TEST_CASE ("parse sample file", "[parser]") {
-
-    int argc = 0;
-    QCoreApplication app(argc, nullptr);
+TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
     Parser parser;
 
-    qRegisterMetaType<CallerCalleeResults>();
     QSignalSpy spySummary(&parser, &Parser::summaryAvailable);
     QSignalSpy spyCCD(&parser, &Parser::callerCalleeDataAvailable);
     QSignalSpy spyBottomUp(&parser, &Parser::bottomUpDataAvailable);
@@ -142,4 +138,38 @@ TEST_CASE ("parse sample file", "[parser]") {
 
     if (spyFinished.isEmpty())
         REQUIRE(spyFinished.wait());
+}
+
+TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst", "[parser]") {
+    Parser parser;
+
+    QSignalSpy spySummary(&parser, &Parser::summaryAvailable);
+    QSignalSpy spyFinished(&parser, &Parser::finished);
+
+    parser.parse(SRC_DIR "/heaptrack.embedded_lsan_suppressions.84207.zst", QString(), QString());
+
+    if (spySummary.isEmpty())
+        REQUIRE(spySummary.wait());
+
+    const auto summary = spySummary.at(0).at(0).value<SummaryData>();
+    REQUIRE(summary.debuggee == "./tests/manual/embedded_lsan_suppressions");
+    REQUIRE(summary.cost.allocations == 5);
+    REQUIRE(summary.cost.temporary == 0);
+    REQUIRE(summary.cost.leaked == 5);
+    REQUIRE(summary.totalLeakedSuppressed == 5);
+    REQUIRE(summary.cost.peak == 72714);
+    REQUIRE(summary.totalSystemMemory == 0);
+
+    if (spyFinished.isEmpty())
+        REQUIRE(spyFinished.wait());
+}
+
+int main(int argc, char** argv)
+{
+    QCoreApplication app(argc, argv);
+
+    qRegisterMetaType<CallerCalleeResults>();
+
+    const int res = Catch::Session().run(argc, argv);
+    return (res < 0xff ? res : 0xff);
 }
