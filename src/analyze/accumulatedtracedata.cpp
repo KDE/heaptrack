@@ -25,6 +25,7 @@
 
 #include <boost-zstd/zstd.hpp>
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 
@@ -90,6 +91,7 @@ std::vector<Suppression> parseSuppressions(std::istream& input)
     std::vector<Suppression> ret;
     std::string line;
     while (std::getline(input, line)) {
+        boost::trim(line, std::locale::classic());
         if (line.empty() || line[0] == '#') {
             // comment
             continue;
