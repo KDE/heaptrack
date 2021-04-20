@@ -84,6 +84,26 @@ public:
 private:
     uint64_t m_bytes = 0;
 };
+
+std::vector<Suppression> parseSuppressions(std::istream& input)
+{
+    std::vector<Suppression> ret;
+    std::string line;
+    while (std::getline(input, line)) {
+        if (line.empty() || line[0] == '#') {
+            // comment
+            continue;
+        } else if (line.compare(0, 5, "leak:") == 0) {
+            auto needle = line.substr(5);
+            if (!needle.empty()) {
+                ret.push_back({std::move(needle)});
+            }
+        } else {
+            std::cerr << "invalid suppression line: " << line << '\n';
+        }
+    }
+    return ret;
+}
 }
 
 AccumulatedTraceData::AccumulatedTraceData()
@@ -795,4 +815,77 @@ TraceNode AccumulatedTraceData::findTrace(const TraceIndex traceIndex) const
 bool AccumulatedTraceData::isStopIndex(const StringIndex index) const
 {
     return find(stopIndices.begin(), stopIndices.end(), index) != stopIndices.end();
+}
+
+bool AccumulatedTraceData::setSuppressions(const std::string& suppressionFile)
+{
+    suppressions.clear();
+
+    if (suppressionFile.empty()) {
+        return true;
+    }
+
+    auto stream = std::ifstream(suppressionFile);
+    if (!stream.is_open()) {
+        std::cerr << "failed to open suppression file: " << suppressionFile << '\n';
+        return false;
+    }
+
+    suppressions = parseSuppressions(stream);
+    return true;
+}
+
+void AccumulatedTraceData::applyLeakSuppressions()
+{
+    if (suppressions.empty()) {
+        return;
+    }
+
+    // match all strings once against all suppression rules
+    std::vector<bool> suppressedStrings(strings.size());
+    std::transform(strings.begin(), strings.end(), suppressedStrings.begin(), [&](const auto& string) {
+        return std::any_of(suppressions.begin(), suppressions.end(),
+                           [&string](const Suppression& suppression) { return suppression.matches(string); });
+    });
+    auto isSuppressedString = [&suppressedStrings](StringIndex index) {
+        return index && index.index <= suppressedStrings.size() && suppressedStrings[index.index - 1];
+    };
+    auto isSuppressedFrame = [&isSuppressedString](Frame frame) {
+        return isSuppressedString(frame.functionIndex) || isSuppressedString(frame.fileIndex);
+    };
+
+    if (std::find(suppressedStrings.begin(), suppressedStrings.end(), true) == suppressedStrings.end()) {
+        // nothing matched the suppressions, we can return early
+        return;
+    }
+
+    // now match all instruction pointers against the suppressed strings
+    std::vector<bool> suppressedIps(instructionPointers.size());
+    std::transform(instructionPointers.begin(), instructionPointers.end(), suppressedIps.begin(), [&](const auto& ip) {
+        return isSuppressedString(ip.moduleIndex) || isSuppressedFrame(ip.frame)
+            || std::any_of(ip.inlined.begin(), ip.inlined.end(), isSuppressedFrame);
+    });
+    suppressedStrings = {};
+    auto isSuppressedIp = [&suppressedIps](IpIndex index) {
+        return index && index.index <= suppressedIps.size() && suppressedIps[index.index - 1];
+    };
+
+    // now match all trace indices against the suppressed instruction pointers
+    std::vector<bool> suppressedTraces(traces.size());
+    auto isSuppressedTrace = [&suppressedTraces](TraceIndex index) {
+        return index && index.index <= suppressedTraces.size() && suppressedTraces[index.index - 1];
+    };
+    std::transform(traces.begin(), traces.end(), suppressedTraces.begin(), [&](const auto& trace) {
+        return isSuppressedTrace(trace.parentIndex) || isSuppressedIp(trace.ipIndex);
+    });
+    suppressedIps = {};
+
+    // now finally zero all the matching allocations
+    for (auto& allocation : allocations) {
+        if (isSuppressedTrace(allocation.traceIndex)) {
+            totalLeakedSuppressed += allocation.leaked;
+            totalCost.leaked -= allocation.leaked;
+            allocation.leaked = 0;
+        }
+    }
 }

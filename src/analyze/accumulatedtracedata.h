@@ -95,6 +95,16 @@ struct AllocationInfo
     }
 };
 
+struct Suppression
+{
+    bool matches(const std::string& haystack) const
+    {
+        // TODO: add support for ^ and $ constraints
+        return haystack.find(needle) != std::string::npos;
+    }
+    std::string needle;
+};
+
 struct AccumulatedTraceData
 {
     AccumulatedTraceData();
@@ -123,6 +133,8 @@ struct AccumulatedTraceData
     bool read(boost::iostreams::filtering_istream& in, const ParsePass pass, bool isReparsing);
 
     void diff(const AccumulatedTraceData& base);
+
+    bool setSuppressions(const std::string& suppressionFile);
 
     bool shortenTemplates = false;
     bool fromAttached = false;
@@ -184,6 +196,10 @@ struct AccumulatedTraceData
     };
 
     ParsingState parsingState;
+
+    void applyLeakSuppressions();
+    std::vector<Suppression> suppressions;
+    int64_t totalLeakedSuppressed = 0;
 };
 
 #endif // ACCUMULATEDTRACEDATA_H

@@ -116,6 +116,7 @@ struct Printer final : public AccumulatedTraceData
 {
     void finalize()
     {
+        applyLeakSuppressions();
         filterAllocations();
         mergedAllocations = mergeAllocations(allocations);
     }
@@ -604,6 +605,8 @@ int main(int argc, char** argv)
             "You can set the value to zero to disable detailed snapshots.\n")
         ("filter-bt-function", po::value<string>()->default_value(string()),
             "Only print allocations where the backtrace contains the given function.")
+        ("suppressions", po::value<string>()->default_value(string()),
+            "Load list of leak suppressions from the specified file. Specify one suppression per line, and start each line with 'leak:', i.e. use the LSAN suppression file format.")
         ("help,h", "Show this help message.")
         ("version,v", "Displays version information.");
     // clang-format on
@@ -668,6 +671,12 @@ int main(int argc, char** argv)
     const bool printPeaks = vm["print-peaks"].as<bool>();
     const bool printAllocs = vm["print-allocators"].as<bool>();
     const bool printTemporary = vm["print-temporary"].as<bool>();
+
+    const auto suppressionsFile = vm["suppressions"].as<string>();
+
+    if (!data.setSuppressions(suppressionsFile)) {
+        return 1;
+    }
 
     cout << "reading file \"" << inputFile << "\" - please wait, this might take some time..." << endl;
 
@@ -759,6 +768,9 @@ int main(int argc, char** argv)
          << "peak heap memory consumption: " << formatBytes(data.totalCost.peak) << '\n'
          << "peak RSS (including heaptrack overhead): " << formatBytes(data.peakRSS * data.systemInfo.pageSize) << '\n'
          << "total memory leaked: " << formatBytes(data.totalCost.leaked) << '\n';
+    if (data.totalLeakedSuppressed) {
+        cout << "suppressed leaks: " << formatBytes(data.totalLeakedSuppressed) << '\n';
+    }
 
     if (!printHistogram.empty()) {
         ofstream histogram(printHistogram, ios_base::out);
