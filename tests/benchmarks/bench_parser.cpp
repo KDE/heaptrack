@@ -71,7 +71,7 @@ int main(int argc, char** argv)
         exit(1);
     }();
 
-    parser.parse(files.value(0), files.value(1), stopAfter);
+    parser.parse(files.value(0), files.value(1), files.value(2), stopAfter);
 
     return app.exec();
 }

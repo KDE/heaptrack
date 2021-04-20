@@ -63,6 +63,12 @@ int main(int argc, char** argv)
                                   i18n("Base profile data to compare other files to."),
                                   QStringLiteral("<file>")};
     parser.addOption(diffOption);
+    QCommandLineOption suppressionsOption {
+        {QStringLiteral("s"), QStringLiteral("suppressions")},
+        i18n("Load list of leak suppressions from the specified file. Specify one suppression per line, and start each "
+             "line with 'leak:', i.e. use the LSAN suppression file format."),
+        QStringLiteral("<file>")};
+    parser.addOption(suppressionsOption);
     parser.addPositionalArgument(QStringLiteral("files"), i18n("Files to load"), i18n("[FILE...]"));
 
     parser.process(app);
@@ -76,7 +82,7 @@ int main(int argc, char** argv)
     };
 
     foreach (const QString& file, parser.positionalArguments()) {
-        createWindow()->loadFile(file, parser.value(diffOption));
+        createWindow()->loadFile(file, parser.value(diffOption), parser.value(suppressionsOption));
     }
 
     if (parser.positionalArguments().isEmpty()) {

@@ -403,7 +403,13 @@ MainWindow::MainWindow(QWidget* parent)
                 stream << i18n("<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>",
                                Util::formatBytes(data.cost.leaked));
             } else {
-                stream << i18n("<dt><b>total memory leaked</b>:</dt><dd>%1</dd>", Util::formatBytes(data.cost.leaked));
+                if (data.totalLeakedSuppressed) {
+                    stream << i18n("<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>",
+                                   Util::formatBytes(data.cost.leaked), Util::formatBytes(data.totalLeakedSuppressed));
+                } else {
+                    stream << i18n("<dt><b>total memory leaked</b>:</dt><dd>%1</dd>",
+                                   Util::formatBytes(data.cost.leaked));
+                }
             }
             stream << "</dl></qt>";
         }
@@ -595,7 +601,7 @@ MainWindow::~MainWindow()
     group.writeEntry(Config::Entries::State, state);
 }
 
-void MainWindow::loadFile(const QString& file, const QString& diffBase)
+void MainWindow::loadFile(const QString& file, const QString& diffBase, const QString& suppressions)
 {
     // TODO: support canceling of ongoing parse jobs
     m_closeAction->setEnabled(false);
@@ -609,7 +615,7 @@ void MainWindow::loadFile(const QString& file, const QString& diffBase)
         m_diffMode = true;
     }
     m_ui->pages->setCurrentWidget(m_ui->loadingPage);
-    m_parser->parse(file, diffBase);
+    m_parser->parse(file, diffBase, suppressions);
 }
 
 void MainWindow::reparse(int64_t minTime, int64_t maxTime)
