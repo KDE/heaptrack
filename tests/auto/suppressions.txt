@@ -4,5 +4,6 @@
 this line is invalid
 
 leak:ld-linux-x86-64.so.2
-leak:corelib/codecs/qicucodec.cpp
+# whitespace is trimmed
+  leak:corelib/codecs/qicucodec.cpp  
 leak:QEventDispatcherGlibPrivate::QEventDispatcherGlibPrivate
