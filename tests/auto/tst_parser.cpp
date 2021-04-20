@@ -33,6 +33,7 @@ TEST_CASE ("parse sample file", "[parser]") {
     Parser parser;
 
     qRegisterMetaType<CallerCalleeResults>();
+    QSignalSpy spySummary(&parser, &Parser::summaryAvailable);
     QSignalSpy spyCCD(&parser, &Parser::callerCalleeDataAvailable);
     QSignalSpy spyBottomUp(&parser, &Parser::bottomUpDataAvailable);
     QSignalSpy spyTopDown(&parser, &Parser::topDownDataAvailable);
@@ -120,6 +121,23 @@ TEST_CASE ("parse sample file", "[parser]") {
     REQUIRE(topDownData.rows.at(2).children.size() == 1);
     REQUIRE(topDownData.rows.at(2).cost.allocations == 15);
     REQUIRE(topDownData.rows.at(2).cost.peak == 94496);
+
+    // ---- Check Summary
+
+    if (spySummary.isEmpty())
+        REQUIRE(spySummary.wait());
+
+    const auto summary = spySummary.at(0).at(0).value<SummaryData>();
+    REQUIRE(summary.debuggee == "./david");
+    REQUIRE(summary.cost.allocations == 2896);
+    REQUIRE(summary.cost.temporary == 729);
+    REQUIRE(summary.cost.leaked == 30463);
+    REQUIRE(summary.cost.peak == 996970);
+    REQUIRE(summary.totalTime == 80);
+    REQUIRE(summary.peakRSS == 0);
+    REQUIRE(summary.peakTime == 0);
+    REQUIRE(summary.totalSystemMemory == 0);
+    REQUIRE(summary.fromAttached == false);
 
     if (spyFinished.isEmpty())
         REQUIRE(spyFinished.wait());
