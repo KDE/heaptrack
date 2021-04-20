@@ -131,9 +131,9 @@ TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
     REQUIRE(summary.totalLeakedSuppressed == 30463);
     REQUIRE(summary.cost.peak == 996970);
     REQUIRE(summary.totalTime == 80);
-    REQUIRE(summary.peakRSS == 0);
+    REQUIRE(summary.peakRSS == 76042240);
     REQUIRE(summary.peakTime == 0);
-    REQUIRE(summary.totalSystemMemory == 0);
+    REQUIRE(summary.totalSystemMemory == 16715239424);
     REQUIRE(summary.fromAttached == false);
 
     if (spyFinished.isEmpty())
@@ -158,7 +158,7 @@ TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst", "[parser]") {
     REQUIRE(summary.cost.leaked == 5);
     REQUIRE(summary.totalLeakedSuppressed == 5);
     REQUIRE(summary.cost.peak == 72714);
-    REQUIRE(summary.totalSystemMemory == 0);
+    REQUIRE(summary.totalSystemMemory == 12242059264);
 
     if (spyFinished.isEmpty())
         REQUIRE(spyFinished.wait());
