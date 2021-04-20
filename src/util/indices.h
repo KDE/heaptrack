@@ -110,6 +110,10 @@ struct IndexHasher
 
 namespace std {
 template <>
+struct hash<StringIndex> : IndexHasher
+{
+};
+template <>
 struct hash<TraceIndex> : IndexHasher
 {
 };
