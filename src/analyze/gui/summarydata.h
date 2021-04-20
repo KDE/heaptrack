@@ -27,11 +27,12 @@
 struct SummaryData
 {
     SummaryData() = default;
-    SummaryData(const QString& debuggee, const AllocationData& cost, int64_t totalTime,
+    SummaryData(const QString& debuggee, const AllocationData& cost, int64_t totalLeakedSuppressed, int64_t totalTime,
                 const FilterParameters& filterParameters, int64_t peakTime, int64_t peakRSS, int64_t totalSystemMemory,
                 bool fromAttached)
         : debuggee(debuggee)
         , cost(cost)
+        , totalLeakedSuppressed(totalLeakedSuppressed)
         , totalTime(totalTime)
         , filterParameters(filterParameters)
         , peakTime(peakTime)
@@ -42,6 +43,7 @@ struct SummaryData
     }
     QString debuggee;
     AllocationData cost;
+    int64_t totalLeakedSuppressed = 0;
     int64_t totalTime = 0;
     FilterParameters filterParameters;
     int64_t peakTime = 0;

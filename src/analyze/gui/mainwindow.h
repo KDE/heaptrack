@@ -40,7 +40,7 @@ public:
     virtual ~MainWindow();
 
 public slots:
-    void loadFile(const QString& path, const QString& diffBase = {});
+    void loadFile(const QString& path, const QString& diffBase = {}, const QString& suppressions = {});
     void reparse(int64_t minTime, int64_t maxTime);
     void openNewFile();
     void closeFile();

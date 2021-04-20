@@ -39,7 +39,7 @@ TEST_CASE ("parse sample file", "[parser]") {
     QSignalSpy spyTopDown(&parser, &Parser::topDownDataAvailable);
     QSignalSpy spyFinished(&parser, &Parser::finished);
 
-    parser.parse(SRC_DIR "/heaptrack.david.18594.gz", QString());
+    parser.parse(SRC_DIR "/heaptrack.david.18594.gz", QString(), SRC_DIR "/suppressions.txt");
 
     // ---- Check Caller Callee Data
 
@@ -131,7 +131,8 @@ TEST_CASE ("parse sample file", "[parser]") {
     REQUIRE(summary.debuggee == "./david");
     REQUIRE(summary.cost.allocations == 2896);
     REQUIRE(summary.cost.temporary == 729);
-    REQUIRE(summary.cost.leaked == 30463);
+    REQUIRE(summary.cost.leaked == 0);
+    REQUIRE(summary.totalLeakedSuppressed == 30463);
     REQUIRE(summary.cost.peak == 996970);
     REQUIRE(summary.totalTime == 80);
     REQUIRE(summary.peakRSS == 0);

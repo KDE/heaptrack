@@ -1,0 +1,8 @@
+# this is a comment
+
+# as shown above, we can deal with empty lines
+this line is invalid
+
+leak:ld-linux-x86-64.so.2
+leak:corelib/codecs/qicucodec.cpp
+leak:QEventDispatcherGlibPrivate::QEventDispatcherGlibPrivate

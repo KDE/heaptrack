@@ -627,20 +627,19 @@ bool Parser::isFiltered() const
     return m_data->filterParameters.isFilteredByTime(m_data->totalTime);
 }
 
-void Parser::parse(const QString& path, const QString& diffBase, StopAfter stopAfter)
+void Parser::parse(const QString& path, const QString& diffBase, const QString& suppressionFile, StopAfter stopAfter)
 {
-    parseImpl(path, diffBase, {}, stopAfter);
+    parseImpl(path, diffBase, suppressionFile, {}, stopAfter);
 }
 
-void Parser::parseImpl(const QString& path, const QString& diffBase, const FilterParameters& filterParameters,
-                       StopAfter stopAfter)
+void Parser::parseImpl(const QString& path, const QString& diffBase, const QString& suppressionFile,
+                       const FilterParameters& filterParameters, StopAfter stopAfter)
 {
     auto oldData = std::move(m_data);
     using namespace ThreadWeaver;
-    stream() << make_job([this, oldData, path, diffBase, filterParameters, stopAfter]() {
+    stream() << make_job([this, oldData, path, diffBase, suppressionFile, filterParameters, stopAfter]() {
         const auto isReparsing = (path == m_path && oldData && diffBase.isEmpty());
         auto parsingMsg = isReparsing ? i18n("reparsing data") : i18n("parsing data");
-        emit progressMessageAvailable(parsingMsg);
 
         auto updateProgress = [this, parsingMsg, lastPassCompletion = 0.f](const ParserData& data) mutable {
             auto passCompletion = 1.0 * data.parsingState.readCompressedByte / data.parsingState.fileSize;
@@ -664,6 +663,16 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         const auto stdPath = path.toStdString();
         auto data = isReparsing ? oldData : make_shared<ParserData>(updateProgress);
         data->filterParameters = filterParameters;
+
+        if (!isReparsing && !suppressionFile.isEmpty()) {
+            emit progressMessageAvailable(i18n("parsing suppression file"));
+            if (!data->setSuppressions(suppressionFile.toStdString())) {
+                emit failedToOpen(suppressionFile);
+                return;
+            }
+        }
+
+        emit progressMessageAvailable(parsingMsg);
 
         if (!diffBase.isEmpty()) {
             ParserData diffData(nullptr); // currently we don't track the progress of diff parsing
@@ -695,10 +704,13 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
                            [](const std::string& string) { return QString::fromStdString(string); });
         }
 
+        data->applyLeakSuppressions();
+
         const auto resultData = std::make_shared<const ResultData>(data->totalCost, data->qtStrings);
 
-        emit summaryAvailable({QString::fromStdString(data->debuggee), data->totalCost, data->totalTime,
-                               data->filterParameters, data->peakTime, data->peakRSS * data->systemInfo.pageSize,
+        emit summaryAvailable({QString::fromStdString(data->debuggee), data->totalCost, data->totalLeakedSuppressed,
+                               data->totalTime, data->filterParameters, data->peakTime,
+                               data->peakRSS * data->systemInfo.pageSize,
                                data->systemInfo.pages * data->systemInfo.pageSize, data->fromAttached});
 
         if (stopAfter == StopAfter::Summary) {
@@ -778,5 +790,5 @@ void Parser::reparse(const FilterParameters& parameters_)
     filterParameters.minTime = std::max(int64_t(0), filterParameters.minTime);
     filterParameters.maxTime = std::min(m_data->totalTime, filterParameters.maxTime);
 
-    parseImpl(m_path, {}, filterParameters, StopAfter::Finished);
+    parseImpl(m_path, {}, {}, filterParameters, StopAfter::Finished);
 }
