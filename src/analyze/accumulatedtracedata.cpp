@@ -86,9 +86,62 @@ private:
     uint64_t m_bytes = 0;
 };
 
-std::vector<Suppression> parseSuppressions(std::istream& input)
+/**
+ * This function is based on the TemplateMatch function found in
+ *     llvm-project/compiler-rt/lib/sanitizer_common/sanitizer_common.cpp
+ * The code was licensed under Apache License v2.0 with LLVM Exceptions
+ */
+bool TemplateMatch(const char* templ, const char* str)
 {
-    std::vector<Suppression> ret;
+    if ((!str) || str[0] == 0)
+        return false;
+    bool start = false;
+    if (templ && templ[0] == '^') {
+        start = true;
+        templ++;
+    }
+    bool asterisk = false;
+    while (templ && templ[0]) {
+        if (templ[0] == '*') {
+            templ++;
+            start = false;
+            asterisk = true;
+            continue;
+        }
+        if (templ[0] == '$')
+            return str[0] == 0 || asterisk;
+        if (str[0] == 0)
+            return false;
+        char* tpos = (char*)strchr(templ, '*');
+        char* tpos1 = (char*)strchr(templ, '$');
+        if ((!tpos) || (tpos1 && tpos1 < tpos))
+            tpos = tpos1;
+        if (tpos)
+            tpos[0] = 0;
+        const char* str0 = str;
+        const char* spos = strstr(str, templ);
+        str = spos + strlen(templ);
+        templ = tpos;
+        if (tpos)
+            tpos[0] = tpos == tpos1 ? '$' : '*';
+        if (!spos)
+            return false;
+        if (start && spos != str0)
+            return false;
+        start = false;
+        asterisk = false;
+    }
+    return true;
+}
+
+bool matchesSuppression(const std::string& suppression, const std::string& haystack)
+{
+    return suppression == haystack || TemplateMatch(suppression.c_str(), haystack.c_str());
+}
+
+std::vector<std::string> parseSuppressions(std::istream& input)
+{
+    std::vector<std::string> ret;
     std::string line;
     while (std::getline(input, line)) {
         boost::trim(line, std::locale::classic());
@@ -98,7 +151,7 @@ std::vector<Suppression> parseSuppressions(std::istream& input)
         } else if (line.compare(0, 5, "leak:") == 0) {
             auto needle = line.substr(5);
             if (!needle.empty()) {
-                ret.push_back({std::move(needle)});
+                ret.push_back(std::move(needle));
             }
         } else {
             std::cerr << "invalid suppression line: " << line << '\n';
@@ -846,8 +899,9 @@ void AccumulatedTraceData::applyLeakSuppressions()
     // match all strings once against all suppression rules
     std::vector<bool> suppressedStrings(strings.size());
     std::transform(strings.begin(), strings.end(), suppressedStrings.begin(), [&](const auto& string) {
-        return std::any_of(suppressions.begin(), suppressions.end(),
-                           [&string](const Suppression& suppression) { return suppression.matches(string); });
+        return std::any_of(suppressions.begin(), suppressions.end(), [&string](const std::string& suppression) {
+            return matchesSuppression(suppression, string);
+        });
     });
     auto isSuppressedString = [&suppressedStrings](StringIndex index) {
         return index && index.index <= suppressedStrings.size() && suppressedStrings[index.index - 1];
