@@ -38,6 +38,8 @@
 #include <QProcess>
 #include <QInputDialog>
 
+#include "analyze/suppressions.h"
+
 #include "callercalleemodel.h"
 #include "costdelegate.h"
 #include "costheaderview.h"
@@ -534,16 +536,26 @@ MainWindow::MainWindow(QWidget* parent)
     auto validateInput = [this, validateInputFile]() {
         m_ui->messages->hide();
         m_ui->buttonBox->setEnabled(validateInputFile(m_ui->openFile->url().toLocalFile(), false)
-                                    && validateInputFile(m_ui->compareTo->url().toLocalFile(), true));
+                                    && validateInputFile(m_ui->compareTo->url().toLocalFile(), true)
+                                    && validateInputFile(m_ui->suppressions->url().toLocalFile(), true));
     };
 
     connect(m_ui->openFile, &KUrlRequester::textChanged, this, validateInput);
     connect(m_ui->compareTo, &KUrlRequester::textChanged, this, validateInput);
+    connect(m_ui->suppressions, &KUrlRequester::textChanged, this, validateInput);
     connect(m_ui->buttonBox, &QDialogButtonBox::accepted, this, [this]() {
         const auto path = m_ui->openFile->url().toLocalFile();
         Q_ASSERT(!path.isEmpty());
         const auto base = m_ui->compareTo->url().toLocalFile();
-        loadFile(path, base);
+
+        bool parsedOk = false;
+        m_lastFilterParameters.suppressions =
+            parseSuppressions(m_ui->suppressions->url().toLocalFile().toStdString(), &parsedOk);
+        if (parsedOk) {
+            loadFile(path, base);
+        } else {
+            showError(i18n("Failed to parse suppression file."));
+        }
     });
 
     setupStacks();
