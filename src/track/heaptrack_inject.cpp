@@ -329,15 +329,36 @@ void overwrite_symbols() noexcept
 {
     dl_iterate_phdr(&iterate_phdrs, nullptr);
 }
+
+void restore_symbols() noexcept
+{
+    bool do_shutdown = true;
+    dl_iterate_phdr(&iterate_phdrs, &do_shutdown);
+}
 }
 
 extern "C" {
+// this function is called when heaptrack_inject is runtime injected via GDB
 void heaptrack_inject(const char* outputFileName) noexcept
 {
-    heaptrack_init(outputFileName, []() { overwrite_symbols(); }, [](LineWriter& out) { out.write("A\n"); },
-                   []() {
-                       bool do_shutdown = true;
-                       dl_iterate_phdr(&iterate_phdrs, &do_shutdown);
-                   });
+    heaptrack_init(
+        outputFileName, &overwrite_symbols, [](LineWriter& out) { out.write("A\n"); }, &restore_symbols);
 }
 }
+
+// alternatively, the code below may initialize heaptrack when we use
+// heaptrack_inject via LD_PRELOAD and have the right environment variables setup
+struct HeaptrackInjectPreloadInitialization
+{
+    HeaptrackInjectPreloadInitialization()
+    {
+        const auto outputFileName = getenv("DUMP_HEAPTRACK_OUTPUT");
+        if (!outputFileName) {
+            // when the env var wasn't set, then this means we got runtime injected, don't do anything here
+            return;
+        }
+        heaptrack_init(outputFileName, &overwrite_symbols, nullptr, &restore_symbols);
+    }
+};
+
+static HeaptrackInjectPreloadInitialization heaptrackInjectPreloadInitialization;

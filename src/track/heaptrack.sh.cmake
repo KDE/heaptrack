@@ -19,7 +19,7 @@
 #
 
 usage() {
-    echo "Usage: $0 [--debug|-d] DEBUGGEE [ARGUMENT]..."
+    echo "Usage: $0 [--debug|-d] [--use-inject] DEBUGGEE [ARGUMENT]..."
     echo "or:    $0 [--debug|-d] -p PID"
     echo "or:    $0 -a FILE"
     echo
@@ -48,6 +48,8 @@ usage() {
     echo
     echo "Optional arguments to heaptrack:"
     echo "  -d, --debug    Run the debuggee in GDB and heaptrack."
+    echo " --use-inject    Use the same heaptrack_inject symbol interception mechanism instead of relying on"
+    echo "                 the dynamic linker and LD_PRELOAD. This is an experimental flag for now."
     echo "  ARGUMENT       Any number of arguments that will be passed verbatim"
     echo "                 to the debuggee."
     echo "  -h, --help     Show this help message and exit."
@@ -71,6 +73,7 @@ usage() {
 debug=
 pid=
 client=
+use_inject_lib=
 
 # path to current heaptrack.sh executable
 SCRIPT_PATH=$(readlink -f "$0")
@@ -95,6 +98,10 @@ while true; do
                 exit 1
             fi
             debug=1
+            shift 1
+            ;;
+        "--use-inject")
+            use_inject_lib=1
             shift 1
             ;;
         "-h" | "--help")
@@ -199,7 +206,11 @@ if [ ! -f "$INTERPRETER" ]; then
 fi
 INTERPRETER=$(readlink -f "$INTERPRETER")
 
-LIBHEAPTRACK_PRELOAD="$EXE_PATH/$LIB_REL_PATH/libheaptrack_preload.so"
+if [ -z "$use_inject_lib" ]; then
+    LIBHEAPTRACK_PRELOAD="$EXE_PATH/$LIB_REL_PATH/libheaptrack_preload.so"
+else
+    LIBHEAPTRACK_PRELOAD="$EXE_PATH/$LIB_REL_PATH/libheaptrack_inject.so"
+fi
 if [ ! -f "$LIBHEAPTRACK_PRELOAD" ]; then
     echo "Could not find heaptrack preload library $LIBHEAPTRACK_PRELOAD"
     exit 1
@@ -272,6 +283,7 @@ cleanup() {
 trap cleanup EXIT
 
 echo "heaptrack output will be written to \"$output\""
+echo "$LIBHEAPTRACK_PRELOAD"
 
 if [ -z "$debug" ] && [ -z "$pid" ]; then
   echo "starting application, this might take some time..."
