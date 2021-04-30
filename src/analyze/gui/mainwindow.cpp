@@ -585,6 +585,18 @@ MainWindow::MainWindow(QWidget* parent)
         }
     });
 
+    m_disableEmbeddedSuppressions = m_ui->menu_Settings->addAction(i18n("Disable Embedded Suppressions"));
+    m_disableEmbeddedSuppressions->setToolTip(
+        i18n("Ignore suppression definitions that are embedded into the heaptrack data file. By default, heaptrack "
+             "will copy the suppressions optionally defined via a `const char *__lsan_default_suppressions()` symbol "
+             "in the debuggee application.  These are then always applied when analyzing the data, unless this feature "
+             "is explicitly disabled using this command line  option."));
+    m_disableEmbeddedSuppressions->setCheckable(true);
+    connect(m_disableEmbeddedSuppressions, &QAction::toggled, this, [this]() {
+        m_lastFilterParameters.disableEmbeddedSuppressions = m_disableEmbeddedSuppressions->isChecked();
+        reparse(m_lastFilterParameters.minTime, m_lastFilterParameters.maxTime);
+    });
+
     setupCodeNavigationMenu();
 
     m_ui->actionResetFilter->setEnabled(false);
@@ -601,7 +613,7 @@ MainWindow::~MainWindow()
     group.writeEntry(Config::Entries::State, state);
 }
 
-void MainWindow::loadFile(const QString& file, const QString& diffBase, const QString& suppressions)
+void MainWindow::loadFile(const QString& file, const QString& diffBase)
 {
     // TODO: support canceling of ongoing parse jobs
     m_closeAction->setEnabled(false);
@@ -615,19 +627,22 @@ void MainWindow::loadFile(const QString& file, const QString& diffBase, const QS
         m_diffMode = true;
     }
     m_ui->pages->setCurrentWidget(m_ui->loadingPage);
-    m_parser->parse(file, diffBase, suppressions);
+    m_parser->parse(file, diffBase, m_lastFilterParameters);
 }
 
 void MainWindow::reparse(int64_t minTime, int64_t maxTime)
 {
+    if (m_ui->pages->currentWidget() != m_ui->resultsPage) {
+        return;
+    }
+
     m_closeAction->setEnabled(false);
     m_ui->flameGraphTab->clearData();
     m_ui->loadingLabel->setText(i18n("Reparsing file, please wait..."));
     m_ui->pages->setCurrentWidget(m_ui->loadingPage);
-    FilterParameters filterParameters;
-    filterParameters.minTime = minTime;
-    filterParameters.maxTime = maxTime;
-    m_parser->reparse(filterParameters);
+    m_lastFilterParameters.minTime = minTime;
+    m_lastFilterParameters.maxTime = maxTime;
+    m_parser->reparse(m_lastFilterParameters);
 }
 
 void MainWindow::openNewFile()
@@ -635,6 +650,8 @@ void MainWindow::openNewFile()
     auto window = new MainWindow;
     window->setAttribute(Qt::WA_DeleteOnClose, true);
     window->show();
+    window->setDisableEmbeddedSuppressions(m_lastFilterParameters.disableEmbeddedSuppressions);
+    window->setSuppressions(m_lastFilterParameters.suppressions);
 }
 
 void MainWindow::closeFile()
@@ -802,4 +819,14 @@ void MainWindow::navigateToCode(const QString& filePath, int lineNumber, int col
     } else {
         QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
     }
+}
+
+void MainWindow::setDisableEmbeddedSuppressions(bool disable)
+{
+    m_disableEmbeddedSuppressions->setChecked(disable);
+}
+
+void MainWindow::setSuppressions(std::vector<std::string> suppressions)
+{
+    m_lastFilterParameters.suppressions = std::move(suppressions);
 }

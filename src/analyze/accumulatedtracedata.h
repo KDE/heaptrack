@@ -124,8 +124,6 @@ struct AccumulatedTraceData
 
     void diff(const AccumulatedTraceData& base);
 
-    bool setSuppressions(const std::string& suppressionFile);
-
     bool shortenTemplates = false;
     bool fromAttached = false;
     FilterParameters filterParameters;

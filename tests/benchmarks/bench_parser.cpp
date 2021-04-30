@@ -18,6 +18,8 @@
 
 #include "parser.h"
 
+#include "analyze/suppressions.h"
+
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QDebug>
@@ -71,7 +73,16 @@ int main(int argc, char** argv)
         exit(1);
     }();
 
-    parser.parse(files.value(0), files.value(1), files.value(2), stopAfter);
+    FilterParameters params;
+    const auto suppressionsFile = files.value(2);
+    if (!suppressionsFile.isEmpty()) {
+        bool parsedOk = false;
+        params.suppressions = parseSuppressions(suppressionsFile.toStdString(), &parsedOk);
+        if (!parsedOk)
+            return 1;
+    }
+
+    parser.parse(files.value(0), files.value(1), params, stopAfter);
 
     return app.exec();
 }

@@ -49,7 +49,7 @@ public:
         Finished,
     };
 
-    void parse(const QString& path, const QString& diffBase, const QString& suppressionFile,
+    void parse(const QString& path, const QString& diffBase, const FilterParameters& filterParameters,
                StopAfter stopAfter = StopAfter::Finished);
     void reparse(const FilterParameters& filterParameters);
 
@@ -68,8 +68,8 @@ signals:
     void failedToOpen(const QString& path);
 
 private:
-    void parseImpl(const QString& path, const QString& diffBase, const QString& suppressionFile,
-                   const FilterParameters& filterParameters, StopAfter stopAfter);
+    void parseImpl(const QString& path, const QString& diffBase, const FilterParameters& filterParameters,
+                   StopAfter stopAfter);
 
     QString m_path;
     std::shared_ptr<ParserData> m_data;

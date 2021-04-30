@@ -627,17 +627,18 @@ bool Parser::isFiltered() const
     return m_data->filterParameters.isFilteredByTime(m_data->totalTime);
 }
 
-void Parser::parse(const QString& path, const QString& diffBase, const QString& suppressionFile, StopAfter stopAfter)
+void Parser::parse(const QString& path, const QString& diffBase, const FilterParameters& filterParameters,
+                   StopAfter stopAfter)
 {
-    parseImpl(path, diffBase, suppressionFile, {}, stopAfter);
+    parseImpl(path, diffBase, filterParameters, stopAfter);
 }
 
-void Parser::parseImpl(const QString& path, const QString& diffBase, const QString& suppressionFile,
-                       const FilterParameters& filterParameters, StopAfter stopAfter)
+void Parser::parseImpl(const QString& path, const QString& diffBase, const FilterParameters& filterParameters,
+                       StopAfter stopAfter)
 {
     auto oldData = std::move(m_data);
     using namespace ThreadWeaver;
-    stream() << make_job([this, oldData, path, diffBase, suppressionFile, filterParameters, stopAfter]() {
+    stream() << make_job([this, oldData, path, diffBase, filterParameters, stopAfter]() {
         const auto isReparsing = (path == m_path && oldData && diffBase.isEmpty());
         auto parsingMsg = isReparsing ? i18n("reparsing data") : i18n("parsing data");
 
@@ -663,14 +664,6 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const QStri
         const auto stdPath = path.toStdString();
         auto data = isReparsing ? oldData : make_shared<ParserData>(updateProgress);
         data->filterParameters = filterParameters;
-
-        if (!isReparsing && !suppressionFile.isEmpty()) {
-            emit progressMessageAvailable(i18n("parsing suppression file"));
-            if (!data->setSuppressions(suppressionFile.toStdString())) {
-                emit failedToOpen(suppressionFile);
-                return;
-            }
-        }
 
         emit progressMessageAvailable(parsingMsg);
 
@@ -790,5 +783,5 @@ void Parser::reparse(const FilterParameters& parameters_)
     filterParameters.minTime = std::max(int64_t(0), filterParameters.minTime);
     filterParameters.maxTime = std::min(m_data->totalTime, filterParameters.maxTime);
 
-    parseImpl(m_path, {}, {}, filterParameters, StopAfter::Finished);
+    parseImpl(m_path, {}, filterParameters, StopAfter::Finished);
 }
