@@ -219,20 +219,19 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
 
         KColorScheme scheme(QPalette::Active, KColorScheme::Window);
         const QPen foreground(scheme.foreground().color());
+        auto fixupTextAttributes = [&foreground](KChart::TextAttributes attributes, float pointSize) {
+            attributes.setPen(foreground);
+            auto fontSize = attributes.fontSize();
+            fontSize.setAbsoluteValue(pointSize);
+            attributes.setFontSize(fontSize);
+            return attributes;
+        };
+
         m_bottomAxis = new TimeAxis(totalPlotter);
-        auto axisTextAttributes = m_bottomAxis->textAttributes();
-        axisTextAttributes.setPen(foreground);
+        const auto axisTextAttributes = fixupTextAttributes(m_bottomAxis->textAttributes(), font().pointSizeF() - 2);
         m_bottomAxis->setTextAttributes(axisTextAttributes);
-        auto axisTitleTextAttributes = m_bottomAxis->titleTextAttributes();
-        axisTitleTextAttributes.setPen(foreground);
-        auto fontSize = axisTitleTextAttributes.fontSize();
-        fontSize.setCalculationMode(KChartEnums::MeasureCalculationModeAbsolute);
-        if (minimalMode) {
-            fontSize.setValue(font().pointSizeF() - 2);
-        } else {
-            fontSize.setValue(font().pointSizeF() + 2);
-        }
-        axisTitleTextAttributes.setFontSize(fontSize);
+        const auto axisTitleTextAttributes =
+            fixupTextAttributes(m_bottomAxis->titleTextAttributes(), font().pointSizeF() + (minimalMode ? (-2) : (+2)));
         m_bottomAxis->setTitleTextAttributes(axisTitleTextAttributes);
         m_bottomAxis->setPosition(CartesianAxis::Bottom);
         totalPlotter->addAxis(m_bottomAxis);
