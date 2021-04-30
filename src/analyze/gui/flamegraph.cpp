@@ -636,9 +636,12 @@ void FlameGraph::showData()
 {
     setData(nullptr);
 
-    m_buildingScene = true;
     using namespace ThreadWeaver;
     auto data = m_showBottomUpData ? m_bottomUpData : m_topDownData;
+    if (!data.resultData)
+        return;
+
+    m_buildingScene = true;
     bool collapseRecursion = m_collapseRecursion;
     auto source = m_costSource->currentData().value<CostType>();
     auto threshold = m_costThreshold;

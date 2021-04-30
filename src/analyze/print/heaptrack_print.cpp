@@ -25,6 +25,7 @@
 #include <boost/program_options.hpp>
 
 #include "analyze/accumulatedtracedata.h"
+#include "analyze/suppressions.h"
 
 #include <future>
 #include <iomanip>
@@ -607,6 +608,10 @@ int main(int argc, char** argv)
             "Only print allocations where the backtrace contains the given function.")
         ("suppressions", po::value<string>()->default_value(string()),
             "Load list of leak suppressions from the specified file. Specify one suppression per line, and start each line with 'leak:', i.e. use the LSAN suppression file format.")
+        ("disable-embedded-suppressions",
+            "Ignore suppression definitions that are embedded into the heaptrack data file. By default, heaptrack will copy the suppressions"
+            "optionally defined via a `const char *__lsan_default_suppressions()` symbol in the debuggee application. These are then always "
+            "applied when analyzing the data, unless this feature is explicitly disabled using this command line option.")
         ("help,h", "Show this help message.")
         ("version,v", "Displays version information.");
     // clang-format on
@@ -674,7 +679,10 @@ int main(int argc, char** argv)
 
     const auto suppressionsFile = vm["suppressions"].as<string>();
 
-    if (!data.setSuppressions(suppressionsFile)) {
+    data.filterParameters.disableEmbeddedSuppressions = vm.count("disable-embedded-suppressions");
+    bool suppressionsOk = false;
+    data.filterParameters.suppressions = parseSuppressions(suppressionsFile, &suppressionsOk);
+    if (!suppressionsOk) {
         return 1;
     }
 

@@ -15,6 +15,7 @@ include_directories(
 
 add_library(sharedprint STATIC
     accumulatedtracedata.cpp
+    suppressions.cpp
 )
 
 target_link_libraries(sharedprint LINK_PUBLIC

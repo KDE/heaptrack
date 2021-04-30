@@ -23,6 +23,8 @@
 
 #include <KSharedConfig>
 
+#include <analyze/filterparameters.h>
+
 namespace Ui {
 class MainWindow;
 }
@@ -40,13 +42,16 @@ public:
     virtual ~MainWindow();
 
 public slots:
-    void loadFile(const QString& path, const QString& diffBase = {}, const QString& suppressions = {});
+    void loadFile(const QString& path, const QString& diffBase = {});
     void reparse(int64_t minTime, int64_t maxTime);
     void openNewFile();
     void closeFile();
 
     void setCodeNavigationIDE(QAction* action);
     void navigateToCode(const QString& url, int lineNumber, int columnNumber = -1);
+
+    void setDisableEmbeddedSuppressions(bool disable);
+    void setSuppressions(std::vector<std::string> suppressions);
 
 signals:
     void clearData();
@@ -65,6 +70,8 @@ private:
     QAction* m_openNewAction = nullptr;
     QAction* m_closeAction = nullptr;
     QAction* m_quitAction = nullptr;
+    QAction* m_disableEmbeddedSuppressions = nullptr;
+    FilterParameters m_lastFilterParameters;
 };
 
 #endif // MAINWINDOW_H

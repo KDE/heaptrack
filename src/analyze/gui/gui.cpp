@@ -23,6 +23,8 @@
 #include <KAboutData>
 #include <KLocalizedString>
 
+#include "analyze/suppressions.h"
+
 #include "gui_config.h"
 #include "mainwindow.h"
 #include "proxystyle.h"
@@ -69,20 +71,35 @@ int main(int argc, char** argv)
              "line with 'leak:', i.e. use the LSAN suppression file format."),
         QStringLiteral("<file>")};
     parser.addOption(suppressionsOption);
+    QCommandLineOption disableEmbeddedSuppressionsOption {
+        {QStringLiteral("disable-embedded-suppressions")},
+        i18n("Ignore suppression definitions that are embedded into the heaptrack data file. By default, heaptrack "
+             "will copy the suppressions optionally defined via a `const char *__lsan_default_suppressions()` symbol "
+             "in the debuggee application.  These are then always applied when analyzing the data, unless this feature "
+             "is explicitly disabled using this command line  option.")};
+    parser.addOption(disableEmbeddedSuppressionsOption);
     parser.addPositionalArgument(QStringLiteral("files"), i18n("Files to load"), i18n("[FILE...]"));
 
     parser.process(app);
     aboutData.processCommandLine(&parser);
 
-    auto createWindow = []() -> MainWindow* {
+    bool parsedOk = false;
+    const auto suppressions = parseSuppressions(parser.value(suppressionsOption).toStdString(), &parsedOk);
+    if (!parsedOk) {
+        return 1;
+    }
+
+    auto createWindow = [&]() -> MainWindow* {
         auto window = new MainWindow;
         window->setAttribute(Qt::WA_DeleteOnClose);
+        window->setSuppressions(suppressions);
+        window->setDisableEmbeddedSuppressions(parser.isSet(disableEmbeddedSuppressionsOption));
         window->show();
         return window;
     };
 
     foreach (const QString& file, parser.positionalArguments()) {
-        createWindow()->loadFile(file, parser.value(diffOption), parser.value(suppressionsOption));
+        createWindow()->loadFile(file, parser.value(diffOption));
     }
 
     if (parser.positionalArguments().isEmpty()) {

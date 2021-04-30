@@ -18,8 +18,9 @@
 
 #include "3rdparty/catch.hpp"
 
-#include "parser.h"
+#include "analyze/suppressions.h"
 #include "locationdata.h"
+#include "parser.h"
 #include "treemodel.h"
 #include "tst_config.h" // for SRC_DIR
 
@@ -35,7 +36,12 @@ TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
     QSignalSpy spyTopDown(&parser, &Parser::topDownDataAvailable);
     QSignalSpy spyFinished(&parser, &Parser::finished);
 
-    parser.parse(SRC_DIR "/heaptrack.david.18594.gz", QString(), SRC_DIR "/suppressions.txt");
+    FilterParameters params;
+    bool parsedSuppressions = false;
+    params.suppressions = parseSuppressions(SRC_DIR "/suppressions.txt", &parsedSuppressions);
+    REQUIRE(parsedSuppressions);
+
+    parser.parse(SRC_DIR "/heaptrack.david.18594.gz", QString(), params);
 
     // ---- Check Caller Callee Data
 
@@ -146,7 +152,7 @@ TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst", "[parser]") {
     QSignalSpy spySummary(&parser, &Parser::summaryAvailable);
     QSignalSpy spyFinished(&parser, &Parser::finished);
 
-    parser.parse(SRC_DIR "/heaptrack.embedded_lsan_suppressions.84207.zst", QString(), QString());
+    parser.parse(SRC_DIR "/heaptrack.embedded_lsan_suppressions.84207.zst", QString(), {});
 
     if (spySummary.isEmpty())
         REQUIRE(spySummary.wait());
@@ -159,6 +165,29 @@ TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst", "[parser]") {
     REQUIRE(summary.totalLeakedSuppressed == 5);
     REQUIRE(summary.cost.peak == 72714);
     REQUIRE(summary.totalSystemMemory == 12242059264);
+
+    if (spyFinished.isEmpty())
+        REQUIRE(spyFinished.wait());
+}
+
+TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst without suppressions", "[parser]") {
+    Parser parser;
+
+    QSignalSpy spySummary(&parser, &Parser::summaryAvailable);
+    QSignalSpy spyFinished(&parser, &Parser::finished);
+
+    FilterParameters params;
+    params.disableEmbeddedSuppressions = true;
+    parser.parse(SRC_DIR "/heaptrack.embedded_lsan_suppressions.84207.zst", QString(), params);
+
+    if (spySummary.isEmpty())
+        REQUIRE(spySummary.wait());
+
+    const auto summary = spySummary.at(0).at(0).value<SummaryData>();
+    REQUIRE(summary.debuggee == "./tests/manual/embedded_lsan_suppressions");
+    REQUIRE(summary.cost.allocations == 5);
+    REQUIRE(summary.cost.leaked == 10);
+    REQUIRE(summary.totalLeakedSuppressed == 0);
 
     if (spyFinished.isEmpty())
         REQUIRE(spyFinished.wait());
