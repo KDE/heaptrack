@@ -190,7 +190,7 @@ void setupTopView(TreeModel* source, QTreeView* view, TopProxy::Type type, T cal
     proxy->setSourceModel(source);
     proxy->setSortRole(TreeModel::SortRole);
     view->setModel(proxy);
-    sortByColumn(view, 0);
+    sortByColumn(view, 1);
     view->header()->setStretchLastSection(true);
     setupTreeContextMenu(view, callback);
 }
