@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="toolTip">
+   <string>Path to a file containing leak suppression rules in the LSAN format.</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_6">
     <property name="leftMargin">
@@ -113,6 +116,26 @@
              </property>
              <property name="buddy">
               <cstring>compareTo</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="suppressionsLabel">
+             <property name="toolTip">
+              <string>Path to a file containing leak suppression rules in the LSAN format.</string>
+             </property>
+             <property name="text">
+              <string>Suppressions:</string>
+             </property>
+             <property name="buddy">
+              <cstring>suppressions</cstring>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="KUrlRequester" name="suppressions">
+             <property name="placeholderText">
+              <string>path/to/lsan_suppressions.txt</string>
              </property>
             </widget>
            </item>
@@ -798,7 +821,7 @@
      <x>0</x>
      <y>0</y>
      <width>1332</width>
-     <height>30</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
