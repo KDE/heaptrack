@@ -42,6 +42,8 @@ struct TestParser
         , spyTopDown(&parser, &Parser::topDownDataAvailable)
         , spyFinished(&parser, &Parser::finished)
     {
+        QObject::connect(&parser, &Parser::bottomUpDataAvailable, &parser,
+                         [this](const auto& data) { resultData = data.resultData; });
     }
 
     ~TestParser()
@@ -57,6 +59,7 @@ struct TestParser
 
         auto ccr = spyCCD.at(0).at(0).value<CallerCalleeResults>();
         REQUIRE(ccr.resultData);
+        REQUIRE(ccr.resultData == resultData);
         return ccr;
     }
 
@@ -67,6 +70,15 @@ struct TestParser
 
         auto bottomUpData = spyBottomUp.at(0).at(0).value<TreeData>();
         REQUIRE(bottomUpData.resultData);
+        REQUIRE(bottomUpData.resultData == resultData);
+
+        if (qEnvironmentVariableIntValue("HEAPTRACK_DEBUG")) {
+            qDebug() << "Bottom Up Data:";
+            for (const RowData& row : bottomUpData.rows) {
+                qDebug() << symbolToString(row.symbol);
+            }
+        }
+
         return bottomUpData;
     }
 
@@ -77,6 +89,15 @@ struct TestParser
 
         auto topDownData = spyTopDown.at(0).at(0).value<TreeData>();
         REQUIRE(topDownData.resultData);
+        REQUIRE(topDownData.resultData == resultData);
+
+        if (qEnvironmentVariableIntValue("HEAPTRACK_DEBUG")) {
+            qDebug() << "Top Down Data:";
+            for (const RowData& row : topDownData.rows) {
+                qDebug() << symbolToString(row.symbol);
+            }
+        }
+
         return topDownData;
     }
 
@@ -89,6 +110,34 @@ struct TestParser
     }
 
     Parser parser;
+    std::shared_ptr<const ResultData> resultData;
+
+    QString symbolToString(const Symbol& sym) const
+    {
+        const auto module = resultData->string(sym.moduleId);
+        return resultData->string(sym.functionId) + '|' + Util::basename(module) + '|' + module;
+    }
+
+    QList<Symbol> sortedSymbols(const CallerCalleeResults& ccr) const
+    {
+        auto ccrSymbolList = ccr.entries.keys();
+        std::sort(ccrSymbolList.begin(), ccrSymbolList.end(), [&](const Symbol& lhs, const Symbol& rhs) {
+            // keep unresolved functions up front
+            auto sortable = [&](const Symbol& symbol) {
+                auto str = [&](StringIndex stringId) { return ccr.resultData->string(stringId); };
+                return std::make_tuple(str(symbol.functionId), str(symbol.moduleId));
+            };
+            return sortable(lhs) < sortable(rhs);
+        });
+        if (qEnvironmentVariableIntValue("HEAPTRACK_DEBUG")) {
+            qDebug() << "Sorted Symbols";
+            int i = 0;
+            for (const Symbol& sym : ccrSymbolList) {
+                qDebug() << i++ << symbolToString(sym);
+            }
+        }
+        return ccrSymbolList;
+    }
 
 private:
     QSignalSpy spySummary;
@@ -111,34 +160,17 @@ TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
     // ---- Check Caller Callee Data
 
     const auto ccr = parser.awaitCallerCallee();
-
-    auto symbolToString = [&](const Symbol& sym) {
-        const auto module = ccr.resultData->string(sym.moduleId);
-        return ccr.resultData->string(sym.functionId) + '|' + Util::basename(module) + '|' + module;
-    };
-
-    auto ccrSymbolList = ccr.entries.keys();
-    std::sort(ccrSymbolList.begin(), ccrSymbolList.end(), [&](const Symbol& lhs, const Symbol& rhs) {
-        // keep unresolved functions up front
-        auto sortable = [&](const Symbol& symbol) {
-            auto str = [&](StringIndex stringId) { return ccr.resultData->string(stringId); };
-            return std::make_tuple(str(symbol.functionId), str(symbol.moduleId));
-        };
-        return sortable(lhs) < sortable(rhs);
-    });
-    if (!qgetenv("HEAPTRACK_DEBUG").isEmpty()) {
-        int i = 0;
-        for (const Symbol &sym : ccrSymbolList) {
-            qDebug() << i++ << symbolToString(sym);
-        }
-    }
+    const auto ccrSymbolList = parser.sortedSymbols(ccr);
 
     // Let's check a few items
-    REQUIRE(symbolToString(ccrSymbolList.at(0)) == "<unresolved function>||");
-    REQUIRE(symbolToString(ccrSymbolList.at(1)) == "<unresolved function>|ld-linux-x86-64.so.2|/lib64/ld-linux-x86-64.so.2");
-    REQUIRE(symbolToString(ccrSymbolList.at(25)) == "QByteArray::constData() const|libQt5Core.so.5|/d/qt/5/kde/build/qtbase/lib/libQt5Core.so.5");
+    REQUIRE(parser.symbolToString(ccrSymbolList.at(0)) == "<unresolved function>||");
+    REQUIRE(parser.symbolToString(ccrSymbolList.at(1))
+            == "<unresolved function>|ld-linux-x86-64.so.2|/lib64/ld-linux-x86-64.so.2");
+    REQUIRE(parser.symbolToString(ccrSymbolList.at(25))
+            == "QByteArray::constData() const|libQt5Core.so.5|/d/qt/5/kde/build/qtbase/lib/libQt5Core.so.5");
     const int lastIndx = ccrSymbolList.size() - 1;
-    REQUIRE(symbolToString(ccrSymbolList.at(lastIndx)) == "~QVarLengthArray|libQt5Core.so.5|/d/qt/5/kde/build/qtbase/lib/libQt5Core.so.5");
+    REQUIRE(parser.symbolToString(ccrSymbolList.at(lastIndx))
+            == "~QVarLengthArray|libQt5Core.so.5|/d/qt/5/kde/build/qtbase/lib/libQt5Core.so.5");
 
     REQUIRE(ccr.entries.count() == 365);
     REQUIRE(ccr.resultData->totalCosts().allocations == 2896);
@@ -146,36 +178,21 @@ TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
     // ---- Check Bottom Up Data
 
     const auto bottomUpData = parser.awaitBottomUp();
-    REQUIRE(bottomUpData.resultData == ccr.resultData);
-
-    if (!qgetenv("HEAPTRACK_DEBUG").isEmpty()) {
-        qDebug() << "Bottom Up Data:";
-        for (const RowData& row : bottomUpData.rows) {
-            qDebug() << symbolToString(row.symbol);
-        }
-    }
 
     REQUIRE(bottomUpData.rows.size() == 54);
-    REQUIRE(symbolToString(bottomUpData.rows.at(3).symbol)
+    REQUIRE(parser.symbolToString(bottomUpData.rows.at(3).symbol)
             == "<unresolved function>|libglib-2.0.so.0|/usr/lib64/libglib-2.0.so.0");
     REQUIRE(bottomUpData.rows.at(3).children.size() == 2);
     REQUIRE(bottomUpData.rows.at(3).cost.allocations == 17);
     REQUIRE(bottomUpData.rows.at(3).cost.peak == 2020);
-    REQUIRE(symbolToString(bottomUpData.rows.at(53).symbol)
+    REQUIRE(parser.symbolToString(bottomUpData.rows.at(53).symbol)
             == "QThreadPool::QThreadPool(QObject*)|libQt5Core.so.5|/d/qt/5/kde/build/qtbase/lib/libQt5Core.so.5");
 
     // ---- Check Top Down Data
 
     const auto topDownData = parser.awaitTopDown();
-    REQUIRE(topDownData.resultData == ccr.resultData);
-    if (!qgetenv("HEAPTRACK_DEBUG").isEmpty()) {
-        qDebug() << "Top Down Data:";
-        for (const RowData& row : topDownData.rows) {
-            qDebug() << symbolToString(row.symbol);
-        }
-    }
     REQUIRE(topDownData.rows.size() == 5);
-    REQUIRE(symbolToString(topDownData.rows.at(2).symbol)
+    REQUIRE(parser.symbolToString(topDownData.rows.at(2).symbol)
             == "<unresolved function>|ld-linux-x86-64.so.2|/lib64/ld-linux-x86-64.so.2");
     REQUIRE(topDownData.rows.at(2).children.size() == 1);
     REQUIRE(topDownData.rows.at(2).cost.allocations == 15);
