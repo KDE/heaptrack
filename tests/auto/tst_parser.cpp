@@ -27,6 +27,12 @@
 #include <QDebug>
 #include <QSignalSpy>
 
+std::ostream& operator<<(std::ostream& os, const QString& value)
+{
+    os << value.toStdString();
+    return os;
+}
+
 struct TestParser
 {
     TestParser()
@@ -218,6 +224,45 @@ TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst without suppressions"
     REQUIRE(summary.cost.allocations == 5);
     REQUIRE(summary.cost.leaked == 10);
     REQUIRE(summary.totalLeakedSuppressed == 0);
+}
+
+TEST_CASE ("heaptrack.heaptrack_gui.99454.zst", "[parser]") {
+    TestParser parser;
+
+    parser.parser.parse(SRC_DIR "/heaptrack.heaptrack_gui.99454.zst", QString(), {});
+
+    const auto summary = parser.awaitSummary();
+    REQUIRE(summary.debuggee == "heaptrack_gui heaptrack.trest_c.78689.zst");
+    REQUIRE(summary.cost.allocations == 278534);
+    REQUIRE(summary.cost.temporary == 35481);
+    REQUIRE(summary.cost.leaked == 1047379);
+    REQUIRE(summary.cost.peak == 12222213);
+}
+
+TEST_CASE ("heaptrack.heaptrack_gui.99529.zst", "[parser]") {
+    TestParser parser;
+
+    parser.parser.parse(SRC_DIR "/heaptrack.heaptrack_gui.99529.zst", QString(), {});
+
+    const auto summary = parser.awaitSummary();
+    REQUIRE(summary.debuggee == "heaptrack_gui heaptrack.test_c.78689.zst");
+    REQUIRE(summary.cost.allocations == 315255);
+    REQUIRE(summary.cost.temporary == 40771);
+    REQUIRE(summary.cost.leaked == 1046377);
+    REQUIRE(summary.cost.peak == 64840134);
+}
+
+TEST_CASE ("heaptrack.heaptrack_gui.{99454,99529}.zst diff", "[parser]") {
+    TestParser parser;
+
+    parser.parser.parse(SRC_DIR "/heaptrack.heaptrack_gui.99529.zst", SRC_DIR "/heaptrack.heaptrack_gui.99454.zst", {});
+
+    const auto summary = parser.awaitSummary();
+    REQUIRE(summary.debuggee == "heaptrack_gui heaptrack.test_c.78689.zst");
+    REQUIRE(summary.cost.allocations == 36721);
+    REQUIRE(summary.cost.temporary == 5290);
+    REQUIRE(summary.cost.leaked == -1002);
+    REQUIRE(summary.cost.peak == 52617921);
 }
 
 int main(int argc, char** argv)
