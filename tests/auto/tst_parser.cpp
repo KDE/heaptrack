@@ -254,6 +254,21 @@ TEST_CASE ("heaptrack.heaptrack_gui.99454.zst", "[parser]") {
     REQUIRE(summary.cost.temporary == 35481);
     REQUIRE(summary.cost.leaked == 1047379);
     REQUIRE(summary.cost.peak == 12222213);
+
+    const auto ccr = parser.awaitCallerCallee();
+    const auto sortedSymbols = parser.sortedSymbols(ccr);
+
+    const auto& sym = sortedSymbols[994];
+    REQUIRE(parser.symbolToString(sym) == "QHashData::allocateNode(int)|libQt5Core.so.5|/usr/lib/libQt5Core.so.5");
+    const auto& cost = ccr.entries[sym];
+    CHECK(cost.inclusiveCost.allocations == 5214);
+    CHECK(cost.inclusiveCost.temporary == 0);
+    CHECK(cost.inclusiveCost.leaked == 32);
+    CHECK(cost.inclusiveCost.peak == 56152);
+    CHECK(cost.selfCost.allocations == 5214);
+    CHECK(cost.selfCost.temporary == 0);
+    CHECK(cost.selfCost.leaked == 32);
+    CHECK(cost.selfCost.peak == 56152);
 }
 
 TEST_CASE ("heaptrack.heaptrack_gui.99529.zst", "[parser]") {
@@ -267,6 +282,21 @@ TEST_CASE ("heaptrack.heaptrack_gui.99529.zst", "[parser]") {
     REQUIRE(summary.cost.temporary == 40771);
     REQUIRE(summary.cost.leaked == 1046377);
     REQUIRE(summary.cost.peak == 64840134);
+
+    const auto ccr = parser.awaitCallerCallee();
+    const auto sortedSymbols = parser.sortedSymbols(ccr);
+
+    const auto& sym = sortedSymbols[1103];
+    REQUIRE(parser.symbolToString(sym) == "QHashData::allocateNode(int)|libQt5Core.so.5|/usr/lib/libQt5Core.so.5");
+    const auto& cost = ccr.entries[sym];
+    CHECK(cost.inclusiveCost.allocations == 5559);
+    CHECK(cost.inclusiveCost.temporary == 0);
+    CHECK(cost.inclusiveCost.leaked == 32);
+    CHECK(cost.inclusiveCost.peak == 68952);
+    CHECK(cost.selfCost.allocations == 5559);
+    CHECK(cost.selfCost.temporary == 0);
+    CHECK(cost.selfCost.leaked == 32);
+    CHECK(cost.selfCost.peak == 68952);
 }
 
 TEST_CASE ("heaptrack.heaptrack_gui.{99454,99529}.zst diff", "[parser]") {
@@ -280,6 +310,21 @@ TEST_CASE ("heaptrack.heaptrack_gui.{99454,99529}.zst diff", "[parser]") {
     REQUIRE(summary.cost.temporary == 5290);
     REQUIRE(summary.cost.leaked == -1002);
     REQUIRE(summary.cost.peak == 52617921);
+
+    const auto ccr = parser.awaitCallerCallee();
+    const auto sortedSymbols = parser.sortedSymbols(ccr);
+
+    const auto& sym = sortedSymbols[1124];
+    REQUIRE(parser.symbolToString(sym) == "QHashData::allocateNode(int)|libQt5Core.so.5|/usr/lib/libQt5Core.so.5");
+    const auto& cost = ccr.entries[sym];
+    CHECK(cost.inclusiveCost.allocations == (5559 - 5214));
+    CHECK(cost.inclusiveCost.temporary == 0);
+    CHECK(cost.inclusiveCost.leaked == 0);
+    CHECK(cost.inclusiveCost.peak == (68952 - 56152));
+    CHECK(cost.selfCost.allocations == (5559 - 5214));
+    CHECK(cost.selfCost.temporary == 0);
+    CHECK(cost.selfCost.leaked == 0);
+    CHECK(cost.selfCost.peak == ((68952 - 56152)));
 }
 
 int main(int argc, char** argv)
