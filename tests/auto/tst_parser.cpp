@@ -27,29 +27,84 @@
 #include <QDebug>
 #include <QSignalSpy>
 
-TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
+struct TestParser
+{
+    TestParser()
+        : spySummary(&parser, &Parser::summaryAvailable)
+        , spyCCD(&parser, &Parser::callerCalleeDataAvailable)
+        , spyBottomUp(&parser, &Parser::bottomUpDataAvailable)
+        , spyTopDown(&parser, &Parser::topDownDataAvailable)
+        , spyFinished(&parser, &Parser::finished)
+    {
+    }
+
+    ~TestParser()
+    {
+        if (spyFinished.isEmpty())
+            REQUIRE(spyFinished.wait());
+    }
+
+    CallerCalleeResults awaitCallerCallee()
+    {
+        if (spyCCD.isEmpty())
+            REQUIRE(spyCCD.wait());
+
+        auto ccr = spyCCD.at(0).at(0).value<CallerCalleeResults>();
+        REQUIRE(ccr.resultData);
+        return ccr;
+    }
+
+    TreeData awaitBottomUp()
+    {
+        if (spyBottomUp.isEmpty())
+            REQUIRE(spyBottomUp.wait());
+
+        auto bottomUpData = spyBottomUp.at(0).at(0).value<TreeData>();
+        REQUIRE(bottomUpData.resultData);
+        return bottomUpData;
+    }
+
+    TreeData awaitTopDown()
+    {
+        if (spyTopDown.isEmpty())
+            REQUIRE(spyTopDown.wait());
+
+        auto topDownData = spyTopDown.at(0).at(0).value<TreeData>();
+        REQUIRE(topDownData.resultData);
+        return topDownData;
+    }
+
+    SummaryData awaitSummary()
+    {
+        if (spySummary.isEmpty())
+            REQUIRE(spySummary.wait());
+
+        return spySummary.at(0).at(0).value<SummaryData>();
+    }
+
     Parser parser;
 
-    QSignalSpy spySummary(&parser, &Parser::summaryAvailable);
-    QSignalSpy spyCCD(&parser, &Parser::callerCalleeDataAvailable);
-    QSignalSpy spyBottomUp(&parser, &Parser::bottomUpDataAvailable);
-    QSignalSpy spyTopDown(&parser, &Parser::topDownDataAvailable);
-    QSignalSpy spyFinished(&parser, &Parser::finished);
+private:
+    QSignalSpy spySummary;
+    QSignalSpy spyCCD;
+    QSignalSpy spyBottomUp;
+    QSignalSpy spyTopDown;
+    QSignalSpy spyFinished;
+};
+
+TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
+    TestParser parser;
 
     FilterParameters params;
     bool parsedSuppressions = false;
     params.suppressions = parseSuppressions(SRC_DIR "/suppressions.txt", &parsedSuppressions);
     REQUIRE(parsedSuppressions);
 
-    parser.parse(SRC_DIR "/heaptrack.david.18594.gz", QString(), params);
+    parser.parser.parse(SRC_DIR "/heaptrack.david.18594.gz", QString(), params);
 
     // ---- Check Caller Callee Data
 
-    if (spyCCD.isEmpty())
-        REQUIRE(spyCCD.wait());
-
-    const CallerCalleeResults ccr = spyCCD.at(0).at(0).value<CallerCalleeResults>();
-    REQUIRE(ccr.resultData);
+    const auto ccr = parser.awaitCallerCallee();
 
     auto symbolToString = [&](const Symbol& sym) {
         const auto module = ccr.resultData->string(sym.moduleId);
@@ -84,17 +139,16 @@ TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
 
     // ---- Check Bottom Up Data
 
-    if (spyBottomUp.isEmpty())
-        REQUIRE(spyBottomUp.wait());
-
-    const TreeData bottomUpData = spyBottomUp.at(0).at(0).value<TreeData>();
+    const auto bottomUpData = parser.awaitBottomUp();
     REQUIRE(bottomUpData.resultData == ccr.resultData);
+
     if (!qgetenv("HEAPTRACK_DEBUG").isEmpty()) {
         qDebug() << "Bottom Up Data:";
         for (const RowData& row : bottomUpData.rows) {
             qDebug() << symbolToString(row.symbol);
         }
     }
+
     REQUIRE(bottomUpData.rows.size() == 54);
     REQUIRE(symbolToString(bottomUpData.rows.at(3).symbol)
             == "<unresolved function>|libglib-2.0.so.0|/usr/lib64/libglib-2.0.so.0");
@@ -106,10 +160,7 @@ TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
 
     // ---- Check Top Down Data
 
-    if (spyTopDown.isEmpty())
-        REQUIRE(spyTopDown.wait());
-
-    const TreeData topDownData = spyTopDown.at(0).at(0).value<TreeData>();
+    const auto topDownData = parser.awaitTopDown();
     REQUIRE(topDownData.resultData == ccr.resultData);
     if (!qgetenv("HEAPTRACK_DEBUG").isEmpty()) {
         qDebug() << "Top Down Data:";
@@ -126,10 +177,7 @@ TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
 
     // ---- Check Summary
 
-    if (spySummary.isEmpty())
-        REQUIRE(spySummary.wait());
-
-    const auto summary = spySummary.at(0).at(0).value<SummaryData>();
+    const auto summary = parser.awaitSummary();
     REQUIRE(summary.debuggee == "./david");
     REQUIRE(summary.cost.allocations == 2896);
     REQUIRE(summary.cost.temporary == 729);
@@ -141,23 +189,14 @@ TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
     REQUIRE(summary.peakTime == 0);
     REQUIRE(summary.totalSystemMemory == 16715239424);
     REQUIRE(summary.fromAttached == false);
-
-    if (spyFinished.isEmpty())
-        REQUIRE(spyFinished.wait());
 }
 
 TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst", "[parser]") {
-    Parser parser;
+    TestParser parser;
 
-    QSignalSpy spySummary(&parser, &Parser::summaryAvailable);
-    QSignalSpy spyFinished(&parser, &Parser::finished);
+    parser.parser.parse(SRC_DIR "/heaptrack.embedded_lsan_suppressions.84207.zst", QString(), {});
 
-    parser.parse(SRC_DIR "/heaptrack.embedded_lsan_suppressions.84207.zst", QString(), {});
-
-    if (spySummary.isEmpty())
-        REQUIRE(spySummary.wait());
-
-    const auto summary = spySummary.at(0).at(0).value<SummaryData>();
+    const auto summary = parser.awaitSummary();
     REQUIRE(summary.debuggee == "./tests/manual/embedded_lsan_suppressions");
     REQUIRE(summary.cost.allocations == 5);
     REQUIRE(summary.cost.temporary == 0);
@@ -165,32 +204,20 @@ TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst", "[parser]") {
     REQUIRE(summary.totalLeakedSuppressed == 5);
     REQUIRE(summary.cost.peak == 72714);
     REQUIRE(summary.totalSystemMemory == 12242059264);
-
-    if (spyFinished.isEmpty())
-        REQUIRE(spyFinished.wait());
 }
 
 TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst without suppressions", "[parser]") {
-    Parser parser;
-
-    QSignalSpy spySummary(&parser, &Parser::summaryAvailable);
-    QSignalSpy spyFinished(&parser, &Parser::finished);
+    TestParser parser;
 
     FilterParameters params;
     params.disableEmbeddedSuppressions = true;
-    parser.parse(SRC_DIR "/heaptrack.embedded_lsan_suppressions.84207.zst", QString(), params);
+    parser.parser.parse(SRC_DIR "/heaptrack.embedded_lsan_suppressions.84207.zst", QString(), params);
 
-    if (spySummary.isEmpty())
-        REQUIRE(spySummary.wait());
-
-    const auto summary = spySummary.at(0).at(0).value<SummaryData>();
+    const auto summary = parser.awaitSummary();
     REQUIRE(summary.debuggee == "./tests/manual/embedded_lsan_suppressions");
     REQUIRE(summary.cost.allocations == 5);
     REQUIRE(summary.cost.leaked == 10);
     REQUIRE(summary.totalLeakedSuppressed == 0);
-
-    if (spyFinished.isEmpty())
-        REQUIRE(spyFinished.wait());
 }
 
 int main(int argc, char** argv)
