@@ -20,6 +20,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "../benchutil.h"
+
 int main()
 {
     int i;
@@ -27,7 +29,8 @@ int main()
     srand(0);
     void* p = malloc(1);
     for (i = 0; i < 10000; ++i) {
-        void* __attribute__((unused)) l = malloc(rand() % 1000);
+        void* l = malloc(rand() % 1000);
+        escape(l);
         usleep(100);
     }
     printf("malloc: %p\n", p);

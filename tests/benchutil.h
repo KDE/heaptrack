@@ -24,10 +24,12 @@ inline void escape(void* p)
     asm volatile("" : : "g"(p) : "memory");
 }
 
+#ifdef __cplusplus
 inline void escape(const void* p)
 {
     escape(const_cast<void*>(p));
 }
+#endif
 
 inline void clobber()
 {
