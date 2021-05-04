@@ -101,8 +101,8 @@ int main()
     printf("valloc: %p\n", buf);
     free(buf);
 
-    int __attribute__((unused)) ret = posix_memalign(&buf, 16, 64);
-    printf("posix_memalign: %p\n", buf);
+    int ret = posix_memalign(&buf, 16, 64);
+    printf("posix_memalign: %d %p\n", ret, buf);
     free(buf);
 
     for (int i = 0; i < 10; ++i) {
