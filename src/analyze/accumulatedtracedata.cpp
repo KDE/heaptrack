@@ -499,6 +499,8 @@ vector<IndexT> sortedIndices(size_t numIndices, SortF sorter)
 vector<StringIndex> remapStrings(vector<string>& lhs, const vector<string>& rhs)
 {
     tsl::robin_map<string, StringIndex> stringRemapping;
+
+    // insert known strings in lhs into the map for lookup below
     StringIndex stringIndex;
     {
         stringRemapping.reserve(lhs.size());
@@ -508,6 +510,9 @@ vector<StringIndex> remapStrings(vector<string>& lhs, const vector<string>& rhs)
         }
     }
 
+    // now insert the missing strings form rhs into lhs
+    // and create a remapped string vector, keeping the order
+    // of the strings in rhs, but mapping into the string vector from lhs
     vector<StringIndex> map;
     {
         map.reserve(rhs.size() + 1);
@@ -515,6 +520,8 @@ vector<StringIndex> remapStrings(vector<string>& lhs, const vector<string>& rhs)
         for (const auto& string : rhs) {
             auto it = stringRemapping.find(string);
             if (it == stringRemapping.end()) {
+                // a string that only occurs in rhs, but not lhs
+                // add it to lhs to make sure we can find it again later on
                 ++stringIndex.index;
                 lhs.push_back(string);
                 map.push_back(stringIndex);
