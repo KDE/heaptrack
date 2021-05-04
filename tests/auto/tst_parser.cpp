@@ -49,7 +49,7 @@ struct TestParser
     ~TestParser()
     {
         if (spyFinished.isEmpty())
-            REQUIRE(spyFinished.wait());
+            REQUIRE(spyFinished.wait(10000));
     }
 
     CallerCalleeResults awaitCallerCallee()
@@ -66,7 +66,7 @@ struct TestParser
     TreeData awaitBottomUp()
     {
         if (spyBottomUp.isEmpty())
-            REQUIRE(spyBottomUp.wait());
+            REQUIRE(spyBottomUp.wait(10000));
 
         auto bottomUpData = spyBottomUp.at(0).at(0).value<TreeData>();
         REQUIRE(bottomUpData.resultData);
@@ -85,7 +85,7 @@ struct TestParser
     TreeData awaitTopDown()
     {
         if (spyTopDown.isEmpty())
-            REQUIRE(spyTopDown.wait());
+            REQUIRE(spyTopDown.wait(10000));
 
         auto topDownData = spyTopDown.at(0).at(0).value<TreeData>();
         REQUIRE(topDownData.resultData);
@@ -104,7 +104,7 @@ struct TestParser
     SummaryData awaitSummary()
     {
         if (spySummary.isEmpty())
-            REQUIRE(spySummary.wait());
+            REQUIRE(spySummary.wait(10000));
 
         return spySummary.at(0).at(0).value<SummaryData>();
     }
