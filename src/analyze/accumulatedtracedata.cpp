@@ -98,6 +98,8 @@ AccumulatedTraceData::AccumulatedTraceData()
     opNewIpIndices.reserve(16);
 }
 
+AccumulatedTraceData::~AccumulatedTraceData() = default;
+
 const string& AccumulatedTraceData::stringify(const StringIndex stringId) const
 {
     if (!stringId || stringId.index > strings.size()) {

@@ -45,6 +45,7 @@
 #include "costheaderview.h"
 #include "parser.h"
 #include "stacksmodel.h"
+#include "suppressionsmodel.h"
 #include "topproxy.h"
 #include "treemodel.h"
 #include "treeproxy.h"
@@ -327,6 +328,22 @@ MainWindow::MainWindow(QWidget* parent)
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->topDownTab), false);
     m_ui->tabWidget->setTabEnabled(m_ui->tabWidget->indexOf(m_ui->flameGraphTab), false);
 
+    auto* suppressionsModel = new SuppressionsModel(this);
+    {
+        auto* proxy = new QSortFilterProxyModel(this);
+        proxy->setSourceModel(suppressionsModel);
+        m_ui->suppressionsView->setModel(proxy);
+        auto* delegate = new CostDelegate(SuppressionsModel::SortRole, SuppressionsModel::TotalCostRole, this);
+        m_ui->suppressionsView->setItemDelegateForColumn(static_cast<int>(SuppressionsModel::Columns::Leaked),
+                                                         delegate);
+        m_ui->suppressionsView->setItemDelegateForColumn(static_cast<int>(SuppressionsModel::Columns::Matches),
+                                                         delegate);
+
+        auto margins = m_ui->suppressionBox->contentsMargins();
+        margins.setLeft(0);
+        m_ui->suppressionBox->setContentsMargins(margins);
+    }
+
     connect(m_parser, &Parser::bottomUpDataAvailable, this, [=](const TreeData& data) {
         bottomUpModel->resetData(data);
         if (!m_diffMode) {
@@ -353,6 +370,8 @@ MainWindow::MainWindow(QWidget* parent)
     connect(m_parser, &Parser::summaryAvailable, this, [=](const SummaryData& data) {
         bottomUpModel->setSummary(data);
         topDownModel->setSummary(data);
+        suppressionsModel->setSuppressions(data);
+        m_ui->suppressionBox->setVisible(suppressionsModel->rowCount() > 0);
         const auto isFiltered = data.filterParameters.isFilteredByTime(data.totalTime);
         QString textLeft;
         QString textCenter;

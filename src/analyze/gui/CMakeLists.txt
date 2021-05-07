@@ -57,6 +57,7 @@ set(SRCFILES
     topproxy.cpp
     callercalleemodel.cpp
     proxystyle.cpp
+    suppressionsmodel.cpp
     resources.qrc
 )
 

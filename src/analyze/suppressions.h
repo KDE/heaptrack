@@ -26,4 +26,11 @@ std::string parseSuppression(std::string line);
 std::vector<std::string> parseSuppressions(const std::string& suppressionFile, bool* ok);
 bool matchesSuppression(const std::string& suppression, const std::string& haystack);
 
+struct Suppression
+{
+    std::string pattern;
+    int64_t matches = 0;
+    int64_t leaked = 0;
+};
+
 #endif // SUPPRESSIONS_H

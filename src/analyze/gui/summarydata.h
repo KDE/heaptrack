@@ -21,15 +21,18 @@
 
 #include "../allocationdata.h"
 #include "../filterparameters.h"
+#include "../suppressions.h"
+
 #include <QMetaType>
 #include <QString>
+#include <QVector>
 
 struct SummaryData
 {
     SummaryData() = default;
-    SummaryData(const QString& debuggee, const AllocationData& cost, int64_t totalLeakedSuppressed, int64_t totalTime,
+    SummaryData(const QString& debuggee, const AllocationData& cost, int64_t totalTime,
                 const FilterParameters& filterParameters, int64_t peakTime, int64_t peakRSS, int64_t totalSystemMemory,
-                bool fromAttached)
+                bool fromAttached, int64_t totalLeakedSuppressed, QVector<Suppression> suppressions)
         : debuggee(debuggee)
         , cost(cost)
         , totalLeakedSuppressed(totalLeakedSuppressed)
@@ -39,6 +42,7 @@ struct SummaryData
         , peakRSS(peakRSS)
         , totalSystemMemory(totalSystemMemory)
         , fromAttached(fromAttached)
+        , suppressions(std::move(suppressions))
     {
     }
     QString debuggee;
@@ -50,6 +54,7 @@ struct SummaryData
     int64_t peakRSS = 0;
     int64_t totalSystemMemory = 0;
     bool fromAttached = false;
+    QVector<Suppression> suppressions;
 };
 Q_DECLARE_METATYPE(SummaryData)
 

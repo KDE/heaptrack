@@ -91,6 +91,13 @@ struct ChartMergeData
 };
 
 const uint64_t MAX_CHART_DATAPOINTS = 500; // TODO: make this configurable via the GUI
+
+QVector<Suppression> toQt(const std::vector<Suppression>& suppressions)
+{
+    QVector<Suppression> ret(suppressions.size());
+    std::copy(suppressions.begin(), suppressions.end(), ret.begin());
+    return ret;
+}
 }
 
 struct ParserData final : public AccumulatedTraceData
@@ -701,10 +708,10 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
 
         const auto resultData = std::make_shared<const ResultData>(data->totalCost, data->qtStrings);
 
-        emit summaryAvailable({QString::fromStdString(data->debuggee), data->totalCost, data->totalLeakedSuppressed,
-                               data->totalTime, data->filterParameters, data->peakTime,
-                               data->peakRSS * data->systemInfo.pageSize,
-                               data->systemInfo.pages * data->systemInfo.pageSize, data->fromAttached});
+        emit summaryAvailable({QString::fromStdString(data->debuggee), data->totalCost, data->totalTime,
+                               data->filterParameters, data->peakTime, data->peakRSS * data->systemInfo.pageSize,
+                               data->systemInfo.pages * data->systemInfo.pageSize, data->fromAttached,
+                               data->totalLeakedSuppressed, toQt(data->suppressions)});
 
         if (stopAfter == StopAfter::Summary) {
             emit finished();

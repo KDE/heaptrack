@@ -95,10 +95,12 @@ struct AllocationInfo
     }
 };
 
+struct Suppression;
+
 struct AccumulatedTraceData
 {
     AccumulatedTraceData();
-    virtual ~AccumulatedTraceData() = default;
+    virtual ~AccumulatedTraceData();
 
     enum ParsePass
     {
@@ -186,12 +188,6 @@ struct AccumulatedTraceData
     ParsingState parsingState;
 
     void applyLeakSuppressions();
-    struct Suppression
-    {
-        std::string pattern;
-        uint64_t matches = 0;
-        uint64_t leaked = 0;
-    };
     std::vector<Suppression> suppressions;
     int64_t totalLeakedSuppressed = 0;
 };
