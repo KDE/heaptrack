@@ -314,7 +314,7 @@ TEST_CASE ("heaptrack.heaptrack_gui.{99454,99529}.zst diff", "[parser]") {
     const auto ccr = parser.awaitCallerCallee();
     const auto sortedSymbols = parser.sortedSymbols(ccr);
 
-    const auto& sym = sortedSymbols[1124];
+    const auto& sym = sortedSymbols[545];
     REQUIRE(parser.symbolToString(sym) == "QHashData::allocateNode(int)|libQt5Core.so.5|/usr/lib/libQt5Core.so.5");
     const auto& cost = ccr.entries[sym];
     CHECK(cost.inclusiveCost.allocations == (5559 - 5214));

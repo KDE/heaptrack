@@ -587,6 +587,11 @@ int compareTraceIndices(const TraceIndex& lhs, const AccumulatedTraceData& lhsDa
     return lhsIp.compareWithoutAddress(rhsIp) ? -1 : 1;
 }
 
+POTENTIALLY_UNUSED void printCost(const AllocationData& data)
+{
+    cerr << data.allocations << " (" << data.temporary << "), " << data.peak << " (" << data.leaked << ")\n";
+}
+
 POTENTIALLY_UNUSED void printTrace(const AccumulatedTraceData& data, TraceIndex index)
 {
     do {
@@ -613,31 +618,22 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     systemInfo.pages -= base.systemInfo.pages;
     systemInfo.pageSize -= base.systemInfo.pageSize;
 
-    // step 1: sort trace indices of allocations for efficient lookup
+    // step 1: sort allocations for efficient lookup
     // step 2: while at it, also merge equal allocations
-    vector<TraceIndex> allocationTraceNodes;
-    allocationTraceNodes.reserve(allocations.size());
-    allocations.erase(
-        std::remove_if(
-            allocations.begin(), allocations.end(),
-            [&](const Allocation& allocation) {
-                auto sortedIt =
-                    lower_bound(allocationTraceNodes.begin(), allocationTraceNodes.end(), allocation.traceIndex,
-                                [this](const TraceIndex& lhs, const TraceIndex& rhs) -> bool {
-                                    return compareTraceIndices(lhs, *this, rhs, *this, identity {}) < 0;
-                                });
-                if (sortedIt == allocationTraceNodes.end()
-                    || compareTraceIndices(allocation.traceIndex, *this, *sortedIt, *this, identity {}) != 0) {
-                    allocationTraceNodes.insert(sortedIt, allocation.traceIndex);
-                    return false;
-                } else if (*sortedIt != allocation.traceIndex) {
-                    findAllocation(*sortedIt) += allocation;
-                    return true;
-                } else {
-                    return false;
-                }
-            }),
-        allocations.end());
+
+    std::sort(allocations.begin(), allocations.end(), [this](Allocation& lhs, Allocation& rhs) -> bool {
+        auto ret = compareTraceIndices(lhs.traceIndex, *this, rhs.traceIndex, *this, identity {});
+        if (ret == 0) {
+            // merge data
+            lhs += rhs;
+            rhs.clearCost();
+        }
+        return ret < 0;
+    });
+    // remove the merged allocations, they now have zero cost
+    allocations.erase(remove_if(allocations.begin(), allocations.end(),
+                                [](const Allocation& allocation) { return allocation == AllocationData(); }),
+                      allocations.end());
 
     // step 3: map string indices from rhs to lhs data
 
@@ -718,33 +714,24 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     };
 
     // find an equivalent trace or copy the data over if it does not exist yet
-    // a trace is equivalent if the complete backtrace has equal
-    // InstructionPointer
+    // a trace is equivalent if the complete backtrace has equal InstructionPointer
     // data while ignoring the actual pointer address
-    auto remapTrace = [&base, &allocationTraceNodes, this, remapIp, copyTrace](TraceIndex rhsIndex) -> TraceIndex {
-        if (!rhsIndex) {
-            return rhsIndex;
-        }
+    for (const auto& rhsAllocation : base.allocations) {
 
-        auto it = lower_bound(allocationTraceNodes.begin(), allocationTraceNodes.end(), rhsIndex,
-                              [&base, this, remapIp](const TraceIndex& lhs, const TraceIndex& rhs) -> bool {
-                                  return compareTraceIndices(lhs, *this, rhs, base, remapIp) < 0;
+        assert(rhsAllocation.traceIndex);
+        auto it = lower_bound(allocations.begin(), allocations.end(), rhsAllocation.traceIndex,
+                              [&base, this, remapIp](const Allocation& lhs, const TraceIndex& rhs) -> bool {
+                                  return compareTraceIndices(lhs.traceIndex, *this, rhs, base, remapIp) < 0;
                               });
 
-        if (it != allocationTraceNodes.end() && compareTraceIndices(*it, *this, rhsIndex, base, remapIp) == 0) {
-            return *it;
+        if (it == allocations.end()
+            || compareTraceIndices(it->traceIndex, *this, rhsAllocation.traceIndex, base, remapIp) != 0) {
+            Allocation lhsAllocation;
+            lhsAllocation.traceIndex = copyTrace(rhsAllocation.traceIndex);
+            it = allocations.insert(it, lhsAllocation);
         }
 
-        TraceIndex ret = copyTrace(rhsIndex);
-        allocationTraceNodes.insert(it, ret);
-        return ret;
-    };
-
-    for (const auto& rhsAllocation : base.allocations) {
-        const auto lhsTrace = remapTrace(rhsAllocation.traceIndex);
-        assert(remapIp(base.findIp(base.findTrace(rhsAllocation.traceIndex).ipIndex))
-                   .equalWithoutAddress(findIp(findTrace(lhsTrace).ipIndex)));
-        findAllocation(lhsTrace) -= rhsAllocation;
+        (*it) -= rhsAllocation;
     }
 
     // step 5: remove allocations that don't show any differences
@@ -752,7 +739,7 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     //         we can still end up with merged backtraces that have a total
     //         of 0, but different "tails" of different origin with non-zero cost
     allocations.erase(remove_if(allocations.begin(), allocations.end(),
-                                [](const Allocation& allocation) -> bool { return allocation == AllocationData(); }),
+                                [&](const Allocation& allocation) -> bool { return allocation == AllocationData(); }),
                       allocations.end());
 }
 
@@ -788,11 +775,6 @@ AllocationIndex AccumulatedTraceData::mapToAllocationIndex(const TraceIndex trac
         m_maxAllocationTraceIndex = traceIndex;
     }
     return allocationIndex;
-}
-
-Allocation& AccumulatedTraceData::findAllocation(const TraceIndex traceIndex)
-{
-    return allocations[mapToAllocationIndex(traceIndex).index];
 }
 
 const InstructionPointer& AccumulatedTraceData::findIp(const IpIndex ipIndex) const

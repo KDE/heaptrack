@@ -145,7 +145,7 @@ struct AccumulatedTraceData
 
     // our indices are sequentially increasing thus a new allocation can only ever
     // occur with an index larger than any other we encountered so far
-    // this can be used to our advantage in speeding up the findAllocation calls.
+    // this can be used to our advantage in speeding up the mapToAllocationIndex calls.
     TraceIndex m_maxAllocationTraceIndex;
     AllocationIndex m_maxAllocationIndex;
     // we don't want to shuffle allocations around, so instead keep a secondary
@@ -156,8 +156,6 @@ struct AccumulatedTraceData
     /// if the trace index wasn't mapped before, an empty Allocation will be added
     /// and its index returned.
     AllocationIndex mapToAllocationIndex(const TraceIndex traceIndex);
-    /// map the trace index to an allocation and return a reference to it
-    Allocation& findAllocation(const TraceIndex traceIndex);
 
     const InstructionPointer& findIp(const IpIndex ipIndex) const;
 
