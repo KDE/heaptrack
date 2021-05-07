@@ -186,7 +186,13 @@ struct AccumulatedTraceData
     ParsingState parsingState;
 
     void applyLeakSuppressions();
-    std::vector<std::string> suppressions;
+    struct Suppression
+    {
+        std::string pattern;
+        uint64_t matches = 0;
+        uint64_t leaked = 0;
+    };
+    std::vector<Suppression> suppressions;
     int64_t totalLeakedSuppressed = 0;
 };
 

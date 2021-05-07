@@ -211,7 +211,11 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
     totalCost = {};
     peakTime = 0;
     if (pass == FirstPass) {
-        suppressions = filterParameters.suppressions;
+        suppressions.resize(filterParameters.suppressions.size());
+        std::transform(filterParameters.suppressions.begin(), filterParameters.suppressions.end(), suppressions.begin(),
+                       [](const std::string& pattern) {
+                           return Suppression {pattern, 0, 0};
+                       });
     }
     peakRSS = 0;
     for (auto& allocation : allocations) {
@@ -465,7 +469,7 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
             }
             auto suppression = parseSuppression(reader.line().substr(2));
             if (!suppression.empty()) {
-                suppressions.push_back(std::move(suppression));
+                suppressions.push_back({std::move(suppression), 0, 0});
             }
         } else {
             cerr << "failed to parse line: " << reader.line() << endl;
@@ -813,6 +817,23 @@ bool AccumulatedTraceData::isStopIndex(const StringIndex index) const
     return find(stopIndices.begin(), stopIndices.end(), index) != stopIndices.end();
 }
 
+struct SuppressionStringMatch
+{
+    static constexpr auto NO_MATCH = std::numeric_limits<std::size_t>::max();
+
+    SuppressionStringMatch(std::size_t index = NO_MATCH)
+        : suppressionIndex(index)
+    {
+    }
+
+    explicit operator bool() const
+    {
+        return suppressionIndex != NO_MATCH;
+    }
+
+    std::size_t suppressionIndex;
+};
+
 void AccumulatedTraceData::applyLeakSuppressions()
 {
     totalLeakedSuppressed = 0;
@@ -822,49 +843,93 @@ void AccumulatedTraceData::applyLeakSuppressions()
     }
 
     // match all strings once against all suppression rules
-    std::vector<bool> suppressedStrings(strings.size());
+    bool hasAnyMatch = false;
+    std::vector<SuppressionStringMatch> suppressedStrings(strings.size());
     std::transform(strings.begin(), strings.end(), suppressedStrings.begin(), [&](const auto& string) {
-        return std::any_of(suppressions.begin(), suppressions.end(), [&string](const std::string& suppression) {
-            return matchesSuppression(suppression, string);
+        auto it = std::find_if(suppressions.begin(), suppressions.end(), [&string](const Suppression& suppression) {
+            return matchesSuppression(suppression.pattern, string);
         });
+        if (it == suppressions.end()) {
+            return SuppressionStringMatch();
+        } else {
+            hasAnyMatch = true;
+            return SuppressionStringMatch(static_cast<std::size_t>(std::distance(suppressions.begin(), it)));
+        }
     });
-    auto isSuppressedString = [&suppressedStrings](StringIndex index) {
-        return index && index.index <= suppressedStrings.size() && suppressedStrings[index.index - 1];
-    };
-    auto isSuppressedFrame = [&isSuppressedString](Frame frame) {
-        return isSuppressedString(frame.functionIndex) || isSuppressedString(frame.fileIndex);
-    };
-
-    if (std::find(suppressedStrings.begin(), suppressedStrings.end(), true) == suppressedStrings.end()) {
+    if (!hasAnyMatch) {
         // nothing matched the suppressions, we can return early
         return;
     }
 
+    auto isSuppressedString = [&suppressedStrings](StringIndex index) {
+        if (index && index.index <= suppressedStrings.size()) {
+            return suppressedStrings[index.index - 1];
+        } else {
+            return SuppressionStringMatch();
+        }
+    };
+    auto isSuppressedFrame = [&isSuppressedString](Frame frame) {
+        auto match = isSuppressedString(frame.functionIndex);
+        if (match) {
+            return match;
+        }
+        return isSuppressedString(frame.fileIndex);
+    };
+
     // now match all instruction pointers against the suppressed strings
-    std::vector<bool> suppressedIps(instructionPointers.size());
+    std::vector<SuppressionStringMatch> suppressedIps(instructionPointers.size());
     std::transform(instructionPointers.begin(), instructionPointers.end(), suppressedIps.begin(), [&](const auto& ip) {
-        return isSuppressedString(ip.moduleIndex) || isSuppressedFrame(ip.frame)
-            || std::any_of(ip.inlined.begin(), ip.inlined.end(), isSuppressedFrame);
+        auto match = isSuppressedString(ip.moduleIndex);
+        if (match) {
+            return match;
+        }
+        match = isSuppressedFrame(ip.frame);
+        if (match) {
+            return match;
+        }
+        for (const auto& inlined : ip.inlined) {
+            match = isSuppressedFrame(inlined);
+            if (match) {
+                return match;
+            }
+        }
+        return SuppressionStringMatch();
     });
     suppressedStrings = {};
     auto isSuppressedIp = [&suppressedIps](IpIndex index) {
-        return index && index.index <= suppressedIps.size() && suppressedIps[index.index - 1];
+        if (index && index.index <= suppressedIps.size()) {
+            return suppressedIps[index.index - 1];
+        }
+        return SuppressionStringMatch();
     };
 
     // now match all trace indices against the suppressed instruction pointers
-    std::vector<bool> suppressedTraces(traces.size());
+    std::vector<SuppressionStringMatch> suppressedTraces(traces.size());
     auto isSuppressedTrace = [&suppressedTraces](TraceIndex index) {
-        return index && index.index <= suppressedTraces.size() && suppressedTraces[index.index - 1];
+        if (index && index.index <= suppressedTraces.size()) {
+            return suppressedTraces[index.index - 1];
+        }
+        return SuppressionStringMatch();
     };
     std::transform(traces.begin(), traces.end(), suppressedTraces.begin(), [&](const auto& trace) {
-        return isSuppressedTrace(trace.parentIndex) || isSuppressedIp(trace.ipIndex);
+        auto match = isSuppressedTrace(trace.parentIndex);
+        if (match) {
+            return match;
+        }
+        return isSuppressedIp(trace.ipIndex);
     });
     suppressedIps = {};
 
     // now finally zero all the matching allocations
     for (auto& allocation : allocations) {
-        if (isSuppressedTrace(allocation.traceIndex)) {
+        auto match = isSuppressedTrace(allocation.traceIndex);
+        if (match) {
             totalLeakedSuppressed += allocation.leaked;
+
+            auto& suppression = suppressions[match.suppressionIndex];
+            ++suppression.matches;
+            suppression.leaked += allocation.leaked;
+
             totalCost.leaked -= allocation.leaked;
             allocation.leaked = 0;
         }

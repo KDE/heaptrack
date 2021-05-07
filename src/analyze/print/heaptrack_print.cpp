@@ -54,8 +54,9 @@ struct MergedAllocation : public AllocationData
 class formatBytes
 {
 public:
-    formatBytes(int64_t bytes)
+    formatBytes(int64_t bytes, int width = 0)
         : m_bytes(bytes)
+        , m_width(width)
     {
     }
 
@@ -63,29 +64,28 @@ public:
 
 private:
     int64_t m_bytes;
+    int m_width;
 };
 
 ostream& operator<<(ostream& out, const formatBytes data)
 {
-    if (data.m_bytes < 0) {
-        // handle negative values
-        return out << '-' << formatBytes(-data.m_bytes);
-    }
-    if (data.m_bytes < 1000) {
-        // no fancy formatting for plain byte values, esp. no .00 factions
-        return out << data.m_bytes << 'B';
-    }
+    auto bytes = static_cast<double>(data.m_bytes);
 
     static const auto units = {"B", "KB", "MB", "GB", "TB"};
     auto unit = units.begin();
     size_t i = 0;
-    double bytes = data.m_bytes;
-    while (i < units.size() - 1 && bytes > 1000.) {
+    while (i < units.size() - 1 && std::abs(bytes) > 1000.) {
         bytes /= 1000.;
         ++i;
         ++unit;
     }
-    return out << fixed << setprecision(2) << bytes << *unit;
+
+    const auto unitLength = strlen(*unit);
+    if (data.m_width > static_cast<int>(unitLength)) {
+        return out << fixed << setprecision(2) << setw(data.m_width - unitLength) << bytes << *unit;
+    } else {
+        return out << fixed << setprecision(2) << bytes << *unit;
+    }
 }
 
 enum CostType
@@ -612,6 +612,8 @@ int main(int argc, char** argv)
             "Ignore suppression definitions that are embedded into the heaptrack data file. By default, heaptrack will copy the suppressions"
             "optionally defined via a `const char *__lsan_default_suppressions()` symbol in the debuggee application. These are then always "
             "applied when analyzing the data, unless this feature is explicitly disabled using this command line option.")
+        ("print-suppressions", po::value<bool>()->default_value(false)->implicit_value(true),
+            "Show statistics for matched suppressions.")
         ("help,h", "Show this help message.")
         ("version,v", "Displays version information.");
     // clang-format on
@@ -676,7 +678,7 @@ int main(int argc, char** argv)
     const bool printPeaks = vm["print-peaks"].as<bool>();
     const bool printAllocs = vm["print-allocators"].as<bool>();
     const bool printTemporary = vm["print-temporary"].as<bool>();
-
+    const auto printSuppressions = vm["print-suppressions"].as<bool>();
     const auto suppressionsFile = vm["suppressions"].as<string>();
 
     data.filterParameters.disableEmbeddedSuppressions = vm.count("disable-embedded-suppressions");
@@ -778,6 +780,19 @@ int main(int argc, char** argv)
          << "total memory leaked: " << formatBytes(data.totalCost.leaked) << '\n';
     if (data.totalLeakedSuppressed) {
         cout << "suppressed leaks: " << formatBytes(data.totalLeakedSuppressed) << '\n';
+
+        if (printSuppressions) {
+            cout << "Suppressions used:\n";
+            cout << setw(16) << "matches" << ' ' << setw(16) << "leaked"
+                 << " pattern\n";
+            for (const auto& suppression : data.suppressions) {
+                if (!suppression.matches) {
+                    continue;
+                }
+                cout << setw(16) << suppression.matches << ' ' << formatBytes(suppression.leaked, 16) << ' '
+                     << suppression.pattern << '\n';
+            }
+        }
     }
 
     if (!printHistogram.empty()) {
