@@ -673,6 +673,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         data->filterParameters = filterParameters;
 
         emit progressMessageAvailable(parsingMsg);
+        data->parseTimer.start();
 
         if (!diffBase.isEmpty()) {
             ParserData diffData(nullptr); // currently we don't track the progress of diff parsing
@@ -690,8 +691,6 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             data->diff(diffData);
             data->diffMode = true;
         } else {
-            data->parseTimer.start();
-
             if (!data->read(stdPath, isReparsing)) {
                 emit failedToOpen(path);
                 return;
