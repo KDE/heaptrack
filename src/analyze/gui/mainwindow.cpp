@@ -602,7 +602,7 @@ MainWindow::MainWindow(QWidget* parent)
         i18n("Ignore suppression definitions that are embedded into the heaptrack data file. By default, heaptrack "
              "will copy the suppressions optionally defined via a `const char *__lsan_default_suppressions()` symbol "
              "in the debuggee application.  These are then always applied when analyzing the data, unless this feature "
-             "is explicitly disabled using this command line  option."));
+             "is explicitly disabled using this command line option."));
     m_disableEmbeddedSuppressions->setCheckable(true);
     connect(m_disableEmbeddedSuppressions, &QAction::toggled, this, [this]() {
         m_lastFilterParameters.disableEmbeddedSuppressions = m_disableEmbeddedSuppressions->isChecked();
