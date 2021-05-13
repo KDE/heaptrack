@@ -769,12 +769,12 @@ int main(int argc, char** argv)
         cout << endl;
     }
 
-    const double totalTimeS = 0.001 * data.totalTime;
-    cout << "total runtime: " << fixed << totalTimeS << "s.\n"
+    const double totalTimeS = data.totalTime ? (1000. / data.totalTime) : 1.;
+    cout << "total runtime: " << fixed << (data.totalTime / 1000.) << "s.\n"
          << "calls to allocation functions: " << data.totalCost.allocations << " ("
-         << int64_t(data.totalCost.allocations / totalTimeS) << "/s)\n"
+         << int64_t(data.totalCost.allocations * totalTimeS) << "/s)\n"
          << "temporary memory allocations: " << data.totalCost.temporary << " ("
-         << int64_t(data.totalCost.temporary / totalTimeS) << "/s)\n"
+         << int64_t(data.totalCost.temporary * totalTimeS) << "/s)\n"
          << "peak heap memory consumption: " << formatBytes(data.totalCost.peak) << '\n'
          << "peak RSS (including heaptrack overhead): " << formatBytes(data.peakRSS * data.systemInfo.pageSize) << '\n'
          << "total memory leaked: " << formatBytes(data.totalCost.leaked) << '\n';
