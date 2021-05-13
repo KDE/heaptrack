@@ -608,6 +608,23 @@ POTENTIALLY_UNUSED void printTrace(const AccumulatedTraceData& data, TraceIndex 
     } while (index);
     cerr << "---\n";
 }
+
+template <class ForwardIt, class BinaryPredicateCompare, class BinaryOpReduce>
+ForwardIt inplace_unique_reduce(ForwardIt first, ForwardIt last, BinaryPredicateCompare cmp, BinaryOpReduce reduce)
+{
+    if (first == last)
+        return last;
+
+    ForwardIt result = first;
+    while (++first != last) {
+        if (cmp(*result, *first)) {
+            reduce(*result, *first);
+        } else if (++result != first) {
+            *result = std::move(*first);
+        }
+    }
+    return ++result;
+}
 }
 
 void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
@@ -618,21 +635,21 @@ void AccumulatedTraceData::diff(const AccumulatedTraceData& base)
     systemInfo.pages -= base.systemInfo.pages;
     systemInfo.pageSize -= base.systemInfo.pageSize;
 
-    // step 1: sort allocations for efficient lookup
-    // step 2: while at it, also merge equal allocations
+    // step 1: sort allocations for efficient lookup and to prepare for merging equal allocations
 
-    std::sort(allocations.begin(), allocations.end(), [this](Allocation& lhs, Allocation& rhs) -> bool {
-        auto ret = compareTraceIndices(lhs.traceIndex, *this, rhs.traceIndex, *this, identity {});
-        if (ret == 0) {
-            // merge data
-            lhs += rhs;
-            rhs.clearCost();
-        }
-        return ret < 0;
+    std::sort(allocations.begin(), allocations.end(), [this](const Allocation& lhs, const Allocation& rhs) {
+        return compareTraceIndices(lhs.traceIndex, *this, rhs.traceIndex, *this, identity {}) < 0;
     });
-    // remove the merged allocations, they now have zero cost
-    allocations.erase(remove_if(allocations.begin(), allocations.end(),
-                                [](const Allocation& allocation) { return allocation == AllocationData(); }),
+
+    // step 2: now merge equal allocations
+
+    allocations.erase(inplace_unique_reduce(
+                          allocations.begin(), allocations.end(),
+                          [this](const Allocation& lhs, const Allocation& rhs) {
+                              return compareTraceIndices(lhs.traceIndex, *this, rhs.traceIndex, *this, identity {})
+                                  == 0;
+                          },
+                          [](Allocation& lhs, const Allocation& rhs) { lhs += rhs; }),
                       allocations.end());
 
     // step 3: map string indices from rhs to lhs data
