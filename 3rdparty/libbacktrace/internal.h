@@ -1,5 +1,5 @@
 /* internal.h -- Internal header file for stack backtrace library.
-   Copyright (C) 2012-2017 Free Software Foundation, Inc.
+   Copyright (C) 2012-2021 Free Software Foundation, Inc.
    Written by Ian Lance Taylor, Google.
 
 Redistribution and use in source and binary forms, with or without
@@ -57,6 +57,14 @@ extern "C" {
 #  define ATTRIBUTE_MALLOC __attribute__ ((__malloc__))
 # else
 #  define ATTRIBUTE_MALLOC
+# endif
+#endif
+
+#ifndef ATTRIBUTE_FALLTHROUGH
+# if (GCC_VERSION >= 7000)
+#  define ATTRIBUTE_FALLTHROUGH __attribute__ ((__fallthrough__))
+# else
+#  define ATTRIBUTE_FALLTHROUGH
 # endif
 #endif
 
@@ -183,7 +191,7 @@ struct backtrace_view
 /* Create a view of SIZE bytes from DESCRIPTOR at OFFSET.  Store the
    result in *VIEW.  Returns 1 on success, 0 on error.  */
 extern int backtrace_get_view (struct backtrace_state *state, int descriptor,
-			       off_t offset, size_t size,
+			       off_t offset, uint64_t size,
 			       backtrace_error_callback error_callback,
 			       void *data, struct backtrace_view *view);
 
@@ -261,6 +269,18 @@ extern int backtrace_vector_release (struct backtrace_state *state,
 				     backtrace_error_callback error_callback,
 				     void *data);
 
+/* Free the space managed by VEC.  This will reset VEC.  */
+
+static inline void
+backtrace_vector_free (struct backtrace_state *state,
+		       struct backtrace_vector *vec,
+		       backtrace_error_callback error_callback, void *data)
+{
+  vec->alc += vec->size;
+  vec->size = 0;
+  backtrace_vector_release (state, vec, error_callback, data);
+}
+
 /* Read initial debug data from a descriptor, and set the
    fileline_data, syminfo_fn, and syminfo_data fields of STATE.
    Return the fileln_fn field in *FILELN_FN--this is done this way so
@@ -278,23 +298,70 @@ extern int backtrace_initialize (struct backtrace_state *state,
 				 void *data,
 				 fileline *fileline_fn);
 
+/* An enum for the DWARF sections we care about.  */
+
+enum dwarf_section
+{
+  DEBUG_INFO,
+  DEBUG_LINE,
+  DEBUG_ABBREV,
+  DEBUG_RANGES,
+  DEBUG_STR,
+  DEBUG_ADDR,
+  DEBUG_STR_OFFSETS,
+  DEBUG_LINE_STR,
+  DEBUG_RNGLISTS,
+
+  DEBUG_MAX
+};
+
+/* Data for the DWARF sections we care about.  */
+
+struct dwarf_sections
+{
+  const unsigned char *data[DEBUG_MAX];
+  size_t size[DEBUG_MAX];
+};
+
+/* DWARF data read from a file, used for .gnu_debugaltlink.  */
+
+struct dwarf_data;
+
 /* Add file/line information for a DWARF module.  */
 
 extern int backtrace_dwarf_add (struct backtrace_state *state,
 				uintptr_t base_address,
-				const unsigned char* dwarf_info,
-				size_t dwarf_info_size,
-				const unsigned char *dwarf_line,
-				size_t dwarf_line_size,
-				const unsigned char *dwarf_abbrev,
-				size_t dwarf_abbrev_size,
-				const unsigned char *dwarf_ranges,
-				size_t dwarf_range_size,
-				const unsigned char *dwarf_str,
-				size_t dwarf_str_size,
+				const struct dwarf_sections *dwarf_sections,
 				int is_bigendian,
+				struct dwarf_data *fileline_altlink,
 				backtrace_error_callback error_callback,
-				void *data, fileline *fileline_fn);
+				void *data, fileline *fileline_fn,
+				struct dwarf_data **fileline_entry);
+
+/* A data structure to pass to backtrace_syminfo_to_full.  */
+
+struct backtrace_call_full
+{
+  backtrace_full_callback full_callback;
+  backtrace_error_callback full_error_callback;
+  void *full_data;
+  int ret;
+};
+
+/* A backtrace_syminfo_callback that can call into a
+   backtrace_full_callback, used when we have a symbol table but no
+   debug info.  */
+
+extern void backtrace_syminfo_to_full_callback (void *data, uintptr_t pc,
+						const char *symname,
+						uintptr_t symval,
+						uintptr_t symsize);
+
+/* An error callback that corresponds to
+   backtrace_syminfo_to_full_callback.  */
+
+extern void backtrace_syminfo_to_full_error_callback (void *, const char *,
+						      int);
 
 /* A test-only hook for elf_uncompress_zdebug.  */
 
@@ -308,9 +375,11 @@ extern int backtrace_uncompress_zdebug (struct backtrace_state *,
 //BEGIN HEAPTRACK
 // the following internal functions are used by heaptrack, and thus must be made exported here
 extern int elf_add (struct backtrace_state *state, const char *filename, int descriptor,
+		    const unsigned char *memory, size_t memory_size,
 		    uintptr_t base_address, backtrace_error_callback error_callback,
 		    void *data, fileline *fileline_fn, int *found_sym, int *found_dwarf,
-		    int exe, int debuginfo);
+		    struct dwarf_data **fileline_entry, int exe, int debuginfo,
+		    const char *with_buildid_data, uint32_t with_buildid_size);
 extern void elf_syminfo (struct backtrace_state *state, uintptr_t addr,
 			 backtrace_syminfo_callback callback,
 			 backtrace_error_callback error_callback ATTRIBUTE_UNUSED,
@@ -324,5 +393,14 @@ extern void elf_nosyms (struct backtrace_state *state ATTRIBUTE_UNUSED,
 #ifdef __cplusplus
 }
 #endif
+
+/* A test-only hook for elf_uncompress_lzma.  */
+
+extern int backtrace_uncompress_lzma (struct backtrace_state *,
+				      const unsigned char *compressed,
+				      size_t compressed_size,
+				      backtrace_error_callback, void *data,
+				      unsigned char **uncompressed,
+				      size_t *uncompressed_size);
 
 #endif

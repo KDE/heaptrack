@@ -1,3 +1,935 @@
+2021-05-03  H.J. Lu  <hjl.tools@gmail.com>
+
+	PR bootstrap/99703
+	* configure: Regenerated.
+
+2021-03-03  Ian Lance Taylor  <iant@golang.org>
+
+	* dwarf.c (read_line_program): Don't special case file 0.
+	(read_function_entry): Likewise.
+
+2021-03-02  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/98818
+	* dwarf.c (dwarf_buf_error): Add errnum parameter.  Change all
+	callers.
+	* backtrace.h: Update backtrace_error_callback comment.
+
+2021-02-12  Ian Lance Taylor  <iant@golang.org>
+
+	* configure.ac: Check for objcopy --add-gnu-debuglink by using
+	objcopy --help.
+	* configure: Regenerate
+
+2021-01-18  Ian Lance Taylor  <iant@golang.org>
+
+	* Makefile.am (%_dwz): If dwz fails, use uncompressed debug info.
+	* Makefile.in: Regenerate.
+	* configure: Regenerate.
+
+2021-01-18  Ian Lance Taylor  <iant@golang.org>
+
+	PR debug/98716
+	* dwarf.c (read_v2_paths): Allocate zero entry for dirs and
+	filenames.
+	(read_line_program): Remove parameter u, change caller.  Don't
+	subtract one from dirs and filenames index.
+	(read_function_entry): Don't subtract one from filenames index.
+
+2021-01-05  Samuel Thibault  <samuel.thibault@ens-lyon.org>
+
+	* configure: Re-generate.
+
+2020-12-05  Iain Sandoe  <iain@sandoe.co.uk>
+
+	PR target/97865
+	* configure: Regenerate.
+
+2020-12-02  Ian Lance Taylor  <iant@golang.org>
+
+	* dwarf.c (resolve_string): Use > rather than >= to check whether
+	string index extends past buffer.
+	(resolve_addr_index): Similarly for address index.
+
+2020-11-29  John David Anglin  <danglin@gcc.gnu.org>
+
+	* configure: Regenerate.
+
+2020-10-20  Ian Lance Taylor  <iant@golang.org>
+
+	* internal.h (ATTRIBUTE_FALLTHROUGH): Define.
+	* elf.c (elf_zlib_inflate): Use ATTRIBUTE_FALLTHROUGH.
+
+2020-09-28  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/97082
+	* Makefile.am (check_DATA): Add mtest.dSYM if USE_DSYMUTIL.
+	* Makefile.in: Regenerate.
+
+2020-09-28  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/97227
+	* configure.ac (USE_DSYMUTIL): Define instead of HAVE_DSYMUTIL.
+	* Makefile.am: Change all uses of HAVE_DSYMUTIL to USE_DSYMUTIL.
+	* configure: Regenerate.
+	* Makefile.in: Regenerate.
+
+2020-09-23  Ian Lance Taylor  <iant@golang.org>
+
+	* dwarf.c (report_inlined_functions): Handle PC == -1 and PC ==
+	p->low.
+	(dwarf_lookup_pc): Likewise.
+
+2020-09-17  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/97080
+	* fileline.c (backtrace_syminfo_to_full_callback): New function.
+	(backtrace_syminfo_to_full_error_callback): New function.
+	* elf.c (elf_nodebug): Call syminfo_fn if possible.
+	* internal.h (struct backtrace_call_full): Define.
+	(backtrace_syminfo_to_full_callback): Declare.
+	(backtrace_syminfo_to_full_error_callback): Declare.
+	* mtest.c (f3): Only check all[i] if data.index permits.
+
+2020-09-16  Iain Sandoe  <iain@sandoe.co.uk>
+
+	* macho.c (MACH_O_CPU_TYPE_PPC): New.
+	(MACH_O_CPU_TYPE_PPC64): New.
+	Add compile-tests for powerpc to the Mach-O variants.
+
+2020-09-14  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/93608
+	Add support for MiniDebugInfo.
+	* elf.c (struct elf_view): Define.  Replace most uses of
+	backtrace_view with elf_view.
+	(elf_get_view): New static functions.  Replace most calls of
+	backtrace_get_view with elf_get_view.
+	(elf_release_view): New static functions.  Replace most calls of
+	backtrace_release_view with elf_release_view.
+	(elf_uncompress_failed): Rename from elf_zlib_failed.  Change all
+	callers.
+	(LZMA_STATES, LZMA_POS_STATES, LZMA_DIST_STATES): Define.
+	(LZMA_DIST_SLOTS, LZMA_DIST_MODEL_START): Define.
+	(LZMA_DIST_MODEL_END, LZMA_FULL_DISTANCES): Define.
+	(LZMA_ALIGN_SIZE, LZMA_LEN_LOW_SYMBOLS): Define.
+	(LZMA_LEN_MID_SYMBOLS, LZMA_LEN_HIGH_SYMBOLS): Define.
+	(LZMA_LITERAL_CODERS_MAX, LZMA_LITERAL_CODER_SIZE): Define.
+	(LZMA_PROB_IS_MATCH_LEN, LZMA_PROB_IS_REP_LEN): Define.
+	(LZMA_PROB_IS_REP0_LEN, LZMA_PROB_IS_REP1_LEN): Define.
+	(LZMA_PROB_IS_REP2_LEN, LZMA_PROB_IS_REP0_LONG_LEN): Define.
+	(LZMA_PROB_DIST_SLOT_LEN, LZMA_PROB_DIST_SPECIAL_LEN): Define.
+	(LZMA_PROB_DIST_ALIGN_LEN): Define.
+	(LZMA_PROB_MATCH_LEN_CHOICE_LEN): Define.
+	(LZMA_PROB_MATCH_LEN_CHOICE2_LEN): Define.
+	(LZMA_PROB_MATCH_LEN_LOW_LEN): Define.
+	(LZMA_PROB_MATCH_LEN_MID_LEN): Define.
+	(LZMA_PROB_MATCH_LEN_HIGH_LEN): Define.
+	(LZMA_PROB_REP_LEN_CHOICE_LEN): Define.
+	(LZMA_PROB_REP_LEN_CHOICE2_LEN): Define.
+	(LZMA_PROB_REP_LEN_LOW_LEN): Define.
+	(LZMA_PROB_REP_LEN_MID_LEN): Define.
+	(LZMA_PROB_REP_LEN_HIGH_LEN): Define.
+	(LZMA_PROB_LITERAL_LEN): Define.
+	(LZMA_PROB_IS_MATCH_OFFSET, LZMA_PROB_IS_REP_OFFSET): Define.
+	(LZMA_PROB_IS_REP0_OFFSET, LZMA_PROB_IS_REP1_OFFSET): Define.
+	(LZMA_PROB_IS_REP2_OFFSET): Define.
+	(LZMA_PROB_IS_REP0_LONG_OFFSET): Define.
+	(LZMA_PROB_DIST_SLOT_OFFSET): Define.
+	(LZMA_PROB_DIST_SPECIAL_OFFSET): Define.
+	(LZMA_PROB_DIST_ALIGN_OFFSET): Define.
+	(LZMA_PROB_MATCH_LEN_CHOICE_OFFSET): Define.
+	(LZMA_PROB_MATCH_LEN_CHOICE2_OFFSET): Define.
+	(LZMA_PROB_MATCH_LEN_LOW_OFFSET): Define.
+	(LZMA_PROB_MATCH_LEN_MID_OFFSET): Define.
+	(LZMA_PROB_MATCH_LEN_HIGH_OFFSET): Define.
+	(LZMA_PROB_REP_LEN_CHOICE_OFFSET): Define.
+	(LZMA_PROB_REP_LEN_CHOICE2_OFFSET): Define.
+	(LZMA_PROB_REP_LEN_LOW_OFFSET): Define.
+	(LZMA_PROB_REP_LEN_MID_OFFSET): Define.
+	(LZMA_PROB_REP_LEN_HIGH_OFFSET): Define.
+	(LZMA_PROB_LITERAL_OFFSET): Define.
+	(LZMA_PROB_TOTAL_COUNT): Define.
+	(LZMA_IS_MATCH, LZMA_IS_REP, LZMA_IS_REP0): Define.
+	(LZMA_IS_REP1, LZMA_IS_REP2, LZMA_IS_REP0_LONG): Define.
+	(LZMA_DIST_SLOT, LZMA_DIST_SPECIAL, LZMA_DIST_ALIGN): Define.
+	(LZMA_MATCH_LEN_CHOICE, LZMA_MATCH_LEN_CHOICE2): Define.
+	(LZMA_MATCH_LEN_LOW, LZMA_MATCH_LEN_MID): Define.
+	(LZMA_MATCH_LEN_HIGH, LZMA_REP_LEN_CHOICE): Define.
+	(LZMA_REP_LEN_CHOICE2, LZMA_REP_LEN_LOW): Define.
+	(LZMA_REP_LEN_MID, LZMA_REP_LEN_HIGH, LZMA_LITERAL): Define.
+	(elf_lzma_varint): New static function.
+	(elf_lzma_range_normalize): New static function.
+	(elf_lzma_bit, elf_lzma_integer): New static functions.
+	(elf_lzma_reverse_integer): New static function.
+	(elf_lzma_len, elf_uncompress_lzma_block): New static functions.
+	(elf_uncompress_lzma): New static function.
+	(backtrace_uncompress_lzma): New function.
+	(elf_add): Add memory and memory_size parameters.  Change all
+	callers.  Look for .gnu_debugdata section, and, if found,
+	decompress it and use it for symbols and debug info.  Permit the
+	descriptor parameter to be -1.
+	* internal.h (backtrace_uncompress_lzma): Declare.
+	* mtest.c: New file.
+	* xztest.c: New file.
+	* configure.ac: Check for nm, xz, and comm programs.  Check for
+	liblzma library.
+	(HAVE_MINIDEBUG): Define.
+	* Makefile.am (mtest_SOURCES): Define.
+	(mtest_CFLAGS, mtest_LDADD): Define.
+	(TESTS): Add mtest_minidebug if HAVE_MINIDEBUG.
+	(%_minidebug): New pattern rule, if HAVE_MINIDEBUG.
+	(xztest_SOURCES, xztest_CFLAGS, xztest_LDADD): Define.
+	(xztest_alloc_SOURCES, xztest_alloc_CFLAGS): Define
+	(xztest_alloc_LDADD): Define.
+	(BUILDTESTS): Add mtest, xztest, xztest_alloc.
+	(CLEANFILES): Add files created by minidebug pattern.
+	(btest.lo): Correct INCDIR reference.
+	(mtest.lo, xztest.lo, ztest.lo): New targets.
+	* configure: Regenerate.
+	* config.h.in: Regenerate.
+	* Makefile.in: Regenerate.
+
+2020-09-09  Ian Lance Taylor  <iant@golang.org>
+
+	* pecoff.c (coff_initialize_syminfo): Add is_64 parameter.
+	(coff_add): Determine and pass is_64.
+
+2020-09-09  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/96973
+	* fileline.c (macho_get_executable_path): New static function.
+	(fileline_initialize): Call macho_get_executable_path.
+
+2020-09-09  Ian Lance Taylor  <iant@golang.org>
+
+	* dwarf.c (function_addrs_search): Compare against the next entry
+	low address, not the high address.
+	(unit_addrs_search): Likewise.
+	(build_address_map): Add a trailing unit_addrs.
+	(read_function_entry): Add a trailing function_addrs.
+	(read_function_info): Likewise.
+	(report_inlined_functions): Search backward for function_addrs
+	match.
+	(dwarf_lookup_pc): Search backward for unit_addrs and
+	function_addrs matches.
+
+2020-09-08  Ian Lance Taylor  <iant@golang.org>
+
+	* simple.c (simple_unwind): Correct comment spelling.
+
+2020-09-08  Ian Lance Taylor  <iant@golang.org>
+
+	* macho.c (macho_add_dsym): Make space for '/' in dsym.  Use
+	correct length when freeing diralc.
+
+2020-09-08  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/96973
+	* macho.c (macho_add_fat): Correctly swap 32-bit file offset.
+
+2020-09-08  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/96971
+	* filetype.awk: Only match magic number at start of line.
+
+2020-08-24  Ian Lance Taylor  <iant@golang.org>
+
+	* macho.c (MACH_O_MH_MAGIC_FAT_64): Define.
+	(MACH_O_MH_CIGAM_FAT_64): Define.
+	(struct macho_fat_arch_64): Define.
+	(macho_add_fat): Add and use is_64 parameter.
+	(macho_add): Recognize 64-bit fat files.
+
+2020-07-30  H.J. Lu  <hjl.tools@gmail.com>
+
+	PR bootstrap/96202
+	* configure: Regenerated.
+
+2020-07-08  Ian Lance Taylor  <iant@golang.org>
+
+	* configure.ac: Test linker support for DWARF5
+	* configure: Regenerate
+
+2020-05-29  H.J. Lu  <hjl.tools@gmail.com>
+
+	PR bootstrap/95413
+	* configure: Regenerated.
+
+2020-05-15  H.J. Lu  <hongjiu.lu@intel.com>
+
+	PR bootstrap/95147
+	* configure: Regenerated.
+
+2020-05-14  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* configure: Regenerated.
+
+2020-05-13  Ian Lance Taylor  <iant@golang.org>
+
+	* ztest.c (test_large): Mark state ATTRIBUTE_UNUSED.
+
+2020-05-13  Ian Lance Taylor  <iant@golang.org>
+
+	PR go/95061
+	* posix.c (backtrace_open): Treat EACCESS like ENOENT.
+
+2020-05-12  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* Makefile.am (AM_CFLAGS): Add $(CET_HOST_FLAGS).
+	* configure.ac: Add GCC_CET_HOST_FLAGS(CET_HOST_FLAGS) and
+	AC_SUBST(CET_HOST_FLAGS).  Clear CET_HOST_FLAGS if jit isn't
+	enabled.
+	* Makefile.in: Regenerated.
+	* configure: Likewise.
+
+2020-05-11  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/95012
+	* configure.ac: Check for getpagesize declaration.
+	* mmap.c: Declare getpagesize if necessary.
+	* mmapio.c: Likewise.
+	* configure: Regenerate.
+	* config.h.in: Regenerate.
+	* Makefile.in: Regenerate.
+
+2020-05-09  Roland McGrath  <mcgrathr@google.com>
+
+	* elf.c (elf_add): Bail early if there are no section headers at all.
+
+2020-05-09  Ian Lance Taylor  <iant@golang.org>
+
+	* elf.c (elf_add): Don't free strtab if an error occurs after
+	recording symbol information.
+
+2020-05-09  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/88745
+	* macho.c: New file.
+	* filetype.awk: Recognize Mach-O files.
+	* Makefile.am (FORMAT_FILES): Add macho.c.
+	(check_DATA): New variable.  Set to .dSYM if HAVE_DSYMUTIL.
+	(%.dSYM): New pattern target.
+	(test_macho_SOURCES, test_macho_CFLAGS): New targets.
+	(test_macho_LDADD): New target.
+	(BUILDTESTS): Add test_macho.
+	(macho.lo): Add dependencies.
+	* configure.ac: Recognize macho file type.  Check for
+	mach-o/dyld.h.  Don't try to run objcopy if we don't find it.
+	Look for dsymutil and define a HAVE_DSYMUTIL conditional.
+	* Makefile.in: Regenerate.
+	* configure: Regenerate.
+	* config.h.in: Regenerate.
+
+2020-05-09  Ian Lance Taylor  <iant@golang.org>
+
+	* read.c (backtrace_get_view): Support short read.
+
+2020-05-09  Ian Lance Taylor  <iant@golang.org>
+
+	* elf.c (elf_add): If debug sections are very large or far apart,
+	read them individually rather than as a single view.
+
+2020-05-08  Ian Lance Taylor  <iant@golang.org>
+
+	* fileline.c (sysctl_exec_name): New static function.
+	(sysctl_exec_name1): New macro or static function.
+	(sysctl_exec_name2): Likewise.
+	(fileline_initialize): Try sysctl_exec_name[12].
+	* configure.ac: Check for sysctl args to fetch executable name.
+	* configure: Regenerate.
+	* config.h.in: Regenerate.
+
+2020-02-15  Ian Lance Taylor  <iant@golang.org>
+
+	* ztest.c (test_large): Update file to current libgo test file.
+
+2020-02-03  Ian Lance Taylor  <iant@golang.org>
+
+	* Makefile.am (libbacktrace_TEST_CFLAGS): Define.
+	(test_elf32_CFLAGS): Use $(libbacktrace_test_CFLAGS).
+	(test_elf_64_CFLAGS, test_xcoff_32_CFLAGS): Likewise.
+	(test_xcoff_64_CFLAGS, test_pecoff_CFLAGS): Likewise.
+	(test_unknown_CFLAGS, unittest_CFLAGS): Likewise.
+	(unittest_alloc_CFLAGS, allocfail_CFLAGS): Likewise.
+	(b2test_CFLAGS, b3test_CFLAGS, btest_CFLAGS): Likewise.
+	(btest_lto_CFLAGS, btest_alloc_CFLAGS, stest_CFLAGS): Likewise.
+	(stest_alloc_CFLAGS): Likewise.
+	* Makefile.in: Regenerate.
+	* ztest.c (error_callback_compress): Mark vdata unused.
+	(test_large): Add casts to avoid warnings.
+
+2020-01-01  Jakub Jelinek  <jakub@redhat.com>
+
+	Update copyright years.
+
+2019-12-13  Ian Lance Taylor  <iant@golang.org>
+
+	Add DWARF 5 support.
+	* dwarf.c (struct attr): Add val field.
+	(enum attr_val_encoding): Add ATTR_VAL_ADDDRESS_INDEX,
+	ATTR_VAL_STRING_INDEX, ATTR_VAL_RNGLISTS_INDEX.
+	(struct line_header): Add addrsize field.
+	(struct line_header_format): Define.
+	(struct unit): Add str_offsets_base, addr_base, and rnglists_base
+	fields.
+	(read_uint24): New static function.
+	(read_attribute): Add implicit_val parameter.  Replace dwarf_str
+	and dwarf_str_size parameters with dwarf_sections parameter.  Add
+	support for new DWARF 5 forms.  Change all callers.
+	(resolve_string): New static function.
+	(resolve_addr_index): Likewise.
+	(read_abbrevs): Support DW_FORM_implicit_const.
+	(struct pcrange): Add lowpc_is_addr_index, highpc_is_addr_Index,
+	and ranges_is_index fields.
+	(update_pcrange): Support DWARF 5 encodings.
+	(add_high_low_range): New static function, split out of
+	add_ranges.
+	(add_ranges_from_ranges): Likewise.
+	(add_ranges_from_rnglists): New static function.
+	(add_ranges): Just call new helper functions.
+	(find_address_ranges): Use resolve_string for strings, after
+	reading all attributes.  Handle new DWARF 5 attributes.
+	(build_address_map): Support DWARF 5 compilation units.
+	(read_v2_paths): New static function, split out of
+	read_line_header.
+	(read_lnct): New static	function.
+	(read_line_header_format_entries): Likewise.
+	(read_line_header): Add ddata parameter.  Support DWARF 5 line
+	headers.  Call new helper functions.  Change all callers.
+	(read_line_program): Use addrsize from line program header.  Don't
+	special case directory index 0 for DWARF 5.
+	(read_referenced_name): Use resolve_string.
+	(read_function_entry): Handle DWARF 5 encodings.  Use
+	resolve_string.
+	* internal.h (enum dwarf_section): Add DEBUG_ADDR,
+	DEBUG_STR_OFFSETS, DEBUG_LINE_STR, DEBUG_RNGLISTS.
+	* elf.c (dwarf_section_names): Add new section names.
+	* pecoff.c (dwarf_section_names): Likewise.
+	* xcoff.c (xcoff_add): Clear dwarf_sections before setting
+	fields.
+	* configure.ac: Define HAVE_DWARF5 automake conditional.
+	* Makefile.am (dwarf5_SOURCES): New variable if HAVE_DWARF5.
+	(dwarf5_CFLAGS, dwarf5_LDADD): Likewise.
+	(dwarf5_alloc_SOURCES, dwarf5_alloc_CFLAGS): Likewise.
+	(dwarf5_alloc_LDADD): Likewise.
+	(BUILDTESTS): Add dwarf5 tests if HAVE_DWARF5.
+	(CLEANFILES, clean-local): Define.
+
+2019-12-08  Ian Lance Taylor  <iant@golang.org>
+
+	* dwarf.c (struct pcrange): Define.
+	(update_pcrange, add_ranges): New static functions.
+	(add_unit_addr): Change signature to work with add_ranges.  Don't
+	add base_address here.
+	(add_unit_ranges): Remove.
+	(find_address_ranges): Replace str/ranges parameters with
+	dwarf_sections.  Use update_pcrange and add_ranges.  Change all
+	callers.
+	(add_function_range): Change signature to work with add_ranges.
+	Don't add base_address here.
+	(add_function_ranges): Remove.
+	(read_function_entry): Use update_pcrange and add_ranges.
+
+2019-12-04  Ian Lance Taylor  <iant@golang.org>
+
+	* edtest.c (test1): Add noclone attribute.
+
+2019-12-04  Ian Lance Taylor  <iant@golang.org>
+
+	* internal.h (enum dwarf_section): Define.
+	(struct dwarf_sections): Define.
+	(backtrace_dwarf_add): Update declaration to replace specific
+	section parameters with dwarf_sections parameter.
+	* dwarf.c (struct dwarf_data): Replace specific section fields
+	with dwarf_sections field.
+	(read_attribute): Use dwarf_sections with altlink.
+	(build_address_map): Replace specific section parameters with
+	dwarf_sections parameter.  Change all callers.
+	(read_line_info): Use dwarf_sections with ddata.
+	(read_referenced_name): Likewise.
+	(add_function_ranges): Likewise.
+	(read_function_entry): Likewise.
+	(read_function_info): Likewise.
+	(build_dwarf_data): Replace specific section parameters with
+	dwarf_sections parameter.  Change all callers.
+	(backtrace_dwarf_add): Likewise.
+	* elf.c (enum debug_section): Remove.
+	(dwarf_section_names): Remove .zdebug names.
+	(elf_add): Track zsections separately.  Build dwarf_sections.
+	* pecoff.c (enum debug_section): Remove.
+	(struct debug_section_info): Remove data field.
+	(coff_add): Build dwarf_sections.
+	* xcoff.c (enum dwarf_section): Remove.  Replace DWSECT_xxx
+	references with DEBUG_xxx references.
+	(xcoff_add): Build dwarf_sections.
+
+2019-09-27  Maciej W. Rozycki  <macro@wdc.com>
+
+	* configure: Regenerate.
+
+2019-09-26  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/91908
+	* pecoff.c (backtrace_initialize): Explicitly cast unchecked
+	__sync_bool_compare_and_swap to void.
+	* xcoff.c (backtrace_initialize): Likewise.
+
+2019-09-03  Ulrich Weigand  <uweigand@de.ibm.com>
+
+	* configure.ac: Remove references to spu.
+	* configure: Regenerate.
+
+2019-05-24  Clement Chigot  <clement.chigot@atos.net>
+
+	* Makefile.am (BUILDTESTS): Remove test_elf, add test_elf_32 and
+	test_elf_64.
+	* Makefile.in: Regenerate.
+
+2019-05-14  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* configure.ac (have_dl_iterate_phdr): Remove *-*-solaris2.10*
+	handling.
+	* configure: Regenerate.
+
+2019-03-11  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/89669
+	* Makefile.am (BUILDTESTS): Only add ztest and ztest_alloc if
+	HAVE_ELF.
+	* Makefile.in: Regenerate.
+
+2019-02-26  Tom de Vries  <tdevries@suse.de>
+
+	* btest.c (test5): Allow global.* as minimal symbol name for global.
+
+2019-02-26  Tom de Vries  <tdevries@suse.de>
+
+	* Makefile.am (TESTS): Only add b3test_dwz_buildid if HAVE_DWZ.
+	* Makefile.in: Regenerate.
+
+2019-02-12  Tom de Vries  <tdevries@suse.de>
+
+	PR libbacktrace/81983
+	* dwarf.c (dwarf_lookup_pc): Don't call bsearch if nmemb == 0.
+
+2019-02-10  Tom de Vries  <tdevries@suse.de>
+
+	* Makefile.am (BUILDTESTS): Add btest_lto.
+	* Makefile.in: Regenerate.
+	* btest.c (test1, f2, f3, test3, f22, f23): Declare with
+	__attribute__((noclone)).
+
+2019-02-08  Tom de Vries  <tdevries@suse.de>
+
+	* backtrace.c (backtrace_full): Declare with __attribute__((noinline)).
+	* print.c (backtrace_print): Same.
+	* simple.c (backtrace_simple): Same.
+
+2019-02-08  Tom de Vries  <tdevries@suse.de>
+
+	PR libbacktrace/78063
+	* dwarf.c (build_address_map): Keep all parsed units.
+	(read_referenced_name_from_attr): Handle DW_FORM_ref_addr.
+
+2019-01-31  Tom de Vries  <tdevries@suse.de>
+
+	PR libbacktrace/89136
+	* elf.c (elf_add): Read build-id if with_buildid_data.  Fix
+	'debugaltlink_name_len =+ 1'.
+
+2019-01-29  Tom de Vries  <tdevries@suse.de>
+
+	* install-debuginfo-for-buildid.sh.in: New script.
+	* Makefile.am (check_PROGRAMS): Add b2test and b3test.
+	(TESTS): Add b2test_buildid and b3test_dwz_buildid.
+	* Makefile.in: Regenerate.
+	* configure.ac (HAVE_ELF): Set with AM_CONDITIONAL.
+	(READELF): Set with AC_CHECK_PROG.
+	(install-debuginfo-for-buildid.sh): Generate with AC_CONFIG_FILES.
+	* configure: Regenerate.
+	* elf.c (SYSTEM_BUILD_ID_DIR): Factor out of ...
+	(elf_open_debugfile_by_buildid): ... here.
+
+2019-01-29  Tom de Vries  <tdevries@suse.de>
+
+	* Makefile.am: Replace check_PROGRAMS with BUILDTESTS, except for
+	allocfail.
+	(TESTS): Don't add check_PROGRAMS. Add BUILDTESTS.
+	(check_PROGRAMS): Add BUILDTESTS.
+	* Makefile.in: Regenerate.
+
+2019-01-28  Tom de Vries  <tdevries@suse.de>
+
+	* Makefile.am (xcoff_%.c): Generate sed result into temporary file.
+	Use $< to access prerequisite.
+	* Makefile.in: Regenerate.
+
+2019-01-25  Nathan Sidwell  <nathan@acm.org>
+
+	* elf.c (elf_add): Pass "" filename to recursive call with
+	separated debug.
+
+2019-01-25  Tom de Vries  <tdevries@suse.de>
+
+	* elf.c (elf_add): When handling .gnu_debugaltlink, call elf_add with
+	filename == "".
+	* Makefile.am (TESTS): Add btest_dwz_gnudebuglink.
+	* Makefile.in: Regenerate.
+
+2019-01-25  Tom de Vries  <tdevries@suse.de>
+
+	* Makefile.am: Rewrite dtest rule into "%_gnudebuglink" pattern rule.
+	(TESTS): Rename dtest to btest_gnudebuglink.
+	* Makefile.in: Regenerate.
+
+2019-01-23  Tom de Vries  <tdevries@suse.de>
+
+	* dwarf.c (struct unit): Use size_t for low_offset/high_offset fields.
+	(units_search, find_unit): Use size_t for offset.
+	(build_address_map): Use size_t for unit_offset.
+
+2019-01-20  Gerald Pfeifer  <gerald@pfeifer.com>
+
+	* allocfail.c (main): Increase portability of printf statement.
+
+2019-01-18  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/88890
+	* mmapio.c (backtrace_get_view): Change size parameter to
+	uint64_t.  Check that value fits in size_t.
+	* read.c (backtrace_get_view): Likewise.
+	* internal.h (backtrace_get_view): Update declaration.
+	* elf.c (elf_add): Pass shstrhdr->sh_size to backtrace_get_view.
+
+2019-01-17  Tom de Vries  <tdevries@suse.de>
+
+	PR libbacktrace/82857
+	* configure.ac (DWZ): Set with AC_CHECK_PROG.
+	(HAVE_DWZ): Set with AM_CONDITIONAL.
+	* configure: Regenerate.
+	* Makefile.am (TESTS): Add btest_dwz.
+	* Makefile.in: Regenerate.
+
+2019-01-17  Tom de Vries  <tdevries@suse.de>
+
+	PR libbacktrace/82857
+	* dwarf.c (enum attr_val_encoding): Add ATTR_VAL_REF_ALT_INFO.
+	(read_attribute): Handle DW_FORM_GNU_ref_alt using
+	ATTR_VAL_REF_ALT_INFO.
+	(read_referenced_name_from_attr): Handle DW_FORM_GNU_ref_alt.
+
+2019-01-17  Tom de Vries  <tdevries@suse.de>
+
+	* dwarf.c (struct unit): Add low_offset and high_offset fields.
+	(struct unit_vector): New type.
+	(struct dwarf_data): Add units and units_counts fields.
+	(find_unit): New function.
+	(find_address_ranges): Add and handle unit_tag parameter.
+	(build_address_map): Add and handle units_vec parameter.
+	(build_dwarf_data): Pass units_vec to build_address_map.  Store resulting
+	units vector.
+
+2019-01-17  Tom de Vries  <tdevries@suse.de>
+
+	PR libbacktrace/82857
+	* dwarf.c (read_attribute): Handle DW_FORM_GNU_strp_alt
+	using altlink.
+
+2019-01-17  Tom de Vries  <tdevries@suse.de>
+
+	* dwarf.c (enum attr_val_encoding): Add ATTR_VAL_NONE.
+	(read_attribute): Add altlink parameter.  Handle missing altlink for
+	DW_FORM_GNU_strp_alt and DW_FORM_GNU_ref_alt.
+	(find_address_ranges, build_address_map, build_dwarf_data): Add and
+	handle altlink parameter.
+	(read_referenced_name, read_function_entry): Add argument to
+	read_attribute call.
+
+2019-01-17  Tom de Vries  <tdevries@suse.de>
+
+	* dwarf.c (struct dwarf_data): Add altlink field.
+	(backtrace_dwarf_add): Add and handle fileline_altlink parameter.
+	* elf.c	(elf_add): Add argument to backtrace_dwarf_add call.
+	(phdr_callback, backtrace_initialize): Add argument to elf_add calls.
+	* internal.h (backtrace_dwarf_add): Add fileline_altlink parameter.
+	* pecoff.c (coff_add): Add argument to backtrace_dwarf_add call.
+	* xcoff.c (xcoff_add): Same.
+
+2019-01-17  Tom de Vries  <tdevries@suse.de>
+
+	* internal.h (backtrace_dwarf_add): Add fileline_entry parameter.
+	* dwarf.c (backtrace_dwarf_add): Add and handle fileline_entry parameter.
+	* elf.c	(elf_add): Add and handle fileline_entry parameter.  Add
+	argument to backtrace_dwarf_add call.
+	(phdr_callback, backtrace_initialize): Add argument to elf_add calls.
+	* pecoff.c (coff_add): Add argument to backtrace_dwarf_add call.
+	* xcoff.c (xcoff_add): Same.
+
+2019-01-17  Tom de Vries  <tdevries@suse.de>
+
+	* elf.c (elf_add): Add and handle with_buildid_data and
+	with_buildid_size parameters.  Handle .gnu_debugaltlink section.
+	(phdr_callback, backtrace_initialize): Add arguments to elf_add calls.
+
+2019-01-16  Tom de Vries  <tdevries@suse.de>
+
+	* dwarf.c (read_referenced_name_from_attr): New function.  Factor out
+	of ...
+ 	(read_referenced_name): ... here, and ...
+	(read_function_entry): ... here.
+
+2019-01-16  Tom de Vries  <tdevries@suse.de>
+
+	* dwarf.c (read_referenced_name): Don't allow DW_AT_name to override any
+	name.
+	(read_function_entry): Same.  Don't allow name found via
+	DW_AT_abstract_origin or case DW_AT_specification to override linkage
+	name.
+
+2019-01-09  Sandra Loosemore  <sandra@codesourcery.com>
+
+	PR other/16615
+
+	* backtrace.h: Mechanically replace "can not" with "cannot".
+
+2019-01-01  Jakub Jelinek  <jakub@redhat.com>
+
+	Update copyright years.
+
+2018-12-29  Gerald Pfeifer  <gerald@pfeifer.com>
+
+	* Makefile.am (xcoff_%.c): Use an actual newline instead of \n
+	in sed pattern.
+	* Makefile.in: Regenerate.
+
+2018-12-28  Tom de Vries  <tdevries@suse.de>
+
+	* dwarf.c (build_address_map): Reuse unused units.
+
+2018-12-28  Tom de Vries  <tdevries@suse.de>
+
+	* dwarf.c (build_address_map): Simplify by removing local variable
+	abbrevs.
+
+2018-12-28  Ian Lance Taylor  <iant@golang.org>
+	    Tom de Vries  <tdevries@suse.de>
+
+	PR libbacktrace/88063
+	* dwarf.c (free_unit_addrs_vector): Remove.
+	(build_address_map): Keep track of allocated units in vector.  Free
+	allocated units and corresponding abbrevs upon failure.  Remove now
+	redundant call to free_unit_addrs_vector.  Free addrs vector upon
+	failure.  Free allocated unit vector.
+
+2018-12-28  Tom de Vries  <tdevries@suse.de>
+
+	* dwarf.c (build_address_map): Free addrs vector upon failure.
+
+2018-12-14  Tom de Vries  <tdevries@suse.de>
+
+	PR testsuite/88491
+	* allocfail.sh: Remove "set -o pipefail".
+
+2018-12-12  Tom de Vries  <tdevries@suse.de>
+
+	* Makefile.am (TESTS): Add allocfail.sh.
+	(check_PROGRAMS): Add allocfail.
+	* Makefile.in: Regenerate.
+	* instrumented_alloc.c: New file.  Redefine malloc and realloc.
+	Include alloc.c.
+	* allocfail.c: New file.
+	* allocfail.sh: New file.
+
+2018-11-30  Tom de Vries  <tdevries@suse.de>
+
+	* Makefile.am (check_PROGRAMS): Add test_elf, test_xcoff_32,
+	test_xcoff_64, test_pecoff and test_unknown.
+	* Makefile.in: Regenerate.
+	* test_format.c: New file.
+
+2018-11-30  Tom de Vries  <tdevries@suse.de>
+
+	* Makefile.am : Add _with_alloc version for each test in
+	check_PROGRAMS.
+	* Makefile.in: Regenerate.
+
+2018-11-30  Tom de Vries  <tdevries@suse.de>
+
+	* internal.h (backtrace_vector_free): New static inline fuction,
+	factored out of ...
+	* dwarf.c (read_line_info): ... here.
+
+2018-11-28  Tom de Vries  <tdevries@suse.de>
+
+	* dwarf.c (read_abbrevs): Fix handling of abbrevs->abbrevs allocation
+	failure.
+
+2018-11-27  Tom de Vries  <tdevries@suse.de>
+
+	* mmap.c (backtrace_vector_release): Same.
+	* unittest.c (test1): Add check.
+
+2018-11-27  Tom de Vries  <tdevries@suse.de>
+
+	* alloc.c (backtrace_vector_release): Handle vec->size == 0 using free
+	instead of realloc.
+	* Makefile.am (check_PROGRAMS): Add unittest.
+	* Makefile.in: Regenerate.
+	* unittest.c: New file.
+
+2018-11-22  Tom de Vries  <tdevries@suse.de>
+
+	* dwarf.c (read_initial_length): Factor out of ...
+	(build_address_map, read_line_info): ... here.
+
+2018-11-21  Tom de Vries  <tdevries@suse.de>
+
+	* dwarf.c (read_string): Factor out of ...
+	(read_attribute, read_line_header, read_line_program): ... here.
+
+2018-10-31  Joseph Myers  <joseph@codesourcery.com>
+
+	PR bootstrap/82856
+	* Makefile.am: Include multilib.am.
+	* configure.ac: Remove AC_PREREQ.  Use AC_LANG_SOURCE.
+	* Makefile.in, aclocal.m4, config.h.in, configure: Regenerate.
+
+2018-10-05  Ian Lance Taylor  <iant@golang.org>
+
+	PR libbacktrace/87529
+	* backtrace.h: Document that backtrace_create_state should be
+	called only once.
+
+2018-08-05 Iain Buclaw  <ibuclaw@gdcproject.org>
+
+	* configure.ac: Move define of HAVE_ZLIB into check for -lz.
+	* Makefile.in: Regenerate.
+	* config.h.in: Likewise.
+	* configure: Likewise.
+
+2018-08-01  Tony Reix  <tony.reix@atos.net>
+
+	* xcoff.c (struct xcoff_line, struct xcoff_line_vector): Remove.
+	(struct xcoff_func, struct xcoff_func_vector): New structs.
+	(xcoff_syminfo): Drop leading dot from symbol name.
+	(xcoff_line_compare, xcoff_line_search): Remove.
+	(xcoff_func_compare, xcoff_func_search): New static functions.
+	(xcoff_lookup_pc): Search function table.
+	(xcoff_add_line, xcoff_process_linenos): Remove.
+	(xcoff_initialize_fileline): Build function table.
+
+2018-06-21 Denis Khalikov <d.khalikov@partner.samsung.com>
+
+	PR other/86198
+	* elf.c (elf_add): Increase ".note.gnu.build-id" section size
+	checking up to 36 bytes.
+
+2018-04-24  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* configure: Regenerated.
+
+2018-04-19  Jakub Jelinek  <jakub@redhat.com>
+
+	* configure: Regenerated.
+
+2018-04-17  Ian Lance Taylor  <iant@golang.org>
+
+	* backtrace.c: Revert last two changes.  Don't call mmap
+	directly.
+
+2018-04-17  Ian Lance Taylor  <iant@golang.org>
+
+	* backtrace.c: Include backtrace-supported.h before checking
+	BACKTRACE_USES_MALLOC.
+
+2018-04-17  Ian Lance Taylor  <iant@golang.org>
+
+	* backtrace.c (backtrace_full): When testing whether we can
+	allocate memory, call mmap directly, and munmap the memory.
+
+2018-04-04  Jakub Jelinek  <jakub@redhat.com>
+
+	PR other/85161
+	* elf.c (elf_zlib_fetch): Fix up predefined macro names in test for
+	big endian, only use 32-bit loads if endianity macros are predefined
+	and indicate big or little endian.
+
+2018-02-14  Igor Tsimbalist  <igor.v.tsimbalist@intel.com>
+
+	PR target/84148
+	* configure: Regenerate.
+
+2018-02-15  Jakub Jelinek  <jakub@redhat.com>
+
+	PR other/82368
+	* elf.c (SHT_PROGBITS): Undefine and define.
+
+2018-02-14  Jakub Jelinek  <jakub@redhat.com>
+
+	PR other/82368
+	* elf.c (EM_PPC64, EF_PPC64_ABI): Undefine and define.
+	(struct elf_ppc64_opd_data): New type.
+	(elf_initialize_syminfo): Add opd argument, handle symbols
+	pointing into the PowerPC64 ELFv1 .opd section.
+	(elf_add): Read .opd section on PowerPC64 ELFv1, pass pointer
+	to structure with .opd data to elf_initialize_syminfo.
+
+2018-01-31  Ian Lance Taylor  <iant@golang.org>
+
+	* elf.c (elf_add): Close descriptor if we use a debugfile.
+	* btest.c (check_open_files): New static function.
+	(main): Call check_open_files.
+
+2018-01-25  Ian Lance Taylor  <iant@golang.org>
+
+	* elf.c (elf_open_debugfile_by_debuglink): Don't check CRC if the
+	desired CRC is zero.
+	(elf_add): Don't clear *found_sym and *found_dwarf if debuginfo.
+
+2018-01-25  Ian Lance Taylor  <iant@golang.org>
+
+	* pecoff.c (coff_add): Only release syms_view if it is valid.
+
+2018-01-25  Ian Lance Taylor  <iant@golang.org>
+
+	* pecoff.c (coff_add): Another memcpy -> coff_read4 fix.
+
+2018-01-24  Ian Lance Taylor  <iant@golang.org>
+
+	* pecoff.c (coff_add): Use coff_read4, not memcpy.
+
+2018-01-24  Ian Lance Taylor  <iant@golang.org>
+
+	PR other/68239
+	* mmap.c (backtrace_free_locked): Don't put more than 16 entries
+	on the free list.
+
+2018-01-19  Tony Reix  <tony.reix@atos.net>
+
+	* xcoff.c (xcoff_incl_compare): New function.
+	(xcoff_incl_search): New function.
+	(xcoff_process_linenos): Use bsearch to find include file.
+	(xcoff_initialize_fileline): Sort include file information.
+
+2018-01-16  Ian Lance Taylor  <iant@golang.org>
+
+	* elf.c (codes) [GENERATE_FIXED_HUFFMAN_TABLE]: Fix size to be
+	288.
+	(main) [GENERATE_FIXED_HUFFMAN_TABLE]: Pass 288 to
+	elf_zlib_inflate_table.  Generate elf_zlib_default_dist_table.
+	(elf_zlib_default_table): Update.
+	(elf_zlib_default_dist_table): New static array.
+	(elf_zlib_inflate): Use elf_zlib_default_dist_table for dist table
+	for block type 1.
+	* ztest.c (struct zlib_test): Add uncompressed_len.
+	(tests): Initialize uncompressed_len field.  Add new test case.
+	(test_samples): Use uncompressed_len field.
+
+2018-01-03  Jakub Jelinek  <jakub@redhat.com>
+
+	Update copyright years.
+
 2017-11-17  Igor Tsimbalist  <igor.v.tsimbalist@intel.com>
 
 	* configure.ac: Add CET_FLAGS to EXTRA_FLAGS.
@@ -752,11 +1684,11 @@
 2012-09-19  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
 	    Ian Lance Taylor  <iant@google.com>
 
-        * configure.ac (GCC_HEADER_STDINT): Invoke.
-        * backtrace.h: If we can't find <stdint.h>, use "gstdint.h".
-        * btest.c: Don't include <stdint.h>.
-        * dwarf.c: Likewise.
-        * configure, aclocal.m4, Makefile.in, config.h.in: Rebuild.
+	* configure.ac (GCC_HEADER_STDINT): Invoke.
+	* backtrace.h: If we can't find <stdint.h>, use "gstdint.h".
+	* btest.c: Don't include <stdint.h>.
+	* dwarf.c: Likewise.
+	* configure, aclocal.m4, Makefile.in, config.h.in: Rebuild.
 
 2012-09-18  Ian Lance Taylor  <iant@google.com>
 
@@ -820,7 +1752,7 @@
 
 	* Initial implementation.
 
-Copyright (C) 2012-2017 Free Software Foundation, Inc.
+Copyright (C) 2012-2021 Free Software Foundation, Inc.
 
 Copying and distribution of this file, with or without modification,
 are permitted in any medium without royalty provided the copyright
