@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #
-# Copyright 2014-2017 Milian Wolff <mail@milianw.de>
+# Copyright 2014-2021 Milian Wolff <mail@milianw.de>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -93,7 +93,7 @@ ORIG_CMDLINE=$@
 while true; do
     case "$1" in
         "-d" | "--debug")
-            if [ -z "$(which gdb 2> /dev/null)" ]; then
+            if [ -z "$(type -p gdb 2> /dev/null)" ]; then
                 echo "GDB is not installed, cannot debug heaptrack."
                 exit 1
             fi
@@ -125,7 +125,7 @@ while true; do
             shift 2
             ;;
         "-p" | "--pid")
-            if [ -z "$(which gdb 2> /dev/null)" ]; then
+            if [ -z "$(type -p gdb 2> /dev/null)" ]; then
                 echo "GDB is not installed, cannot attach to running process."
                 exit 1
             fi
@@ -167,7 +167,7 @@ while true; do
             if [ "$1" = "--" ]; then
                 shift 1
             fi
-            if [ ! -x "$(which "$1" 2> /dev/null)" ]; then
+            if [ ! -x "$(type -p "$1" 2> /dev/null)" ]; then
                 if [ -f "$1" ] && echo "$1" | grep -q "heaptrack."; then
                     openHeaptrackDataFiles $ORIG_CMDLINE
                     exit
@@ -248,7 +248,7 @@ fi
 output_suffix="gz"
 COMPRESSOR="gzip -c"
 
-if [ "@ZSTD_FOUND@" = "TRUE" ] && [ ! -z "$(which zstd 2> /dev/null)" ]; then
+if [ "@ZSTD_FOUND@" = "TRUE" ] && [ ! -z "$(type -p zstd 2> /dev/null)" ]; then
     output_suffix="zst"
     COMPRESSOR="zstd -c"
 fi
