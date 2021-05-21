@@ -360,8 +360,8 @@ struct AccumulatedTraceData
             if (descriptor >= 1) {
                 int foundSym = 0;
                 int foundDwarf = 0;
-                auto ret = elf_add(state, data.fileName, descriptor, addressStart, errorHandler, &data,
-                                   &state->fileline_fn, &foundSym, &foundDwarf, false, false);
+                auto ret = elf_add(state, data.fileName, descriptor, NULL, 0, addressStart, errorHandler, &data,
+                                   &state->fileline_fn, &foundSym, &foundDwarf, nullptr, false, false, nullptr, 0);
                 if (ret && foundSym) {
                     state->syminfo_fn = &elf_syminfo;
                 } else {
