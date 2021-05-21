@@ -25,7 +25,6 @@
 
 #include <fstream>
 
-#include <boost/functional/hash.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 
 #include "allocationdata.h"
