@@ -1,7 +1,3 @@
-include_directories(
-    ${Boost_INCLUDE_DIRS}
-)
-
 # heaptrack: bash script to inject/preload
 configure_file(heaptrack.sh.cmake
     ${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}/heaptrack @ONLY

@@ -3,7 +3,6 @@ if (ECM_FOUND)
 endif()
 
 include_directories(
-    ${Boost_INCLUDE_DIRS}
     ${PROJECT_SOURCE_DIR}/3rdparty/
 )
 

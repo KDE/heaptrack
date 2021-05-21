@@ -27,8 +27,6 @@
 #include <tsl/robin_map.h>
 #include <tsl/robin_set.h>
 
-#include <boost/functional/hash.hpp>
-
 #include "indices.h"
 
 /**
@@ -46,6 +44,14 @@ struct IndexedAllocationInfo
     }
 };
 
+// see: https://stackoverflow.com/a/2595226/35250
+template <class T>
+inline void hashCombine(std::size_t& seed, const T& v)
+{
+    std::hash<T> hasher;
+    seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+
 namespace std {
 template <>
 struct hash<IndexedAllocationInfo>
@@ -53,8 +59,8 @@ struct hash<IndexedAllocationInfo>
     size_t operator()(const IndexedAllocationInfo& info) const
     {
         size_t seed = 0;
-        boost::hash_combine(seed, info.size);
-        boost::hash_combine(seed, info.traceIndex.index);
+        hashCombine(seed, info.size);
+        hashCombine(seed, info.traceIndex.index);
         // allocationInfoIndex not hashed to allow to look it up
         return seed;
     }

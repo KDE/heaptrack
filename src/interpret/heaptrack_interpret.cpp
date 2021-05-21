@@ -34,8 +34,6 @@
 
 #include <cxxabi.h>
 
-#include <boost/algorithm/string/predicate.hpp>
-
 #include "libbacktrace/backtrace.h"
 #include "libbacktrace/internal.h"
 #include "util/linereader.h"
@@ -67,6 +65,11 @@ string demangle(const char* function)
         free(demangled);
     }
     return ret;
+}
+
+bool startsWith(const std::string& haystack, const char* needle)
+{
+    return haystack.compare(0, strlen(needle), needle) == 0;
 }
 
 struct Frame
@@ -327,7 +330,7 @@ struct AccumulatedTraceData
      */
     backtrace_state* findBacktraceState(const char* fileName, uintptr_t addressStart)
     {
-        if (boost::algorithm::starts_with(fileName, "linux-vdso.so")) {
+        if (startsWith(fileName, "linux-vdso.so")) {
             // prevent warning, since this will always fail
             return nullptr;
         }

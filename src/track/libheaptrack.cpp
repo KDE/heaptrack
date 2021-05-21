@@ -51,8 +51,6 @@
 #include <string>
 #include <thread>
 
-#include <boost/algorithm/string/replace.hpp>
-
 #include "tracetree.h"
 #include "util/config.h"
 #include "util/libunwind_config.h"
@@ -179,6 +177,16 @@ atomic<bool> s_atexit{false};
  */
 atomic<bool> s_forceCleanup{false};
 
+// based on: https://stackoverflow.com/a/24315631/35250
+void replaceAll(string& str, const string& search, const string& replace)
+{
+    size_t start_pos = 0;
+    while ((start_pos = str.find(search, start_pos)) != string::npos) {
+        str.replace(start_pos, search.length(), replace);
+        start_pos += replace.length();
+    }
+}
+
 int createFile(const char* fileName)
 {
     string outputFileName;
@@ -199,7 +207,7 @@ int createFile(const char* fileName)
         outputFileName = "heaptrack.$$";
     }
 
-    boost::replace_all(outputFileName, "$$", to_string(getpid()));
+    replaceAll(outputFileName, "$$", to_string(getpid()));
 
     auto out = open(outputFileName.c_str(), O_CREAT | O_WRONLY | O_CLOEXEC, 0644);
     debugLog<VerboseOutput>("will write to %s/%p\n", outputFileName.c_str(), out);
