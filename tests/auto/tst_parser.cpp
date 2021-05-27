@@ -226,7 +226,7 @@ TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst", "[parser]") {
     REQUIRE(summary.cost.leaked == 5);
     REQUIRE(summary.totalLeakedSuppressed == 5);
     REQUIRE(summary.cost.peak == 72714);
-    REQUIRE(summary.totalSystemMemory == 12242059264);
+    REQUIRE(summary.totalSystemMemory == 33643876352);
 }
 
 TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst without suppressions", "[parser]") {
