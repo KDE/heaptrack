@@ -67,6 +67,17 @@ private:
     int m_width;
 };
 
+template <typename Bytes>
+ostream& writeBytes(ostream& out, Bytes bytes, int width, const char* unit)
+{
+    const auto unitLength = strlen(unit);
+    if (width > static_cast<int>(unitLength)) {
+        return out << fixed << setprecision(2) << setw(width - unitLength) << bytes << unit;
+    } else {
+        return out << fixed << setprecision(2) << bytes << *unit;
+    }
+}
+
 ostream& operator<<(ostream& out, const formatBytes data)
 {
     auto bytes = static_cast<double>(data.m_bytes);
@@ -80,11 +91,11 @@ ostream& operator<<(ostream& out, const formatBytes data)
         ++unit;
     }
 
-    const auto unitLength = strlen(*unit);
-    if (data.m_width > static_cast<int>(unitLength)) {
-        return out << fixed << setprecision(2) << setw(data.m_width - unitLength) << bytes << *unit;
+    if (i == 0) {
+        // no fractions for bytes
+        return writeBytes(out, data.m_bytes, data.m_width, *unit);
     } else {
-        return out << fixed << setprecision(2) << bytes << *unit;
+        return writeBytes(out, bytes, data.m_width, *unit);
     }
 }
 
