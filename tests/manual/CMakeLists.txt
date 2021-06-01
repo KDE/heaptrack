@@ -32,3 +32,10 @@ set(CMAKE_BUILD_TYPE RelWithDebInfo)
 add_executable(inlining inlining.cpp)
 
 add_executable(embedded_lsan_suppressions embedded_lsan_suppressions.c)
+
+add_library(testlib_indirect SHARED libindirect.cpp)
+target_link_libraries(testlib_indirect ${CMAKE_DL_LIBS})
+
+add_executable(dlopen dlopen.cpp)
+target_compile_definitions(dlopen PRIVATE -DLIB_PATH="$<TARGET_FILE:testlib_indirect>")
+target_link_libraries(dlopen ${CMAKE_DL_LIBS})

@@ -128,6 +128,7 @@ thread_local bool RecursionGuard::isActive = false;
 
 enum DebugVerbosity
 {
+    WarningOutput,
     NoDebugOutput,
     MinimalOutput,
     VerboseOutput,
@@ -141,18 +142,32 @@ constexpr const DebugVerbosity s_debugVerbosity = NoDebugOutput;
  * Call this to optionally show debug information but give the compiler
  * a hand in removing it all if debug output is disabled.
  */
-template <DebugVerbosity debugLevel, typename... Args>
-inline void debugLog(const char fmt[], Args... args)
+template <DebugVerbosity debugLevel, typename Callback>
+inline void debugLog(Callback callback)
 {
     if (debugLevel <= s_debugVerbosity) {
         RecursionGuard guard;
         flockfile(stderr);
-        fprintf(stderr, "heaptrack debug(%d) [%d:%d]@%" PRIu64 " ", static_cast<int>(debugLevel), getpid(), gettid(),
-                elapsedTime().count());
-        fprintf(stderr, fmt, args...);
+        if (debugLevel == WarningOutput) {
+            fprintf(stderr, "heaptrack warning [%d:%d]@%" PRIu64 " ", getpid(), gettid(), elapsedTime().count());
+        } else {
+            fprintf(stderr, "heaptrack debug(%d) [%d:%d]@%" PRIu64 " ", debugLevel, getpid(), gettid(),
+                    elapsedTime().count());
+        }
+        callback(stderr);
         fputc('\n', stderr);
         funlockfile(stderr);
     }
+}
+
+/**
+ * Call this to optionally show debug information but give the compiler
+ * a hand in removing it all if debug output is disabled.
+ */
+template <DebugVerbosity debugLevel, typename... Args>
+inline void debugLog(const char fmt[], Args... args)
+{
+    debugLog<debugLevel>([&](FILE* out) { fprintf(out, fmt, args...); });
 }
 
 void printBacktrace()
@@ -855,5 +870,12 @@ void heaptrack_invalidate_module_cache()
 
     HeapTrack heaptrack(guard);
     heaptrack.invalidateModuleCache();
+}
+
+void heaptrack_warning(heaptrack_warning_callback_t callback)
+{
+    RecursionGuard guard;
+
+    debugLog<WarningOutput>(callback);
 }
 }

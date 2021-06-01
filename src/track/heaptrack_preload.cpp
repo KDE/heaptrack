@@ -317,6 +317,18 @@ void* dlopen(const char* filename, int flag) LIBC_FUN_ATTRS
         hooks::init();
     }
 
+#ifdef RTLD_DEEPBIND
+    if (filename && flag & RTLD_DEEPBIND) {
+        heaptrack_warning([](FILE* out) {
+            fprintf(out,
+                    "Detected dlopen call with RTLD_DEEPBIND which breaks function call interception. "
+                    "Heaptrack will drop this flag. If your application relies on it, try to run `heaptrack "
+                    "--use-inject` instead.");
+        });
+        flag &= ~RTLD_DEEPBIND;
+    }
+#endif
+
     void* ret = hooks::dlopen(filename, flag);
 
     if (ret) {
