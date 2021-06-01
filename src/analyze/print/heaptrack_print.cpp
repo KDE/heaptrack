@@ -289,8 +289,7 @@ struct Printer final : public AccumulatedTraceData
 
     void printBacktrace(TraceNode node, ostream& out, const size_t indent = 0, bool skipFirst = false) const
     {
-        tsl::robin_set<uint32_t> recursionGuard;
-        recursionGuard.insert(node.ipIndex.index);
+        tsl::robin_set<TraceIndex> recursionGuard;
         while (node.ipIndex) {
             const auto& ip = findIp(node.ipIndex);
             if (!skipFirst) {
@@ -302,11 +301,10 @@ struct Printer final : public AccumulatedTraceData
                 break;
             }
 
-            if (!recursionGuard.insert(node.parentIndex.index).second) {
-                cerr << "Trace recursion detected - corrupt data file?" << endl;
+            if (!recursionGuard.insert(node.parentIndex).second) {
+                cerr << "Trace recursion detected - corrupt data file? " << node.parentIndex.index << endl;
                 break;
             }
-
             node = findTrace(node.parentIndex);
         };
     }
