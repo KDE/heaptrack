@@ -108,7 +108,7 @@ while true; do
             usage
             exit 0
             ;;
-        "-o" | "--output-file")
+        "-o" | "--output" | "--output-file")
             if [ -z "$2" ]; then
                 echo "Missing output argument."
                 exit 1
