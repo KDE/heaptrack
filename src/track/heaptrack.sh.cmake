@@ -263,7 +263,7 @@ output="$output.$output_suffix"
 debuggee=$!
 
 cleanup() {
-    if [ ! -z "$pid" ]; then
+    if [ ! -z "$pid" ] && [ -d "/proc/$pid" ]; then
         echo "removing heaptrack injection via GDB, this might take some time..."
         gdb --batch-silent -n -iex="set auto-solib-add off" -p $pid \
             --eval-command="sharedlibrary libheaptrack_inject" \
