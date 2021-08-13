@@ -129,6 +129,10 @@ while true; do
                 echo "GDB is not installed, cannot attach to running process."
                 exit 1
             fi
+            if [ -f "/proc/sys/kernel/yama/ptrace_scope"  ] && [ "$(cat "/proc/sys/kernel/yama/ptrace_scope")" -gt "0" ]; then
+                echo "Cannot runtime-attach, you need to set /proc/sys/kernel/yama/ptrace_scope to 0"
+                exit 1
+            fi
             pid=$2
             if [ -z "$pid" ]; then
                 echo "Missing PID argument."
