@@ -4,9 +4,12 @@
     SPDX-License-Identifier: LGPL-2.1-or-later
 */
 
+#include "../benchutil.h"
+
 inline void __attribute__((always_inline)) asdf()
 {
-    new char[1234];
+    auto p = new char[1234];
+    escape(p);
 }
 
 inline void __attribute__((always_inline)) bar()
