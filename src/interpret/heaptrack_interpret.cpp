@@ -1,7 +1,7 @@
 /*
-    SPDX-FileCopyrightText: 2014-2017 Milian Wolff <mail@milianw.de>
+    SPDX-FileCopyrightText: 2014-2022 Milian Wolff <mail@milianw.de>
 
-    SPDX-License-Identifier: LGPL-2.1-or-later
+    SPDX-License-Identifier: GPL-2.0-or-later
 */
 
 /**
@@ -17,47 +17,65 @@
 #ifdef __linux__
 #include <stdio_ext.h>
 #endif
+#include <memory>
 #include <tuple>
 #include <vector>
 
-#include <cxxabi.h>
+#include "dwarfdiecache.h"
+#include "symbolcache.h"
 
-#include "libbacktrace/backtrace.h"
-#include "libbacktrace/internal.h"
 #include "util/linereader.h"
 #include "util/linewriter.h"
 #include "util/pointermap.h"
 
+#include <dwarf.h>
 #include <signal.h>
 #include <unistd.h>
 
 using namespace std;
 
 namespace {
+bool isArmArch()
+{
+#if __arm__
+    return true;
+#else
+    return false;
+#endif
+}
 
 #define error_out cerr << __FILE__ << ':' << __LINE__ << " ERROR:"
-
-string demangle(const char* function)
-{
-    if (!function) {
-        return {};
-    } else if (function[0] != '_' || function[1] != 'Z') {
-        return {function};
-    }
-
-    string ret;
-    int status = 0;
-    char* demangled = abi::__cxa_demangle(function, 0, 0, &status);
-    if (demangled) {
-        ret = demangled;
-        free(demangled);
-    }
-    return ret;
-}
 
 bool startsWith(const std::string& haystack, const char* needle)
 {
     return haystack.compare(0, strlen(needle), needle) == 0;
+}
+
+static uint64_t alignedAddress(uint64_t addr, bool isArmArch)
+{
+    // Adjust addr back. The symtab entries are 1 off for all practical purposes.
+    return (isArmArch && (addr & 1)) ? addr - 1 : addr;
+}
+
+static SymbolCache::Symbols extractSymbols(Dwfl_Module* module, uint64_t elfStart, bool isArmArch)
+{
+    SymbolCache::Symbols symbols;
+
+    const auto numSymbols = dwfl_module_getsymtab(module);
+    if (numSymbols <= 0)
+        return symbols;
+
+    symbols.reserve(numSymbols);
+    for (int i = 0; i < numSymbols; ++i) {
+        GElf_Sym sym;
+        GElf_Addr symAddr;
+        const auto symbol = dwfl_module_getsym_info(module, i, &sym, &symAddr, nullptr, nullptr, nullptr);
+        if (symbol) {
+            const uint64_t start = alignedAddress(sym.st_value, isArmArch);
+            symbols.push_back({symAddr - elfStart, start, sym.st_size, symbol});
+        }
+    }
+    return symbols;
 }
 
 struct Frame
@@ -105,83 +123,140 @@ struct ResolvedIP
     vector<ResolvedFrame> inlined;
 };
 
-struct Module
+struct ModuleFragment
 {
-    Module(string fileName, uintptr_t addressStart, uintptr_t addressEnd, backtrace_state* backtraceState,
-           size_t moduleIndex)
+    ModuleFragment(string fileName, uintptr_t addressStart, uintptr_t fragmentStart, uintptr_t fragmentEnd,
+                   size_t moduleIndex)
         : fileName(fileName)
         , addressStart(addressStart)
-        , addressEnd(addressEnd)
+        , fragmentStart(fragmentStart)
+        , fragmentEnd(fragmentEnd)
         , moduleIndex(moduleIndex)
-        , backtraceState(backtraceState)
+    {
+    }
+
+    bool operator<(const ModuleFragment& module) const
+    {
+        return tie(addressStart, fragmentStart, fragmentEnd, moduleIndex)
+            < tie(module.addressStart, module.fragmentStart, module.fragmentEnd, module.moduleIndex);
+    }
+
+    bool operator!=(const ModuleFragment& module) const
+    {
+        return tie(addressStart, fragmentStart, fragmentEnd, moduleIndex)
+            != tie(module.addressStart, module.fragmentStart, module.fragmentEnd, module.moduleIndex);
+    }
+
+    string fileName;
+    uintptr_t addressStart;
+    uintptr_t fragmentStart;
+    uintptr_t fragmentEnd;
+    size_t moduleIndex;
+};
+
+struct Module
+{
+    Module(string fileName, uintptr_t addressStart, Dwfl_Module* module, SymbolCache* symbolCache)
+        : fileName(std::move(fileName))
+        , addressStart(addressStart)
+        , module(module)
+        , dieCache(module)
+        , symbolCache(symbolCache)
+    {
+    }
+
+    Module()
+        : Module({}, 0, nullptr, nullptr)
     {
     }
 
     AddressInformation resolveAddress(uintptr_t address) const
     {
         AddressInformation info;
-        if (!backtraceState) {
+
+        if (!module) {
             return info;
         }
 
-        // try to find frame information from debug information
-        backtrace_pcinfo(backtraceState, address,
-                         [](void* data, uintptr_t /*addr*/, const char* file, int line, const char* function) -> int {
-                             Frame frame(demangle(function), file ? file : "", line);
-                             auto info = reinterpret_cast<AddressInformation*>(data);
-                             if (!info->frame.isValid()) {
-                                 info->frame = frame;
-                             } else {
-                                 info->inlined.push_back(frame);
-                             }
-                             return 0;
-                         },
-                         [](void* /*data*/, const char* /*msg*/, int /*errnum*/) {}, &info);
-
-        // no debug information available? try to fallback on the symbol table information
-        if (!info.frame.isValid()) {
-            struct Data
-            {
-                AddressInformation* info;
-                const Module* module;
-                uintptr_t address;
-            };
-            Data data = {&info, this, address};
-            backtrace_syminfo(
-                backtraceState, address,
-                [](void* data, uintptr_t /*pc*/, const char* symname, uintptr_t /*symval*/, uintptr_t /*symsize*/) {
-                    if (symname) {
-                        reinterpret_cast<Data*>(data)->info->frame.function = demangle(symname);
-                    }
-                },
-                [](void* _data, const char* msg, int errnum) {
-                    auto* data = reinterpret_cast<const Data*>(_data);
-                    error_out << "Module backtrace error for address " << hex << data->address << dec << " in module "
-                              << data->module->fileName << " (code " << errnum << "): " << msg << endl;
-                },
-                &data);
+        if (!symbolCache->hasSymbols(fileName)) {
+            // cache all symbols in a sorted lookup table and demangle them on-demand
+            // note that the symbols within the symtab aren't necessarily sorted,
+            // which makes searching repeatedly via dwfl_module_addrinfo potentially very slow
+            symbolCache->setSymbols(fileName, extractSymbols(module, addressStart, isArmArch()));
         }
 
+        auto cachedAddrInfo = symbolCache->findSymbol(fileName, address - addressStart);
+        if (cachedAddrInfo.isValid()) {
+            info.frame.function = std::move(cachedAddrInfo.symname);
+        }
+
+        auto cuDie = dieCache.findCuDie(address);
+        if (!cuDie) {
+            return info;
+        }
+
+        const auto offset = address - cuDie->bias();
+        auto srcloc = dwarf_getsrc_die(cuDie->cudie(), offset);
+        if (srcloc) {
+            const char* srcfile = dwarf_linesrc(srcloc, nullptr, nullptr);
+            if (srcfile) {
+                const auto file = std::string(srcfile);
+                info.frame.file = srcfile;
+                dwarf_lineno(srcloc, &info.frame.line);
+            }
+        }
+
+        auto* subprogram = cuDie->findSubprogramDie(offset);
+        if (!subprogram) {
+            return info;
+        }
+
+        auto scopes = findInlineScopes(subprogram->die(), offset);
+
+        // setup function location, i.e. entry point of the (inlined) frame
+        auto setupEntry = [&](Dwarf_Die die) {
+            info.frame.function = cuDie->dieName(&die); // use name of inlined function as symbol
+            if (auto file = dwarf_decl_file(&die)) {
+                info.frame.file = file;
+                dwarf_decl_line(&die, &info.frame.line);
+            }
+        };
+        if (scopes.empty()) {
+            setupEntry(*subprogram->die());
+        } else {
+            setupEntry(scopes.back());
+            scopes.pop_back();
+        }
+
+        // resolve the inline chain if possible
+        if (scopes.empty()) {
+            return info;
+        }
+
+        auto handleDie = [&](Dwarf_Die scope) {
+            const auto tag = dwarf_tag(&scope);
+            if (tag == DW_TAG_inlined_subroutine || tag == DW_TAG_subprogram) {
+                int line = 0;
+                std::string file;
+                if (auto f = dwarf_decl_file(&scope)) {
+                    file = f;
+                    dwarf_decl_line(&scope, &line);
+                }
+
+                info.inlined.push_back({cuDie->dieName(&scope), file, line});
+            }
+        };
+
+        std::for_each(scopes.rbegin(), scopes.rend(), handleDie);
+        handleDie(*subprogram->die());
         return info;
-    }
-
-    bool operator<(const Module& module) const
-    {
-        return tie(addressStart, addressEnd, moduleIndex)
-            < tie(module.addressStart, module.addressEnd, module.moduleIndex);
-    }
-
-    bool operator!=(const Module& module) const
-    {
-        return tie(addressStart, addressEnd, moduleIndex)
-            != tie(module.addressStart, module.addressEnd, module.moduleIndex);
     }
 
     string fileName;
     uintptr_t addressStart;
-    uintptr_t addressEnd;
-    size_t moduleIndex;
-    backtrace_state* backtraceState;
+    Dwfl_Module* module;
+    mutable DwarfDieCache dieCache;
+    SymbolCache* symbolCache;
 };
 
 struct AccumulatedTraceData
@@ -189,44 +264,68 @@ struct AccumulatedTraceData
     AccumulatedTraceData()
         : out(fileno(stdout))
     {
-        m_modules.reserve(256);
-        m_backtraceStates.reserve(64);
+        m_moduleFragments.reserve(256);
         m_internedData.reserve(4096);
         m_encounteredIps.reserve(32768);
+
+        {
+            std::string debugPath(":.debug:/usr/lib/debug");
+            const auto length = debugPath.size() + 1;
+            m_debugPath = new char[length];
+            std::memcpy(m_debugPath, debugPath.data(), length);
+        }
+
+        m_callbacks = {
+            &dwfl_build_id_find_elf,
+            &dwfl_standard_find_debuginfo,
+            &dwfl_offline_section_address,
+            &m_debugPath,
+        };
+
+        m_dwfl = dwfl_begin(&m_callbacks);
     }
 
     ~AccumulatedTraceData()
     {
         out.write("# strings: %zu\n# ips: %zu\n", m_internedData.size(), m_encounteredIps.size());
         out.flush();
+
+        delete[] m_debugPath;
+        dwfl_end(m_dwfl);
     }
 
     ResolvedIP resolve(const uintptr_t ip)
     {
         if (m_modulesDirty) {
             // sort by addresses, required for binary search below
-            sort(m_modules.begin(), m_modules.end());
+            sort(m_moduleFragments.begin(), m_moduleFragments.end());
 
 #ifndef NDEBUG
-            for (size_t i = 0; i < m_modules.size(); ++i) {
-                const auto& m1 = m_modules[i];
-                for (size_t j = i + 1; j < m_modules.size(); ++j) {
+            for (size_t i = 0; i < m_moduleFragments.size(); ++i) {
+                const auto& m1 = m_moduleFragments[i];
+                for (size_t j = i + 1; j < m_moduleFragments.size(); ++j) {
                     if (i == j) {
                         continue;
                     }
-                    const auto& m2 = m_modules[j];
-                    if ((m1.addressStart <= m2.addressStart && m1.addressEnd > m2.addressStart)
-                        || (m1.addressStart < m2.addressEnd && m1.addressEnd >= m2.addressEnd)) {
-                        cerr << "OVERLAPPING MODULES: " << hex << m1.moduleIndex << " (" << m1.addressStart << " to "
-                             << m1.addressEnd << ") and " << m1.moduleIndex << " (" << m2.addressStart << " to "
-                             << m2.addressEnd << ")\n"
+                    const auto& m2 = m_moduleFragments[j];
+                    if ((m1.fragmentStart <= m2.fragmentStart && m1.fragmentEnd > m2.fragmentStart)
+                        || (m1.fragmentStart < m2.fragmentEnd && m1.fragmentEnd >= m2.fragmentEnd)) {
+                        cerr << "OVERLAPPING MODULES: " << hex << m1.moduleIndex << " (" << m1.fragmentStart << " to "
+                             << m1.fragmentEnd << ") and " << m1.moduleIndex << " (" << m2.fragmentStart << " to "
+                             << m2.fragmentEnd << ")\n"
                              << dec;
-                    } else if (m2.addressStart >= m1.addressEnd) {
+                    } else if (m2.fragmentStart >= m1.fragmentEnd) {
                         break;
                     }
                 }
             }
 #endif
+
+            // reset dwfl state
+            m_modules.clear();
+
+            dwfl_report_begin(m_dwfl);
+            dwfl_report_end(m_dwfl, nullptr, nullptr);
 
             m_modulesDirty = false;
         }
@@ -237,14 +336,18 @@ struct AccumulatedTraceData
 
         ResolvedIP data;
         // find module for this instruction pointer
-        auto module =
-            lower_bound(m_modules.begin(), m_modules.end(), ip,
-                        [](const Module& module, const uintptr_t ip) -> bool { return module.addressEnd < ip; });
-        if (module != m_modules.end() && module->addressStart <= ip && module->addressEnd >= ip) {
-            data.moduleIndex = module->moduleIndex;
-            const auto info = module->resolveAddress(ip);
-            data.frame = resolveFrame(info.frame);
-            std::transform(info.inlined.begin(), info.inlined.end(), std::back_inserter(data.inlined), resolveFrame);
+        auto fragment = lower_bound(
+            m_moduleFragments.begin(), m_moduleFragments.end(), ip,
+            [](const ModuleFragment& fragment, const uintptr_t ip) -> bool { return fragment.fragmentEnd < ip; });
+        if (fragment != m_moduleFragments.end() && fragment->fragmentStart <= ip && fragment->fragmentEnd >= ip) {
+            data.moduleIndex = fragment->moduleIndex;
+
+            if (auto module = reportModule(*fragment)) {
+                const auto info = module->resolveAddress(ip);
+                data.frame = resolveFrame(info.frame);
+                std::transform(info.inlined.begin(), info.inlined.end(), std::back_inserter(data.inlined),
+                               resolveFrame);
+            }
         }
         return data;
     }
@@ -271,17 +374,17 @@ struct AccumulatedTraceData
         return id;
     }
 
-    void addModule(string fileName, backtrace_state* backtraceState, const size_t moduleIndex,
-                   const uintptr_t addressStart, const uintptr_t addressEnd)
+    void addModule(string fileName, const size_t moduleIndex, const uintptr_t addressStart,
+                   const uintptr_t fragmentStart, const uintptr_t fragmentEnd)
     {
-        m_modules.emplace_back(fileName, addressStart, addressEnd, backtraceState, moduleIndex);
+        m_moduleFragments.emplace_back(fileName, addressStart, fragmentStart, fragmentEnd, moduleIndex);
         m_modulesDirty = true;
     }
 
     void clearModules()
     {
         // TODO: optimize this, reuse modules that are still valid
-        m_modules.clear();
+        m_moduleFragments.clear();
         m_modulesDirty = true;
     }
 
@@ -312,66 +415,47 @@ struct AccumulatedTraceData
         return ipId;
     }
 
-    /**
-     * Prevent the same file from being initialized multiple times.
-     * This drastically cuts the memory consumption down
-     */
-    backtrace_state* findBacktraceState(const char* fileName, uintptr_t addressStart)
-    {
-        if (startsWith(fileName, "linux-vdso.so")) {
-            // prevent warning, since this will always fail
-            return nullptr;
-        }
-
-        auto it = m_backtraceStates.find(fileName);
-        if (it != m_backtraceStates.end()) {
-            return it->second;
-        }
-
-        struct CallbackData
-        {
-            const char* fileName;
-        };
-        CallbackData data = {fileName};
-
-        auto errorHandler = [](void* rawData, const char* msg, int errnum) {
-            auto data = reinterpret_cast<const CallbackData*>(rawData);
-            error_out << "Failed to create backtrace state for module " << data->fileName << ": " << msg << " / "
-                      << strerror(errnum) << " (error code " << errnum << ")" << endl;
-        };
-
-        auto state = backtrace_create_state(data.fileName, /* we are single threaded, so: not thread safe */ false,
-                                            errorHandler, &data);
-
-        if (state) {
-            const int descriptor = backtrace_open(data.fileName, errorHandler, &data, nullptr);
-            if (descriptor >= 1) {
-                int foundSym = 0;
-                int foundDwarf = 0;
-                auto ret = elf_add(state, data.fileName, descriptor, NULL, 0, addressStart, errorHandler, &data,
-                                   &state->fileline_fn, &foundSym, &foundDwarf, nullptr, false, false, nullptr, 0);
-                if (ret && foundSym) {
-                    state->syminfo_fn = &elf_syminfo;
-                } else {
-                    state->syminfo_fn = &elf_nosyms;
-                }
-            }
-        }
-
-        m_backtraceStates.insert(it, make_pair(fileName, state));
-
-        return state;
-    }
-
     LineWriter out;
 
 private:
-    vector<Module> m_modules;
-    tsl::robin_map<std::string, backtrace_state*> m_backtraceStates;
+    Module* reportModule(const ModuleFragment& module)
+    {
+        if (startsWith(module.fileName, "linux-vdso.so")) {
+            return nullptr;
+        }
+
+        auto& ret = m_modules[module.fileName];
+        if (ret.module)
+            return &ret;
+
+        auto dwflModule = dwfl_addrmodule(m_dwfl, module.addressStart);
+        if (!dwflModule) {
+            dwfl_report_begin_add(m_dwfl);
+            dwflModule = dwfl_report_elf(m_dwfl, module.fileName.c_str(), module.fileName.c_str(), -1,
+                                         module.addressStart, false);
+            dwfl_report_end(m_dwfl, nullptr, nullptr);
+
+            if (!dwflModule) {
+                error_out << "Failed to report module for " << module.fileName << ": " << dwfl_errmsg(dwfl_errno())
+                          << endl;
+                return nullptr;
+            }
+        }
+
+        ret = Module(module.fileName, module.addressStart, dwflModule, &m_symbolCache);
+        return &ret;
+    }
+
+    vector<ModuleFragment> m_moduleFragments;
+    Dwfl* m_dwfl = nullptr;
+    char* m_debugPath = nullptr;
+    Dwfl_Callbacks m_callbacks;
+    SymbolCache m_symbolCache;
     bool m_modulesDirty = false;
 
     tsl::robin_map<string, size_t> m_internedData;
     tsl::robin_map<uintptr_t, size_t> m_encounteredIps;
+    tsl::robin_map<string, Module> m_modules;
 };
 
 struct Stats
@@ -447,11 +531,11 @@ int main(int /*argc*/, char** /*argv*/)
                     error_out << "failed to parse line: " << reader.line() << endl;
                     return 1;
                 }
-                auto state = data.findBacktraceState(internedString, addressStart);
                 uintptr_t vAddr = 0;
                 uintptr_t memSize = 0;
                 while ((reader >> vAddr) && (reader >> memSize)) {
-                    data.addModule(fileName, state, moduleIndex, addressStart + vAddr, addressStart + vAddr + memSize);
+                    data.addModule(fileName, moduleIndex, addressStart, addressStart + vAddr,
+                                   addressStart + vAddr + memSize);
                 }
             }
         } else if (reader.mode() == 't') {

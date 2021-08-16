@@ -68,20 +68,10 @@ option(
 )
 
 option(
-  HEAPTRACK_BUILD_BACKTRACE
-  "Enable this option to build libbacktrace. It will be enabled implicitly if HEAPTRACK_BUILD_INTERPRET is enabled."
-  OFF
-)
-
-option(
   HEAPTRACK_BUILD_INTERPRET
   "Disable this option to skip building the interpret part for heaptrack."
   ${HEAPTRACK_BUILD_INTERPRET_DEFAULT}
 )
-
-if (HEAPTRACK_BUILD_INTERPRET)
-    set(HEAPTRACK_BUILD_BACKTRACE ON)
-endif()
 
 if (CMAKE_CROSSCOMPILING)
     set(HEAPTRACK_BUILD_ANALYZE_DEFAULT OFF)

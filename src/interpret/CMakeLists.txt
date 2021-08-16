@@ -2,6 +2,8 @@ if (ECM_FOUND)
     include(ECMEnableSanitizers)
 endif()
 
+find_package(Elfutils REQUIRED)
+
 include_directories(
     ${PROJECT_SOURCE_DIR}/3rdparty/
 )
@@ -10,10 +12,16 @@ add_definitions("-DHAVE_STDINT_H")
 
 add_executable(heaptrack_interpret
     heaptrack_interpret.cpp
+    dwarfdiecache.cpp
+    symbolcache.cpp
 )
 
 target_link_libraries(heaptrack_interpret
-    backtrace
+    PRIVATE ${LIBDW_LIBRARIES}
+)
+
+target_include_directories(heaptrack_interpret
+    PRIVATE ${LIBDW_INCLUDE_DIRS}
 )
 
 install(TARGETS heaptrack_interpret
