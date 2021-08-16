@@ -7,10 +7,6 @@ Files: 3rdparty/robin-map/*
 Copyright: 2017 Thibaut Goetghebuer-Planchon <tessil@gmx.com>
 License: MIT
 
-Files: 3rdparty/libbacktrace/*
-Copyright: 2012-2021 Free Software Foundation, Inc.
-License: BSD-3-Clause
-
 Files: 3rdparty/boost-zstd/*
 Copyright: Boost developers <http://www.boost.org/libs/iostreams>
 License: BSL-1.0
@@ -19,6 +15,3 @@ Files: 3rdparty/catch.hpp
 Copyright: Boost developers <http://www.boost.org/libs/iostreams>
 License: BSL-1.0
 
-Files: 3rdparty/libdwarf/*
-Copyright: Libdwarf developers
-License: LGPL-2.1-only
