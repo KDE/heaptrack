@@ -202,6 +202,17 @@ void replaceAll(string& str, const string& search, const string& replace)
     }
 }
 
+// see https://bugs.kde.org/show_bug.cgi?id=408547
+// apparently sometimes flock can return EAGAIN, despite that not being a documented return value
+static int lockFile(int fd)
+{
+    int ret = -1;
+    while ((ret = flock(fd, LOCK_EX | LOCK_NB)) == EAGAIN) {
+        // try again
+    }
+    return ret;
+}
+
 int createFile(const char* fileName)
 {
     string outputFileName;
@@ -230,13 +241,13 @@ int createFile(const char* fileName)
     if (out == -1) {
         fprintf(stderr, "ERROR: failed to open heaptrack output file %s: %s (%d)\n", outputFileName.c_str(),
                 strerror(errno), errno);
-    } else if (flock(out, LOCK_EX | LOCK_NB) != 0) {
+    } else if (lockFile(out) != 0) {
 #ifdef __FreeBSD__
         // pipes do not support flock, create a regular file
         auto lockpath = outputFileName + ".lock";
         auto lockfile = open(lockpath.c_str(), O_CREAT | O_WRONLY | O_CLOEXEC, 0644);
         debugLog<VerboseOutput>("will lock %s/%p\n", lockpath.c_str(), lockfile);
-        if (flock(lockfile, LOCK_EX | LOCK_NB) == 0) {
+        if (lockFile(lockfile) == 0) {
             // leaking the fd seems fine
             return out;
         }
