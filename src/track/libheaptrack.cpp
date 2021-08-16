@@ -532,8 +532,15 @@ public:
         }
         updateModuleCache();
 
-        const auto index = s_data->traceTree.index(
-            trace, [](uintptr_t ip, uint32_t index) { return s_data->out.writeHexLine('t', ip, index); });
+        const auto index = s_data->traceTree.index(trace, [](uintptr_t ip, uint32_t index) {
+            // decrement addresses by one - otherwise we misattribute the cost to the wrong instruction
+            // for some reason, it seems like we always get the instruction _after_ the one we are interested in
+            // see also: https://github.com/libunwind/libunwind/issues/287
+            // and https://bugs.kde.org/show_bug.cgi?id=439897
+            --ip;
+
+            return s_data->out.writeHexLine('t', ip, index);
+        });
 
 #ifdef DEBUG_MALLOC_PTRS
         auto it = s_data->known.find(ptr);
