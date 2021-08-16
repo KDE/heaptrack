@@ -70,3 +70,29 @@ bool TreeProxy::filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent)
     }
     return true;
 }
+
+bool TreeProxy::lessThan(const QModelIndex& source_left, const QModelIndex& source_right) const
+{
+    if (sortColumn() != 0) {
+        return QSortFilterProxyModel::lessThan(source_left, source_right);
+    }
+
+    const auto* resultData = source_left.data(m_resultDataRole).value<const ResultData*>();
+
+    const auto symbol_left = source_left.data(m_symbolRole).value<Symbol>();
+    const auto symbol_right = source_right.data(m_symbolRole).value<Symbol>();
+
+    if (symbol_left.functionId != symbol_right.functionId) {
+        return resultData->string(symbol_left.functionId) < resultData->string(symbol_right.functionId);
+    }
+
+    const auto path_left = resultData->string(symbol_left.moduleId);
+    const auto path_right = resultData->string(symbol_right.moduleId);
+
+    auto toShortPath = [](const QString& path) {
+        int idx = path.lastIndexOf(QLatin1Char('/'));
+        return path.midRef(idx + 1);
+    };
+
+    return toShortPath(path_left) < toShortPath(path_right);
+}
