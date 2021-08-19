@@ -36,7 +36,7 @@ struct ChartRows
     }
     enum
     {
-        MAX_NUM_COST = 20
+        MAX_NUM_COST = 21
     };
     // time in ms
     qint64 timeStamp = 0;

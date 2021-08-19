@@ -154,13 +154,14 @@ struct ParserData final : public AccumulatedTraceData
             sort(merged.begin(), merged.end(), [=](const ChartMergeData& left, const ChartMergeData& right) {
                 return std::abs(left.*member) > std::abs(right.*member);
             });
-            for (size_t i = 0; i < min(size_t(ChartRows::MAX_NUM_COST - 1), merged.size()); ++i) {
+            for (size_t i = 0; i < min(size_t(ChartRows::MAX_NUM_COST - 2), merged.size()); ++i) {
                 const auto& alloc = merged[i];
                 if (!(alloc.*member)) {
                     break;
                 }
                 (ipToLabelIds[alloc.ip].*label) = i + 1;
                 data->labels[i + 1] = symbol(findIp(alloc.ip));
+                Q_ASSERT(data->labels.size() < ChartRows::MAX_NUM_COST);
             }
         };
         ipToLabelIds.reserve(3 * ChartRows::MAX_NUM_COST);
