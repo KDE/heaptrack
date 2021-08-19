@@ -18,11 +18,12 @@ endif()
 
 add_executable(bench_linereader bench_linereader.cpp)
 
-find_package(Qt5 5.10.0 CONFIG OPTIONAL_COMPONENTS Core)
-if (Qt5Core_FOUND AND Boost_CONTAINER_FOUND)
-   add_executable(bench_parser bench_parser.cpp)
-   target_link_libraries(bench_parser sharedprint heaptrack_gui_private)
+if (TARGET heaptrack_gui_private)
+    add_executable(bench_parser bench_parser.cpp)
+    target_link_libraries(bench_parser sharedprint heaptrack_gui_private)
+endif()
 
+if (TARGET Qt5::Core AND Boost_CONTAINER_FOUND)
     add_executable(bench_tree bench_tree.cpp)
     target_include_directories(bench_tree PRIVATE ${Boost_INCLUDE_DIRS})
     target_link_libraries(bench_tree Qt5::Core

@@ -50,18 +50,19 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
     )
     add_test(NAME tst_io COMMAND tst_io)
 
-
-    find_package(Qt5 5.2.0 CONFIG OPTIONAL_COMPONENTS Test)
-    if (Qt5Test_FOUND)
-        add_executable(tst_parser tst_parser.cpp)
-        target_link_libraries(tst_parser
-                ${Boost_SYSTEM_LIBRARY}
-                ${Boost_FILESYSTEM_LIBRARY}
-                heaptrack_gui_private
-                Qt5::Test
-        )
-        target_compile_definitions(tst_parser PRIVATE -DCATCH_CONFIG_RUNNER)
-        add_test(NAME tst_parser COMMAND tst_parser)
+    if (TARGET heaptrack_gui_private)
+        find_package(Qt5 5.2.0 CONFIG OPTIONAL_COMPONENTS Test)
+        if (Qt5Test_FOUND)
+            add_executable(tst_parser tst_parser.cpp)
+            target_link_libraries(tst_parser
+                    ${Boost_SYSTEM_LIBRARY}
+                    ${Boost_FILESYSTEM_LIBRARY}
+                    heaptrack_gui_private
+                    Qt5::Test
+            )
+            target_compile_definitions(tst_parser PRIVATE -DCATCH_CONFIG_RUNNER)
+            add_test(NAME tst_parser COMMAND tst_parser)
+        endif()
     endif()
 
     add_executable(tst_inject tst_inject.cpp)
