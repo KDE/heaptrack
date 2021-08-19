@@ -72,6 +72,7 @@ set(LIBRARIES
     KF5::ConfigWidgets
     KF5::I18n
     KF5::KIOWidgets
+    KF5::IconThemes
     sharedprint
     heaptrack_gui_private
 )

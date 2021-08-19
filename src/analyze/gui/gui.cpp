@@ -29,6 +29,37 @@
 #include "mainwindow.h"
 #include "proxystyle.h"
 
+#include <KIconTheme>
+#include <QFile>
+#include <QResource>
+
+// FIXME: patch KIconTheme so that this isn't needed here
+void Q_DECL_UNUSED initRCCIconTheme()
+{
+    const QString iconThemeRcc = qApp->applicationDirPath() + QStringLiteral("/../share/icons/breeze/breeze-icons.rcc");
+    if (!QFile::exists(iconThemeRcc)) {
+        qWarning("cannot find icons rcc: %ls", qUtf16Printable(iconThemeRcc));
+        return;
+    }
+
+    const QString iconThemeName = QStringLiteral("kf5_rcc_theme");
+    const QString iconSubdir = QStringLiteral("/icons/") + iconThemeName;
+    if (!QResource::registerResource(iconThemeRcc, iconSubdir)) {
+        qWarning("Invalid rcc file: %ls", qUtf16Printable(iconThemeRcc));
+    }
+
+    if (!QFile::exists(QLatin1Char(':') + iconSubdir + QStringLiteral("/index.theme"))) {
+        qWarning("No index.theme found in %ls", qUtf16Printable(iconThemeRcc));
+        QResource::unregisterResource(iconThemeRcc, iconSubdir);
+    }
+
+    // Tell Qt about the theme
+    // Note that since qtbase commit a8621a3f8, this means the QPA (i.e. KIconLoader) will NOT be used.
+    QIcon::setThemeName(iconThemeName); // Qt looks under :/icons automatically
+    // Tell KIconTheme about the theme, in case KIconLoader is used directly
+    KIconTheme::forceThemeForTests(iconThemeName);
+}
+
 int main(int argc, char** argv)
 {
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
@@ -37,8 +68,7 @@ int main(int argc, char** argv)
     app.setStyle(new ProxyStyle);
 
 #if APPIMAGE_BUILD
-    QIcon::setThemeSearchPaths({app.applicationDirPath() + QLatin1String("/../share/icons/")});
-    QIcon::setThemeName(QStringLiteral("breeze"));
+    initRCCIconTheme();
 #endif
 
     KLocalizedString::setApplicationDomain("heaptrack");
