@@ -172,6 +172,10 @@ while true; do
                 shift 1
             fi
             if [ ! -x "$(command -v "$1" 2> /dev/null)" ]; then
+                if [ -z "$1" ] && [ -x "$EXE_PATH/heaptrack_gui" ]; then
+                    "$EXE_PATH/heaptrack_gui"
+                    exit
+                fi
                 if [ -f "$1" ] && echo "$1" | grep -q "heaptrack."; then
                     openHeaptrackDataFiles $ORIG_CMDLINE
                     exit
