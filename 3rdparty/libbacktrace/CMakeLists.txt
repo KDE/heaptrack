@@ -155,14 +155,6 @@ check_function_exists (strnlen HAVE_DECL_STRNLEN)
 
 check_function_exists (getexecname HAVE_GETEXECNAME)
 
-include (CheckIncludeFile)
-find_path(DWARF_INCLUDE_DIR dwarf.h
-      PATH_SUFFIXES libdwarf)
-if (NOT DWARF_INCLUDE_DIR)
-    message(FATAL_ERROR "Could not find dwarf.h, try installing the dwarf or elfutils development package.")
-endif ()
-include_directories(${DWARF_INCLUDE_DIR})
-
 configure_file (backtrace-supported.h.in backtrace-supported.h)
 
 configure_file (config.h.in.cmake config.h)
@@ -172,6 +164,7 @@ include_directories (BEFORE
 )
 include_directories (
     auxincl
+    ../libdwarf
 )
 
 add_library (backtrace STATIC

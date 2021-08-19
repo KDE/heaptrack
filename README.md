@@ -77,7 +77,6 @@ following libraries:
 
 - boost 1.41 or higher: iostreams, program_options
 - libunwind
-- elfutils: libdwarf
 
 For runtime-attaching, you will need `gdb` installed.
 

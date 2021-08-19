@@ -11,7 +11,7 @@ RUN apt-get update && \
     add-apt-repository ppa:beineri/opt-qt-5.10.1-trusty -y && \
     add-apt-repository ppa:ubuntu-toolchain-r/test -y && \
     apt-get update && \
-    apt-get install -y qt510base qt510svg qt510x11extras cmake3 libdwarf-dev mesa-common-dev \
+    apt-get install -y qt510base qt510svg qt510x11extras cmake3 mesa-common-dev \
         libboost-iostreams-dev libboost-program-options-dev libboost-system-dev libboost-filesystem-dev \
         gcc-4.9 g++-4.9 && \
     apt-get -y upgrade && \
