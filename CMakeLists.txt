@@ -22,13 +22,20 @@ set(HEAPTRACK_FILE_FORMAT_VERSION 2)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
+option(APPIMAGE_BUILD "configure build for bundling in an appimage" OFF)
+
+set(REQUIRED_IN_APPIMAGE "")
+if (APPIMAGE_BUILD)
+    set(REQUIRED_IN_APPIMAGE REQUIRED)
+endif()
+
 include(FeatureSummary)
-find_package(Boost 1.60.0 COMPONENTS system filesystem iostreams container)
+find_package(Boost 1.60.0 ${REQUIRED_IN_APPIMAGE} COMPONENTS system filesystem iostreams container)
 find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 
 if (${Boost_IOSTREAMS_FOUND})
-    find_package(Zstd)
+    find_package(Zstd ${REQUIRED_IN_APPIMAGE})
 endif()
 set_package_properties(Zstd PROPERTIES TYPE RECOMMENDED PURPOSE "Zstandard offers better (de)compression performance compared with gzip/zlib, making heaptrack faster and datafiles smaller.")
 

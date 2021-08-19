@@ -15,8 +15,6 @@ include(ECMAddTests)
 include(ECMInstallIcons)
 include(ECMAddAppIcon)
 
-option(APPIMAGE_BUILD "configure build for bundling in an appimage" OFF)
-
 configure_file(gui_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/gui_config.h)
 
 add_definitions(-Wall
