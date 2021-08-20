@@ -24,11 +24,11 @@
 
 #include "util/libunwind_config.h"
 
-#define UNW_LOCAL_ONLY
-#include <libunwind.h>
-
 #include <cinttypes>
 #include <cstdio>
+
+#define UNW_LOCAL_ONLY
+#include <libunwind.h>
 
 void Trace::print()
 {
