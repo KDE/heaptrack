@@ -23,9 +23,13 @@
 #include <iostream>
 #include <memory>
 
-#include <boost-zstd/zstd.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
+#if BOOST_IOSTREAMS_HAS_ZSTD
+#include <boost/iostreams/filter/zstd.hpp>
+#else
+#include <boost-zstd/zstd.hpp>
+#endif
 #include <boost/iostreams/filtering_stream.hpp>
 
 #include <boost/filesystem.hpp>
