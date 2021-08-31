@@ -35,9 +35,20 @@ find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 
 if (${Boost_IOSTREAMS_FOUND})
-    find_package(Zstd ${REQUIRED_IN_APPIMAGE})
+    find_package(ZSTD ${REQUIRED_IN_APPIMAGE})
+
+    include(CheckCXXSourceCompiles)
+    include(CMakePushCheckState)
+    cmake_push_check_state()
+    set(CMAKE_REQUIRED_INCLUDES ${Boost_INCLUDE_DIRS})
+    set(CMAKE_REQUIRED_LIBRARIES ${Boost_LIBRARIES})
+    check_cxx_source_compiles("#include <boost/iostreams/filter/zstd.hpp>
+        int main() { boost::iostreams::zstd_decompressor(); return 0; }"
+        BOOST_IOSTREAMS_HAS_ZSTD
+    )
+    cmake_pop_check_state()
 endif()
-set_package_properties(Zstd PROPERTIES TYPE RECOMMENDED PURPOSE "Zstandard offers better (de)compression performance compared with gzip/zlib, making heaptrack faster and datafiles smaller.")
+set_package_properties(ZSTD PROPERTIES TYPE RECOMMENDED PURPOSE "Zstandard offers better (de)compression performance compared with gzip/zlib, making heaptrack faster and datafiles smaller.")
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     set(HEAPTRACK_BUILD_TRACK_DEFAULT ON)

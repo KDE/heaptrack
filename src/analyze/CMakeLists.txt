@@ -23,7 +23,7 @@ target_link_libraries(sharedprint LINK_PUBLIC
     ${ZLIB_LIBRARIES}
 )
 
-if (ZSTD_FOUND)
+if (ZSTD_FOUND AND NOT BOOST_IOSTREAMS_HAS_ZSTD)
     target_link_libraries(sharedprint LINK_PUBLIC
         boost-zstd
     )

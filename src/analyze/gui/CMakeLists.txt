@@ -17,8 +17,9 @@ include(ECMAddAppIcon)
 
 configure_file(gui_config.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/gui_config.h)
 
-add_definitions(-Wall
-    -DQT_NO_URL_CAST_FROM_STRING
+add_compile_options(-Wall)
+
+add_definitions(-DQT_NO_URL_CAST_FROM_STRING
     -DQT_NO_CAST_FROM_ASCII -DQT_NO_CAST_TO_ASCII
     -DQT_NO_CAST_FROM_BYTEARRAY
     -DQT_USE_QSTRINGBUILDER
