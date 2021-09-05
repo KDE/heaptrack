@@ -26,10 +26,12 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
+#if ZSTD_FOUND
 #if BOOST_IOSTREAMS_HAS_ZSTD
 #include <boost/iostreams/filter/zstd.hpp>
 #else
 #include <boost-zstd/zstd.hpp>
+#endif
 #endif
 #include <boost/iostreams/filtering_stream.hpp>
 
