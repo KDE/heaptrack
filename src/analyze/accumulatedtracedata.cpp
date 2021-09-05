@@ -17,6 +17,7 @@
  */
 
 #include "accumulatedtracedata.h"
+#include "analyze_config.h"
 
 #include <algorithm>
 #include <cassert>
@@ -38,7 +39,6 @@
 #include "util/linereader.h"
 #include "util/pointermap.h"
 
-#include "analyze_config.h"
 #include "suppressions.h"
 
 #ifdef __GNUC__
