@@ -374,7 +374,9 @@ std::pair<TreeData, CallerCalleeResults> mergeAllocations(Parser* parser, const 
         traceRecursionGuard.clear();
         traceRecursionGuard.insert(traceIndex);
         symbolRecursionGuard.clear();
-        while (traceIndex) {
+        bool first = true;
+        while (traceIndex || first) {
+            first = false;
             const auto& trace = data.findTrace(traceIndex);
             const auto& ip = data.findIp(trace.ipIndex);
             rows = addRow(rows, location(ip), allocation);
