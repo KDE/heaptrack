@@ -166,9 +166,7 @@ struct Printer final : public AccumulatedTraceData
         vector<MergedAllocation> ret;
         ret.reserve(allocations.size());
         for (const Allocation& allocation : allocations) {
-            if (allocation.traceIndex) {
-                mergeAllocation(&ret, allocation);
-            }
+            mergeAllocation(&ret, allocation);
         }
         for (MergedAllocation& merged : ret) {
             for (const Allocation& allocation : merged.traces) {
@@ -352,6 +350,10 @@ struct Printer final : public AccumulatedTraceData
             }
             label(allocation);
             printIp(allocation.ipIndex, cout);
+
+            if (!allocation.ipIndex) {
+                continue;
+            }
 
             sort(allocation.traces.begin(), allocation.traces.end(), sortOrder);
             int64_t handled = 0;
