@@ -287,6 +287,12 @@ cleanup() {
     echo "Heaptrack finished! Now run the following to investigate the data:"
     echo
     echo "  heaptrack --analyze \"$output\""
+
+    if [ -x "$EXE_PATH/heaptrack_gui" ]; then
+        echo ""
+        echo "heaptrack_gui detected, automatically opening the file..."
+        "$EXE_PATH/heaptrack_gui" "$output"
+    fi
 }
 trap cleanup EXIT
 
