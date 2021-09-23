@@ -47,6 +47,7 @@ usage() {
     echo "           You are hereby warned, use it at your own risk!"
     echo
     echo "Optional arguments to heaptrack:"
+    echo "  -r, --raw      Only record raw data, do not interpret it."
     echo "  -d, --debug    Run the debuggee in GDB and heaptrack."
     echo " --use-inject    Use the same heaptrack_inject symbol interception mechanism instead of relying on"
     echo "                 the dynamic linker and LD_PRELOAD. This is an experimental flag for now."
@@ -74,6 +75,7 @@ debug=
 pid=
 client=
 use_inject_lib=
+write_raw_data=
 
 # path to current heaptrack.sh executable
 SCRIPT_PATH=$(readlink -f "$0")
@@ -102,6 +104,10 @@ while true; do
             ;;
         "--use-inject")
             use_inject_lib=1
+            shift 1
+            ;;
+        "-r" | "--raw")
+            write_raw_data=1
             shift 1
             ;;
         "-h" | "--help")
@@ -208,7 +214,7 @@ LIB_REL_PATH="@LIB_REL_PATH@"
 LIBEXEC_REL_PATH="@LIBEXEC_REL_PATH@"
 
 INTERPRETER="$EXE_PATH/$LIBEXEC_REL_PATH/heaptrack_interpret"
-if [ ! -f "$INTERPRETER" ]; then
+if [ -z "$write_raw_data" ] && [ ! -f "$INTERPRETER" ]; then
     echo "Could not find heaptrack interpreter executable: $INTERPRETER"
     exit 1
 fi
@@ -255,15 +261,27 @@ fi
 
 output_suffix="gz"
 COMPRESSOR="gzip -c"
+UNCOMPRESSOR="gzip -dc"
 
 if [ "@ZSTD_FOUND@" = "TRUE" ] && [ ! -z "$(command -v zstd 2> /dev/null)" ]; then
     output_suffix="zst"
     COMPRESSOR="zstd -c"
+    UNCOMPRESSOR="zstd -dc"
+fi
+
+output_non_raw="$output.$output_suffix"
+
+if [ ! -z "$write_raw_data" ]; then
+    output_suffix="raw.$output_suffix"
 fi
 
 # interpret the data and compress the output on the fly
 output="$output.$output_suffix"
-"$INTERPRETER" < $pipe | $COMPRESSOR > "$output" &
+if [ -z "$write_raw_data" ]; then
+    "$INTERPRETER" < $pipe | $COMPRESSOR > "$output" &
+else
+    $COMPRESSOR < $pipe > "$output" &
+fi
 debuggee=$!
 
 cleanup() {
@@ -286,9 +304,14 @@ cleanup() {
 
     echo "Heaptrack finished! Now run the following to investigate the data:"
     echo
-    echo "  heaptrack --analyze \"$output\""
 
-    if [ -x "$EXE_PATH/heaptrack_gui" ]; then
+    if [ ! -z "$write_raw_data" ]; then
+        echo "  $UNCOMPRESSOR < \"$output\" | $INTERPRETER | $COMPRESSOR > \"$output_non_raw\""
+    else
+        echo "  heaptrack --analyze \"$output\""
+    fi
+
+    if [ -z "$write_raw_data" ] && [ -x "$EXE_PATH/heaptrack_gui" ]; then
         echo ""
         echo "heaptrack_gui detected, automatically opening the file..."
         "$EXE_PATH/heaptrack_gui" "$output"
