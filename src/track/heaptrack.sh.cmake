@@ -183,7 +183,7 @@ while true; do
                     exit
                 fi
                 if [ -f "$1" ] && echo "$1" | grep -q "heaptrack."; then
-                    openHeaptrackDataFiles $ORIG_CMDLINE
+                    openHeaptrackDataFiles "$ORIG_CMDLINE"
                     exit
                 fi
 

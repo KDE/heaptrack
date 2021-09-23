@@ -39,3 +39,5 @@ target_link_libraries(testlib_indirect ${CMAKE_DL_LIBS})
 add_executable(dlopen dlopen.cpp)
 target_compile_definitions(dlopen PRIVATE -DLIB_PATH="$<TARGET_FILE:testlib_indirect>")
 target_link_libraries(dlopen ${CMAKE_DL_LIBS})
+
+add_subdirectory("with space")

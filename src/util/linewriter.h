@@ -115,6 +115,20 @@ public:
     bool write(const std::string& line)
     {
         const auto length = line.length();
+
+        {
+            // first write the size of the string
+            constexpr const int maxHexCharsForSize = 16 + 1; // 2^64 == 16^16 + 1 space
+            if (availableSpace() < maxHexCharsForSize && !flush())
+                return false;
+
+            const auto start = out();
+            auto end = writeHexNumber(start, length);
+            *end = ' ';
+            ++end;
+            bufferSize += (end - start);
+        }
+
         if (availableSpace() < length) {
             if (!flush()) {
                 return false;
@@ -122,12 +136,12 @@ public:
             if (availableSpace() < length) {
                 int ret = 0;
                 do {
-                    ret = ::write(fd, line.c_str(), length);
+                    ret = ::write(fd, line.data(), length);
                 } while (ret < 0 && errno == EINTR);
                 return ret >= 0;
             }
         }
-        memcpy(out(), line.c_str(), length);
+        memcpy(out(), line.data(), length);
         bufferSize += length;
         return true;
     }

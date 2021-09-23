@@ -257,7 +257,16 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
             if (pass != FirstPass || isReparsing) {
                 continue;
             }
-            strings.push_back(reader.line().substr(2));
+            if (fileVersion >= 3) {
+                // read sized string directly
+                std::string string;
+                reader >> string;
+                strings.push_back(std::move(string));
+            } else {
+                // read remaining line as string, possibly including white spaces
+                strings.push_back(reader.line().substr(2));
+            }
+
             StringIndex index;
             index.index = strings.size();
 
@@ -467,6 +476,9 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
                      << "), which can read file format version " << hex << HEAPTRACK_FILE_FORMAT_VERSION << " and below"
                      << endl;
                 return false;
+            }
+            if (fileVersion >= 3) {
+                reader.setExpectedSizedStrings(true);
             }
         } else if (reader.mode() == 'I') { // system information
             reader >> systemInfo.pageSize;

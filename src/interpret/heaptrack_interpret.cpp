@@ -428,7 +428,16 @@ int main(int /*argc*/, char** /*argv*/)
     AllocationInfoSet allocationInfos;
 
     while (reader.getLine(cin)) {
-        if (reader.mode() == 'x') {
+        if (reader.mode() == 'v') {
+            unsigned int heaptrackVersion = 0;
+            reader >> heaptrackVersion;
+            unsigned int fileVersion = 0;
+            reader >> fileVersion;
+            if (fileVersion >= 3) {
+                reader.setExpectedSizedStrings(true);
+            }
+            data.out.write("%s\n", reader.line().c_str());
+        } else if (reader.mode() == 'x') {
             if (!exe.empty()) {
                 error_out << "received duplicate exe event - child process tracking is not yet supported" << endl;
                 return 1;

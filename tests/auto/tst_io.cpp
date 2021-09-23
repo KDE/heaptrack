@@ -63,25 +63,28 @@ TEST_CASE ("buffered write", "[write]") {
 
     LineWriter writer(file.fd);
     REQUIRE(writer.canWrite());
-    string expectedContents;
+    ostringstream expectedContents;
     for (unsigned i = 0; i < 10000; ++i) {
         REQUIRE(writer.write("%d %x\n", 42, 42));
-        expectedContents += "42 2a\n";
+        expectedContents << "42 2a\n";
         if (i % 1000 == 0) {
             const string longString(LineWriter::BUFFER_CAPACITY * 2, '*');
             REQUIRE(writer.write(longString));
-            expectedContents += longString;
+            expectedContents << std::hex << longString.size() << ' ' << longString;
         }
     }
     for (unsigned i = 0; i < LineWriter::BUFFER_CAPACITY * 2; ++i) {
         const string longString(i, '*');
         REQUIRE(writer.write(longString));
-        expectedContents += longString;
+        expectedContents << std::hex << longString.size() << ' ' << longString;
     }
-    REQUIRE(expectedContents.size() > LineWriter::BUFFER_CAPACITY);
+
+    expectedContents.flush();
+
+    REQUIRE(expectedContents.str().size() > LineWriter::BUFFER_CAPACITY);
     REQUIRE(writer.flush());
 
-    REQUIRE(file.readContents() == expectedContents);
+    REQUIRE(file.readContents() == expectedContents.str());
 }
 
 TEST_CASE ("buffered writeHex", "[write]") {

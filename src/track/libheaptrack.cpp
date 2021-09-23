@@ -471,7 +471,7 @@ public:
 
         if (size > 0 && size < BUF_SIZE) {
             buf[size] = 0;
-            s_data->out.write("x %s\n", buf);
+            s_data->out.write("x %x %s\n", size, buf);
         }
     }
 
@@ -587,7 +587,7 @@ private:
 
         debugLog<VerboseOutput>("dlopen_notify_callback: %s %zx", fileName, info->dlpi_addr);
 
-        if (!heaptrack->s_data->out.write("m %s %zx", fileName, info->dlpi_addr)) {
+        if (!heaptrack->s_data->out.write("m %x %s %zx", strlen(fileName), fileName, info->dlpi_addr)) {
             return 1;
         }
 
@@ -636,7 +636,7 @@ private:
             return;
         }
         debugLog<MinimalOutput>("%s", "updateModuleCache()");
-        if (!s_data->out.write("m -\n")) {
+        if (!s_data->out.write("m 1 -\n")) {
             return;
         }
         dl_iterate_phdr(&dl_iterate_phdr_callback, this);

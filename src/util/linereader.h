@@ -115,8 +115,28 @@ public:
         return readHex(hex);
     }
 
+    void setExpectedSizedStrings(bool expectSizedStrings)
+    {
+        m_expectSizedStrings = expectSizedStrings;
+    }
+
     bool operator>>(std::string& str)
     {
+        if (m_expectSizedStrings) {
+            uint64_t size = 0;
+            if (!(*this >> size) || size > static_cast<uint64_t>(std::distance(m_it, m_line.cend()))) {
+                return false;
+            }
+            auto start = m_it;
+            m_it += size;
+            str.assign(start, m_it);
+            if (m_it != m_line.cend()) {
+                // eat trailing whitespace
+                ++m_it;
+            }
+            return true;
+        }
+
         auto it = m_it;
         const auto end = m_line.cend();
         while (it != end && *it != ' ') {
@@ -149,6 +169,7 @@ public:
     }
 
 private:
+    bool m_expectSizedStrings = false;
     std::string m_line;
     std::string::const_iterator m_it;
 };
