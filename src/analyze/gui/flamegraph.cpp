@@ -21,7 +21,9 @@
 #include <cmath>
 
 #include <QAction>
+#include <QApplication>
 #include <QCheckBox>
+#include <QClipboard>
 #include <QComboBox>
 #include <QCursor>
 #include <QDebug>
@@ -562,6 +564,10 @@ FlameGraph::FlameGraph(QWidget* parent)
             auto* action = menu->addAction(i18n("View Caller/Callee"));
             connect(action, &QAction::triggered, this,
                     [this, item]() { emit callerCalleeViewRequested(item->symbol()); });
+
+            auto* copy = menu->addAction(QIcon::fromTheme(QStringLiteral("edit-copy")), tr("Copy"));
+            connect(copy, &QAction::triggered, this, [item]() { qApp->clipboard()->setText(item->description()); });
+
             menu->addSeparator();
         }
         menu->addActions(actions());
