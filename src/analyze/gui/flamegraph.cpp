@@ -33,6 +33,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
+#include <QPushButton>
 #include <QStyleOption>
 #include <QToolTip>
 #include <QVBoxLayout>
@@ -465,6 +466,13 @@ FlameGraph::FlameGraph(QWidget* parent)
     m_view->viewport()->setMouseTracking(true);
     m_view->setFont(QFont(QStringLiteral("monospace")));
 
+    m_backButton = new QPushButton(this);
+    m_backButton->setIcon(QIcon::fromTheme(QStringLiteral("go-previous")));
+    m_backButton->setToolTip(QStringLiteral("Go back in symbol view history"));
+    m_forwardButton = new QPushButton(this);
+    m_forwardButton->setIcon(QIcon::fromTheme(QStringLiteral("go-next")));
+    m_forwardButton->setToolTip(QStringLiteral("Go forward in symbol view history"));
+
     auto bottomUpCheckbox = new QCheckBox(i18n("Bottom-Up View"), this);
     bottomUpCheckbox->setToolTip(i18n("Enable the bottom-up flame graph view. When this is unchecked, "
                                       "the top-down view is enabled by default."));
@@ -511,6 +519,8 @@ FlameGraph::FlameGraph(QWidget* parent)
 
     auto controls = new QWidget(this);
     controls->setLayout(new QHBoxLayout);
+    controls->layout()->addWidget(m_backButton);
+    controls->layout()->addWidget(m_forwardButton);
     controls->layout()->addWidget(m_costSource);
     controls->layout()->addWidget(bottomUpCheckbox);
     controls->layout()->addWidget(collapseRecursionCheckbox);
@@ -533,8 +543,12 @@ FlameGraph::FlameGraph(QWidget* parent)
 
     m_backAction = KStandardAction::back(this, SLOT(navigateBack()), this);
     addAction(m_backAction);
+    connect(m_backButton, &QPushButton::released, m_backAction, &QAction::trigger);
+
     m_forwardAction = KStandardAction::forward(this, SLOT(navigateForward()), this);
     addAction(m_forwardAction);
+    connect(m_forwardButton, &QPushButton::released, m_forwardAction, &QAction::trigger);
+
     m_resetAction = new QAction(QIcon::fromTheme(QStringLiteral("go-first")), i18n("Reset View"), this);
     m_resetAction->setShortcut(Qt::Key_Escape);
     connect(m_resetAction, &QAction::triggered, this, [this]() { selectItem(0); });
@@ -788,7 +802,11 @@ void FlameGraph::navigateForward()
 
 void FlameGraph::updateNavigationActions()
 {
-    m_backAction->setEnabled(m_selectedItem > 0);
-    m_forwardAction->setEnabled(m_selectedItem + 1 < m_selectionHistory.size());
-    m_resetAction->setEnabled(m_selectedItem > 0);
+    const bool hasItems = m_selectedItem > 0;
+    const bool isNotLastItem = m_selectedItem + 1 < m_selectionHistory.size();
+    m_backAction->setEnabled(hasItems);
+    m_forwardAction->setEnabled(isNotLastItem);
+    m_resetAction->setEnabled(hasItems);
+    m_backButton->setEnabled(hasItems);
+    m_forwardButton->setEnabled(isNotLastItem);
 }
