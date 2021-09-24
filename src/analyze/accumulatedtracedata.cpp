@@ -219,7 +219,11 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
     totalCost = {};
     peakTime = 0;
     if (pass == FirstPass) {
-        suppressions.resize(filterParameters.suppressions.size());
+        if (!filterParameters.disableBuiltinSuppressions) {
+            suppressions = builtinSuppressions();
+        }
+
+        suppressions.resize(suppressions.size() + filterParameters.suppressions.size());
         std::transform(filterParameters.suppressions.begin(), filterParameters.suppressions.end(), suppressions.begin(),
                        [](const std::string& pattern) {
                            return Suppression {pattern, 0, 0};

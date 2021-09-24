@@ -33,4 +33,6 @@ struct Suppression
     int64_t leaked = 0;
 };
 
+std::vector<Suppression> builtinSuppressions();
+
 #endif // SUPPRESSIONS_H

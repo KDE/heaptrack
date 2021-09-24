@@ -628,6 +628,16 @@ MainWindow::MainWindow(QWidget* parent)
         reparse(m_lastFilterParameters.minTime, m_lastFilterParameters.maxTime);
     });
 
+    m_disableBuiltinSuppressions = m_ui->menu_Settings->addAction(i18n("Disable Builtin Suppressions"));
+    m_disableBuiltinSuppressions->setToolTip(i18n(
+        "Ignore suppression definitions that are built into heaptrack. By default, heaptrack will suppress certain "
+        "known leaks from common system libraries."));
+    m_disableBuiltinSuppressions->setCheckable(true);
+    connect(m_disableBuiltinSuppressions, &QAction::toggled, this, [this]() {
+        m_lastFilterParameters.disableBuiltinSuppressions = m_disableBuiltinSuppressions->isChecked();
+        reparse(m_lastFilterParameters.minTime, m_lastFilterParameters.maxTime);
+    });
+
     setupCodeNavigationMenu();
 
     m_ui->actionResetFilter->setEnabled(false);
@@ -855,6 +865,11 @@ void MainWindow::navigateToCode(const QString& filePath, int lineNumber, int col
 void MainWindow::setDisableEmbeddedSuppressions(bool disable)
 {
     m_disableEmbeddedSuppressions->setChecked(disable);
+}
+
+void MainWindow::setDisableBuiltinSuppressions(bool disable)
+{
+    m_disableBuiltinSuppressions->setChecked(disable);
 }
 
 void MainWindow::setSuppressions(std::vector<std::string> suppressions)

@@ -623,6 +623,9 @@ int main(int argc, char** argv)
             "Ignore suppression definitions that are embedded into the heaptrack data file. By default, heaptrack will copy the suppressions"
             "optionally defined via a `const char *__lsan_default_suppressions()` symbol in the debuggee application. These are then always "
             "applied when analyzing the data, unless this feature is explicitly disabled using this command line option.")
+        ("disable-builtin-suppressions",
+            "Ignore suppression definitions that are built into heaptrack. By default, heaptrack will suppress certain "
+            "known leaks from common system libraries.")
         ("print-suppressions", po::value<bool>()->default_value(false)->implicit_value(true),
             "Show statistics for matched suppressions.")
         ("help,h", "Show this help message.")
@@ -693,6 +696,7 @@ int main(int argc, char** argv)
     const auto suppressionsFile = vm["suppressions"].as<string>();
 
     data.filterParameters.disableEmbeddedSuppressions = vm.count("disable-embedded-suppressions");
+    data.filterParameters.disableBuiltinSuppressions = vm.count("disable-builtin-suppressions");
     bool suppressionsOk = false;
     data.filterParameters.suppressions = parseSuppressions(suppressionsFile, &suppressionsOk);
     if (!suppressionsOk) {

@@ -51,6 +51,7 @@ public slots:
     void navigateToCode(const QString& url, int lineNumber, int columnNumber = -1);
 
     void setDisableEmbeddedSuppressions(bool disable);
+    void setDisableBuiltinSuppressions(bool disable);
     void setSuppressions(std::vector<std::string> suppressions);
 
 signals:
@@ -71,6 +72,7 @@ private:
     QAction* m_closeAction = nullptr;
     QAction* m_quitAction = nullptr;
     QAction* m_disableEmbeddedSuppressions = nullptr;
+    QAction* m_disableBuiltinSuppressions = nullptr;
     FilterParameters m_lastFilterParameters;
 };
 

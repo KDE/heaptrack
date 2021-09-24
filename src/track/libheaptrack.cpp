@@ -57,8 +57,6 @@
 #include "util/linewriter.h"
 
 extern "C" {
-__attribute__((weak)) void __libc_freeres();
-
 // see upstream "documentation" at:
 // https://github.com/llvm-mirror/compiler-rt/blob/master/include/sanitizer/lsan_interface.h#L76
 __attribute__((weak)) const char* __lsan_default_suppressions();
@@ -319,11 +317,6 @@ public:
                 // see also Valgrind's `--run-cxx-freeres` option
                 if (&__gnu_cxx::__freeres) {
                     __gnu_cxx::__freeres();
-                }
-                // free internal libc resources, cf: https://bugs.kde.org/show_bug.cgi?id=378765
-                // see also Valgrind's `--run-libc-freeres` option
-                if (&__libc_freeres) {
-                    __libc_freeres();
                 }
 
                 s_atexit.store(true);

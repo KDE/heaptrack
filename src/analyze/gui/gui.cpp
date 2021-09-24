@@ -108,6 +108,12 @@ int main(int argc, char** argv)
              "in the debuggee application.  These are then always applied when analyzing the data, unless this feature "
              "is explicitly disabled using this command line option.")};
     parser.addOption(disableEmbeddedSuppressionsOption);
+    QCommandLineOption disableBuiltinSuppressionsOption {
+        {QStringLiteral("disable-builtin-suppressions")},
+        i18n(
+            "Ignore suppression definitions that are built into heaptrack. By default, heaptrack will suppress certain "
+            "known leaks in common system libraries.")};
+    parser.addOption(disableBuiltinSuppressionsOption);
     parser.addPositionalArgument(QStringLiteral("files"), i18n("Files to load"), i18n("[FILE...]"));
 
     parser.process(app);
@@ -124,6 +130,7 @@ int main(int argc, char** argv)
         window->setAttribute(Qt::WA_DeleteOnClose);
         window->setSuppressions(suppressions);
         window->setDisableEmbeddedSuppressions(parser.isSet(disableEmbeddedSuppressionsOption));
+        window->setDisableBuiltinSuppressions(parser.isSet(disableBuiltinSuppressionsOption));
         window->show();
         return window;
     };

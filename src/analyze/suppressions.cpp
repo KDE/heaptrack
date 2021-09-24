@@ -126,3 +126,20 @@ bool matchesSuppression(const std::string& suppression, const std::string& hayst
 {
     return suppression == haystack || TemplateMatch(suppression.c_str(), haystack.c_str());
 }
+
+std::vector<Suppression> builtinSuppressions()
+{
+    return {
+        // libc
+        {"__nss_module_allocate", 0, 0},
+        {"__gconv_read_conf", 0, 0},
+        {"__new_exitfn", 0, 0},
+        {"tzset_internal", 0, 0},
+        // dynamic linker
+        {"dl_open_worker", 0, 0},
+        // glib event loop
+        {"g_main_context_new", 0, 0},
+        {"g_main_context_new", 0, 0},
+        {"g_thread_self", 0, 0},
+    };
+}
