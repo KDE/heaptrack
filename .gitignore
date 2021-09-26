@@ -16,6 +16,12 @@ perf.data.*
 callgrind.out.*
 .*kate-swp
 
+# IDEs/clangd
+.clangd
+.cache
+compile_commands.json
+.idea
+
 # from kdiff3
 *.BACKUP.*
 *.BASE.*
