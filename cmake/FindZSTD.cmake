@@ -1,5 +1,6 @@
 # taken from: https://github.com/facebook/folly/blob/master/CMake/FindZstd.cmake
-# should be apache 2.0, cf.: https://github.com/facebook/folly/blob/master/LICENSE
+# SPDX-FileCopyrightText: Facebook, Inc. and its affiliates.
+# SPDX-License-Identifier: Apache-2.0
 #
 # - Try to find Facebook zstd library
 # This will define
