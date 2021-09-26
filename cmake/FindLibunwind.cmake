@@ -18,7 +18,7 @@
 #   LIBUNWIND_VERSION_STRING            - version number as a string (ex: "5.0.3")
 
 #=============================================================================
-# Copyright 2014 ZBackup contributors
+# SPDX-FileCopyrightText: 2014 ZBackup contributors
 #
 # Distributed under the OSI-approved BSD License (the "License");
 # see accompanying file Copyright.txt for details.
