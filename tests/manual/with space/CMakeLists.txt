@@ -1,1 +1,1 @@
-add_executable("my binary" "my binary.cpp")
+add_executable("mybinary" "my binary.cpp")
