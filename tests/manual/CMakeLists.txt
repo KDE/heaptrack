@@ -40,4 +40,6 @@ add_executable(dlopen dlopen.cpp)
 target_compile_definitions(dlopen PRIVATE -DLIB_PATH="$<TARGET_FILE:testlib_indirect>")
 target_link_libraries(dlopen ${CMAKE_DL_LIBS})
 
-add_subdirectory("with space")
+if (NOT CMAKE_GENERATOR STREQUAL "Unix Makefiles")
+    add_subdirectory("with space")
+endif()
