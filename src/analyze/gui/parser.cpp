@@ -540,6 +540,7 @@ struct MergedHistogramColumnData
 {
     Symbol symbol;
     int64_t allocations;
+    int64_t totalAllocated;
     bool operator<(const Symbol& rhs) const
     {
         return symbol < rhs;
@@ -572,12 +573,12 @@ HistogramData buildSizeHistogram(ParserData& data, std::shared_ptr<const ResultD
     auto insertColumns = [&]() {
         sort(columnData.begin(), columnData.end(),
              [](const MergedHistogramColumnData& lhs, const MergedHistogramColumnData& rhs) {
-                 return lhs.allocations > rhs.allocations;
+                 return std::tie(lhs.allocations, lhs.totalAllocated) > std::tie(rhs.allocations, rhs.totalAllocated);
              });
         // -1 to account for total row
         for (size_t i = 0; i < min(columnData.size(), size_t(HistogramRow::NUM_COLUMNS - 1)); ++i) {
             const auto& column = columnData[i];
-            row.columns[i + 1] = {column.allocations, column.symbol};
+            row.columns[i + 1] = {column.allocations, column.totalAllocated, column.symbol};
         }
     };
     for (const auto& info : data.allocationInfoCounter) {
@@ -588,9 +589,11 @@ HistogramData buildSizeHistogram(ParserData& data, std::shared_ptr<const ResultD
             ++bucketIndex;
             row.size = buckets[bucketIndex].first;
             row.sizeLabel = buckets[bucketIndex].second;
-            row.columns[0] = {info.allocations, {}};
+            row.columns[0] = {info.allocations, static_cast<qint64>(info.info.size * info.allocations), {}};
         } else {
-            row.columns[0].allocations += info.allocations;
+            auto& column = row.columns[0];
+            column.allocations += info.allocations;
+            column.totalAllocated += info.info.size * info.allocations;
         }
         const auto& allocation = data.allocations[info.info.allocationIndex.index];
         const auto& ipIndex = data.findTrace(allocation.traceIndex).ipIndex;
@@ -598,9 +601,10 @@ HistogramData buildSizeHistogram(ParserData& data, std::shared_ptr<const ResultD
         const auto& sym = symbol(ip);
         auto it = lower_bound(columnData.begin(), columnData.end(), sym);
         if (it == columnData.end() || it->symbol != sym) {
-            columnData.insert(it, {sym, info.allocations});
+            columnData.insert(it, {sym, info.allocations, static_cast<qint64>(info.info.size * info.allocations)});
         } else {
             it->allocations += info.allocations;
+            it->totalAllocated += static_cast<qint64>(info.info.size * info.allocations);
         }
     }
     insertColumns();

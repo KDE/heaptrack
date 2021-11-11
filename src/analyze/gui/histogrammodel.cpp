@@ -62,8 +62,10 @@ QVariant HistogramModel::data(const QModelIndex& index, int role) const
         if (index.column() == 0) {
             return i18n("%1 allocations in total", column.allocations);
         }
-        return i18n("%1 allocations from %2", column.allocations,
-                    Util::toString(column.symbol, *m_data.resultData, Util::Long));
+        return i18n("%1 allocations from %2, totalling %3 allocated with an average of %4 per allocation",
+                    column.allocations, Util::toString(column.symbol, *m_data.resultData, Util::Long),
+                    Util::formatBytes(column.totalAllocated),
+                    Util::formatBytes(column.totalAllocated / column.allocations));
     }
     return column.allocations;
 }

@@ -14,6 +14,7 @@
 struct HistogramColumn
 {
     qint64 allocations;
+    qint64 totalAllocated;
     Symbol symbol;
 };
 Q_DECLARE_TYPEINFO(HistogramColumn, Q_MOVABLE_TYPE);
@@ -22,7 +23,7 @@ struct HistogramRow
 {
     HistogramRow()
     {
-        columns.fill({0, {}});
+        columns.fill({0, 0, {}});
     }
     enum
     {
