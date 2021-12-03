@@ -31,6 +31,7 @@ endif()
 
 include(FeatureSummary)
 find_package(Boost 1.60.0 ${REQUIRED_IN_APPIMAGE} COMPONENTS system filesystem iostreams container)
+set_package_properties(Boost PROPERTIES TYPE RECOMMENDED PURPOSE "Boost container libraries can greatly improve performance (via pmr allocators)")
 find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 
