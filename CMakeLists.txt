@@ -169,4 +169,8 @@ include_directories(3rdparty/robin-map/include)
 add_subdirectory(src)
 add_subdirectory(tests)
 
+# Let releaseme know about this:
+# SKIP_PO_INSTALL
+# (KF5I18n is optional in src/analyze/CMakeLists.txt...)
+
 feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
