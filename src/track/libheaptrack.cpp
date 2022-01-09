@@ -80,7 +80,7 @@ chrono::milliseconds elapsedTime()
     return chrono::duration_cast<chrono::milliseconds>(clock::now() - startTime());
 }
 
-__pid_t gettid()
+pid_t gettid()
 {
 #ifdef __linux__
     return syscall(SYS_gettid);
