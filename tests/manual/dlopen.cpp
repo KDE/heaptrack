@@ -9,6 +9,9 @@ __attribute__((weak)) extern void allocFromLib(bool leak);
 
 int main()
 {
+#ifndef RTLD_DEEPBIND
+    printf("SKIP (RTLD_DEEPBIND undefined)\n");
+#else
     fprintf(stderr, "malloc address: %p\n", dlsym(RTLD_NEXT, "malloc"));
     fprintf(stderr, "free address: %p\n", dlsym(RTLD_NEXT, "free"));
 
@@ -27,6 +30,7 @@ int main()
 
     fprintf(stderr, "malloc address: %p\n", dlsym(RTLD_NEXT, "malloc"));
     fprintf(stderr, "free address: %p\n", dlsym(RTLD_NEXT, "free"));
+#endif
 
     return 0;
 }
