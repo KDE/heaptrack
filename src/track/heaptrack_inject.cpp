@@ -17,6 +17,7 @@
 #include <unistd.h>
 
 #include <sys/mman.h>
+#include <limits.h>
 
 #include <type_traits>
 
@@ -26,10 +27,16 @@
  * @brief Experimental support for symbol overloading after runtime injection.
  */
 
+#if ULONG_MAX == 0xffffffffffffffff
+#define WORDSIZE 64
+#elif ULONG_MAX == 0xffffffff
+#define WORDSIZE 32
+#endif
+
 #ifndef ELF_R_SYM
-#if __WORDSIZE == 64
+#if WORDSIZE == 64
 #define ELF_R_SYM(i) ELF64_R_SYM(i)
-#elif __WORDSIZE == 32
+#elif WORDSIZE == 32
 #define ELF_R_SYM(i) ELF32_R_SYM(i)
 #else
 #error unsupported word size
@@ -37,9 +44,9 @@
 #endif
 
 #ifndef ElfW
-#if __WORDSIZE == 64
+#if WORDSIZE == 64
 #define ElfW(type) Elf64_##type
-#elif __WORDSIZE == 32
+#elif WORDSIZE == 32
 #define ElfW(type) Elf32_##type
 #else
 #error unsupported word size
@@ -54,7 +61,7 @@ using Dyn = ElfW(Dyn);
 using Rel = ElfW(Rel);
 using Rela = ElfW(Rela);
 using Sym = ElfW(Sym);
-#if __WORDSIZE == 64
+#if WORDSIZE == 64
 using Sxword = ElfW(Sxword);
 using Xword = ElfW(Xword);
 #else
