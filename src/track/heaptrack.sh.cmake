@@ -313,6 +313,7 @@ echo "$LIBHEAPTRACK_PRELOAD"
 if [ -z "$debug" ] && [ -z "$pid" ]; then
   echo "starting application, this might take some time..."
   LD_PRELOAD="$LIBHEAPTRACK_PRELOAD${LD_PRELOAD:+:$LD_PRELOAD}" DUMP_HEAPTRACK_OUTPUT="$pipe" "$client" "$@"
+  EXIT_CODE=$?
 else
   if [ -z "$pid" ]; then
     echo "starting application in GDB, this might take some time..."
@@ -320,6 +321,7 @@ else
         --eval-command="set environment DUMP_HEAPTRACK_OUTPUT=$pipe" \
         --eval-command="set startup-with-shell off" \
         --eval-command="run" --args "$client" "$@"
+    EXIT_CODE=$?
   else
     echo "injecting heaptrack into application via GDB, this might take some time..."
     case $(uname) in
@@ -344,10 +346,12 @@ else
             --eval-command="sharedlibrary libheaptrack_inject" \
             --eval-command="call (void) heaptrack_inject(\"$pipe\")"
     fi
+    EXIT_CODE=$?
     echo "injection finished"
   fi
 fi
 
 wait $debuggee
+exit $EXIT_CODE
 
 # kate: hl Bash
