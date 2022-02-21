@@ -181,6 +181,7 @@
       <caption xml:lang="es">Sumario de datos de asignación de memoria de almacenamiento libre rastreada</caption>
       <caption xml:lang="fr">Résumé des données d'allocation pour la mémoire dynamique surveillée.</caption>
       <caption xml:lang="it">Riepilogo dei dati delle allocazioni di memoria heap tracciati</caption>
+      <caption xml:lang="ko">추적된 힙 메모리 할당 데이터 요약</caption>
       <caption xml:lang="nl">Samenvatting van gevolgde gegevens voor heap-geheugen toewijzen</caption>
       <caption xml:lang="nn">Samandrag av minnereserveringsdata</caption>
       <caption xml:lang="pl">Podsumować śledzonych danych przydzielonych na pamięci stosu</caption>
@@ -199,6 +200,7 @@
       <caption xml:lang="es">Visualización de gráfico de llamas del número de asignaciones de memoria de almacenamiento libre</caption>
       <caption xml:lang="fr">Affichage graphe en chandelles du nombre d'allocations de mémoire dynamique.</caption>
       <caption xml:lang="it">Visualizzazione di tipo Flamegraph del totale di allocazioni di memoria heap</caption>
+      <caption xml:lang="ko">힙 메모리 할당 횟수를 플레임 그래프로 보기</caption>
       <caption xml:lang="nl">Flamegraph visualisatie van het aantal toewijzingen van heap-geheugen</caption>
       <caption xml:lang="nn">Flammegraf-visualisering av talet på minnereserveringar</caption>
       <caption xml:lang="pl">Zobrazowanie liczby przydzieleń pamięci na stosie na wykresie płomieni</caption>
@@ -217,6 +219,7 @@
       <caption xml:lang="es">Gráfico de asignaciones de memoria del almacenamiento libre a lo largo del tiempo</caption>
       <caption xml:lang="fr">Graphique des allocations de mémoire dynamique en temps réel</caption>
       <caption xml:lang="it">Grafico delle allocazioni della memoria heap nel tempo</caption>
+      <caption xml:lang="ko">시간별 힙 메모리 할당 횟수를 그래프로 보기</caption>
       <caption xml:lang="nl">Grafiek van toewijzingen van heap-geheugen in de tijd</caption>
       <caption xml:lang="nn">Diagram over minnereserveringar over tid</caption>
       <caption xml:lang="pl">Wykres przydzieleń pamięci na stosie na osi czasu</caption>
