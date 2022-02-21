@@ -244,4 +244,8 @@
     <binary>heaptrack_gui</binary>
     <binary>heaptrack_print</binary>
   </provides>
+  <releases>
+    <release version="1.3.0" date="2021-12-16"></release>
+  </releases>
+  <content_rating type="oars-1.1"/>
 </component>
