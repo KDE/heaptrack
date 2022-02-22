@@ -53,6 +53,24 @@
 #endif
 #endif
 
+// NOTE: adding noexcept to C functions is a hard error in clang++
+//       (but not even a warning in GCC, even with -Wall)
+#if defined(__GNUC__) && !defined(__clang__)
+#define LIBC_FUN_ATTRS noexcept
+#else
+#define LIBC_FUN_ATTRS
+#endif
+
+extern "C" {
+
+// Foward declare mimalloc (https://github.com/microsoft/mimalloc) functions so we don't need to include its .h.
+void* mi_malloc(size_t size) LIBC_FUN_ATTRS;
+void* mi_calloc(size_t count, size_t size) LIBC_FUN_ATTRS;
+void* mi_realloc(void* p, size_t newsize) LIBC_FUN_ATTRS;
+void  mi_free(void* p) LIBC_FUN_ATTRS;
+
+}
+
 namespace {
 
 namespace Elf {
@@ -190,6 +208,58 @@ struct posix_memalign
     }
 };
 
+// mimalloc functions
+struct mi_malloc
+{
+    static constexpr auto name = "mi_malloc";
+    static constexpr auto original = &::mi_malloc;
+
+    static void* hook(size_t size) noexcept
+    {
+        auto ptr = original(size);
+        heaptrack_malloc(ptr, size);
+        return ptr;
+    }
+};
+
+struct mi_free
+{
+    static constexpr auto name = "mi_free";
+    static constexpr auto original = &::mi_free;
+
+    static void hook(void* ptr) noexcept
+    {
+        heaptrack_free(ptr);
+        original(ptr);
+    }
+};
+
+struct mi_realloc
+{
+    static constexpr auto name = "mi_realloc";
+    static constexpr auto original = &::mi_realloc;
+
+    static void* hook(void* ptr, size_t size) noexcept
+    {
+        auto ret = original(ptr, size);
+        heaptrack_realloc(ptr, size, ret);
+        return ret;
+    }
+};
+
+struct mi_calloc
+{
+    static constexpr auto name = "mi_calloc";
+    static constexpr auto original = &::mi_calloc;
+
+    static void* hook(size_t num, size_t size) noexcept
+    {
+        auto ptr = original(num, size);
+        heaptrack_malloc(ptr, num * size);
+        return ptr;
+    }
+};
+
 template <typename Hook>
 bool hook(const char* symname, Elf::Addr addr, bool restore)
 {
@@ -227,7 +297,10 @@ void apply(const char* symname, Elf::Addr addr, bool restore)
         || hook<cfree>(symname, addr, restore)
 #endif
         || hook<posix_memalign>(symname, addr, restore) || hook<dlopen>(symname, addr, restore)
-        || hook<dlclose>(symname, addr, restore);
+        || hook<dlclose>(symname, addr, restore)
+        // mimalloc functions
+        || hook<mi_malloc>(symname, addr, restore) || hook<mi_free>(symname, addr, restore) || hook<mi_realloc>(symname, addr, restore)
+        || hook<mi_calloc>(symname, addr, restore);
 }
 }
 
