@@ -24,6 +24,24 @@ using namespace std;
 #define HAVE_ALIGNED_ALLOC 0
 #endif
 
+// NOTE: adding noexcept to C functions is a hard error in clang++
+//       (but not even a warning in GCC, even with -Wall)
+#if defined(__GNUC__) && !defined(__clang__)
+#define LIBC_FUN_ATTRS noexcept
+#else
+#define LIBC_FUN_ATTRS
+#endif
+
+extern "C" {
+
+// Foward declare mimalloc (https://github.com/microsoft/mimalloc) functions so we don't need to include its .h.
+void* mi_malloc(size_t size) LIBC_FUN_ATTRS;
+void* mi_calloc(size_t count, size_t size) LIBC_FUN_ATTRS;
+void* mi_realloc(void* p, size_t newsize) LIBC_FUN_ATTRS;
+void  mi_free(void* p) LIBC_FUN_ATTRS;
+
+}
+
 namespace {
 
 namespace hooks {
@@ -80,6 +98,12 @@ HOOK(aligned_alloc);
 #endif
 HOOK(dlopen);
 HOOK(dlclose);
+
+// mimalloc functions
+HOOK(mi_malloc);
+HOOK(mi_calloc);
+HOOK(mi_realloc);
+HOOK(mi_free);
 
 #pragma GCC diagnostic pop
 #undef HOOK
@@ -152,6 +176,12 @@ void init()
                        hooks::aligned_alloc.init();
 #endif
 
+                       // mimalloc functions
+                       hooks::mi_malloc.init();
+                       hooks::mi_calloc.init();
+                       hooks::mi_realloc.init();
+                       hooks::mi_free.init();
+
                        // cleanup environment to prevent tracing of child apps
                        unsetenv("LD_PRELOAD");
                        unsetenv("DUMP_HEAPTRACK_OUTPUT");
@@ -164,14 +194,6 @@ void init()
 extern "C" {
 
 /// TODO: memalign, pvalloc, ...?
-
-// NOTE: adding noexcept to C functions is a hard error in clang++
-//       (but not even a warning in GCC, even with -Wall)
-#if defined(__GNUC__) && !defined(__clang__)
-#define LIBC_FUN_ATTRS noexcept
-#else
-#define LIBC_FUN_ATTRS
-#endif
 
 void* malloc(size_t size) LIBC_FUN_ATTRS
 {
@@ -339,5 +361,65 @@ int dlclose(void* handle) LIBC_FUN_ATTRS
     }
 
     return ret;
+}
+
+// mimalloc functions, implementations just copied from above and names changed
+void* mi_malloc(size_t size) LIBC_FUN_ATTRS
+{
+    if (!hooks::mi_malloc) {
+        hooks::init();
+    }
+
+    void* ptr = hooks::mi_malloc(size);
+    heaptrack_malloc(ptr, size);
+    return ptr;
+}
+
+void* mi_realloc(void* ptr, size_t size) LIBC_FUN_ATTRS
+{
+    if (!hooks::mi_realloc) {
+        hooks::init();
+    }
+
+    void* ret = hooks::mi_realloc(ptr, size);
+
+    if (ret) {
+        heaptrack_realloc(ptr, size, ret);
+    }
+
+    return ret;
+}
+
+void* mi_calloc(size_t num, size_t size) LIBC_FUN_ATTRS
+{
+    if (!hooks::mi_calloc) {
+        hooks::init();
+    }
+
+    void* ret = hooks::mi_calloc(num, size);
+
+    if (ret) {
+        heaptrack_malloc(ret, num * size);
+    }
+
+    return ret;
+}
+
+void mi_free(void* ptr) LIBC_FUN_ATTRS
+{
+    if (!hooks::mi_free) {
+        hooks::init();
+    }
+
+    if (hooks::dummyPool().isDummyAllocation(ptr)) {
+        return;
+    }
+
+    // call handler before handing over the real free implementation
+    // to ensure the ptr is not reused in-between and thus the output
+    // stays consistent
+    heaptrack_free(ptr);
+
+    hooks::mi_free(ptr);
 }
 }
