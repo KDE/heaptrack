@@ -65,7 +65,7 @@
     <p xml:lang="es">Heaptrack rastrea todas las asignaciones de memoria y anota estos eventos con trazas de la pila para poder usar herramientas de dedicadas que le permitan interpretar el análisis de rendimiento de la memoria de almacenamiento libre para:</p>
     <p xml:lang="fr">Le logiciel « Heaptrack » permet le suivi des allocations de mémoire. Il annote les demandes par des traces dans la pile. Des outils dédiés d'analyse vous permettent ensuite d'interpréter le profil de la mémoire dynamique pour :</p>
     <p xml:lang="gl">Heaptrack fai un seguimento de todas as asociacións de memoria e apunta os eventos co historial da rima. Logo pode usar ferramentas de análise para interpretar os datos de uso da memoria dinámica (heap) para:</p>
-    <p xml:lang="id">Heaptrack melacak semua alokasi memori dan membubuhi keterangan peristiwa ini dengan jejak tumpukan. Alat analisis khusus kemudian memungkinkan kamu untuk menginterpretasikan profil memori tumpukan untuk:</p>
+    <p xml:lang="id">Heaptrack melacak semua alokasi memori dan membubuhi keterangan peristiwa ini dengan jejak tumpukan. Alat analisis khusus kemudian memungkinkan Anda untuk menginterpretasikan profil memori tumpukan untuk:</p>
     <p xml:lang="it">Heaptrack traccia tutte le allocazioni di memoria e le annota con tracciati dello stack. Degli strumenti dedicati di analisi ti permettono quindi di interpretare il profilo della memoria heap in modo da:</p>
     <p xml:lang="ko">힙 추적은 모든 메모리 할당을 추적하고 스택 추적과 메모리 할당을 연결합니다. 분석 도구를 사용하여 힙 메모리 프로필을 해석할 수 있습니다:</p>
     <p xml:lang="nl">Heaptrack traceert alle toewijzingen van geheugen en annoteert deze gebeurtenissen met stacktraces. Specifieke hulpmiddelen voor analyse bieden u de mogelijkheid om het geheugenprofiel van de heap te interpreteren:</p>
@@ -88,7 +88,7 @@
       <li xml:lang="es">encontrar cuellos de botella que es necesario optimizar para reducir el impacto de su aplicación en la memoria</li>
       <li xml:lang="fr">trouver les zones principales de code à améliorer pour réduire l'empreinte mémoire de votre application</li>
       <li xml:lang="gl">Atopar puntos quentes que cómpre optimizar para reducir o consumo de memoria da aplicación</li>
-      <li xml:lang="id">menemukan hotspot yang perlu dioptimalkan untuk mengurangi jejak memori aplikasimu</li>
+      <li xml:lang="id">menemukan hotspot yang perlu dioptimalkan untuk mengurangi jejak memori aplikasi Anda</li>
       <li xml:lang="it">trovare gli «hotspot» che devono essere ottimizzati per ridurre il consumo di memoria della tua applicazione</li>
       <li xml:lang="ko">프로그램의 메모리 사용량을 줄일 때 필요한 핫스팟(최적화해야 할 지점) 확인</li>
       <li xml:lang="nl">zoek hotspots die het nodig hebben om geoptimaliseerd te worden om de voetafdruk van het geheugen van uw toepassing te verminderen</li>
