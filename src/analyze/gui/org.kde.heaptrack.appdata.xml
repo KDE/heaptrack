@@ -180,6 +180,7 @@
       <caption xml:lang="en-GB">Summary of tracked heap memory allocation data</caption>
       <caption xml:lang="es">Sumario de datos de asignación de memoria de almacenamiento libre rastreada</caption>
       <caption xml:lang="fr">Résumé des données d'allocation pour la mémoire dynamique surveillée.</caption>
+      <caption xml:lang="id">Ringkasan data alokasi memori tumpukan yang terlacak</caption>
       <caption xml:lang="it">Riepilogo dei dati delle allocazioni di memoria heap tracciati</caption>
       <caption xml:lang="ko">추적된 힙 메모리 할당 데이터 요약</caption>
       <caption xml:lang="nl">Samenvatting van gevolgde gegevens voor heap-geheugen toewijzen</caption>
@@ -199,6 +200,7 @@
       <caption xml:lang="en-GB">Flamegraph visualisation of number of heap memory allocations</caption>
       <caption xml:lang="es">Visualización de gráfico de llamas del número de asignaciones de memoria de almacenamiento libre</caption>
       <caption xml:lang="fr">Affichage graphe en chandelles du nombre d'allocations de mémoire dynamique.</caption>
+      <caption xml:lang="id">Visualisasi Flamegraph dari jumlah alokasi memori tumpukan</caption>
       <caption xml:lang="it">Visualizzazione di tipo Flamegraph del totale di allocazioni di memoria heap</caption>
       <caption xml:lang="ko">힙 메모리 할당 횟수를 플레임 그래프로 보기</caption>
       <caption xml:lang="nl">Flamegraph visualisatie van het aantal toewijzingen van heap-geheugen</caption>
@@ -218,6 +220,7 @@
       <caption xml:lang="en-GB">Chart of heap memory allocations over time</caption>
       <caption xml:lang="es">Gráfico de asignaciones de memoria del almacenamiento libre a lo largo del tiempo</caption>
       <caption xml:lang="fr">Graphique des allocations de mémoire dynamique en temps réel</caption>
+      <caption xml:lang="id">Bagan alokasi memori tumpukan dari waktu ke waktu</caption>
       <caption xml:lang="it">Grafico delle allocazioni della memoria heap nel tempo</caption>
       <caption xml:lang="ko">시간별 힙 메모리 할당 횟수를 그래프로 보기</caption>
       <caption xml:lang="nl">Grafiek van toewijzingen van heap-geheugen in de tijd</caption>
