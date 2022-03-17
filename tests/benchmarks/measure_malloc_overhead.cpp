@@ -16,10 +16,10 @@ int main()
 {
     const auto log2_max = 17;
     const auto max_steps = log2_max * 2 + 1;
-    unsigned int cost[max_steps];
+    size_t cost[max_steps];
     int sizes[max_steps];
 
-    const auto baseline = mallinfo().uordblks;
+    const auto baseline = mallinfo2().uordblks;
 
     for (int i = 1; i < max_steps; ++i) {
         int size = 1 << i / 2;
@@ -29,7 +29,7 @@ int main()
         sizes[i] = size;
         auto ptr = malloc(size);
         escape(ptr); // prevent the compiler from optimizing the malloc away
-        cost[i] = mallinfo().uordblks;
+        cost[i] = mallinfo2().uordblks;
         free(ptr);
     }
 

@@ -23,21 +23,21 @@ void benchPointers()
     constexpr uint32_t NUM_POINTERS = 10000000;
     {
         std::vector<uint64_t> pointers(NUM_POINTERS);
-        const auto baseline = mallinfo().uordblks;
+        const auto baseline = mallinfo2().uordblks;
         std::cerr << "allocated vector:        \t" << baseline << std::endl;
         for (uint32_t i = 0; i < NUM_POINTERS; ++i) {
             pointers[i] = reinterpret_cast<uint64_t>(malloc(1));
         }
-        const auto allocated = (mallinfo().uordblks - baseline);
+        const auto allocated = (mallinfo2().uordblks - baseline);
         std::cerr << "allocated input pointers:\t" << allocated << std::endl;
         for (auto ptr : pointers) {
             free(reinterpret_cast<void*>(ptr));
         }
-        std::cerr << "freed input pointers:    \t" << (mallinfo().uordblks - baseline) << std::endl;
+        std::cerr << "freed input pointers:    \t" << (mallinfo2().uordblks - baseline) << std::endl;
         srand(0);
         std::random_shuffle(pointers.begin(), pointers.end());
         malloc_trim(0);
-        std::cerr << "begin actual benchmark:  \t" << (mallinfo().uordblks - baseline) << std::endl;
+        std::cerr << "begin actual benchmark:  \t" << (mallinfo2().uordblks - baseline) << std::endl;
 
         {
             Map map;
@@ -47,7 +47,7 @@ void benchPointers()
                 map.addPointer(ptr, index);
             }
 
-            const auto added = mallinfo().uordblks - baseline;
+            const auto added = mallinfo2().uordblks - baseline;
             std::cerr << "pointers added:          \t" << added << " (" << (float(added) * 100.f / allocated)
                       << "% overhead)" << std::endl;
 
@@ -61,9 +61,9 @@ void benchPointers()
                 }
             }
 
-            std::cerr << "pointers removed:        \t" << mallinfo().uordblks << std::endl;
+            std::cerr << "pointers removed:        \t" << mallinfo2().uordblks << std::endl;
             malloc_trim(0);
-            std::cerr << "trimmed:                 \t" << mallinfo().uordblks << std::endl;
+            std::cerr << "trimmed:                 \t" << mallinfo2().uordblks << std::endl;
         }
     }
     if (matches != NUM_POINTERS) {

@@ -6,7 +6,7 @@ include_directories(
 include (CheckCXXSourceCompiles)
 check_cxx_source_compiles(
     "#include <malloc.h>
-    int main() { return mallinfo().uordblks > 0; }"
+    int main() { return mallinfo2().uordblks > 0; }"
     HAVE_MALLOC_H)
 
 if (HAVE_MALLOC_H)
