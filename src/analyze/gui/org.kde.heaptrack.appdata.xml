@@ -57,7 +57,7 @@
       Heaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:
     </p>
     <p xml:lang="ca">El «heaptrack» rastreja totes les assignacions de memòria i anota aquests esdeveniments amb seguiments de pila. Les eines d'anàlisi dedicades que hi ha a continuació, us permetran interpretar el perfil de memòria en monticles:</p>
-    <p xml:lang="ca-valencia">El «heaptrack» rastreja totes les assignacions de memòria i anota aquests esdeveniments amb seguiments de pila. Les eines d'anàlisi dedicades que hi ha a continuació, vos permetran interpretar el perfil de memòria en monticles:</p>
+    <p xml:lang="ca-valencia">El «heaptrack» rastreja totes les assignacions de memòria i anota estos esdeveniments amb seguiments de pila. Les eines d'anàlisi dedicades que hi ha a continuació, vos permetran interpretar el perfil de memòria en monticles:</p>
     <p xml:lang="da">Heaptrack sporer alle hukommelsesallokeringer og anmærker begivenhederne med stakspor. Dedikerede analyseværktøjer som giver dig mulighed for at fortolke heapens hukommelsesprofil til:</p>
     <p xml:lang="en-GB">Heaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:</p>
     <p xml:lang="es">Heaptrack rastrea todas las asignaciones de memoria y anota estos eventos con trazas de la pila para poder usar herramientas de dedicadas que le permitan interpretar el análisis de rendimiento de la memoria de almacenamiento libre para:</p>
