@@ -46,7 +46,13 @@ namespace {
 
 namespace hooks {
 
-template <typename Signature, typename Base>
+enum class HookType
+{
+    Required,
+    Optional
+};
+
+template <typename Signature, typename Base, HookType Type>
 struct hook
 {
     Signature original = nullptr;
@@ -54,7 +60,10 @@ struct hook
     void init() noexcept
     {
         auto ret = dlsym(RTLD_NEXT, Base::identifier);
-        if (!ret && strstr(Base::identifier, "mi_") != Base::identifier) {
+        if (!ret && Type == HookType::Optional) {
+            return;
+        }
+        if (!ret) {
             fprintf(stderr, "Could not find original function %s\n", Base::identifier);
             abort();
         }
@@ -73,8 +82,8 @@ struct hook
     }
 };
 
-#define HOOK(name)                                                                                                     \
-    struct name##_t : public hook<decltype(&::name), name##_t>                                                         \
+#define HOOK(name, type)                                                                                               \
+    struct name##_t : public hook<decltype(&::name), name##_t, type>                                                   \
     {                                                                                                                  \
         static constexpr const char* identifier = #name;                                                               \
     } name
@@ -82,28 +91,28 @@ struct hook
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wignored-attributes"
 
-HOOK(malloc);
-HOOK(free);
-HOOK(calloc);
+HOOK(malloc, HookType::Required);
+HOOK(free, HookType::Required);
+HOOK(calloc, HookType::Required);
 #if HAVE_CFREE
-HOOK(cfree);
+HOOK(cfree, HookType::Optional);
 #endif
-HOOK(realloc);
-HOOK(posix_memalign);
+HOOK(realloc, HookType::Required);
+HOOK(posix_memalign, HookType::Optional);
 #if HAVE_VALLOC
-HOOK(valloc);
+HOOK(valloc, HookType::Optional);
 #endif
 #if HAVE_ALIGNED_ALLOC
-HOOK(aligned_alloc);
+HOOK(aligned_alloc, HookType::Optional);
 #endif
-HOOK(dlopen);
-HOOK(dlclose);
+HOOK(dlopen, HookType::Required);
+HOOK(dlclose, HookType::Required);
 
 // mimalloc functions
-HOOK(mi_malloc);
-HOOK(mi_calloc);
-HOOK(mi_realloc);
-HOOK(mi_free);
+HOOK(mi_malloc, HookType::Optional);
+HOOK(mi_calloc, HookType::Optional);
+HOOK(mi_realloc, HookType::Optional);
+HOOK(mi_free, HookType::Optional);
 
 #pragma GCC diagnostic pop
 #undef HOOK
