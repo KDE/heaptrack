@@ -64,10 +64,10 @@
 extern "C" {
 
 // Foward declare mimalloc (https://github.com/microsoft/mimalloc) functions so we don't need to include its .h.
-void* mi_malloc(size_t size) LIBC_FUN_ATTRS;
-void* mi_calloc(size_t count, size_t size) LIBC_FUN_ATTRS;
-void* mi_realloc(void* p, size_t newsize) LIBC_FUN_ATTRS;
-void  mi_free(void* p) LIBC_FUN_ATTRS;
+__attribute__((weak)) void* mi_malloc(size_t size) LIBC_FUN_ATTRS;
+__attribute__((weak)) void* mi_calloc(size_t count, size_t size) LIBC_FUN_ATTRS;
+__attribute__((weak)) void* mi_realloc(void* p, size_t newsize) LIBC_FUN_ATTRS;
+__attribute__((weak)) void  mi_free(void* p) LIBC_FUN_ATTRS;
 
 }
 
