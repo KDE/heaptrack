@@ -3,10 +3,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-extern "C" {
-__attribute__((weak)) extern void allocFromLib(bool leak);
-}
-
 int main()
 {
 #ifndef RTLD_DEEPBIND
@@ -24,6 +20,12 @@ int main()
     if (!handle) {
         fprintf(stderr, "dlopen error loading %s: %s\n", LIB_PATH, dlerror());
         return 1;
+    }
+
+    auto allocFromLib = reinterpret_cast<void (*)(bool)>(dlsym(RTLD_NEXT, "allocFromLib"));
+    if (!allocFromLib) {
+        fprintf(stderr, "allocFromLib not resolved: %s\n", dlerror());
+        return 2;
     }
 
     allocFromLib(false);
