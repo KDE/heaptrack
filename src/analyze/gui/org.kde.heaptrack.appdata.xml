@@ -187,6 +187,7 @@
       <caption xml:lang="nn">Samandrag av minnereserveringsdata</caption>
       <caption xml:lang="pl">Podsumować śledzonych danych przydzielonych na pamięci stosu</caption>
       <caption xml:lang="pt-BR">Resumo dos dados rastreados de alocação de memória de dados</caption>
+      <caption xml:lang="sk">Sumár alokačných údajov sledovanej pamäťovej haldy.</caption>
       <caption xml:lang="sl">Povzetek podatkov o dodelitvi pomnilnika v kopici</caption>
       <caption xml:lang="sv">Sammanfattning av spårad heap-minnestilldelningsdata</caption>
       <caption xml:lang="uk">Резюме щодо стеження за розміщенням даних у «купі» пам'яті</caption>
@@ -207,6 +208,7 @@
       <caption xml:lang="nn">Flammegraf-visualisering av talet på minnereserveringar</caption>
       <caption xml:lang="pl">Zobrazowanie liczby przydzieleń pamięci na stosie na wykresie płomieni</caption>
       <caption xml:lang="pt-BR">Visualização em gráfico de chamas do número de alocações de memória de dados</caption>
+      <caption xml:lang="sk">Plameňový graf vizualizácie počtu alokácií pamäťovej hromady.</caption>
       <caption xml:lang="sl">Grafična vizualizacija števila dodelitev pomnilnika v kopici</caption>
       <caption xml:lang="sv">Visualisering av antal heap-minnestilldelningar med Flamegraph</caption>
       <caption xml:lang="uk">Інтерактивна гістограма кількості розміщень у «купі» пам'яті</caption>
@@ -227,6 +229,7 @@
       <caption xml:lang="nn">Diagram over minnereserveringar over tid</caption>
       <caption xml:lang="pl">Wykres przydzieleń pamięci na stosie na osi czasu</caption>
       <caption xml:lang="pt-BR">Gráfico das alocações de memória de dado no período de tempo</caption>
+      <caption xml:lang="sk">Graf alokácií pamäťovej hromady v čase.</caption>
       <caption xml:lang="sl">Graf dodelitev pomnilnika za kopico skozi čas</caption>
       <caption xml:lang="sv">Diagram över heap-minnestilldelningar över tiden</caption>
       <caption xml:lang="uk">Діаграма розміщення даних у «купі» пам'яті за часом</caption>
