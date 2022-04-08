@@ -277,7 +277,7 @@ cleanup() {
         echo "removing heaptrack injection via GDB, this might take some time..."
         gdb --batch-silent -n -iex="set auto-solib-add off" -p $pid \
             --eval-command="sharedlibrary libheaptrack_inject" \
-            --eval-command="call heaptrack_stop()" \
+            --eval-command="call (void) heaptrack_stop()" \
             --eval-command="detach"
         # NOTE: we do not call dlclose here, as that has the tendency to trigger
         #       crashes in the debuggee. So instead, we keep heaptrack loaded.
