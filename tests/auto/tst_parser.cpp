@@ -234,7 +234,10 @@ TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst without suppressions"
 TEST_CASE ("heaptrack.heaptrack_gui.99454.zst", "[parser]") {
     TestParser parser;
 
-    parser.parser.parse(SRC_DIR "/heaptrack.heaptrack_gui.99454.zst", QString(), {});
+    FilterParameters params;
+    params.disableBuiltinSuppressions = true;
+
+    parser.parser.parse(SRC_DIR "/heaptrack.heaptrack_gui.99454.zst", QString(), params);
 
     const auto summary = parser.awaitSummary();
     REQUIRE(summary.debuggee == "heaptrack_gui heaptrack.trest_c.78689.zst");
@@ -262,7 +265,10 @@ TEST_CASE ("heaptrack.heaptrack_gui.99454.zst", "[parser]") {
 TEST_CASE ("heaptrack.heaptrack_gui.99529.zst", "[parser]") {
     TestParser parser;
 
-    parser.parser.parse(SRC_DIR "/heaptrack.heaptrack_gui.99529.zst", QString(), {});
+    FilterParameters params;
+    params.disableBuiltinSuppressions = true;
+
+    parser.parser.parse(SRC_DIR "/heaptrack.heaptrack_gui.99529.zst", QString(), params);
 
     const auto summary = parser.awaitSummary();
     REQUIRE(summary.debuggee == "heaptrack_gui heaptrack.test_c.78689.zst");
