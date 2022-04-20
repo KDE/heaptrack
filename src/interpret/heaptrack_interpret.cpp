@@ -479,6 +479,26 @@ void exitHandler()
 
 int main(int /*argc*/, char** /*argv*/)
 {
+    [] {
+        // NOTE: we disable debuginfod by default as it can otherwise lead to
+        //       nasty delays otherwise which are highly unexpected to users
+        //       if desired, they can opt in to that via
+        //
+        //       export HEAPTRACK_ENABLE_DEBUGINFOD=1
+        if (!getenv("DEBUGINFOD_URLS")) {
+            return;
+        }
+
+        auto enable = getenv("HEAPTRACK_ENABLE_DEBUGINFOD");
+        if (!enable || !atoi(enable)) {
+            fprintf(stderr,
+                    "NOTE: heaptrack detected DEBUGINFOD_URLS but will disable it to prevent \n"
+                    "unintended network delays during recording\n"
+                    "If you really want to use DEBUGINFOD, export HEAPTRACK_ENABLE_DEBUGINFOD=1\n");
+            unsetenv("DEBUGINFOD_URLS");
+        }
+    }();
+
     // optimize: we only have a single thread
     ios_base::sync_with_stdio(false);
 #ifdef __linux__
