@@ -362,11 +362,20 @@ void try_overwrite_elftable(const Table& jumps, const elf_string_table& strings,
     const auto rela_end = jumps.end(tableOffset);
 
     const auto sym_start = symbols.start(tableOffset);
+    // we have no total size of the symbol table, so we cannot test that for validity
+
     const auto str_start = strings.start(tableOffset);
+    const auto str_end = strings.end(tableOffset);
+    const auto num_str = static_cast<uintptr_t>(str_end - str_start);
 
     for (auto rela = rela_start; rela < rela_end; rela++) {
-        const auto index = ELF_R_SYM(rela->r_info);
-        const char* symname = str_start + sym_start[index].st_name;
+        const auto sym_index = ELF_R_SYM(rela->r_info);
+        const auto str_index = sym_start[sym_index].st_name;
+        if (str_index < 0 || str_index >= num_str)
+            continue;
+
+        const char* symname = str_start + str_index;
+
         auto addr = rela->r_offset + base;
         hooks::apply(symname, addr, restore);
     }
