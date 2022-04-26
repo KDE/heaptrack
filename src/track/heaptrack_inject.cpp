@@ -333,7 +333,7 @@ using elf_string_table = elftable<const char, DT_STRTAB, DT_STRSZ>;
 using elf_rel_table = elftable<Elf::Rel, DT_REL, DT_RELSZ>;
 using elf_rela_table = elftable<Elf::Rela, DT_RELA, DT_RELASZ>;
 using elf_jmprel_table = elftable<Elf::Rela, DT_JMPREL, DT_PLTRELSZ>;
-using elf_symbol_table = elftable<Elf::Sym, DT_SYMTAB, DT_SYMENT>;
+using elf_symbol_table = elftable<const Elf::Sym, DT_SYMTAB, DT_SYMENT>;
 
 template <typename Table>
 void try_overwrite_elftable(const Table& jumps, const elf_string_table& strings, const elf_symbol_table& symbols,
@@ -349,7 +349,7 @@ void try_overwrite_elftable(const Table& jumps, const elf_string_table& strings,
 #endif
     const auto rela_start = reinterpret_cast<typename Table::type*>(reinterpret_cast<char*>(jumps.table) + elf_base);
     const auto rela_end = reinterpret_cast<typename Table::type*>(reinterpret_cast<char*>(jumps.table) + jumps.size + elf_base);
-    const auto sym_start = reinterpret_cast<Elf::Sym*>(reinterpret_cast<char*>(symbols.table) + elf_base);
+    const auto sym_start = reinterpret_cast<const Elf::Sym*>(reinterpret_cast<const char*>(symbols.table) + elf_base);
     const auto str_start = reinterpret_cast<const char*>(strings.table) + elf_base;
     for (auto rela = rela_start; rela < rela_end; rela++) {
         const auto index = ELF_R_SYM(rela->r_info);
