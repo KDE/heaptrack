@@ -322,6 +322,11 @@ struct elftable
         }
         return false;
     }
+
+    explicit operator bool() const noexcept
+    {
+        return table && size;
+    }
 };
 
 using elf_string_table = elftable<const char, DT_STRTAB, DT_STRSZ>;
@@ -367,10 +372,22 @@ void try_overwrite_symbols(const Elf::Dyn* dyn, const Elf::Addr base, const bool
         symbols.consume(dyn) || strings.consume(dyn) || rels.consume(dyn) || relas.consume(dyn) || jmprels.consume(dyn);
     }
 
+    if (!symbols || !strings) {
+        return;
+    }
+
     // find symbols to overwrite
-    try_overwrite_elftable(rels, strings, symbols, base, restore);
-    try_overwrite_elftable(relas, strings, symbols, base, restore);
-    try_overwrite_elftable(jmprels, strings, symbols, base, restore);
+    if (rels) {
+        try_overwrite_elftable(rels, strings, symbols, base, restore);
+    }
+
+    if (relas) {
+        try_overwrite_elftable(relas, strings, symbols, base, restore);
+    }
+
+    if (jmprels) {
+        try_overwrite_elftable(jmprels, strings, symbols, base, restore);
+    }
 }
 
 int iterate_phdrs(dl_phdr_info* info, size_t /*size*/, void* data) noexcept
