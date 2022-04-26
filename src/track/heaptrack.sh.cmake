@@ -333,6 +333,7 @@ else
         ;;
     esac
     if [ -z "$debug" ]; then
+        unset DEBUGINFOD_URLS
         gdb --batch-silent -n -iex="set auto-solib-add off" -p $pid \
             --eval-command="sharedlibrary libc.so" \
             --eval-command="call (void) '$dlopen'(\"$LIBHEAPTRACK_INJECT\", 0x80000000 | 0x002)" \
