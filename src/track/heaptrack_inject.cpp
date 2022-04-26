@@ -308,13 +308,13 @@ template <typename T, Elf::Sxword AddrTag, Elf::Sxword SizeTag>
 struct elftable
 {
     using type = T;
-    T* table = nullptr;
-    Elf::Xword size = {};
+    Elf::Addr table = 0;
+    Elf::Xword size = 0;
 
     bool consume(const Elf::Dyn* dyn) noexcept
     {
         if (dyn->d_tag == AddrTag) {
-            table = reinterpret_cast<T*>(dyn->d_un.d_ptr);
+            table = dyn->d_un.d_ptr;
             return true;
         } else if (dyn->d_tag == SizeTag) {
             size = dyn->d_un.d_val;
@@ -326,6 +326,16 @@ struct elftable
     explicit operator bool() const noexcept
     {
         return table && size;
+    }
+
+    T* start(Elf::Addr tableOffset) const noexcept
+    {
+        return reinterpret_cast<T*>(table + tableOffset);
+    }
+
+    T* end(Elf::Addr tableOffset) const noexcept
+    {
+        return reinterpret_cast<T*>(table + tableOffset + size);
     }
 };
 
@@ -339,7 +349,7 @@ template <typename Table>
 void try_overwrite_elftable(const Table& jumps, const elf_string_table& strings, const elf_symbol_table& symbols,
                             const Elf::Addr base, const bool restore) noexcept
 {
-    const auto elf_base =
+    Elf::Addr tableOffset =
 #ifdef __linux__
         0; // Already has memory addresses
 #elif defined(__FreeBSD__)
@@ -347,10 +357,13 @@ void try_overwrite_elftable(const Table& jumps, const elf_string_table& strings,
 #else
 #error port me
 #endif
-    const auto rela_start = reinterpret_cast<typename Table::type*>(reinterpret_cast<char*>(jumps.table) + elf_base);
-    const auto rela_end = reinterpret_cast<typename Table::type*>(reinterpret_cast<char*>(jumps.table) + jumps.size + elf_base);
-    const auto sym_start = reinterpret_cast<const Elf::Sym*>(reinterpret_cast<const char*>(symbols.table) + elf_base);
-    const auto str_start = reinterpret_cast<const char*>(strings.table) + elf_base;
+
+    const auto rela_start = jumps.start(tableOffset);
+    const auto rela_end = jumps.end(tableOffset);
+
+    const auto sym_start = symbols.start(tableOffset);
+    const auto str_start = strings.start(tableOffset);
+
     for (auto rela = rela_start; rela < rela_end; rela++) {
         const auto index = ELF_R_SYM(rela->r_info);
         const char* symname = str_start + sym_start[index].st_name;
