@@ -5,6 +5,7 @@
 */
 
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #ifdef __cplusplus
@@ -31,6 +32,7 @@ void heaptrack_malloc(void* ptr, size_t size);
 void heaptrack_free(void* ptr);
 
 void heaptrack_realloc(void* ptr_in, size_t size, void* ptr_out);
+void heaptrack_realloc2(uintptr_t ptr_in, size_t size, uintptr_t ptr_out);
 
 void heaptrack_invalidate_module_cache();
 

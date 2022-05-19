@@ -776,6 +776,24 @@ HeapTrack::LockedData* HeapTrack::s_data{nullptr};
 std::atomic<bool> HeapTrack::s_paused{false};
 }
 
+static void heaptrack_realloc_impl(void* ptr_in, size_t size, void* ptr_out)
+{
+    if (!HeapTrack::isPaused() && ptr_out && !RecursionGuard::isActive) {
+        RecursionGuard guard;
+
+        debugLog<VeryVerboseOutput>("heaptrack_realloc(%p, %zu, %p)", ptr_in, size, ptr_out);
+
+        Trace trace;
+        trace.fill(2 + HEAPTRACK_DEBUG_BUILD * 3);
+
+        HeapTrack heaptrack(guard);
+        if (ptr_in) {
+            heaptrack.handleFree(ptr_in);
+        }
+        heaptrack.handleMalloc(ptr_out, size, trace);
+    }
+}
+
 extern "C" {
 
 void heaptrack_init(const char* outputFileName, heaptrack_callback_t initBeforeCallback,
@@ -845,20 +863,12 @@ void heaptrack_free(void* ptr)
 
 void heaptrack_realloc(void* ptr_in, size_t size, void* ptr_out)
 {
-    if (!HeapTrack::isPaused() && ptr_out && !RecursionGuard::isActive) {
-        RecursionGuard guard;
+    heaptrack_realloc_impl(ptr_in, size, ptr_out);
+}
 
-        debugLog<VeryVerboseOutput>("heaptrack_realloc(%p, %zu, %p)", ptr_in, size, ptr_out);
-
-        Trace trace;
-        trace.fill(2 + HEAPTRACK_DEBUG_BUILD * 2);
-
-        HeapTrack heaptrack(guard);
-        if (ptr_in) {
-            heaptrack.handleFree(ptr_in);
-        }
-        heaptrack.handleMalloc(ptr_out, size, trace);
-    }
+void heaptrack_realloc2(uintptr_t ptr_in, size_t size, uintptr_t ptr_out)
+{
+    heaptrack_realloc_impl(reinterpret_cast<void*>(ptr_in), size, reinterpret_cast<void*>(ptr_out));
 }
 
 void heaptrack_invalidate_module_cache()

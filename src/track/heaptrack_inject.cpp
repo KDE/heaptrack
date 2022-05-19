@@ -129,8 +129,10 @@ struct realloc
 
     static void* hook(void* ptr, size_t size) noexcept
     {
+        auto inPtr = reinterpret_cast<uintptr_t>(ptr);
         auto ret = original(ptr, size);
-        heaptrack_realloc(ptr, size, ret);
+        heaptrack_realloc2(inPtr, size, reinterpret_cast<uintptr_t>(ret));
+
         return ret;
     }
 };
