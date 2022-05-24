@@ -22,6 +22,17 @@ endif()
 
 set_property(TARGET heaptrack_unwind PROPERTY POSITION_INDEPENDENT_CODE ON)
 
+# heaptrack_env: runtime environment tests
+add_executable(heaptrack_env heaptrack_env.cpp)
+
+install(TARGETS heaptrack_env
+    RUNTIME DESTINATION ${LIBEXEC_INSTALL_DIR}
+)
+
+set_target_properties(heaptrack_env PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${LIBEXEC_INSTALL_DIR}"
+)
+
 # heaptrack_preload: track a newly started process
 add_library(heaptrack_preload MODULE
     heaptrack_preload.cpp

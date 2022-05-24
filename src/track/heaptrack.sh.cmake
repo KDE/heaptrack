@@ -201,6 +201,13 @@ fi
 LIB_REL_PATH="@LIB_REL_PATH@"
 LIBEXEC_REL_PATH="@LIBEXEC_REL_PATH@"
 
+ENVCHECKER="$EXE_PATH/$LIBEXEC_REL_PATH/heaptrack_env"
+if [ ! -f "$ENVCHECKER" ]; then
+    echo "Could not find heaptrack_env: $ENVCHECKER"
+    exit 1
+fi
+ENVCHECKER=$(readlink -f "$ENVCHECKER")
+
 INTERPRETER="$EXE_PATH/$LIBEXEC_REL_PATH/heaptrack_interpret"
 if [ -z "$write_raw_data" ] && [ ! -f "$INTERPRETER" ]; then
     echo "Could not find heaptrack interpreter executable: $INTERPRETER"
@@ -324,26 +331,20 @@ else
     EXIT_CODE=$?
   else
     echo "injecting heaptrack into application via GDB, this might take some time..."
-    case $(uname) in
-        Linux*)
-            dlopen=__libc_dlopen_mode
-        ;;
-        FreeBSD*)
-            dlopen=dlopen@plt
-        ;;
-    esac
+    dlopen=$($ENVCHECKER dlopen "$LIBHEAPTRACK_INJECT")
     if [ -z "$debug" ]; then
         unset DEBUGINFOD_URLS
         gdb --batch-silent -n -iex="set auto-solib-add off" -p $pid \
             --eval-command="sharedlibrary libc.so" \
-            --eval-command="call (void) '$dlopen'(\"$LIBHEAPTRACK_INJECT\", 0x80000000 | 0x002)" \
+            --eval-command="call (void) $dlopen" \
             --eval-command="sharedlibrary libheaptrack_inject" \
             --eval-command="call (void) heaptrack_inject(\"$pipe\")" \
             --eval-command="detach"
     else
+        echo $dlopen
         gdb --quiet -p $pid \
             --eval-command="sharedlibrary libc.so" \
-            --eval-command="call (void) '$dlopen'(\"$LIBHEAPTRACK_INJECT\", 0x80000000 | 0x002)" \
+            --eval-command="print (void*) $dlopen" \
             --eval-command="sharedlibrary libheaptrack_inject" \
             --eval-command="call (void) heaptrack_inject(\"$pipe\")"
     fi
