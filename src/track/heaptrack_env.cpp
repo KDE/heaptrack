@@ -12,7 +12,6 @@
 
 extern "C" {
 __attribute__((weak)) void* __libc_dlopen_mode(const char* filename, int flag);
-__attribute__((weak)) void* dlmopen(Lmid_t lmid, const char* filename, int flags);
 }
 
 namespace {
@@ -27,11 +26,13 @@ void dlopenLine(const char* lib)
     if (&__libc_dlopen_mode) {
         // __libc_dlopen_mode was available directly in glibc before libdl got merged into it
         fprintf(stdout, "__libc_dlopen_mode(\"%s\", 0x80000000 | 0x002)\n", lib);
-    } else if (&dlmopen) {
-        fprintf(stdout, "dlmopen(0x%x, \"%s\", 0x%x)\n", LM_ID_BASE, lib, RTLD_NOW);
-    } else {
-        fprintf(stdout, "dlopen(\"%s\", 0x%x)\n", lib, RTLD_NOW);
     }
+
+#ifdef __USE_GNU
+    fprintf(stdout, "dlmopen(0x%x, \"%s\", 0x%x)\n", LM_ID_BASE, lib, RTLD_NOW);
+#else
+    fprintf(stdout, "dlopen(\"%s\", 0x%x)\n", lib, RTLD_NOW);
+#endif
 
 #endif
 }

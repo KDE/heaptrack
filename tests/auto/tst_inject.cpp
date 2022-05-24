@@ -88,12 +88,32 @@ TEST_CASE ("inject via dlopen", "[inject]") {
         [](void* handle) { dlclose(handle); });
 }
 
+#ifdef __USE_GNU
+TEST_CASE ("inject via dlmopen", "[inject]") {
+    runInjectTest(
+        []() -> void* {
+            dlerror(); // clear error
+            auto* handle = dlmopen(LM_ID_BASE, HEAPTRACK_LIB_INJECT_SO, RTLD_NOW);
+            if (!handle) {
+                std::cerr << "DLMOPEN FAILED: " << dlerror() << std::endl;
+            }
+            return handle;
+        },
+        [](void* handle) { dlclose(handle); });
+}
+#endif
+
 extern "C" {
 __attribute__((weak)) void* __libc_dlopen_mode(const char* filename, int flag);
 __attribute__((weak)) int __libc_dlclose(void* handle);
 }
 
 TEST_CASE ("inject via libc", "[inject]") {
+    if (!__libc_dlopen_mode) {
+        INFO("__libc_dlopen_mode symbol not available");
+        return;
+    }
+
     REQUIRE(__libc_dlopen_mode);
     runInjectTest([]() { return __libc_dlopen_mode(HEAPTRACK_LIB_INJECT_SO, 0x80000000 | 0x002); },
                   [](void* handle) { __libc_dlclose(handle); });
