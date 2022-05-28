@@ -148,7 +148,7 @@
       <li xml:lang="x-test">xxfind allocation hotspots, i.e. code locations that trigger a lot of memory allocation callsxx</li>
       <li>find temporary allocations, which are allocations that are directly followed by their deallocation</li>
       <li xml:lang="ca">troba les assignacions temporals, són les assignacions que són seguides directament per la cancel·lació de la seva assignació</li>
-      <li xml:lang="ca-valencia">troba les assignacions temporals, són les assignacions que són seguides directament per la cancel·lació de la seua assignació</li>
+      <li xml:lang="ca-valencia">troba les assignacions temporals, són les assignacions que són seguides directament per la cancelació de la seua assignació</li>
       <li xml:lang="da">find midlertidige allokeringer, som er allokeringer der direkte følges af deres deallokering</li>
       <li xml:lang="en-GB">find temporary allocations, which are allocations that are directly followed by their deallocation</li>
       <li xml:lang="es">encontrar asignaciones de memoria temporales, que son asignaciones que son inmediatamente seguidas por sus correspondientes liberaciones</li>
