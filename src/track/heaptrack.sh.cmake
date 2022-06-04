@@ -64,6 +64,7 @@ pid=
 client=
 use_inject_lib=
 write_raw_data=
+record_only=
 
 # path to current heaptrack.sh executable
 SCRIPT_PATH=$(readlink -f "$0")
@@ -96,6 +97,10 @@ while true; do
             ;;
         "-r" | "--raw")
             write_raw_data=1
+            shift 1
+            ;;
+        "--record-only")
+            record_only=1
             shift 1
             ;;
         "-h" | "--help")
@@ -306,7 +311,7 @@ cleanup() {
         echo "  heaptrack --analyze \"$output\""
     fi
 
-    if [ -z "$write_raw_data" ] && [ -x "$EXE_PATH/heaptrack_gui" ]; then
+    if [ -z "$record_only" ] && [ -z "$write_raw_data" ] && [ -x "$EXE_PATH/heaptrack_gui" ]; then
         echo ""
         echo "heaptrack_gui detected, automatically opening the file..."
         "$EXE_PATH/heaptrack_gui" "$output"
