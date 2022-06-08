@@ -111,6 +111,8 @@ of the CMake command, as it will tell you about missing dependencies!
 `heaptrack_print` and `heaptrack_gui` can be built on platforms other than Linux, using the dependencies mentioned above.
 On macOS the dependencies can be installed easily using [homebrew](http://brew.sh) and the [KDE homebrew tap](https://github.com/KDE-mac/homebrew-kde).
 
+    brew install qt@5
+
     # prepare tap
     brew tap kde-mac/kde https://invent.kde.org/packaging/homebrew-kde.git
     "$(brew --repo kde-mac/kde)/tools/do-caveats.sh"
@@ -132,7 +134,7 @@ To compile make sure to use Qt from homebrew and to have gettext in the path:
     cd heaptrack # i.e. the source folder
     mkdir build
     cd build
-    CMAKE_PREFIX_PATH=/usr/local/opt/qt PATH=$PATH:/usr/local/opt/gettext/bin cmake ..
+    CMAKE_PREFIX_PATH=/opt/homebrew/opt/qt@5 PATH=$PATH:/opt/homebrew/opt/gettext/bin cmake ..
     cmake -DCMAKE_BUILD_TYPE=Release .. # look for messages about missing dependencies!
     make heaptrack_gui heaptrack_print
 
