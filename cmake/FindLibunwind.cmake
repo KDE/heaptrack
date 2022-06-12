@@ -1,10 +1,10 @@
 #.rst:
-# FindLibUnwind
+# FindLibunwind
 # -----------
 #
-# Find LibUnwind
+# Find Libunwind
 #
-# Find LibUnwind headers and library
+# Find Libunwind headers and library
 #
 # ::
 #
@@ -48,7 +48,7 @@ endif()
 if (LIBUNWIND_LIBRARY)
   include(CheckCSourceCompiles)
   set(CMAKE_REQUIRED_QUIET_SAVE ${CMAKE_REQUIRED_QUIET})
-  set(CMAKE_REQUIRED_QUIET ${LibUnwind_FIND_QUIETLY})
+  set(CMAKE_REQUIRED_QUIET ${Libunwind_FIND_QUIETLY})
   set(CMAKE_REQUIRED_LIBRARIES_SAVE ${CMAKE_REQUIRED_LIBRARIES})
   set(CMAKE_REQUIRED_LIBRARIES ${LIBUNWIND_LIBRARY})
   set(CMAKE_REQUIRED_INCLUDES_SAVE ${CMAKE_REQUIRED_INCLUDES})
@@ -66,7 +66,7 @@ if (LIBUNWIND_LIBRARY)
 endif ()
 
 include(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(LibUnwind  REQUIRED_VARS  LIBUNWIND_INCLUDE_DIR
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(Libunwind  REQUIRED_VARS  LIBUNWIND_INCLUDE_DIR
                                                             LIBUNWIND_LIBRARY
                                                             LIBUNWIND_HAS_UNW_BACKTRACE
                                              VERSION_VAR    LIBUNWIND_VERSION_STRING
