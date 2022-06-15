@@ -1,8 +1,10 @@
 if (CMAKE_VERSION VERSION_LESS "2.8.12")
     cmake_minimum_required(VERSION 2.8.9)
     set(HEAPTRACK_BUILD_GUI OFF)
-else()
+elseif (CMAKE_VERSION VERSION_LESS "3.16.0")
     cmake_minimum_required(VERSION 2.8.12)
+else()
+    cmake_minimum_required(VERSION 3.16.0)
 endif()
 
 project(heaptrack)
