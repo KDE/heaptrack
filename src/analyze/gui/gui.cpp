@@ -124,11 +124,12 @@ int main(int argc, char** argv)
         return window;
     };
 
-    foreach (const QString& file, parser.positionalArguments()) {
+    const auto files = parser.positionalArguments();
+    for (const auto& file : files) {
         createWindow()->loadFile(file, parser.value(diffOption));
     }
 
-    if (parser.positionalArguments().isEmpty()) {
+    if (files.isEmpty()) {
         createWindow();
     }
 

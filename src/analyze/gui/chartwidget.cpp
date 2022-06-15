@@ -186,7 +186,8 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
 
     auto* coordinatePlane = dynamic_cast<CartesianCoordinatePlane*>(m_chart->coordinatePlane());
     Q_ASSERT(coordinatePlane);
-    foreach (auto diagram, coordinatePlane->diagrams()) {
+    const auto diagrams = coordinatePlane->diagrams();
+    for (auto diagram : diagrams) {
         coordinatePlane->takeDiagram(diagram);
         delete diagram;
     }

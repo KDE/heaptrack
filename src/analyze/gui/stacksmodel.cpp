@@ -55,7 +55,7 @@ void StacksModel::fillFromIndex(const QModelIndex& index)
     m_data.resize(leafs.size());
     m_stackIndex = 0;
     int stackIndex = 0;
-    foreach (QModelIndex leaf, leafs) {
+    for (auto leaf : leafs) {
         auto& stack = m_data[stackIndex];
         while (leaf.isValid()) {
             stack << leaf.sibling(leaf.row(), TreeModel::LocationColumn);
