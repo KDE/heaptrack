@@ -423,6 +423,9 @@ int iterate_phdrs(dl_phdr_info* info, size_t /*size*/, void* data) noexcept
         // prevent strange crashes due to overwriting the free symbol in ld-linux
         // (doesn't seem to be necessary in FreeBSD's ld-elf)
         return 0;
+    } else if (strstr(info->dlpi_name, "linux-vdso.so")) {
+        // don't overwrite anything within linux-vdso
+        return 0;
     }
 
     for (auto phdr = info->dlpi_phdr, end = phdr + info->dlpi_phnum; phdr != end; ++phdr) {
