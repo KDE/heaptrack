@@ -8,16 +8,20 @@
 #include "util/config.h"
 #include "util/linewriter.h"
 
+#include <tsl/robin_map.h>
+
 #include <cstdlib>
 #include <cstring>
 
 #include <dlfcn.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <link.h>
 #include <unistd.h>
 
-#include <sys/mman.h>
 #include <limits.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
 
 #include <type_traits>
 
@@ -74,6 +78,9 @@ __attribute__((weak)) void  mi_free(void* p) LIBC_FUN_ATTRS;
 namespace {
 
 namespace Elf {
+using Ehdr = ElfW(Ehdr);
+using Shdr = ElfW(Shdr);
+using Half = ElfW(Half);
 using Addr = ElfW(Addr);
 using Dyn = ElfW(Dyn);
 using Rel = ElfW(Rel);
@@ -349,7 +356,7 @@ using elf_symbol_table = elftable<const Elf::Sym, DT_SYMTAB, DT_SYMENT>;
 
 template <typename Table>
 void try_overwrite_elftable(const Table& jumps, const elf_string_table& strings, const elf_symbol_table& symbols,
-                            const Elf::Addr base, const bool restore) noexcept
+                            const Elf::Addr base, const bool restore, const Elf::Xword symtabSize) noexcept
 {
     Elf::Addr tableOffset =
 #ifdef __linux__
@@ -364,7 +371,8 @@ void try_overwrite_elftable(const Table& jumps, const elf_string_table& strings,
     const auto rela_end = jumps.end(tableOffset);
 
     const auto sym_start = symbols.start(tableOffset);
-    // we have no total size of the symbol table, so we cannot test that for validity
+    const auto sym_end = symbols.start(tableOffset + symtabSize);
+    const auto num_syms = static_cast<uintptr_t>(sym_end - sym_start);
 
     const auto str_start = strings.start(tableOffset);
     const auto str_end = strings.end(tableOffset);
@@ -372,9 +380,14 @@ void try_overwrite_elftable(const Table& jumps, const elf_string_table& strings,
 
     for (auto rela = rela_start; rela < rela_end; rela++) {
         const auto sym_index = ELF_R_SYM(rela->r_info);
-        const auto str_index = sym_start[sym_index].st_name;
-        if (str_index < 0 || str_index >= num_str)
+        if (sym_index < 0 || sym_index >= num_syms) {
             continue;
+        }
+
+        const auto str_index = sym_start[sym_index].st_name;
+        if (str_index < 0 || str_index >= num_str) {
+            continue;
+        }
 
         const char* symname = str_start + str_index;
 
@@ -383,7 +396,8 @@ void try_overwrite_elftable(const Table& jumps, const elf_string_table& strings,
     }
 }
 
-void try_overwrite_symbols(const Elf::Dyn* dyn, const Elf::Addr base, const bool restore) noexcept
+void try_overwrite_symbols(const Elf::Dyn* dyn, const Elf::Addr base, const bool restore,
+                           const Elf::Xword symtabSize) noexcept
 {
     elf_symbol_table symbols;
     elf_rel_table rels;
@@ -402,16 +416,86 @@ void try_overwrite_symbols(const Elf::Dyn* dyn, const Elf::Addr base, const bool
 
     // find symbols to overwrite
     if (rels) {
-        try_overwrite_elftable(rels, strings, symbols, base, restore);
+        try_overwrite_elftable(rels, strings, symbols, base, restore, symtabSize);
     }
 
     if (relas) {
-        try_overwrite_elftable(relas, strings, symbols, base, restore);
+        try_overwrite_elftable(relas, strings, symbols, base, restore, symtabSize);
     }
 
     if (jmprels) {
-        try_overwrite_elftable(jmprels, strings, symbols, base, restore);
+        try_overwrite_elftable(jmprels, strings, symbols, base, restore, symtabSize);
     }
+}
+
+template <typename Cleanup>
+struct ScopeGuard
+{
+    ScopeGuard(Cleanup cleanup)
+        : cleanup(std::move(cleanup))
+    {
+    }
+
+    ~ScopeGuard()
+    {
+        cleanup();
+    }
+
+    Cleanup cleanup;
+};
+
+template <typename Cleanup>
+auto scopeGuard(Cleanup cleanup)
+{
+    return ScopeGuard<Cleanup>(std::move(cleanup));
+}
+
+Elf::Xword symtabSize(const char* path)
+{
+    auto fd = open(path, O_RDONLY);
+    if (fd == -1) {
+        fprintf(stderr, "open failed: %s %s\n", path, strerror(errno));
+        return 0;
+    }
+    auto closeOnExit = scopeGuard([fd]() { close(fd); });
+
+    struct stat stat_info;
+    if (fstat(fd, &stat_info) != 0) {
+        fprintf(stderr, "stat failed: %s %s\n", path, strerror(errno));
+        return 0;
+    }
+
+    auto mapping = mmap(nullptr, stat_info.st_size, PROT_READ, MAP_SHARED, fd, 0);
+    auto unmapOnExit = scopeGuard([&]() { munmap(mapping, stat_info.st_size); });
+
+    const auto base = reinterpret_cast<ElfW(Addr)>(mapping);
+    const auto ehdr = reinterpret_cast<const ElfW(Ehdr)*>(base);
+    const auto shdr = reinterpret_cast<const ElfW(Shdr)*>(base + ehdr->e_shoff);
+
+    for (ElfW(Half) i = 0; i < ehdr->e_shnum; ++i) {
+        if (shdr[i].sh_type == SHT_DYNSYM) {
+            return shdr[i].sh_size;
+        }
+    }
+
+    fprintf(stderr, "failed to query symtab size: %s\n", path);
+    return 0;
+}
+
+Elf::Xword cachedSymtabSize(const char* path)
+{
+    if (!strlen(path)) {
+        path = "/proc/self/exe";
+    }
+
+    static tsl::robin_map<std::string, Elf::Xword> cache;
+
+    auto key = std::string(path);
+    auto it = cache.find(path);
+    if (it == cache.end()) {
+        it = cache.insert(it, {std::move(key), symtabSize(path)});
+    }
+    return it->second;
 }
 
 int iterate_phdrs(dl_phdr_info* info, size_t /*size*/, void* data) noexcept
@@ -428,10 +512,11 @@ int iterate_phdrs(dl_phdr_info* info, size_t /*size*/, void* data) noexcept
         return 0;
     }
 
+    const auto symtabSize = cachedSymtabSize(info->dlpi_name);
     for (auto phdr = info->dlpi_phdr, end = phdr + info->dlpi_phnum; phdr != end; ++phdr) {
         if (phdr->p_type == PT_DYNAMIC) {
             try_overwrite_symbols(reinterpret_cast<const Elf::Dyn*>(phdr->p_vaddr + info->dlpi_addr), info->dlpi_addr,
-                                  data != nullptr);
+                                  data != nullptr, symtabSize);
         }
     }
     return 0;
