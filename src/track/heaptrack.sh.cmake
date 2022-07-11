@@ -320,7 +320,6 @@ cleanup() {
 trap cleanup EXIT
 
 echo "heaptrack output will be written to \"$output\""
-echo "$LIBHEAPTRACK_PRELOAD"
 
 if [ -z "$debug" ] && [ -z "$pid" ]; then
   echo "starting application, this might take some time..."
