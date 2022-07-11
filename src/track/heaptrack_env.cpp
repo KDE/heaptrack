@@ -26,6 +26,7 @@ void dlopenLine(const char* lib)
     if (&__libc_dlopen_mode) {
         // __libc_dlopen_mode was available directly in glibc before libdl got merged into it
         fprintf(stdout, "__libc_dlopen_mode(\"%s\", 0x80000000 | 0x002)\n", lib);
+        return;
     }
 
 #ifdef __USE_GNU
