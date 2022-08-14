@@ -142,7 +142,7 @@ set(ECM_ENABLE_SANITIZERS "" CACHE STRING "semicolon-separated list of sanitizer
 if (ECM_ENABLE_SANITIZERS)
     find_package(ECM 1.0.0 NO_MODULE)
     if (ECM_FOUND)
-        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
+        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH})
     endif()
 endif()
 
