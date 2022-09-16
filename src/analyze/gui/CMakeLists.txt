@@ -99,15 +99,15 @@ target_link_libraries(heaptrack_gui
 )
 
 install(TARGETS heaptrack_gui
-    ${INSTALL_TARGETS_DEFAULT_ARGS}
+    ${KDE_INSTALL_TARGETS_DEFAULT_ARGS}
 )
 
 set_target_properties(heaptrack_gui PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${KDE_INSTALL_BINDIR}"
 )
 
 install(PROGRAMS org.kde.heaptrack.desktop
-    DESTINATION ${XDG_APPS_INSTALL_DIR}
+    DESTINATION ${KDE_INSTALL_APPDIR}
 )
 
 install(FILES org.kde.heaptrack.appdata.xml
