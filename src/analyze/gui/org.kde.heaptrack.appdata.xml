@@ -193,6 +193,7 @@
       <caption xml:lang="tr">İzlenen yığın bellek ayırma verisinin özeti</caption>
       <caption xml:lang="uk">Резюме щодо стеження за розміщенням даних у «купі» пам'яті</caption>
       <caption xml:lang="x-test">xxSummary of tracked heap memory allocation dataxx</caption>
+      <caption xml:lang="zh-CN">跟踪的堆内存分配数据摘要</caption>
     </screenshot>
     <screenshot>
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_flamegraph.png</image>
@@ -215,6 +216,7 @@
       <caption xml:lang="tr">Yığın bellek ayırma sayısının Flamegraph görselleştirmesi</caption>
       <caption xml:lang="uk">Інтерактивна гістограма кількості розміщень у «купі» пам'яті</caption>
       <caption xml:lang="x-test">xxFlamegraph visualization of number of heap memory allocationsxx</caption>
+      <caption xml:lang="zh-CN">堆内存分配次数的火焰图可视化</caption>
     </screenshot>
     <screenshot>
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_allocations_chart.png</image>
@@ -237,6 +239,7 @@
       <caption xml:lang="tr">Zaman içinde yığın bellek ayırmalarının grafiği</caption>
       <caption xml:lang="uk">Діаграма розміщення даних у «купі» пам'яті за часом</caption>
       <caption xml:lang="x-test">xxChart of heap memory allocations over timexx</caption>
+      <caption xml:lang="zh-CN">随时间推移的堆内存分配图表</caption>
     </screenshot>
   </screenshots>
   <project_group>KDE</project_group>
