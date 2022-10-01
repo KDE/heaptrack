@@ -59,6 +59,9 @@ signals:
     void selectionChanged(const Range& range);
     void filterRequested(int64_t minTime, int64_t maxTime);
 
+public slots:
+    void saveAs();
+
 private:
     void updateToolTip();
     void updateStatusTip(qint64 time);

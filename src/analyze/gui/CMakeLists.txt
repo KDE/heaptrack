@@ -86,6 +86,7 @@ if (KChart_FOUND)
     )
     list(APPEND LIBRARIES
         KChart
+        Qt5::Svg
     )
 endif()
 

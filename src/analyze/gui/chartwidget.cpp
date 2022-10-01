@@ -7,10 +7,16 @@
 #include "chartwidget.h"
 
 #include <QApplication>
+#include <QFileDialog>
+#include <QLabel>
 #include <QMenu>
 #include <QPainter>
+#include <QPushButton>
 #include <QRubberBand>
+#include <QSpinBox>
+#include <QSvgGenerator>
 #include <QTextStream>
+#include <QToolBar>
 #include <QToolTip>
 #include <QVBoxLayout>
 
@@ -24,6 +30,7 @@
 #include <KChartGridAttributes>
 #include <KChartHeaderFooter>
 #include <KChartLegend>
+#include <KMessageBox>
 
 #include <KColorScheme>
 #include <KLocalizedString>
@@ -121,7 +128,17 @@ ChartWidget::ChartWidget(QWidget* parent)
     , m_chart(new Chart(this))
     , m_rubberBand(new ChartRubberBand(this))
 {
+    auto m_chartToolBar = new QToolBar(this);
+
+    auto m_exportAsButton = new QPushButton(i18n("Export As..."), this);
+    connect(m_exportAsButton, &QPushButton::released, this, &ChartWidget::saveAs);
+
+    m_chartToolBar->addWidget(m_exportAsButton);
+
     auto layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    layout->addWidget(m_chartToolBar);
     layout->addWidget(m_chart);
     setLayout(layout);
 
@@ -249,6 +266,31 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
 
     updateToolTip();
     updateAxesTitle();
+}
+
+void ChartWidget::saveAs()
+{
+    const auto saveFilename =
+        QFileDialog::getSaveFileName(this, i18n("Save %1", windowTitle()), QString(),
+                                     i18n("Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"));
+
+    if (!saveFilename.isEmpty()) {
+        if (QFileInfo(saveFilename).suffix() == QLatin1String("svg")) {
+            // vector graphic format
+            QSvgGenerator generator;
+            generator.setFileName(saveFilename);
+            generator.setSize(m_chart->size());
+            generator.setViewBox(m_chart->rect());
+
+            QPainter painter;
+            painter.begin(&generator);
+            m_chart->paint(&painter, m_chart->rect());
+            painter.end();
+        } else if (!m_chart->grab().save(saveFilename)) {
+            // other format
+            KMessageBox::error(this, i18n("Failed to save the image to %1", saveFilename));
+        }
+    }
 }
 
 void ChartWidget::updateToolTip()
