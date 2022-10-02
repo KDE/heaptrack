@@ -1,0 +1,1337 @@
+# Copyright (C) YEAR This file is copyright:
+# This file is distributed under the same license as the heaptrack package.
+# Shinjo Park <kde@peremen.name>, 2020, 2021, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: heaptrack\n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2022-06-16 00:50+0000\n"
+"PO-Revision-Date: 2022-05-07 02:01+0200\n"
+"Last-Translator: Shinjo Park <kde@peremen.name>\n"
+"Language-Team: Korean <kde-kr@kde.org>\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Lokalize 21.12.3\n"
+
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "박신조"
+
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "kde@peremen.name"
+
+#: gui/callercalleemodel.cpp:40 gui/callercalleemodel.h:333
+#: gui/treemodel.cpp:73
+#, kde-format
+msgid "Location"
+msgstr "위치"
+
+#: gui/callercalleemodel.cpp:42 gui/callercalleemodel.h:335
+#, kde-format
+msgid "Allocations (Self)"
+msgstr "할당(자체)"
+
+#: gui/callercalleemodel.cpp:44 gui/callercalleemodel.h:337
+#, kde-format
+msgid "Temporary (Self)"
+msgstr "임시(자체)"
+
+#: gui/callercalleemodel.cpp:46 gui/callercalleemodel.h:339
+#, kde-format
+msgid "Peak (Self)"
+msgstr "극값(자체)"
+
+#: gui/callercalleemodel.cpp:48 gui/callercalleemodel.h:341
+#, kde-format
+msgid "Leaked (Self)"
+msgstr "누수됨(자체)"
+
+#: gui/callercalleemodel.cpp:50 gui/callercalleemodel.h:343
+#, kde-format
+msgid "Allocations (Incl.)"
+msgstr "할당(포함)"
+
+#: gui/callercalleemodel.cpp:52 gui/callercalleemodel.h:345
+#, kde-format
+msgid "Temporary (Incl.)"
+msgstr "임시(포함)"
+
+#: gui/callercalleemodel.cpp:54 gui/callercalleemodel.h:347
+#, kde-format
+msgid "Peak (Incl.)"
+msgstr "극값(포함)"
+
+#: gui/callercalleemodel.cpp:56 gui/callercalleemodel.h:349
+#, kde-format
+msgid "Leaked (Incl.)"
+msgstr "누수됨(포함)"
+
+#: gui/callercalleemodel.cpp:63
+#, kde-format
+msgid ""
+"<qt>The parent symbol that called an allocation function. The function name "
+"may be unresolved when debug information is missing.</qt>"
+msgstr ""
+"<qt>할당 함수를 호출한 부모 기호입니다. 디버그 정보가 없다면 함수 이름을 파악"
+"하지 못할 수도 있습니다.</qt>"
+
+#: gui/callercalleemodel.cpp:66 gui/callercalleemodel.h:359
+#, kde-format
+msgid ""
+"<qt>The number of times an allocation function was directly called from this "
+"location.</qt>"
+msgstr "<qt>이 위치에서 할당 함수가 직접 호출된 횟수입니다.</qt>"
+
+#: gui/callercalleemodel.cpp:69 gui/callercalleemodel.h:362
+#, kde-format
+msgid ""
+"<qt>The number of direct temporary allocations. These allocations are "
+"directly followed by a free without any other allocations in-between.</qt>"
+msgstr ""
+"<qt>직접 임시 할당 횟수입니다. 이렇게 할당된 메모리는 중간에 다른 할당 없이 "
+"free로 바로 해제됩니다.</qt>"
+
+#: gui/callercalleemodel.cpp:73 gui/callercalleemodel.h:366
+#, kde-format
+msgid ""
+"<qt>The maximum heap memory in bytes consumed from allocations originating "
+"directly at this location. This takes deallocations into account.</qt>"
+msgstr ""
+"<qt>이 위치에서 직접 호출된 할당에서 사용한 최대 힙 메모리 크기(바이트 단위)"
+"입니다. 할당 해제를 계산합니다.</qt>"
+
+#: gui/callercalleemodel.cpp:78 gui/callercalleemodel.h:371
+#, kde-format
+msgid ""
+"<qt>The bytes allocated directly at this location that have not been "
+"deallocated.</qt>"
+msgstr ""
+"<qt>이 위치에서 직접 할당된 메모리 중 할당 해제되지 않은 바이트 수입니다.</"
+"qt>"
+
+#: gui/callercalleemodel.cpp:81 gui/callercalleemodel.h:181
+#: gui/callercalleemodel.h:374
+#, kde-format
+msgid ""
+"<qt>The inclusive number of times an allocation function was called from "
+"this location or any functions called from here.</qt>"
+msgstr ""
+"<qt>이 위치 또는 여기에서 호출된 함수를 포함하여 할당 함수가 호출된 횟수입니"
+"다.</qt>"
+
+#: gui/callercalleemodel.cpp:85 gui/callercalleemodel.h:185
+#: gui/callercalleemodel.h:378
+#, kde-format
+msgid ""
+"<qt>The number of inclusive temporary allocations. These allocations are "
+"directly followed by a free without any other allocations in-between.</qt>"
+msgstr ""
+"<qt>포함된 임시 할당 횟수입니다. 이렇게 할당된 메모리는 중간에 다른 할당 없"
+"이 free로 바로 해제됩니다.</qt>"
+
+#: gui/callercalleemodel.cpp:89 gui/callercalleemodel.h:173
+#: gui/callercalleemodel.h:382
+#, kde-format
+msgid ""
+"<qt>The inclusive maximum heap memory in bytes consumed from allocations "
+"originating at this location or from functions called from here. This takes "
+"deallocations into account.</qt>"
+msgstr ""
+"<qt>이 위치 또는 여기에서 호출된 함수를 포함하여 할당에서 사용한 최대 힙 메모"
+"리 크기(바이트 단위)입니다. 할당 해제를 계산합니다.</qt>"
+
+#: gui/callercalleemodel.cpp:94 gui/callercalleemodel.h:178
+#: gui/callercalleemodel.h:387 gui/treemodel.cpp:91
+#, kde-format
+msgid ""
+"<qt>The bytes allocated at this location that have not been deallocated.</qt>"
+msgstr ""
+"<qt>이 위치에서 할당된 메모리 중 할당 해제되지 않은 바이트 수입니다.</qt>"
+
+#: gui/callercalleemodel.cpp:202
+#, kde-format
+msgid "Caller"
+msgstr "호출자"
+
+#: gui/callercalleemodel.cpp:214
+#, kde-format
+msgid "Callee"
+msgstr "피호출자"
+
+#: gui/callercalleemodel.h:156 gui/treemodel.cpp:69 gui/util.cpp:112
+#: gui/util.cpp:141 gui/util.cpp:170
+#, kde-format
+msgid "Peak"
+msgstr "극"
+
+#: gui/callercalleemodel.h:158 gui/flamegraph.cpp:433 gui/treemodel.cpp:71
+#: gui/util.cpp:113 gui/util.cpp:142 gui/util.cpp:171
+#, kde-format
+msgid "Leaked"
+msgstr "누수됨"
+
+#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:454
+#: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
+#, kde-format
+msgid "Allocations"
+msgstr "할당"
+
+#: gui/callercalleemodel.h:162 gui/treemodel.cpp:67
+#, kde-format
+msgid "Temporary"
+msgstr "임시"
+
+#: gui/callercalleemodel.h:170
+#, kde-format
+msgid ""
+"The location of the %1. The function name may be unresolved when debug "
+"information is missing."
+msgstr ""
+"%1의 위치입니다. 디버그 정보가 없다면 함수 이름을 파악하지 못할 수도 있습니"
+"다."
+
+#: gui/callercalleemodel.h:356
+#, kde-format
+msgid ""
+"<qt>The source code location that called an allocation function. May be "
+"unknown when debug information is missing.</qt>"
+msgstr ""
+"<qt>할당 함수를 호출한 소스 코드 위치입니다. 디버그 정보가 없다면 파악하지 못"
+"할 수도 있습니다.</qt>"
+
+#: gui/chartmodel.cpp:54
+#, kde-format
+msgid "Elapsed Time"
+msgstr "경과 시간"
+
+#: gui/chartmodel.cpp:58
+#, kde-format
+msgid "Memory Allocations"
+msgstr "메모리 할당"
+
+#: gui/chartmodel.cpp:60
+#, kde-format
+msgid "Memory Consumed"
+msgstr "사용한 메모리"
+
+#: gui/chartmodel.cpp:62 gui/flamegraph.cpp:443 gui/mainwindow.cpp:456
+#: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
+#, kde-format
+msgid "Temporary Allocations"
+msgstr "임시 할당"
+
+#: gui/chartmodel.cpp:115
+#, kde-format
+msgctxt ""
+"%1: the formatted byte size, e.g. \"1.2KB\", %2: the raw byte size, e.g. "
+"\"1300\""
+msgid "%1 (%2 bytes)"
+msgstr "%1(%2바이트)"
+
+#: gui/chartmodel.cpp:123
+#, kde-format
+msgid "<qt>%1 allocations in total after %2</qt>"
+msgstr "<qt>%2 이후 총 할당 %1회</qt>"
+
+#: gui/chartmodel.cpp:125
+#, kde-format
+msgid "<qt>%1 temporary allocations in total after %2</qt>"
+msgstr "<qt>%2 이후 총 임시 할당 %1회</qt>"
+
+#: gui/chartmodel.cpp:127
+#, kde-format
+msgid "<qt>%1 consumed in total after %2</qt>"
+msgstr "<qt>%2 이후 총 %1 사용됨</qt>"
+
+#: gui/chartmodel.cpp:133
+#, kde-format
+msgid ""
+"<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>"
+msgstr "<qt>%3 이후 할당 %2회, 위치:<p style='margin-left:10px;'>%1</p></qt>"
+
+#: gui/chartmodel.cpp:137
+#, kde-format
+msgid ""
+"<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
+"p></qt>"
+msgstr ""
+"<qt>%3 이후 임시 할당 %2회, 위치:<p style='margin-left:10px'>%1</p></qt>"
+
+#: gui/chartmodel.cpp:141
+#, kde-format
+msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
+msgstr "<qt>%3 이후 %2 사용됨, 위치:<p style='margin-left:10px'>%1</p></qt>"
+
+#: gui/chartwidget.cpp:151
+#, kde-format
+msgid "Filter In On Selection"
+msgstr "선택할 때에 필터"
+
+#. i18n: ectx: property (text), widget (QMenu, menuFilter)
+#: gui/chartwidget.cpp:161 gui/mainwindow.ui:899
+#, kde-format
+msgid "Reset Filter"
+msgstr "필터 초기화"
+
+#: gui/chartwidget.cpp:269
+#, kde-format
+msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
+msgstr "<tr><th></th><th>시작</th><th>끝</th><th>차이</th></tr>"
+
+#: gui/chartwidget.cpp:270
+#, kde-format
+msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr "<tr><th>시간</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+
+#: gui/chartwidget.cpp:274
+#, kde-format
+msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr "<tr><th>사용함</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+
+#: gui/chartwidget.cpp:278
+#, kde-format
+msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr "<tr><th>할당</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+
+#: gui/chartwidget.cpp:282
+#, kde-format
+msgid ""
+"<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr "<tr><th>임시 할당</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+
+#: gui/chartwidget.cpp:290
+#, kde-format
+msgid ""
+"<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
+"a time range for filtering.</qt>"
+msgstr ""
+"<qt>시간별 힙 메모리 사용량을 표시합니다.<br>필터링할 시간 범위를 선택하려면 "
+"클릭하고 드래그하십시오.</qt>"
+
+#: gui/chartwidget.cpp:294
+#, kde-format
+msgid ""
+"<qt>Shows number of memory allocations over time.<br>Click and drag to "
+"select a time range for filtering.</qt>"
+msgstr ""
+"<qt>시간별 메모리 할당 횟수를 표시합니다.<br>필터링할 시간 범위를 선택하려면 "
+"클릭하고 드래그하십시오.</qt>"
+
+#: gui/chartwidget.cpp:298
+#, kde-format
+msgid ""
+"<qt>Shows number of temporary memory allocations over time. A temporary "
+"allocation is one that is followed immediately by its corresponding "
+"deallocation, without other allocations happening in-between.<br>Click and "
+"drag to select a time range for filtering.</qt>"
+msgstr ""
+"<qt>시간별 임시 메모리 할당 횟수를 표시합니다. 임시 메모리 할당은 메모리를 할"
+"당한 후 할당 해제하기 전까지 다른 할당이 일어나지 않은 메모리 할당입니다.<br>"
+"필터링할 시간 범위를 선택하려면 클릭하고 드래그하십시오.</qt>"
+
+#: gui/chartwidget.cpp:319
+#, kde-format
+msgid "%1 (filtered from %2 to %3, Δ%4)"
+msgstr "%1(%2부터 %3까지 필터링됨, Δ%4)"
+
+#: gui/chartwidget.cpp:323
+#, kde-format
+msgid "%1 (filtered delta)"
+msgstr "%1(필터된 차이)"
+
+#: gui/chartwidget.cpp:412
+#, kde-format
+msgid "Click and drag to select time range for filtering."
+msgstr "필터링할 시간 범위를 선택하려면 클릭하고 드래그하십시오."
+
+#: gui/chartwidget.cpp:418
+#, kde-format
+msgid ""
+"T = %1, Consumed: %2. Click and drag to select time range for filtering."
+msgstr ""
+"T = %1, 사용함: %2. 필터링할 시간 범위를 선택하려면 클릭하고 드래그하십시오."
+
+#: gui/chartwidget.cpp:422
+#, kde-format
+msgid ""
+"T = %1, Allocations: %2. Click and drag to select time range for filtering."
+msgstr ""
+"T = %1, 할당: %2. 필터링할 시간 범위를 선택하려면 클릭하고 드래그하십시오."
+
+#: gui/chartwidget.cpp:426
+#, kde-format
+msgid ""
+"T = %1, Temporary Allocations: %2. Click and drag to select time range for "
+"filtering."
+msgstr ""
+"T = %1, 임시 할당: %2. 필터링할 시간 범위를 선택하려면 클릭하고 드래그하십시"
+"오."
+
+#: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
+#, kde-format
+msgid "%1 allocations in total"
+msgstr "총 할당 %1회"
+
+#: gui/flamegraph.cpp:177
+#, kde-format
+msgid "%1 temporary allocations in total"
+msgstr "총 임시 할당 %1회"
+
+#: gui/flamegraph.cpp:179
+#, kde-format
+msgid "%1 peak memory consumption"
+msgstr "메모리 사용량 극값 %1"
+
+#: gui/flamegraph.cpp:181
+#, kde-format
+msgid "%1 leaked in total"
+msgstr "총 누수 %1"
+
+#: gui/flamegraph.cpp:234
+#, kde-format
+msgctxt "%1: number of allocations, %2: relative number, %3: function label"
+msgid "%1 (%2%) allocations in %3 and below."
+msgstr "%3 및 아래에서 할당이 %1회(%2%) 일어났습니다."
+
+#: gui/flamegraph.cpp:239
+#, kde-format
+msgctxt ""
+"%1: number of temporary allocations, %2: relative number, %3 function label"
+msgid "%1 (%2%) temporary allocations in %3 and below."
+msgstr "%3 및 아래에서 임시 할당이 %1회(%2%) 일어났습니다."
+
+#: gui/flamegraph.cpp:244
+#, kde-format
+msgctxt ""
+"%1: peak consumption in bytes, %2: relative number, %3: function label"
+msgid "%1 (%2%) contribution to peak consumption in %3 and below."
+msgstr "%3 및 아래에서 메모리 소모 극값의 %1(%2%)를 차지합니다."
+
+#: gui/flamegraph.cpp:248
+#, kde-format
+msgctxt "%1: leaked bytes, %2: relative number, %3: function label"
+msgid "%1 (%2%) leaked in %3 and below."
+msgstr "%3 및 아래에서 %1(%2%)의 메모리가 누수되었습니다."
+
+#: gui/flamegraph.cpp:428
+#, kde-format
+msgid "Memory Peak"
+msgstr "메모리 극값"
+
+#: gui/flamegraph.cpp:430
+#, kde-format
+msgid ""
+"Show a flame graph over the contributions to the peak heap memory "
+"consumption of your application."
+msgstr ""
+"프로그램의 힙 메모리 사용량 극값에서 차지하는 비중을 나타내는 불꽃 그래프를 "
+"표시합니다."
+
+#: gui/flamegraph.cpp:435
+#, kde-format
+msgid ""
+"Show a flame graph over the leaked heap memory of your application. Memory "
+"is considered to be leaked when it never got deallocated. "
+msgstr ""
+"프로그램의 힙 메모리 누수량에서 차지하는 비중을 나타내는 불꽃 그래프를 표시합"
+"니다. 할당 해제되지 않은 메모리는 누수된 것으로 간주합니다."
+
+#: gui/flamegraph.cpp:440
+#, kde-format
+msgid ""
+"Show a flame graph over the number of allocations triggered by functions in "
+"your code."
+msgstr ""
+"코드의 함수에서 할당을 트리거한 횟수를 나타내는 불꽃 그래프를 표시합니다."
+
+#: gui/flamegraph.cpp:445
+#, kde-format
+msgid ""
+"Show a flame graph over the number of temporary allocations triggered by "
+"functions in your code. Allocations are marked as temporary when they are "
+"immediately followed by their deallocation."
+msgstr ""
+"코드의 함수에서 임시 할당을 트리거한 횟수를 나타내는 불꽃 그래프를 표시합니"
+"다. 메모리가 할당된 후 곧바로 해제되면 임시 할당으로 간주합니다."
+
+#: gui/flamegraph.cpp:452
+#, kde-format
+msgid "Select the data source that should be visualized in the flame graph."
+msgstr "불꽃 그래프에 표시할 데이터 원본을 선택합니다."
+
+#: gui/flamegraph.cpp:467
+#, kde-format
+msgid "Bottom-Up View"
+msgstr "아래에서 위로 보기"
+
+#: gui/flamegraph.cpp:468
+#, kde-format
+msgid ""
+"Enable the bottom-up flame graph view. When this is unchecked, the top-down "
+"view is enabled by default."
+msgstr ""
+"불꽃 보기에서 맨 마지막으로 호출된 함수를 위쪽에 표시합니다. 이 옵션을 선택하"
+"지 않으면 기본값으로 맨 처음으로 호출된 함수를 아래쪽에 표시합니다."
+
+#: gui/flamegraph.cpp:476
+#, kde-format
+msgid "Collapse Recursion"
+msgstr "재귀 함수 접기"
+
+#: gui/flamegraph.cpp:478
+#, kde-format
+msgid ""
+"Collapse stack frames for functions calling themselves. When this is "
+"unchecked, recursive frames will be visualized separately."
+msgstr ""
+"재귀 호출을 하는 함수를 스택 프레임에서 접습니다. 이 옵션을 선택하지 않으면 "
+"재귀 호출의 각각 프레임을 별개로 표시합니다."
+
+#: gui/flamegraph.cpp:490
+#, kde-format
+msgid "Cost Threshold: "
+msgstr "비용 하한선: "
+
+#: gui/flamegraph.cpp:494
+#, kde-format
+msgid ""
+"<qt>The cost threshold defines a fractional cut-off value. Items with a "
+"relative cost below this value will not be shown in the flame graph. This is "
+"done as an optimization to quickly generate graphs for large data sets with "
+"low memory overhead. If you need more details, decrease the threshold value, "
+"or set it to zero.</qt>"
+msgstr ""
+"<qt>비용 하한선은 표시할 값의 하한선을 지정합니다. 상대 비용이 해당 값보다 낮"
+"은 항목은 불꽃 그래프에 표시하지 않습니다. 데이터가 클 때 메모리를 적게 사용"
+"하여 그래프를 생성하려고 사용합니다. 더 많은 정보를 표시하려면 값을 내리거나 "
+"0으로 지정하십시오.</qt>"
+
+#: gui/flamegraph.cpp:506
+#, kde-format
+msgid "Search..."
+msgstr "찾기..."
+
+#: gui/flamegraph.cpp:507
+#, kde-format
+msgid "<qt>Search the flame graph for a symbol.</qt>"
+msgstr "<qt>불꽃 그래프에서 기호를 검색합니다.</qt>"
+
+#: gui/flamegraph.cpp:543
+#, kde-format
+msgid "Reset View"
+msgstr "보기 초기화"
+
+#: gui/flamegraph.cpp:553 gui/mainwindow.cpp:119
+#, kde-format
+msgid "View Caller/Callee"
+msgstr "호출자/피호출자 보기"
+
+#: gui/flamegraph.cpp:694
+#, kde-format
+msgid "generating flame graph..."
+msgstr "불꽃 그래프 생성 중..."
+
+#: gui/flamegraph.cpp:771
+#, kde-format
+msgid "%1 (%2% of total of %3) allocations matched by search."
+msgstr "검색과 일치하는 할당이 총 %1회(전체 %3회 중 %2%) 있습니다."
+
+#: gui/flamegraph.cpp:776
+#, kde-format
+msgid "%1 (%2% of total of %3) matched by search."
+msgstr "검색과 일치하는 항목이 총 %1(전체 %3 중 %2%) 있습니다."
+
+#: gui/gui.cpp:65
+#, kde-format
+msgid "Heaptrack GUI"
+msgstr "힙 추적 GUI"
+
+#: gui/gui.cpp:66
+#, kde-format
+msgid "A visualizer for heaptrack data files."
+msgstr "힙 추적 데이터 파일을 시각화합니다."
+
+#: gui/gui.cpp:67
+#, kde-format
+msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
+msgstr "Copyright 2015, Milian Wolff <mail@milianw.de>"
+
+#: gui/gui.cpp:70
+#, kde-format
+msgid "Milian Wolff"
+msgstr "Milian Wolff"
+
+#: gui/gui.cpp:70
+#, kde-format
+msgid "Original author, maintainer"
+msgstr "원 작성자, 관리자"
+
+#: gui/gui.cpp:84
+#, kde-format
+msgid "Base profile data to compare other files to."
+msgstr "다른 파일을 비교할 기본 프로필 데이터입니다."
+
+#: gui/gui.cpp:89
+#, kde-format
+msgid ""
+"Load list of leak suppressions from the specified file. Specify one "
+"suppression per line, and start each line with 'leak:', i.e. use the LSAN "
+"suppression file format."
+msgstr ""
+"지정한 파일에서 누수 억제 목록을 불러옵니다. 한 줄에 하나씩 지정하십시오. 각 "
+"줄은 'leak:'으로 시작하는 LSAN 억제 파일 형식이어야 합니다."
+
+#: gui/gui.cpp:95 gui/mainwindow.cpp:609
+#, kde-format
+msgid ""
+"Ignore suppression definitions that are embedded into the heaptrack data "
+"file. By default, heaptrack will copy the suppressions optionally defined "
+"via a `const char *__lsan_default_suppressions()` symbol in the debuggee "
+"application.  These are then always applied when analyzing the data, unless "
+"this feature is explicitly disabled using this command line option."
+msgstr ""
+"힙 추적 데이터 파일에 임베드된 억제 정의를 무시합니다. 기본적으로 힙 추적에서"
+"는 디버그되는 프로그램의 `const char *__lsan_default_suppressions()` 기호를 "
+"통해 추가로 정의된 억제 정의를 복사합니다. 이 명령행 옵션으로 명시적으로 비활"
+"성화하지 않는 한 데이터를 분석할 때 항상 적용됩니다."
+
+#: gui/gui.cpp:103
+#, kde-format
+msgid ""
+"Ignore suppression definitions that are built into heaptrack. By default, "
+"heaptrack will suppress certain known leaks in common system libraries."
+msgstr ""
+"힙 추적에 내장된 억제 정의를 무시합니다. 기본값으로 힙 추적에서는 시스템 라이"
+"브러리에 있는 알려진 메모리 누수를 무시합니다."
+
+#: gui/gui.cpp:106
+#, kde-format
+msgid "Files to load"
+msgstr "불러올 파일"
+
+#: gui/gui.cpp:106
+#, kde-format
+msgid "[FILE...]"
+msgstr "[파일...]"
+
+#: gui/histogrammodel.cpp:65
+#, kde-format
+msgid ""
+"%1 allocations from %2, totalling %3 allocated with an average of %4 per "
+"allocation"
+msgstr "%2에서 할당 %1회, 총 할당량 %3, 할당당 평균 %4"
+
+#: gui/histogramwidget.cpp:99
+#, kde-format
+msgid "Requested Allocation Size"
+msgstr "요청한 할당 크기"
+
+#: gui/histogramwidget.cpp:105
+#, kde-format
+msgid "Number of Allocations"
+msgstr "할당 횟수"
+
+#: gui/mainwindow.cpp:76
+#, kde-format
+msgid "KDevelop"
+msgstr "KDevelop"
+
+#: gui/mainwindow.cpp:77
+#, kde-format
+msgid "Kate"
+msgstr "Kate"
+
+#: gui/mainwindow.cpp:78
+#, kde-format
+msgid "KWrite"
+msgstr "KWrite"
+
+#: gui/mainwindow.cpp:79
+#, kde-format
+msgid "gedit"
+msgstr "gedit"
+
+#: gui/mainwindow.cpp:80
+#, kde-format
+msgid "gvim"
+msgstr "gvim"
+
+#: gui/mainwindow.cpp:81
+#, kde-format
+msgid "Qt Creator"
+msgstr "Qt Creator"
+
+#: gui/mainwindow.cpp:148
+#, kde-format
+msgid "Open file in editor"
+msgstr "편집기에서 파일 열기"
+
+#: gui/mainwindow.cpp:371
+#, kde-format
+msgid ""
+"<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
+"<i>(attached)</i></dd>"
+msgstr ""
+"<dt><b>디버그할 파일</b>:</dt><dd style='font-family:monospace;'>%1<i>(디버"
+"거 연결됨)</i></dd>"
+
+#: gui/mainwindow.cpp:374
+#, kde-format
+msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
+msgstr ""
+"<dt><b>디버그할 파일</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
+
+#: gui/mainwindow.cpp:378
+#, kde-format
+msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
+msgstr "<dt><b>총 실행 시간</b>:</dt><dd>%1, %2부터 %3깨지 필터링됨(%4)</dd>"
+
+#: gui/mainwindow.cpp:383
+#, kde-format
+msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>총 실행 시간</b>:</dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:385
+#, kde-format
+msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>총 시스템 메모리</b>:</dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:392
+#, kde-format
+msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
+msgstr "<dt><b>할당 함수 호출</b>:</dt><dd>%1(%2/초)</dd>"
+
+#: gui/mainwindow.cpp:395
+#, kde-format
+msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
+msgstr "<dt><b>임시 할당</b>:</dt><dd>%1(%2%, %3/초)</dd>"
+
+#: gui/mainwindow.cpp:405
+#, kde-format
+msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
+msgstr "<dt><b>힙 메모리 할당 극값</b>:</dt><dd>%2 후 %1</dd>"
+
+#: gui/mainwindow.cpp:408
+#, kde-format
+msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
+msgstr "<dt><b>RSS 극값</b>(힙 추적 오버헤드 포함):</dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:412
+#, kde-format
+msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>메모리 사용량 차이</b>:</dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:416
+#, kde-format
+msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
+msgstr "<dt><b>총 메모리 누수</b>:</dt><dd>%1(%2 억제됨)</dd>"
+
+#: gui/mainwindow.cpp:419
+#, kde-format
+msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>총 메모리 누수</b>:</dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:447
+#, kde-format
+msgid "Failed to parse file %1."
+msgstr "%1 파일을 해석할 수 없습니다."
+
+#: gui/mainwindow.cpp:452
+#, kde-format
+msgid "Consumed"
+msgstr "사용함"
+
+#: gui/mainwindow.cpp:468
+#, kde-format
+msgid "Sizes"
+msgstr "크기"
+
+#: gui/mainwindow.cpp:532
+#, kde-format
+msgid "Input data %1 does not exist."
+msgstr "입력 데이터 %1이(가) 없습니다."
+
+#: gui/mainwindow.cpp:534
+#, kde-format
+msgid "Input data %1 is not a file."
+msgstr "입력 데이터 %1이(가) 파일이 아닙니다."
+
+#: gui/mainwindow.cpp:536
+#, kde-format
+msgid "Input data %1 is not readable."
+msgstr "입력 데이터 %1에서 읽을 수 없습니다."
+
+#: gui/mainwindow.cpp:564
+#, kde-format
+msgid "Failed to parse suppression file."
+msgstr "억제 파일을 해석할 수 없습니다."
+
+#: gui/mainwindow.cpp:579
+#, kde-format
+msgid "Heaptrack"
+msgstr "힙 추적"
+
+#: gui/mainwindow.cpp:607
+#, kde-format
+msgid "Disable Embedded Suppressions"
+msgstr "임베드된 억제 비활성화"
+
+#: gui/mainwindow.cpp:619
+#, kde-format
+msgid "Disable Builtin Suppressions"
+msgstr "내장된 억제 비활성화"
+
+#: gui/mainwindow.cpp:621
+#, kde-format
+msgid ""
+"Ignore suppression definitions that are built into heaptrack. By default, "
+"heaptrack will suppress certain known leaks from common system libraries."
+msgstr ""
+"힙 추적에 내장된 억제 정의를 무시합니다. 기본값으로 힙 추적에서는 시스템 라이"
+"브러리에 있는 알려진 메모리 누수를 무시합니다."
+
+#: gui/mainwindow.cpp:649
+#, kde-format
+msgid "Loading file %1, please wait..."
+msgstr "파일 %1 불러오는 중, 잠시 기다려 주십시오..."
+
+#: gui/mainwindow.cpp:651
+#, kde-format
+msgctxt "%1: file name that is open"
+msgid "Heaptrack - %1"
+msgstr "힙 추적 - %1"
+
+#: gui/mainwindow.cpp:654
+#, kde-format
+msgctxt "%1, %2: file names that are open"
+msgid "Heaptrack - %1 compared to %2"
+msgstr "힙 추적 - %1, %2 비교"
+
+#: gui/mainwindow.cpp:670
+#, kde-format
+msgid "Reparsing file, please wait..."
+msgstr "파일 다시 분석하는 중, 잠시 기다려 주십시오..."
+
+#: gui/mainwindow.cpp:713
+#, kde-format
+msgid " / %1"
+msgstr " / %1"
+
+#: gui/mainwindow.cpp:754
+#, kde-format
+msgid "Code Navigation"
+msgstr "코드 탐색"
+
+#: gui/mainwindow.cpp:782
+#, kde-format
+msgid "Custom..."
+msgstr "사용자 정의..."
+
+#: gui/mainwindow.cpp:794
+#, kde-format
+msgid "Automatic (No Line numbers)"
+msgstr "자동(줄 번호 없음)"
+
+#: gui/mainwindow.cpp:814
+#, kde-format
+msgid "Custom Code Navigation"
+msgstr "사용자 정의 코드 탐색"
+
+#: gui/mainwindow.cpp:815
+#, kde-format
+msgid ""
+"Specify command to use for code navigation, '%f' will be replaced by the "
+"file name, '%l' by the line number and '%c' by the column number."
+msgstr ""
+"코드를 탐색할 명령어를 입력하십시오. '%f'는 파일 이름, '%l'은 줄 번호, "
+"'%c'는 칸 번호로 대체됩니다."
+
+#. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
+#: gui/mainwindow.ui:14
+#, kde-format
+msgid "MainWindow"
+msgstr "주 창"
+
+#. i18n: ectx: property (toolTip), widget (QMainWindow, MainWindow)
+#. i18n: ectx: property (toolTip), widget (QLabel, suppressionsLabel)
+#: gui/mainwindow.ui:17 gui/mainwindow.ui:125
+#, kde-format
+msgid "Path to a file containing leak suppression rules in the LSAN format."
+msgstr "LSAN 형식으로 되어 있는 누수 억제 규칙 파일의 경로입니다."
+
+#. i18n: ectx: property (title), widget (QGroupBox, groupBox)
+#: gui/mainwindow.ui:64
+#, kde-format
+msgid "Open Heaptrack Data"
+msgstr "힙 추적 데이터 열기"
+
+#. i18n: ectx: property (toolTip), widget (KUrlRequester, openFile)
+#: gui/mainwindow.ui:73
+#, kde-format
+msgid ""
+"<qt><p>This field specifies the primary heaptrack data file. These files are "
+"called <tt>heaptrack.$APP.$PID.gz</tt> or <tt>heaptrack.$APP.$PID.zst</tt>. "
+"You can produce such a file by profiling your application, e.g. via:</p>\n"
+"<pre><code>heaptrack &lt;yourapplication&gt; ...</code></pre>\n"
+"<p>Or, alternatively, you can attach to a running process via</p>\n"
+"<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
+msgstr ""
+"<qt><p>이 필드는 주 힙 추적 데이터 파일을 지정합니다. 이 파일은 "
+"<tt>heaptrack.$APP.$PID.gz</tt> 또는 <tt>heaptrack.$APP.$PID.zst</tt> 형식을 "
+"갖고 있습니다. 다음 명령을 통해서 프로그램 프로필 데이터를 생성할 수 있습니"
+"다:</p>\n"
+"<pre><code>heaptrack &lt;yourapplication&gt; ...</code></pre>\n"
+"<p>실행 중인 프로그램에 연결할 수도 있습니다:</p>\n"
+"<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
+
+#. i18n: ectx: property (filter), widget (KUrlRequester, openFile)
+#. i18n: ectx: property (filter), widget (KUrlRequester, compareTo)
+#: gui/mainwindow.ui:76 gui/mainwindow.ui:92
+#, kde-format
+msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
+
+#. i18n: ectx: property (placeholderText), widget (KUrlRequester, openFile)
+#. i18n: ectx: property (placeholderText), widget (KUrlRequester, compareTo)
+#: gui/mainwindow.ui:79 gui/mainwindow.ui:95
+#, kde-format
+msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
+msgstr "path/to/heaptrack.$APP.$PID.{gz,zst}"
+
+#. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
+#: gui/mainwindow.ui:89
+#, kde-format
+msgid ""
+"<qt>You can optionally specify a second heaptrack data file to compare to. "
+"If set, this file will be used as a base and its cost gets subtracted from "
+"the primary data costs.</qt>"
+msgstr ""
+"<qt>선택 사항으로 비교할 두 번째 힙 추적 데이터를 지정할 수 있습니다. 두 번"
+"째 파일을 지정하면 해당 파일을 기반 파일로 사용하고 비용을 첫 번째 파일의 비"
+"용에서 뺍니다.</qt>"
+
+#. i18n: ectx: property (text), widget (QLabel, openFileLabel)
+#: gui/mainwindow.ui:105
+#, kde-format
+msgid "Profile &Data:"
+msgstr "프로필 데이터(&D):"
+
+#. i18n: ectx: property (text), widget (QLabel, compareToLabel)
+#: gui/mainwindow.ui:115
+#, kde-format
+msgid "Compare to:"
+msgstr "다음과 비교:"
+
+#. i18n: ectx: property (text), widget (QLabel, suppressionsLabel)
+#: gui/mainwindow.ui:128
+#, kde-format
+msgid "Suppressions:"
+msgstr "억제:"
+
+#. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
+#: gui/mainwindow.ui:138
+#, kde-format
+msgid "path/to/lsan_suppressions.txt"
+msgstr "path/to/lsan_suppressions.txt"
+
+#. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
+#: gui/mainwindow.ui:251
+#, kde-format
+msgid "Summary"
+msgstr "요약"
+
+#. i18n: ectx: property (toolTip), widget (QLabel, topPeakLabel)
+#. i18n: ectx: property (toolTip), widget (QTreeView, topPeak)
+#: gui/mainwindow.ui:352 gui/mainwindow.ui:365
+#, kde-format
+msgid "List of functions that allocated the most memory at a given time."
+msgstr "지정한 시간에 최대로 메모리를 많이 할당한 함수 목록입니다."
+
+#. i18n: ectx: property (text), widget (QLabel, topPeakLabel)
+#: gui/mainwindow.ui:355
+#, kde-format
+msgid "Peak Contributions"
+msgstr "극값 비중"
+
+#. i18n: ectx: property (toolTip), widget (QLabel, topLeakedLabel)
+#. i18n: ectx: property (toolTip), widget (QTreeView, topLeaked)
+#: gui/mainwindow.ui:391 gui/mainwindow.ui:404
+#, kde-format
+msgid "List of functions that leak the most memory."
+msgstr "최대로 메모리 누수가 큰 함수 목록입니다."
+
+#. i18n: ectx: property (text), widget (QLabel, topLeakedLabel)
+#: gui/mainwindow.ui:394
+#, kde-format
+msgid "Largest Memory Leaks"
+msgstr "최대 메모리 누수"
+
+#. i18n: ectx: property (toolTip), widget (QLabel, topAllocationsLabel)
+#. i18n: ectx: property (toolTip), widget (QTreeView, topAllocations)
+#: gui/mainwindow.ui:430 gui/mainwindow.ui:443
+#, kde-format
+msgid "List of functions that allocate memory most often."
+msgstr "가장 자주 메모리를 할당한 함수 목록입니다."
+
+#. i18n: ectx: property (text), widget (QLabel, topAllocationsLabel)
+#: gui/mainwindow.ui:433
+#, kde-format
+msgid "Most Memory Allocations"
+msgstr "최대 메모리 할당"
+
+#. i18n: ectx: property (toolTip), widget (QLabel, topTemporaryLabel)
+#. i18n: ectx: property (toolTip), widget (QTreeView, topTemporary)
+#: gui/mainwindow.ui:472 gui/mainwindow.ui:485
+#, kde-format
+msgid "List of functions that produced the most temporary memory allocations."
+msgstr "최대로 임시 할당 횟수가 많은 함수 목록입니다."
+
+#. i18n: ectx: property (text), widget (QLabel, topTemporaryLabel)
+#: gui/mainwindow.ui:475
+#, kde-format
+msgid "Most Temporary Allocations"
+msgstr "최대 임시 할당"
+
+#. i18n: ectx: property (title), widget (KCollapsibleGroupBox, suppressionBox)
+#: gui/mainwindow.ui:508
+#, kde-format
+msgid "Suppressions"
+msgstr "억제"
+
+#. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
+#: gui/mainwindow.ui:540
+#, kde-format
+msgid "Bottom-Up"
+msgstr "아래에서 위로"
+
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFunction)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterFunction)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFunction)
+#: gui/mainwindow.ui:564 gui/mainwindow.ui:632 gui/mainwindow.ui:753
+#, kde-format
+msgid "filter by function..."
+msgstr "함수로 필터하기..."
+
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
+#: gui/mainwindow.ui:571 gui/mainwindow.ui:760
+#, kde-format
+msgid "filter by file..."
+msgstr "파일로 필터하기..."
+
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterModule)
+#: gui/mainwindow.ui:578 gui/mainwindow.ui:639 gui/mainwindow.ui:767
+#, kde-format
+msgid "filter by module..."
+msgstr "모듈로 필터하기..."
+
+#. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
+#: gui/mainwindow.ui:608
+#, kde-format
+msgid "Caller / Callee"
+msgstr "호출자/피호출자"
+
+#. i18n: ectx: attribute (title), widget (QWidget, topDownTab)
+#: gui/mainwindow.ui:732
+#, kde-format
+msgid "Top-Down"
+msgstr "위에서 아래로"
+
+#. i18n: ectx: attribute (title), widget (FlameGraph, flameGraphTab)
+#: gui/mainwindow.ui:797
+#, kde-format
+msgid "Flame Graph"
+msgstr "불꽃 그래프"
+
+#. i18n: ectx: property (windowTitle), widget (QDockWidget, stacksDock)
+#: gui/mainwindow.ui:813
+#, kde-format
+msgid "S&tacks"
+msgstr "스택(&T)"
+
+#. i18n: ectx: property (text), widget (QLabel, stackSpinnerLabel)
+#: gui/mainwindow.ui:838
+#, kde-format
+msgid "Selected Stack:"
+msgstr "선택한 스택:"
+
+#. i18n: ectx: property (title), widget (QMenu, menu_File)
+#: gui/mainwindow.ui:875
+#, kde-format
+msgid "&File"
+msgstr "파일(&F)"
+
+#. i18n: ectx: property (title), widget (QMenu, menu_Settings)
+#: gui/mainwindow.ui:880
+#, kde-format
+msgid "Setti&ngs"
+msgstr "설정(&N)"
+
+#. i18n: ectx: property (title), widget (QMenu, menuFilter)
+#: gui/mainwindow.ui:885
+#, kde-format
+msgid "Filter"
+msgstr "필터"
+
+#: gui/parser.cpp:387
+#, kde-format
+msgid "merging allocations... %1%"
+msgstr "할당 합치는 중... %1%"
+
+#: gui/parser.cpp:557
+#, kde-format
+msgid "total"
+msgstr "합계"
+
+#: gui/parser.cpp:559
+#, kde-format
+msgid "0B to 8B"
+msgstr "0 B-8 B"
+
+#: gui/parser.cpp:560
+#, kde-format
+msgid "9B to 16B"
+msgstr "9 B-16 B"
+
+#: gui/parser.cpp:561
+#, kde-format
+msgid "17B to 32B"
+msgstr "17 B-32 B"
+
+#: gui/parser.cpp:562
+#, kde-format
+msgid "33B to 64B"
+msgstr "33 B-64 B"
+
+#: gui/parser.cpp:563
+#, kde-format
+msgid "65B to 128B"
+msgstr "65 B-128 B"
+
+#: gui/parser.cpp:564
+#, kde-format
+msgid "129B to 256B"
+msgstr "129 B-256 B"
+
+#: gui/parser.cpp:565
+#, kde-format
+msgid "257B to 512B"
+msgstr "257 B-512 B"
+
+#: gui/parser.cpp:566
+#, kde-format
+msgid "512B to 1KB"
+msgstr "512 B-1 KB"
+
+#: gui/parser.cpp:567
+#, kde-format
+msgid "more than 1KB"
+msgstr "1 KB 초과"
+
+#: gui/parser.cpp:645
+#, kde-format
+msgid "reparsing data"
+msgstr "데이터 다시 분석 중"
+
+#: gui/parser.cpp:645
+#, kde-format
+msgid "parsing data"
+msgstr "데이터 처리 중"
+
+#: gui/parser.cpp:659
+#, kde-format
+msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
+msgstr "%1 합격: %2/%3  소모: %4  남음: %5"
+
+#: gui/parser.cpp:715
+#, kde-format
+msgid "merging allocations..."
+msgstr "할당 합치는 중..."
+
+#: gui/parser.cpp:726
+#, kde-format
+msgid "building size histogram..."
+msgstr "크기 히스토그램 생성 중..."
+
+#: gui/parser.cpp:739
+#, kde-format
+msgid "building charts..."
+msgstr "차트 생성 중..."
+
+#: gui/stacksmodel.cpp:99
+#, kde-format
+msgid "Backtrace"
+msgstr "역추적"
+
+#: gui/treemodel.cpp:80
+#, kde-format
+msgid ""
+"<qt>The number of times an allocation function was called from this location."
+"</qt>"
+msgstr "<qt>이 위치에서 할당 함수가 호출된 횟수입니다.</qt>"
+
+#: gui/treemodel.cpp:83
+#, kde-format
+msgid ""
+"<qt>The number of temporary allocations. These allocations are directly "
+"followed by a free without any other allocations in-between.</qt>"
+msgstr ""
+"<qt>임시 할당 횟수입니다. 이렇게 할당된 메모리는 중간에 다른 할당 없이 free"
+"로 바로 해제됩니다.</qt>"
+
+#: gui/treemodel.cpp:87
+#, kde-format
+msgid ""
+"<qt>The contributions from a given location to the maximum heap memory "
+"consumption in bytes. This takes deallocations into account.</qt>"
+msgstr ""
+"<qt>지정한 위치에서 최대 힙 메모리 크기 사용량(바이트 단위)에서 차지하는 부분"
+"입니다. 할당 해제를 계산합니다.</qt>"
+
+#: gui/treemodel.cpp:94
+#, kde-format
+msgid ""
+"<qt>The location from which an allocation function was called. Function "
+"symbol and file information may be unknown when debug information was "
+"missing when heaptrack was run.</qt>"
+msgstr ""
+"<qt>할당 함수가 호출된 위치입니다. 힙 추적 도구가 실행 중일 때 디버그 정보가 "
+"없었다면 함수 기호와 파일 정보를 사용하지 못할 수도 있습니다.</qt>"
+
+#: gui/treemodel.cpp:149 gui/treemodel.cpp:173
+#, kde-format
+msgctxt "1: function, 2: module, 3: module path"
+msgid ""
+"%1\n"
+"  in %2 (%3)"
+msgstr ""
+"%1\n"
+"  %2(%3)의"
+
+#: gui/treemodel.cpp:159
+#, kde-format
+msgid "peak contribution: %1 (%2% of total)\n"
+msgstr "극값에서의 비중: %1(합계 중 %2%)\n"
+
+#: gui/treemodel.cpp:160
+#, kde-format
+msgid "leaked: %1 (%2% of total)\n"
+msgstr "누수: %1(합계 중 %2%)\n"
+
+#: gui/treemodel.cpp:161
+#, kde-format
+msgid "allocations: %1 (%2% of total)\n"
+msgstr "할당: %1(합계 중 %2%)\n"
+
+#: gui/treemodel.cpp:162
+#, kde-format
+msgid "temporary: %1 (%2% of allocations, %3% of total)\n"
+msgstr "임시: %1(할당 중 %2%, 합계 중 %3%)\n"
+
+#: gui/treemodel.cpp:168
+#, kde-format
+msgid "backtrace:"
+msgstr "역추적:"
+
+#: gui/treemodel.cpp:180
+#, kde-format
+msgid "called from one location"
+msgid_plural "called from %1 locations"
+msgstr[0] "위치 %1곳에서 호출됨"
+
+#: gui/util.cpp:32
+#, kde-format
+msgid "??"
+msgstr "??"
+
+#: gui/util.cpp:108
+#, kde-format
+msgid "%1: %2<br/>&nbsp;&nbsp;%4% out of %3 total"
+msgstr "%1: %2<br/>&nbsp;&nbsp;총 %3 중 %4%"
+
+#: gui/util.cpp:134 gui/util.cpp:163
+#, kde-format
+msgid "%1 (self): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
+msgstr "%1(자신): %2<br/>&nbsp;&nbsp;총 %3 중 %4%"
+
+#: gui/util.cpp:137 gui/util.cpp:166
+#, kde-format
+msgid "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
+msgstr "%1(포함): %2<br/>&nbsp;&nbsp;총 %3 중 %4%"
+
+#: gui/util.cpp:183
+#, kde-format
+msgid "symbol: <tt>%1</tt><br/>binary: <tt>%2 (%3)</tt>"
+msgstr "기호: <tt>%1</tt><br/>이진 파일: <tt>%2(%3)</tt>"
+
+#: gui/util.cpp:187
+#, kde-format
+msgctxt "%1: function name, %2: binary basename"
+msgid "%1 in %2"
+msgstr "%2의 %1"
+
+#: gui/util.cpp:209
+#, kde-format
+msgid "<unresolved function>"
+msgstr "<해결되지 않은 함수>"
+
+#~ msgid "%1 allocations from %2"
+#~ msgstr "%2에서 할당 %1회"
+
+#~ msgctxt "%1: function, %2: binary"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1(%2)"
+
+#~ msgid "%1 in %2 (%3)"
+#~ msgstr "%2(%3)의 %1"
+
+#~ msgid "Symbol"
+#~ msgstr "기호"
+
+#~ msgid "Binary"
+#~ msgstr "2진수"
+
+#~ msgid ""
+#~ "<qt>The parent function that called an allocation function. May be "
+#~ "unresolved when debug information is missing.</qt>"
+#~ msgstr ""
+#~ "<qt>할당 함수를 호출한 부모 함수입니다. 디버그 정보가 없다면 함수 이름을 "
+#~ "파악하지 못할 수도 있습니다.</qt>"
+
+#~ msgid ""
+#~ "<qt>The module, i.e. executable or shared library, from which an "
+#~ "allocation function was called.</qt>"
+#~ msgstr ""
+#~ "<qt>할당 함수를 호출한 모듈(실행 파일이나 공유 라이브러리)입니다.</qt>"
+
+#~ msgid ""
+#~ "The function name of the %1. May be unresolved when debug information is "
+#~ "missing."
+#~ msgstr ""
+#~ "%1의 함수 이름입니다. 디버그 정보가 없다면 함수 이름을 파악하지 못할 수도 "
+#~ "있습니다."
+
+#~ msgid "The name of the executable the symbol resides in."
+#~ msgstr "기호가 있는 실행 파일의 이름입니다."
+
+#~ msgid "Function"
+#~ msgstr "함수"
+
+#~ msgid "Module"
+#~ msgstr "모듈"
+
+#~ msgid ""
+#~ "<qt>The parent function that called an allocation function. May be "
+#~ "unknown when debug information is missing.</qt>"
+#~ msgstr ""
+#~ "<qt>할당 함수를 호출한 부모 함수입니다. 디버그 정보가 없다면 함수 이름을 "
+#~ "파악하지 못할 수도 있습니다.</qt>"

@@ -1,0 +1,1308 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR This file is copyright:
+# This file is distributed under the same license as the heaptrack package.
+#
+# Martin Srebotnjak <miles@filmsi.net>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: heaptrack\n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2022-06-16 00:50+0000\n"
+"PO-Revision-Date: 2022-01-09 16:40+0100\n"
+"Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
+"Language-Team: Slovenian <lugos-slo@lugos.si>\n"
+"Language: sl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
+"%100==4 ? 3 : 0);\n"
+"X-Generator: Poedit 3.0.1\n"
+
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Martin Srebotnjak"
+
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "miles@filmsi.net"
+
+#: gui/callercalleemodel.cpp:40 gui/callercalleemodel.h:333
+#: gui/treemodel.cpp:73
+#, kde-format
+msgid "Location"
+msgstr "Mesto"
+
+#: gui/callercalleemodel.cpp:42 gui/callercalleemodel.h:335
+#, kde-format
+msgid "Allocations (Self)"
+msgstr "Dodelitve (sebi)"
+
+#: gui/callercalleemodel.cpp:44 gui/callercalleemodel.h:337
+#, kde-format
+msgid "Temporary (Self)"
+msgstr "Začasno (sebi)"
+
+#: gui/callercalleemodel.cpp:46 gui/callercalleemodel.h:339
+#, kde-format
+msgid "Peak (Self)"
+msgstr "Vrhunec (sebe)"
+
+#: gui/callercalleemodel.cpp:48 gui/callercalleemodel.h:341
+#, kde-format
+msgid "Leaked (Self)"
+msgstr "Uhajanja (sebi)"
+
+#: gui/callercalleemodel.cpp:50 gui/callercalleemodel.h:343
+#, kde-format
+msgid "Allocations (Incl.)"
+msgstr "Dodelitve (vklj.)"
+
+#: gui/callercalleemodel.cpp:52 gui/callercalleemodel.h:345
+#, kde-format
+msgid "Temporary (Incl.)"
+msgstr "Začasno (vklj.)"
+
+#: gui/callercalleemodel.cpp:54 gui/callercalleemodel.h:347
+#, kde-format
+msgid "Peak (Incl.)"
+msgstr "Vrhunec (vklj.)"
+
+#: gui/callercalleemodel.cpp:56 gui/callercalleemodel.h:349
+#, kde-format
+msgid "Leaked (Incl.)"
+msgstr "Uhajanja (vklj.)"
+
+#: gui/callercalleemodel.cpp:63
+#, kde-format
+msgid ""
+"<qt>The parent symbol that called an allocation function. The function name "
+"may be unresolved when debug information is missing.</qt>"
+msgstr ""
+"<qt>Nadrejeni simbol, ki je klical funkcijo dodelitve. Ime funkcije je morda "
+"nerazrešeno, če manjkajo informacije o razhroščevanju.</qt>"
+
+#: gui/callercalleemodel.cpp:66 gui/callercalleemodel.h:359
+#, kde-format
+msgid ""
+"<qt>The number of times an allocation function was directly called from this "
+"location.</qt>"
+msgstr ""
+"<qt>Število neposrednih klicev funkcije dodeljevanja neposredno s tega mesta."
+"</qt>"
+
+#: gui/callercalleemodel.cpp:69 gui/callercalleemodel.h:362
+#, kde-format
+msgid ""
+"<qt>The number of direct temporary allocations. These allocations are "
+"directly followed by a free without any other allocations in-between.</qt>"
+msgstr ""
+"<qt>Število neposrednih začasnih dodelitev. Tem dodelitvam neposredno sledi "
+"sprostitev brez drugih vmesnih dodelitev.</qt>"
+
+#: gui/callercalleemodel.cpp:73 gui/callercalleemodel.h:366
+#, kde-format
+msgid ""
+"<qt>The maximum heap memory in bytes consumed from allocations originating "
+"directly at this location. This takes deallocations into account.</qt>"
+msgstr ""
+"<qt>Največji pomnilnik kopice v bajtih, porabljenih iz dodelitev, ki "
+"izvirajo neposredno na tem mestu. Pri tem se upoštevajo raz-dodelitve.</qt>"
+
+#: gui/callercalleemodel.cpp:78 gui/callercalleemodel.h:371
+#, kde-format
+msgid ""
+"<qt>The bytes allocated directly at this location that have not been "
+"deallocated.</qt>"
+msgstr ""
+"<qt>Bajti, dodeljeni neposredno na tem mestu, ki niso bili odrazporejeni.</"
+"qt>"
+
+#: gui/callercalleemodel.cpp:81 gui/callercalleemodel.h:181
+#: gui/callercalleemodel.h:374
+#, kde-format
+msgid ""
+"<qt>The inclusive number of times an allocation function was called from "
+"this location or any functions called from here.</qt>"
+msgstr ""
+"<qt>Vključujoče število, kolikokrat je bila funkcija dodelitve klicana s "
+"tega mesta ali iz poljubnih funkcij, klicanih odtod.</qt>"
+
+#: gui/callercalleemodel.cpp:85 gui/callercalleemodel.h:185
+#: gui/callercalleemodel.h:378
+#, kde-format
+msgid ""
+"<qt>The number of inclusive temporary allocations. These allocations are "
+"directly followed by a free without any other allocations in-between.</qt>"
+msgstr ""
+"<qt>Število vključujočih začasnih dodelitev. Tem dodelitvam neposredno sledi "
+"sprostitev brez drugih vmesnih dodelitev.</qt>"
+
+#: gui/callercalleemodel.cpp:89 gui/callercalleemodel.h:173
+#: gui/callercalleemodel.h:382
+#, kde-format
+msgid ""
+"<qt>The inclusive maximum heap memory in bytes consumed from allocations "
+"originating at this location or from functions called from here. This takes "
+"deallocations into account.</qt>"
+msgstr ""
+"<qt>Vključujoči največji pomnilnik v bajtih, porabljenih iz dodelitev s "
+"poreklom s tega mesta ali iz funkcij, klicanih odtod. Pri tem se upoštevajo "
+"preklici dodelitev.</qt>"
+
+#: gui/callercalleemodel.cpp:94 gui/callercalleemodel.h:178
+#: gui/callercalleemodel.h:387 gui/treemodel.cpp:91
+#, kde-format
+msgid ""
+"<qt>The bytes allocated at this location that have not been deallocated.</qt>"
+msgstr "<qt>Bajti, dodeljeni na tem mestu, ki niso bili razporejeni.</qt>"
+
+#: gui/callercalleemodel.cpp:202
+#, kde-format
+msgid "Caller"
+msgstr "Klicatelj"
+
+#: gui/callercalleemodel.cpp:214
+#, kde-format
+msgid "Callee"
+msgstr "Klicani"
+
+#: gui/callercalleemodel.h:156 gui/treemodel.cpp:69 gui/util.cpp:112
+#: gui/util.cpp:141 gui/util.cpp:170
+#, kde-format
+msgid "Peak"
+msgstr "Vrhunec"
+
+#: gui/callercalleemodel.h:158 gui/flamegraph.cpp:433 gui/treemodel.cpp:71
+#: gui/util.cpp:113 gui/util.cpp:142 gui/util.cpp:171
+#, kde-format
+msgid "Leaked"
+msgstr "Uhajanja"
+
+#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:454
+#: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
+#, kde-format
+msgid "Allocations"
+msgstr "Dodelitve"
+
+#: gui/callercalleemodel.h:162 gui/treemodel.cpp:67
+#, kde-format
+msgid "Temporary"
+msgstr "Začasno"
+
+#: gui/callercalleemodel.h:170
+#, kde-format
+msgid ""
+"The location of the %1. The function name may be unresolved when debug "
+"information is missing."
+msgstr ""
+"Lokacija %1. Ime funkcije je morda nerešeno, če manjkajo informacije "
+"razhroščevanja."
+
+#: gui/callercalleemodel.h:356
+#, kde-format
+msgid ""
+"<qt>The source code location that called an allocation function. May be "
+"unknown when debug information is missing.</qt>"
+msgstr ""
+"<qt>Mesto izvorne kode, ki je klicalo funkcijo dodelitve. Lahko ni znano, "
+"kadar manjkajo informacije razhroščevanja.</qt>"
+
+#: gui/chartmodel.cpp:54
+#, kde-format
+msgid "Elapsed Time"
+msgstr "Pretečeni čas"
+
+#: gui/chartmodel.cpp:58
+#, kde-format
+msgid "Memory Allocations"
+msgstr "Dodelitve pomnilnika"
+
+#: gui/chartmodel.cpp:60
+#, kde-format
+msgid "Memory Consumed"
+msgstr "Porabljen pomnilnik"
+
+#: gui/chartmodel.cpp:62 gui/flamegraph.cpp:443 gui/mainwindow.cpp:456
+#: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
+#, kde-format
+msgid "Temporary Allocations"
+msgstr "Začasne dodelitve"
+
+#: gui/chartmodel.cpp:115
+#, kde-format
+msgctxt ""
+"%1: the formatted byte size, e.g. \"1.2KB\", %2: the raw byte size, e.g. "
+"\"1300\""
+msgid "%1 (%2 bytes)"
+msgstr "%1 (%2 bajtov)"
+
+#: gui/chartmodel.cpp:123
+#, kde-format
+msgid "<qt>%1 allocations in total after %2</qt>"
+msgstr "<qt>%1 dodelitev skupaj po %2</qt>"
+
+#: gui/chartmodel.cpp:125
+#, kde-format
+msgid "<qt>%1 temporary allocations in total after %2</qt>"
+msgstr "<qt>%1 začasnih dodelitev skupaj po %2</qt>"
+
+#: gui/chartmodel.cpp:127
+#, kde-format
+msgid "<qt>%1 consumed in total after %2</qt>"
+msgstr "<qt>%1 skupaj porabljenega po %2</qt>"
+
+#: gui/chartmodel.cpp:133
+#, kde-format
+msgid ""
+"<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>"
+msgstr "<qt>%2 dodelitev po %3 iz:<p style='margin-left:10px;'>%1</p></qt>"
+
+#: gui/chartmodel.cpp:137
+#, kde-format
+msgid ""
+"<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
+"p></qt>"
+msgstr ""
+"<qt>%2 začasnih dodelitev po %3 iz:<p style='margin-left:10px'>%1</p></qt>"
+
+#: gui/chartmodel.cpp:141
+#, kde-format
+msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
+msgstr "<qt>%2 porabljenega po %3 f iz:<p style='margin-left:10px'>%1</p></qt>"
+
+#: gui/chartwidget.cpp:151
+#, kde-format
+msgid "Filter In On Selection"
+msgstr "Filtriraj v izboru"
+
+#. i18n: ectx: property (text), widget (QMenu, menuFilter)
+#: gui/chartwidget.cpp:161 gui/mainwindow.ui:899
+#, kde-format
+msgid "Reset Filter"
+msgstr "Ponastavi filter"
+
+#: gui/chartwidget.cpp:269
+#, kde-format
+msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
+msgstr "<tr><th> Začetek </th><th>Konec</th><th>Delta</th></tr>"
+
+#: gui/chartwidget.cpp:270
+#, kde-format
+msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr "<tr><th>Čas</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+
+#: gui/chartwidget.cpp:274
+#, kde-format
+msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr "<tr><th>Porabljeno</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+
+#: gui/chartwidget.cpp:278
+#, kde-format
+msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr "<tr><th>Dodelitve</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+
+#: gui/chartwidget.cpp:282
+#, kde-format
+msgid ""
+"<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr "<tr><th>Začasne dodelitve</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+
+#: gui/chartwidget.cpp:290
+#, kde-format
+msgid ""
+"<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
+"a time range for filtering.</qt>"
+msgstr ""
+"<qt>Prikazuje porabo pomnilnika kopice skozi čas.<br>Kliknite in povlecite, "
+"da izberete časovni obseg za filtriranje.</qt>"
+
+#: gui/chartwidget.cpp:294
+#, kde-format
+msgid ""
+"<qt>Shows number of memory allocations over time.<br>Click and drag to "
+"select a time range for filtering.</qt>"
+msgstr ""
+"<qt>Prikaže število dodelitev pomnilnika skozi čas.<br>Kliknite in "
+"povlecite, da izberete časovni obseg za filtriranje.</qt>"
+
+#: gui/chartwidget.cpp:298
+#, kde-format
+msgid ""
+"<qt>Shows number of temporary memory allocations over time. A temporary "
+"allocation is one that is followed immediately by its corresponding "
+"deallocation, without other allocations happening in-between.<br>Click and "
+"drag to select a time range for filtering.</qt>"
+msgstr ""
+"<qt>Prikaže število začasnih dodelitev pomnilnika skozi čas. Začasna "
+"dodelitev je začasna dodelitev, ki ji takoj sledi ustrezna sprostitev "
+"dodelitve, ne da bi se druga dodelitev zgodila vmes.<br>Kliknite in "
+"povlecite, da izberete časovni obseg za filtriranje.</qt>"
+
+#: gui/chartwidget.cpp:319
+#, kde-format
+msgid "%1 (filtered from %2 to %3, Δ%4)"
+msgstr "%1 (filtrirano od %2 do %3, Δ%4)"
+
+#: gui/chartwidget.cpp:323
+#, kde-format
+msgid "%1 (filtered delta)"
+msgstr "%1 (filtrirana delta)"
+
+#: gui/chartwidget.cpp:412
+#, kde-format
+msgid "Click and drag to select time range for filtering."
+msgstr "Kliknite in povlecite, da izberete časovni obseg za filtriranje."
+
+#: gui/chartwidget.cpp:418
+#, kde-format
+msgid ""
+"T = %1, Consumed: %2. Click and drag to select time range for filtering."
+msgstr ""
+"T = %1, Porabljeno: %2. Kliknite in povlecite, da izberete časovni obseg za "
+"filtriranje."
+
+#: gui/chartwidget.cpp:422
+#, kde-format
+msgid ""
+"T = %1, Allocations: %2. Click and drag to select time range for filtering."
+msgstr ""
+"T = %1, Dodelitve: %2. Kliknite in povlecite, da izberete časovni obseg za "
+"filtriranje."
+
+#: gui/chartwidget.cpp:426
+#, kde-format
+msgid ""
+"T = %1, Temporary Allocations: %2. Click and drag to select time range for "
+"filtering."
+msgstr ""
+"T = %1, Začasne dodelitve: %2. Kliknite in povlecite, da izberete časovni "
+"obseg za filtriranje."
+
+#: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
+#, kde-format
+msgid "%1 allocations in total"
+msgstr "%1 dodelitev skupaj"
+
+#: gui/flamegraph.cpp:177
+#, kde-format
+msgid "%1 temporary allocations in total"
+msgstr "%1 začasnih dodelitev skupaj"
+
+#: gui/flamegraph.cpp:179
+#, kde-format
+msgid "%1 peak memory consumption"
+msgstr "%1 vrhuncev porabe pomnilnika"
+
+#: gui/flamegraph.cpp:181
+#, kde-format
+msgid "%1 leaked in total"
+msgstr "%1 uhajanj skupaj"
+
+#: gui/flamegraph.cpp:234
+#, kde-format
+msgctxt "%1: number of allocations, %2: relative number, %3: function label"
+msgid "%1 (%2%) allocations in %3 and below."
+msgstr "%1 (%2%) dodelitev v %3 in pod njim."
+
+#: gui/flamegraph.cpp:239
+#, kde-format
+msgctxt ""
+"%1: number of temporary allocations, %2: relative number, %3 function label"
+msgid "%1 (%2%) temporary allocations in %3 and below."
+msgstr "%1 (%2%) začasnih dodelitev v %3 in pod njim."
+
+#: gui/flamegraph.cpp:244
+#, kde-format
+msgctxt ""
+"%1: peak consumption in bytes, %2: relative number, %3: function label"
+msgid "%1 (%2%) contribution to peak consumption in %3 and below."
+msgstr "%1 (%2%) prispevkov k vrhu porabe v %3 in pod njim."
+
+#: gui/flamegraph.cpp:248
+#, kde-format
+msgctxt "%1: leaked bytes, %2: relative number, %3: function label"
+msgid "%1 (%2%) leaked in %3 and below."
+msgstr "%1 (%2%) uhajanj v %3 in pod njim."
+
+#: gui/flamegraph.cpp:428
+#, kde-format
+msgid "Memory Peak"
+msgstr "Vrhunec pomnilnika"
+
+#: gui/flamegraph.cpp:430
+#, kde-format
+msgid ""
+"Show a flame graph over the contributions to the peak heap memory "
+"consumption of your application."
+msgstr ""
+"Pokaže plamenski grafikon nad prispevki za vrh porabe pomnilnika kopice v "
+"vašem programu."
+
+#: gui/flamegraph.cpp:435
+#, kde-format
+msgid ""
+"Show a flame graph over the leaked heap memory of your application. Memory "
+"is considered to be leaked when it never got deallocated. "
+msgstr ""
+"Pokaže plamenski grafikon prek izpustov pomnilnika kopice za vaš program. Za "
+"izpust pomnilnika šteje, ko dodelitev nikoli ni sproščena. "
+
+#: gui/flamegraph.cpp:440
+#, kde-format
+msgid ""
+"Show a flame graph over the number of allocations triggered by functions in "
+"your code."
+msgstr ""
+"Pokaže plamenski grafikon nad številom dodelitev, ki jih sprožijo funkcije v "
+"kodi."
+
+#: gui/flamegraph.cpp:445
+#, kde-format
+msgid ""
+"Show a flame graph over the number of temporary allocations triggered by "
+"functions in your code. Allocations are marked as temporary when they are "
+"immediately followed by their deallocation."
+msgstr ""
+"Pokaže plamenski grafikon nad številom začasnih dodelitev, ki jih sprožijo "
+"funkcije v kodi. Dodelitev se označi kot začasna, ko ji takoj sledi njena "
+"sprostitev."
+
+#: gui/flamegraph.cpp:452
+#, kde-format
+msgid "Select the data source that should be visualized in the flame graph."
+msgstr ""
+"Izberite vir podatkov, ki ga želite vizualizirati v plamenskem grafikonu."
+
+#: gui/flamegraph.cpp:467
+#, kde-format
+msgid "Bottom-Up View"
+msgstr "Pogled od spodaj navzgor"
+
+#: gui/flamegraph.cpp:468
+#, kde-format
+msgid ""
+"Enable the bottom-up flame graph view. When this is unchecked, the top-down "
+"view is enabled by default."
+msgstr ""
+"Omogočite pogled plamenskega grafikona od spodaj navzgor. Ko to ni mogoče, "
+"je pogled od zgoraj navzdol privzeto omogočen."
+
+#: gui/flamegraph.cpp:476
+#, kde-format
+msgid "Collapse Recursion"
+msgstr "Strni rekurzijo"
+
+#: gui/flamegraph.cpp:478
+#, kde-format
+msgid ""
+"Collapse stack frames for functions calling themselves. When this is "
+"unchecked, recursive frames will be visualized separately."
+msgstr ""
+"Strni okvirje sklada za funkcije, ki kličejo same sebe. Če to ni potrjeno, "
+"se rekurzivni okvirji ponazorijo ločeno."
+
+#: gui/flamegraph.cpp:490
+#, kde-format
+msgid "Cost Threshold: "
+msgstr "Prag stroškov: "
+
+#: gui/flamegraph.cpp:494
+#, kde-format
+msgid ""
+"<qt>The cost threshold defines a fractional cut-off value. Items with a "
+"relative cost below this value will not be shown in the flame graph. This is "
+"done as an optimization to quickly generate graphs for large data sets with "
+"low memory overhead. If you need more details, decrease the threshold value, "
+"or set it to zero.</qt>"
+msgstr ""
+"<qt>Prag stroškov določa ulompljeno vrednost porezave. Elementi z relativnim "
+"stroškom pod to vrednostjo ne bodo prikazani v plamenskem grafikonu. To se "
+"izvede kot optimizacija za hitro ustvarjanje grafikonov za velike nize "
+"podatkov z nizkim pomnilnikom za režijske zahteve. Če potrebujete več "
+"podrobnosti, zmanjšajte vrednost praga ali jo nastavite na nič.</qt>"
+
+#: gui/flamegraph.cpp:506
+#, kde-format
+msgid "Search..."
+msgstr "Poišči ..."
+
+#: gui/flamegraph.cpp:507
+#, kde-format
+msgid "<qt>Search the flame graph for a symbol.</qt>"
+msgstr "<qt>Preiščite plamenski graf za simbol.</qt>"
+
+#: gui/flamegraph.cpp:543
+#, kde-format
+msgid "Reset View"
+msgstr "Ponastavi pogled"
+
+#: gui/flamegraph.cpp:553 gui/mainwindow.cpp:119
+#, kde-format
+msgid "View Caller/Callee"
+msgstr "Pokaži klicatelja/klicanega"
+
+#: gui/flamegraph.cpp:694
+#, kde-format
+msgid "generating flame graph..."
+msgstr "tvorjenje plamenskega grafikona ..."
+
+#: gui/flamegraph.cpp:771
+#, kde-format
+msgid "%1 (%2% of total of %3) allocations matched by search."
+msgstr "%1 (%2% od skupaj %3) dodelitev, ki se ujemajo z iskanjem."
+
+#: gui/flamegraph.cpp:776
+#, kde-format
+msgid "%1 (%2% of total of %3) matched by search."
+msgstr "%1 (%2% od skupaj %3), ki se ujemajo z iskanjem."
+
+#: gui/gui.cpp:65
+#, kde-format
+msgid "Heaptrack GUI"
+msgstr "Grafični uporabniški vmesnik Heaptrack"
+
+#: gui/gui.cpp:66
+#, kde-format
+msgid "A visualizer for heaptrack data files."
+msgstr "Vizualizator za podatkovne datoteke heaptrack."
+
+#: gui/gui.cpp:67
+#, kde-format
+msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
+msgstr "Copyright 2015, Milian Wolff <mail@milianw.de>"
+
+#: gui/gui.cpp:70
+#, kde-format
+msgid "Milian Wolff"
+msgstr "Milian Wolff"
+
+#: gui/gui.cpp:70
+#, kde-format
+msgid "Original author, maintainer"
+msgstr "Izvirni avtor, vzdrževalec"
+
+#: gui/gui.cpp:84
+#, kde-format
+msgid "Base profile data to compare other files to."
+msgstr "Osnovni podatki profila za primerjavo z drugimi datotekami."
+
+#: gui/gui.cpp:89
+#, kde-format
+msgid ""
+"Load list of leak suppressions from the specified file. Specify one "
+"suppression per line, and start each line with 'leak:', i.e. use the LSAN "
+"suppression file format."
+msgstr ""
+"Nalaganje seznama zatrtih puščanj za navedeno datoteko. Navedite eno "
+"zatiranje na vrstico in začnite vsako vrstico z »leak:«, t.j. uporabite "
+"obliko datoteke za zatiranje LSAN."
+
+#: gui/gui.cpp:95 gui/mainwindow.cpp:609
+#, kde-format
+msgid ""
+"Ignore suppression definitions that are embedded into the heaptrack data "
+"file. By default, heaptrack will copy the suppressions optionally defined "
+"via a `const char *__lsan_default_suppressions()` symbol in the debuggee "
+"application.  These are then always applied when analyzing the data, unless "
+"this feature is explicitly disabled using this command line option."
+msgstr ""
+"Prezrite definicije zatiranja, ki so vdelane v podatkovno datoteko "
+"heaptrack. Privzeto bo heaptrack kopiral zatiranja, ki so izbirno "
+"opredeljena prek simbola »const char *__lsan_default_suppressions()« v "
+"programu za razhroščevanje.  Te se nato vedno uporabljajo pri analizi "
+"podatkov, razen če je ta funkcija izrecno onemogočena z uporabo te možnosti "
+"ukazne vrstice."
+
+#: gui/gui.cpp:103
+#, kde-format
+msgid ""
+"Ignore suppression definitions that are built into heaptrack. By default, "
+"heaptrack will suppress certain known leaks in common system libraries."
+msgstr ""
+"Prezri definicije zatiranj, ki so vgrajene v heaptrack. Privzeto bo "
+"heaptrack zatrl nekatera znana uhajanja v skupnih sistemskih knjižnicah."
+
+#: gui/gui.cpp:106
+#, kde-format
+msgid "Files to load"
+msgstr "Datoteke za nalaganje"
+
+#: gui/gui.cpp:106
+#, kde-format
+msgid "[FILE...]"
+msgstr "[DATOTEKA…]"
+
+#: gui/histogrammodel.cpp:65
+#, kde-format
+msgid ""
+"%1 allocations from %2, totalling %3 allocated with an average of %4 per "
+"allocation"
+msgstr "%1 dodelitev iz %2, skupaj %3 dodeljenih s povprečjem %4 na dodelitev"
+
+#: gui/histogramwidget.cpp:99
+#, kde-format
+msgid "Requested Allocation Size"
+msgstr "Zahtevana velikost dodelitev"
+
+#: gui/histogramwidget.cpp:105
+#, kde-format
+msgid "Number of Allocations"
+msgstr "Število dodelitev"
+
+#: gui/mainwindow.cpp:76
+#, kde-format
+msgid "KDevelop"
+msgstr "KDevelop"
+
+#: gui/mainwindow.cpp:77
+#, kde-format
+msgid "Kate"
+msgstr "Kate"
+
+#: gui/mainwindow.cpp:78
+#, kde-format
+msgid "KWrite"
+msgstr "KWrite"
+
+#: gui/mainwindow.cpp:79
+#, kde-format
+msgid "gedit"
+msgstr "gedit"
+
+#: gui/mainwindow.cpp:80
+#, kde-format
+msgid "gvim"
+msgstr "gvim"
+
+#: gui/mainwindow.cpp:81
+#, kde-format
+msgid "Qt Creator"
+msgstr "Ustvarjalec Qt"
+
+#: gui/mainwindow.cpp:148
+#, kde-format
+msgid "Open file in editor"
+msgstr "Odpri datoteko v urejevalniku"
+
+#: gui/mainwindow.cpp:371
+#, kde-format
+msgid ""
+"<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
+"<i>(attached)</i></dd>"
+msgstr ""
+"<dt><b>razhroščevanec:</b></dt><dd style='font-family:monospace;'>%1 "
+"<i>(priloženo)</i></dd>"
+
+#: gui/mainwindow.cpp:374
+#, kde-format
+msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
+msgstr ""
+"<dt><b>razhroščevanec:</b></dt><dd style='font-family:monospace;'>%1</dd>"
+
+#: gui/mainwindow.cpp:378
+#, kde-format
+msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
+msgstr ""
+"<dt><b>skupni čas izvajanja:</b></dt><dd>%1, filtrirano od %2 do %3 (%4)</dd>"
+
+#: gui/mainwindow.cpp:383
+#, kde-format
+msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>skupni čas izvajanja:</b></dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:385
+#, kde-format
+msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>skupni sistemski pomnilnik:</b></dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:392
+#, kde-format
+msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
+msgstr "<dt><b>klici funkcij dodelitev:</b></dt><dd>%1 (%2/s)</dd>"
+
+#: gui/mainwindow.cpp:395
+#, kde-format
+msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
+msgstr "<dt><b>začasne dodelitve:</b></dt><dd>%1 ( %2% , %3/s)</dd>"
+
+#: gui/mainwindow.cpp:405
+#, kde-format
+msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
+msgstr "<dt><b>vrh porabe pomnilnika kopice</b>:</dt><dd>%1 po %2</dd>"
+
+#: gui/mainwindow.cpp:408
+#, kde-format
+msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
+msgstr ""
+"<dt><b>vrh RSS</b> (vključno z režijskimi stroški heaptrack):</dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:412
+#, kde-format
+msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>delta porabe pomnilnika</b>:</dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:416
+#, kde-format
+msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
+msgstr "<dt><b>skupno uhajanje pomnilnika</b>:</dt><dd>%1 (%2 zatrto)</dd>"
+
+#: gui/mainwindow.cpp:419
+#, kde-format
+msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>skupno uhajanje pomnilnika</b>:</dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:447
+#, kde-format
+msgid "Failed to parse file %1."
+msgstr "Razčlenjevanje datoteke %1 ni uspelo."
+
+#: gui/mainwindow.cpp:452
+#, kde-format
+msgid "Consumed"
+msgstr "Porabljeno"
+
+#: gui/mainwindow.cpp:468
+#, kde-format
+msgid "Sizes"
+msgstr "Velikosti"
+
+#: gui/mainwindow.cpp:532
+#, kde-format
+msgid "Input data %1 does not exist."
+msgstr "Vhodni podatki %1 ne obstajajo."
+
+#: gui/mainwindow.cpp:534
+#, kde-format
+msgid "Input data %1 is not a file."
+msgstr "Vhodni podatki %1 niso datoteka."
+
+#: gui/mainwindow.cpp:536
+#, kde-format
+msgid "Input data %1 is not readable."
+msgstr "Vhodni podatki %1 niso berljivi."
+
+#: gui/mainwindow.cpp:564
+#, kde-format
+msgid "Failed to parse suppression file."
+msgstr "Datoteke za zatiranje ni bilo mogoče razčleniti."
+
+#: gui/mainwindow.cpp:579
+#, kde-format
+msgid "Heaptrack"
+msgstr "Heaptrack"
+
+#: gui/mainwindow.cpp:607
+#, kde-format
+msgid "Disable Embedded Suppressions"
+msgstr "Onemogoči vdelana zatiranja"
+
+#: gui/mainwindow.cpp:619
+#, kde-format
+msgid "Disable Builtin Suppressions"
+msgstr "Onemogoči vgrajena zatiranja"
+
+#: gui/mainwindow.cpp:621
+#, kde-format
+msgid ""
+"Ignore suppression definitions that are built into heaptrack. By default, "
+"heaptrack will suppress certain known leaks from common system libraries."
+msgstr ""
+"Prezri definicije zatiranja, ki so vgrajene v heaptrack. Privzeto bo "
+"heaptrack zatiral nekatera znana uhajanja iz skupnih sistemskih knjižnic."
+
+#: gui/mainwindow.cpp:649
+#, kde-format
+msgid "Loading file %1, please wait..."
+msgstr "Nalaganje datoteke %1, počakajte ..."
+
+#: gui/mainwindow.cpp:651
+#, kde-format
+msgctxt "%1: file name that is open"
+msgid "Heaptrack - %1"
+msgstr "Heaptrack - %1"
+
+#: gui/mainwindow.cpp:654
+#, kde-format
+msgctxt "%1, %2: file names that are open"
+msgid "Heaptrack - %1 compared to %2"
+msgstr "Heaptrack - %1, primerjano z %2"
+
+#: gui/mainwindow.cpp:670
+#, kde-format
+msgid "Reparsing file, please wait..."
+msgstr "Ponovno razčlenjevanje datoteke, počakajte ..."
+
+#: gui/mainwindow.cpp:713
+#, kde-format
+msgid " / %1"
+msgstr " / %1"
+
+#: gui/mainwindow.cpp:754
+#, kde-format
+msgid "Code Navigation"
+msgstr "Krmarjenje po kodi"
+
+#: gui/mainwindow.cpp:782
+#, kde-format
+msgid "Custom..."
+msgstr "Po meri …"
+
+#: gui/mainwindow.cpp:794
+#, kde-format
+msgid "Automatic (No Line numbers)"
+msgstr "Samodejno (brez številk vrstic)"
+
+#: gui/mainwindow.cpp:814
+#, kde-format
+msgid "Custom Code Navigation"
+msgstr "Krmarjenje po kodi po meri"
+
+#: gui/mainwindow.cpp:815
+#, kde-format
+msgid ""
+"Specify command to use for code navigation, '%f' will be replaced by the "
+"file name, '%l' by the line number and '%c' by the column number."
+msgstr ""
+"Določite ukaz, ki ga želite uporabiti za krmarjenje po kodi, »%f« bo "
+"nadomeščen z imenom datoteke, »%l« s številko vrstice in »%c« s številko "
+"stolpca."
+
+#. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
+#: gui/mainwindow.ui:14
+#, kde-format
+msgid "MainWindow"
+msgstr "Glavno okno"
+
+#. i18n: ectx: property (toolTip), widget (QMainWindow, MainWindow)
+#. i18n: ectx: property (toolTip), widget (QLabel, suppressionsLabel)
+#: gui/mainwindow.ui:17 gui/mainwindow.ui:125
+#, kde-format
+msgid "Path to a file containing leak suppression rules in the LSAN format."
+msgstr ""
+"Pot do datoteke, ki vsebuje pravila za zatiranje uhajanja v obliki LSAN."
+
+#. i18n: ectx: property (title), widget (QGroupBox, groupBox)
+#: gui/mainwindow.ui:64
+#, kde-format
+msgid "Open Heaptrack Data"
+msgstr "Odpri podatke o heaptracku"
+
+#. i18n: ectx: property (toolTip), widget (KUrlRequester, openFile)
+#: gui/mainwindow.ui:73
+#, kde-format
+msgid ""
+"<qt><p>This field specifies the primary heaptrack data file. These files are "
+"called <tt>heaptrack.$APP.$PID.gz</tt> or <tt>heaptrack.$APP.$PID.zst</tt>. "
+"You can produce such a file by profiling your application, e.g. via:</p>\n"
+"<pre><code>heaptrack &lt;yourapplication&gt; ...</code></pre>\n"
+"<p>Or, alternatively, you can attach to a running process via</p>\n"
+"<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
+msgstr ""
+"<qt><p>V polju je navedena primarna podatkovna datoteka heaptrack. Te "
+"datoteke se imenujejo <tt>heaptrack.$APP.$PID.gz</tt> ali <tt>heaptrack.$APP."
+"$PID.zst</tt>. Takšno datoteko lahko izdelate tako, da profilirate svoj "
+"program, npr.</p>\n"
+"<pre><code>heaptrack &lt;vašprogram&gt; ...</code></pre>\n"
+"<p>Lahko pa se priključite na tekoči postopek prek</p>\n"
+"<pre><code>heaptrack --pid $(pidof &lt;vašprogram&gt;)</code></pre></qt>"
+
+#. i18n: ectx: property (filter), widget (KUrlRequester, openFile)
+#. i18n: ectx: property (filter), widget (KUrlRequester, compareTo)
+#: gui/mainwindow.ui:76 gui/mainwindow.ui:92
+#, kde-format
+msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
+
+#. i18n: ectx: property (placeholderText), widget (KUrlRequester, openFile)
+#. i18n: ectx: property (placeholderText), widget (KUrlRequester, compareTo)
+#: gui/mainwindow.ui:79 gui/mainwindow.ui:95
+#, kde-format
+msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
+msgstr "pot/do/heaptrack.$APP.$PID. {gz,zst}"
+
+#. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
+#: gui/mainwindow.ui:89
+#, kde-format
+msgid ""
+"<qt>You can optionally specify a second heaptrack data file to compare to. "
+"If set, this file will be used as a base and its cost gets subtracted from "
+"the primary data costs.</qt>"
+msgstr ""
+"<qt>Po želji lahko določite drugo podatkovno datoteko heaptrack za "
+"primerjavo. Če je nastavljena, bo ta datoteka uporabljena kot osnova in njen "
+"strošek se odšteje od primarnih stroškov podatkov.</qt>"
+
+#. i18n: ectx: property (text), widget (QLabel, openFileLabel)
+#: gui/mainwindow.ui:105
+#, kde-format
+msgid "Profile &Data:"
+msgstr "Po&datki profila:"
+
+#. i18n: ectx: property (text), widget (QLabel, compareToLabel)
+#: gui/mainwindow.ui:115
+#, kde-format
+msgid "Compare to:"
+msgstr "Primerjaj z:"
+
+#. i18n: ectx: property (text), widget (QLabel, suppressionsLabel)
+#: gui/mainwindow.ui:128
+#, kde-format
+msgid "Suppressions:"
+msgstr "Zatiranja:"
+
+#. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
+#: gui/mainwindow.ui:138
+#, kde-format
+msgid "path/to/lsan_suppressions.txt"
+msgstr "pot/do/lsan_suppressions.txt"
+
+#. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
+#: gui/mainwindow.ui:251
+#, kde-format
+msgid "Summary"
+msgstr "Povzetek"
+
+#. i18n: ectx: property (toolTip), widget (QLabel, topPeakLabel)
+#. i18n: ectx: property (toolTip), widget (QTreeView, topPeak)
+#: gui/mainwindow.ui:352 gui/mainwindow.ui:365
+#, kde-format
+msgid "List of functions that allocated the most memory at a given time."
+msgstr "Seznam funkcij, ki so dodelile največ pomnilnika v danem času."
+
+#. i18n: ectx: property (text), widget (QLabel, topPeakLabel)
+#: gui/mainwindow.ui:355
+#, kde-format
+msgid "Peak Contributions"
+msgstr "Vrh prispevkov"
+
+#. i18n: ectx: property (toolTip), widget (QLabel, topLeakedLabel)
+#. i18n: ectx: property (toolTip), widget (QTreeView, topLeaked)
+#: gui/mainwindow.ui:391 gui/mainwindow.ui:404
+#, kde-format
+msgid "List of functions that leak the most memory."
+msgstr "Seznam funkcij, ki puščajo največ pomnilnika."
+
+#. i18n: ectx: property (text), widget (QLabel, topLeakedLabel)
+#: gui/mainwindow.ui:394
+#, kde-format
+msgid "Largest Memory Leaks"
+msgstr "Največji izpusti pomnilnika"
+
+#. i18n: ectx: property (toolTip), widget (QLabel, topAllocationsLabel)
+#. i18n: ectx: property (toolTip), widget (QTreeView, topAllocations)
+#: gui/mainwindow.ui:430 gui/mainwindow.ui:443
+#, kde-format
+msgid "List of functions that allocate memory most often."
+msgstr "Seznam funkcij, ki najpogosteje dodelijo pomnilnik."
+
+#. i18n: ectx: property (text), widget (QLabel, topAllocationsLabel)
+#: gui/mainwindow.ui:433
+#, kde-format
+msgid "Most Memory Allocations"
+msgstr "Večina dodelitev pomnilnika"
+
+#. i18n: ectx: property (toolTip), widget (QLabel, topTemporaryLabel)
+#. i18n: ectx: property (toolTip), widget (QTreeView, topTemporary)
+#: gui/mainwindow.ui:472 gui/mainwindow.ui:485
+#, kde-format
+msgid "List of functions that produced the most temporary memory allocations."
+msgstr "Seznam funkcij, ki so ustvarile največ začasnih dodelitev pomnilnika."
+
+#. i18n: ectx: property (text), widget (QLabel, topTemporaryLabel)
+#: gui/mainwindow.ui:475
+#, kde-format
+msgid "Most Temporary Allocations"
+msgstr "Večina začasnih dodelitev"
+
+#. i18n: ectx: property (title), widget (KCollapsibleGroupBox, suppressionBox)
+#: gui/mainwindow.ui:508
+#, kde-format
+msgid "Suppressions"
+msgstr "Zatiranja"
+
+#. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
+#: gui/mainwindow.ui:540
+#, kde-format
+msgid "Bottom-Up"
+msgstr "Od spodaj navzgor"
+
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFunction)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterFunction)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFunction)
+#: gui/mainwindow.ui:564 gui/mainwindow.ui:632 gui/mainwindow.ui:753
+#, kde-format
+msgid "filter by function..."
+msgstr "filtriranje po funkciji ..."
+
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
+#: gui/mainwindow.ui:571 gui/mainwindow.ui:760
+#, kde-format
+msgid "filter by file..."
+msgstr "filtriranje po datoteki ..."
+
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterModule)
+#: gui/mainwindow.ui:578 gui/mainwindow.ui:639 gui/mainwindow.ui:767
+#, kde-format
+msgid "filter by module..."
+msgstr "filtriranje po modulu ..."
+
+#. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
+#: gui/mainwindow.ui:608
+#, kde-format
+msgid "Caller / Callee"
+msgstr "Klicatelj / klicani"
+
+#. i18n: ectx: attribute (title), widget (QWidget, topDownTab)
+#: gui/mainwindow.ui:732
+#, kde-format
+msgid "Top-Down"
+msgstr "Od zgoraj navzdol"
+
+#. i18n: ectx: attribute (title), widget (FlameGraph, flameGraphTab)
+#: gui/mainwindow.ui:797
+#, kde-format
+msgid "Flame Graph"
+msgstr "Plamenski graf"
+
+#. i18n: ectx: property (windowTitle), widget (QDockWidget, stacksDock)
+#: gui/mainwindow.ui:813
+#, kde-format
+msgid "S&tacks"
+msgstr "S&kladi"
+
+#. i18n: ectx: property (text), widget (QLabel, stackSpinnerLabel)
+#: gui/mainwindow.ui:838
+#, kde-format
+msgid "Selected Stack:"
+msgstr "Izbrani sklad:"
+
+#. i18n: ectx: property (title), widget (QMenu, menu_File)
+#: gui/mainwindow.ui:875
+#, kde-format
+msgid "&File"
+msgstr "&Datoteka"
+
+#. i18n: ectx: property (title), widget (QMenu, menu_Settings)
+#: gui/mainwindow.ui:880
+#, kde-format
+msgid "Setti&ngs"
+msgstr "&Nastavitve"
+
+#. i18n: ectx: property (title), widget (QMenu, menuFilter)
+#: gui/mainwindow.ui:885
+#, kde-format
+msgid "Filter"
+msgstr "Filter"
+
+#: gui/parser.cpp:387
+#, kde-format
+msgid "merging allocations... %1%"
+msgstr "spajanje dodelitev ... %1%"
+
+#: gui/parser.cpp:557
+#, kde-format
+msgid "total"
+msgstr "skupaj"
+
+#: gui/parser.cpp:559
+#, kde-format
+msgid "0B to 8B"
+msgstr "0 B do 8 B"
+
+#: gui/parser.cpp:560
+#, kde-format
+msgid "9B to 16B"
+msgstr "9 B do 16 B"
+
+#: gui/parser.cpp:561
+#, kde-format
+msgid "17B to 32B"
+msgstr "17 B do 32 B"
+
+#: gui/parser.cpp:562
+#, kde-format
+msgid "33B to 64B"
+msgstr "33 B do 64 B"
+
+#: gui/parser.cpp:563
+#, kde-format
+msgid "65B to 128B"
+msgstr "65 B do 128 B"
+
+#: gui/parser.cpp:564
+#, kde-format
+msgid "129B to 256B"
+msgstr "129 B do 256 B"
+
+#: gui/parser.cpp:565
+#, kde-format
+msgid "257B to 512B"
+msgstr "257 B do 512 B"
+
+#: gui/parser.cpp:566
+#, kde-format
+msgid "512B to 1KB"
+msgstr "512 B do 1 KB"
+
+#: gui/parser.cpp:567
+#, kde-format
+msgid "more than 1KB"
+msgstr "več kot 1 KB"
+
+#: gui/parser.cpp:645
+#, kde-format
+msgid "reparsing data"
+msgstr "ponovno razčlenjevanje podatkov"
+
+#: gui/parser.cpp:645
+#, kde-format
+msgid "parsing data"
+msgstr "razčlenjevanje podatkov"
+
+#: gui/parser.cpp:659
+#, kde-format
+msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
+msgstr "%1 podano: %2/%3  porabljeno: %4  preostaja: %5"
+
+#: gui/parser.cpp:715
+#, kde-format
+msgid "merging allocations..."
+msgstr "spajanje dodelitev ..."
+
+#: gui/parser.cpp:726
+#, kde-format
+msgid "building size histogram..."
+msgstr "gradnja histograma velikosti …"
+
+#: gui/parser.cpp:739
+#, kde-format
+msgid "building charts..."
+msgstr "gradnja grafikonov ..."
+
+#: gui/stacksmodel.cpp:99
+#, kde-format
+msgid "Backtrace"
+msgstr "Povratno sledenje klicev"
+
+#: gui/treemodel.cpp:80
+#, kde-format
+msgid ""
+"<qt>The number of times an allocation function was called from this location."
+"</qt>"
+msgstr "<qt>Število klicev funkcije dodelitev s tega mesta.</qt>"
+
+#: gui/treemodel.cpp:83
+#, kde-format
+msgid ""
+"<qt>The number of temporary allocations. These allocations are directly "
+"followed by a free without any other allocations in-between.</qt>"
+msgstr ""
+"<qt>Število začasnih dodelitev. Tem dodelitvam neposredno sledi sprostitev "
+"dodelitve brez drugih vmesnih dodelitev.</qt>"
+
+#: gui/treemodel.cpp:87
+#, kde-format
+msgid ""
+"<qt>The contributions from a given location to the maximum heap memory "
+"consumption in bytes. This takes deallocations into account.</qt>"
+msgstr ""
+"<qt>Prispevki z danega mesta k največji porabi pomnilnika kopice v bajtih. "
+"Pri tem se upoštevajo sprostitve dodelitev.</qt>"
+
+#: gui/treemodel.cpp:94
+#, kde-format
+msgid ""
+"<qt>The location from which an allocation function was called. Function "
+"symbol and file information may be unknown when debug information was "
+"missing when heaptrack was run.</qt>"
+msgstr ""
+"<qt>Mesto, s katerega je bila poklicana funkcija dodelitve. Simbol funkcije "
+"in podatki o datoteki so morda neznani, ko so ob zagonu heaptrack manjkali "
+"podatki o napakah.</qt>"
+
+#: gui/treemodel.cpp:149 gui/treemodel.cpp:173
+#, kde-format
+msgctxt "1: function, 2: module, 3: module path"
+msgid ""
+"%1\n"
+"  in %2 (%3)"
+msgstr ""
+"%1\n"
+"  v %2 (%3)"
+
+#: gui/treemodel.cpp:159
+#, kde-format
+msgid "peak contribution: %1 (%2% of total)\n"
+msgstr "vrh prispevka: %1 (%2% od skupnega)\n"
+
+#: gui/treemodel.cpp:160
+#, kde-format
+msgid "leaked: %1 (%2% of total)\n"
+msgstr "uhajanja: %1 (%2% vseh)\n"
+
+#: gui/treemodel.cpp:161
+#, kde-format
+msgid "allocations: %1 (%2% of total)\n"
+msgstr "dodelitev: %1 (%2% vseh)\n"
+
+#: gui/treemodel.cpp:162
+#, kde-format
+msgid "temporary: %1 (%2% of allocations, %3% of total)\n"
+msgstr "začasno: %1 (%2% dodelitev, %3% vseh)\n"
+
+#: gui/treemodel.cpp:168
+#, kde-format
+msgid "backtrace:"
+msgstr "zgodovina klicev:"
+
+#: gui/treemodel.cpp:180
+#, kde-format
+msgid "called from one location"
+msgid_plural "called from %1 locations"
+msgstr[0] "klicano s/z %1 mesta"
+msgstr[1] "klicano s/z %1 mest"
+msgstr[2] "klicano s/z %1 mest"
+msgstr[3] "klicano s/z %1 mest"
+
+#: gui/util.cpp:32
+#, kde-format
+msgid "??"
+msgstr "??"
+
+#: gui/util.cpp:108
+#, kde-format
+msgid "%1: %2<br/>&nbsp;&nbsp;%4% out of %3 total"
+msgstr "%1: %2<br/>&nbsp;&nbsp;%4% od skupaj %3"
+
+#: gui/util.cpp:134 gui/util.cpp:163
+#, kde-format
+msgid "%1 (self): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
+msgstr "%1 (sebe): %2<br/>&nbsp;&nbsp;%4% od skupaj %3"
+
+#: gui/util.cpp:137 gui/util.cpp:166
+#, kde-format
+msgid "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
+msgstr "%1 (vključno): %2<br/>&nbsp;&nbsp;%4% od skupaj %3"
+
+#: gui/util.cpp:183
+#, kde-format
+msgid "symbol: <tt>%1</tt><br/>binary: <tt>%2 (%3)</tt>"
+msgstr "simbol: <tt>%1</tt><br/>binarno: <tt>%2 (%3)</tt>"
+
+#: gui/util.cpp:187
+#, kde-format
+msgctxt "%1: function name, %2: binary basename"
+msgid "%1 in %2"
+msgstr "%1 v %2"
+
+#: gui/util.cpp:209
+#, kde-format
+msgid "<unresolved function>"
+msgstr "<nerazrešena funkcija>"
