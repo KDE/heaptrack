@@ -20,6 +20,7 @@ class ChartModel;
 namespace KChart {
 class Chart;
 class CartesianAxis;
+class Legend;
 class Plotter;
 }
 
@@ -75,6 +76,7 @@ private:
     KChart::Plotter* m_detailedPlotter = nullptr;
     QSpinBox* m_stackedDiagrams = nullptr;
     KChart::Chart* m_chart = nullptr;
+    KChart::Legend* m_legend = nullptr;
     KChart::CartesianAxis* m_bottomAxis = nullptr;
     KChart::CartesianAxis* m_rightAxis = nullptr;
     ChartModel* m_model = nullptr;

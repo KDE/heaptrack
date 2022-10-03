@@ -127,6 +127,7 @@ private:
 ChartWidget::ChartWidget(QWidget* parent)
     : QWidget(parent)
     , m_chart(new Chart(this))
+    , m_legend(new Legend(m_chart))
     , m_rubberBand(new ChartRubberBand(this))
 {
     auto m_chartToolBar = new QToolBar(this);
@@ -134,12 +135,20 @@ ChartWidget::ChartWidget(QWidget* parent)
     auto m_exportAsButton = new QPushButton(i18n("Export As..."), this);
     connect(m_exportAsButton, &QPushButton::released, this, &ChartWidget::saveAs);
 
+    auto m_showLegend = new QCheckBox(i18n("Show legend"), this);
+    m_showLegend->setChecked(false);
+    connect(m_showLegend, &QCheckBox::toggled, this, [=](bool show) {
+        m_legend->setVisible(show);
+        m_chart->update();
+    });
+
     auto m_showTotal = new QCheckBox(i18n("Show total cost graph"), this);
     m_showTotal->setChecked(true);
     connect(m_showTotal, &QCheckBox::toggled, this, [=](bool show) {
         m_totalPlotter->setHidden(!show);
         m_chart->update();
     });
+    m_legend->setVisible(m_showLegend->checkState());
 
     auto m_showDetailed = new QCheckBox(i18n("Show detailed cost graph"), this);
     m_showDetailed->setChecked(true);
@@ -156,6 +165,8 @@ ChartWidget::ChartWidget(QWidget* parent)
             [=](int value) { m_model->setMaximumDatasetCount(value + 1); });
 
     m_chartToolBar->addWidget(m_exportAsButton);
+    m_chartToolBar->addSeparator();
+    m_chartToolBar->addWidget(m_showLegend);
     m_chartToolBar->addSeparator();
     m_chartToolBar->addWidget(m_showTotal);
     m_chartToolBar->addWidget(m_showDetailed);
@@ -244,6 +255,48 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
     }
 
     {
+        KChart::GridAttributes grid = coordinatePlane->gridAttributes(Qt::Horizontal);
+        // Do not align view on main grid line, stretch grid to match datasets
+        grid.setAdjustBoundsToGrid(false, false);
+        coordinatePlane->setGridAttributes(Qt::Horizontal, grid);
+
+        m_legend->setOrientation(Qt::Vertical);
+        m_legend->setTitleText(QString());
+        m_legend->setSortOrder(Qt::DescendingOrder);
+
+        RelativePosition relPos;
+        relPos.setReferenceArea(coordinatePlane);
+        relPos.setReferencePosition(Position::NorthWest);
+        relPos.setAlignment(Qt::AlignTop | Qt::AlignLeft | Qt::AlignAbsolute);
+        relPos.setHorizontalPadding(Measure(3.0, KChartEnums::MeasureCalculationModeAbsolute));
+        relPos.setVerticalPadding(Measure(3.0, KChartEnums::MeasureCalculationModeAbsolute));
+
+        m_legend->setFloatingPosition(relPos);
+        m_legend->setTextAlignment(Qt::AlignLeft | Qt::AlignAbsolute);
+
+        m_chart->addLegend(m_legend);
+
+        KColorScheme scheme(QPalette::Active, KColorScheme::Window);
+        QPen foreground(scheme.foreground().color());
+
+        BackgroundAttributes bkgAtt = m_legend->backgroundAttributes();
+        QColor background = scheme.background(KColorScheme::AlternateBackground).color();
+        background.setAlpha(200);
+        bkgAtt.setBrush(QBrush(background));
+        bkgAtt.setVisible(true);
+
+        TextAttributes textAttr = m_legend->textAttributes();
+        textAttr.setPen(foreground);
+        textAttr.setFontSize(Measure(18));
+        QFont legendFont(QStringLiteral("monospace"));
+        legendFont.setStyleHint(QFont::TypeWriter);
+        textAttr.setFont(legendFont);
+
+        m_legend->setBackgroundAttributes(bkgAtt);
+        m_legend->setTextAttributes(textAttr);
+    }
+
+    {
         m_totalPlotter = new Plotter(this);
         m_totalPlotter->setAntiAliasing(true);
         auto totalProxy = new ChartProxy(true, this);
@@ -279,6 +332,8 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
         m_totalPlotter->addAxis(m_rightAxis);
 
         coordinatePlane->addDiagram(m_totalPlotter);
+
+        m_legend->addDiagram(m_totalPlotter);
     }
 
     {
@@ -290,7 +345,11 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
         proxy->setSourceModel(model);
         m_detailedPlotter->setModel(proxy);
         coordinatePlane->addDiagram(m_detailedPlotter);
+
+        m_legend->addDiagram(m_detailedPlotter);
     }
+
+    m_legend->hide();
 
     // If the dataset has 10 entries, one is for the total plot and the
     // remaining ones are for the detailed plot. We want to only change
@@ -387,8 +446,9 @@ void ChartWidget::updateAxesTitle()
     if (!m_model)
         return;
 
-    m_bottomAxis->setTitleText(m_model->headerData(0).toString());
-    m_rightAxis->setTitleText(m_model->headerData(1).toString());
+    // m_bottomAxis is always time, so we can just write it here instead of in headerData().
+    m_bottomAxis->setTitleText(i18n("Elapsed Time"));
+    m_rightAxis->setTitleText(m_model->typeString());
 
     if (m_summaryData.filterParameters.isFilteredByTime(m_summaryData.totalTime)) {
         m_bottomAxis->setTitleText(

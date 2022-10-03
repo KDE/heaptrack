@@ -55,6 +55,7 @@ public:
     virtual ~ChartModel();
 
     Type type() const;
+    QString typeString() const;
 
     QVariant headerData(int section, Qt::Orientation orientation = Qt::Horizontal,
                         int role = Qt::DisplayRole) const override;

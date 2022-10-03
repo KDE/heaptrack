@@ -45,6 +45,20 @@ ChartModel::Type ChartModel::type() const
     return m_type;
 }
 
+QString ChartModel::typeString() const
+{
+    switch (m_type) {
+    case Allocations:
+        return i18n("Memory Allocations");
+    case Consumed:
+        return i18n("Memory Consumed");
+    case Temporary:
+        return i18n("Temporary Allocations");
+    default:
+        return QString();
+    }
+}
+
 QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     Q_ASSERT(orientation == Qt::Horizontal || section < columnCount());
@@ -55,20 +69,50 @@ QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int ro
             return QVariant::fromValue(m_columnDataSetBrushes.at(section));
         }
 
-        if (role == Qt::DisplayRole || role == Qt::ToolTipRole) {
+        if (role == Qt::ToolTipRole) {
             if (section == 0) {
                 return i18n("Elapsed Time");
             }
-            switch (m_type) {
-            case Allocations:
-                return i18n("Memory Allocations");
-            case Consumed:
-                return i18n("Memory Consumed");
-            case Temporary:
-                return i18n("Temporary Allocations");
+            return typeString();
+        } else if (role == Qt::DisplayRole) {
+            if (section == 0) {
+                switch (m_type) {
+                case Allocations:
+                    return i18n("Total Memory Allocations");
+                case Consumed:
+                    return i18n("Total Memory Consumption");
+                case Temporary:
+                    return i18n("Total Temporary Allocations");
+                }
+            } else {
+                auto id = m_data.labels.value(section / 2).functionId;
+                QString label = m_data.resultData->string(id);
+
+                // Experimental symbol name shortening, currently only truncating
+                // and left-justified labels. The length is also fixed and should
+                // be adjusted later on.
+                //
+                // The justified text is also a workaround to setTextAlignment as
+                // this does not seem to work on KChartLegend objects. This might
+                // be because it is not supported for these instances, as the re-
+                // ference suggests: https://doc.qt.io/qt-6/stylesheet-reference.html
+                // (see "text-align" entry).
+                int symbolNameLength = 60;
+
+                if (label.size() < symbolNameLength) {
+                    label = label.leftJustified(symbolNameLength);
+                } else if (label.size() > symbolNameLength) {
+                    label.truncate(symbolNameLength - 3);
+                    label = label.leftJustified(symbolNameLength, QLatin1Char('.'));
+                }
+
+                label = label.rightJustified(symbolNameLength + 1);
+
+                return i18n("%1", label);
             }
         }
     }
+
     return {};
 }
 
