@@ -7,6 +7,7 @@
 #include "chartwidget.h"
 
 #include <QApplication>
+#include <QCheckBox>
 #include <QFileDialog>
 #include <QLabel>
 #include <QMenu>
@@ -133,7 +134,24 @@ ChartWidget::ChartWidget(QWidget* parent)
     auto m_exportAsButton = new QPushButton(i18n("Export As..."), this);
     connect(m_exportAsButton, &QPushButton::released, this, &ChartWidget::saveAs);
 
+    auto m_showTotal = new QCheckBox(i18n("Show total cost graph"), this);
+    m_showTotal->setChecked(true);
+    connect(m_showTotal, &QCheckBox::toggled, this, [=](bool show) {
+        m_totalPlotter->setHidden(!show);
+        m_chart->update();
+    });
+
+    auto m_showDetailed = new QCheckBox(i18n("Show detailed cost graph"), this);
+    m_showDetailed->setChecked(true);
+    connect(m_showDetailed, &QCheckBox::toggled, this, [=](bool show) {
+        m_detailedPlotter->setHidden(!show);
+        m_chart->update();
+    });
+
     m_chartToolBar->addWidget(m_exportAsButton);
+    m_chartToolBar->addSeparator();
+    m_chartToolBar->addWidget(m_showTotal);
+    m_chartToolBar->addWidget(m_showDetailed);
 
     auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -216,12 +234,12 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
     }
 
     {
-        auto totalPlotter = new Plotter(this);
-        totalPlotter->setAntiAliasing(true);
+        m_totalPlotter = new Plotter(this);
+        m_totalPlotter->setAntiAliasing(true);
         auto totalProxy = new ChartProxy(true, this);
         totalProxy->setSourceModel(model);
-        totalPlotter->setModel(totalProxy);
-        totalPlotter->setType(Plotter::Stacked);
+        m_totalPlotter->setModel(totalProxy);
+        m_totalPlotter->setType(Plotter::Stacked);
 
         KColorScheme scheme(QPalette::Active, KColorScheme::Window);
         const QPen foreground(scheme.foreground().color());
@@ -233,35 +251,35 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
             return attributes;
         };
 
-        m_bottomAxis = new TimeAxis(totalPlotter);
+        m_bottomAxis = new TimeAxis(m_totalPlotter);
         const auto axisTextAttributes = fixupTextAttributes(m_bottomAxis->textAttributes(), font().pointSizeF() - 2);
         m_bottomAxis->setTextAttributes(axisTextAttributes);
         const auto axisTitleTextAttributes =
             fixupTextAttributes(m_bottomAxis->titleTextAttributes(), font().pointSizeF() + (minimalMode ? (-2) : (+2)));
         m_bottomAxis->setTitleTextAttributes(axisTitleTextAttributes);
         m_bottomAxis->setPosition(CartesianAxis::Bottom);
-        totalPlotter->addAxis(m_bottomAxis);
+        m_totalPlotter->addAxis(m_bottomAxis);
 
         m_rightAxis = model->type() == ChartModel::Allocations || model->type() == ChartModel::Temporary
-            ? new CartesianAxis(totalPlotter)
-            : new SizeAxis(totalPlotter);
+            ? new CartesianAxis(m_totalPlotter)
+            : new SizeAxis(m_totalPlotter);
         m_rightAxis->setTextAttributes(axisTextAttributes);
         m_rightAxis->setTitleTextAttributes(axisTitleTextAttributes);
         m_rightAxis->setPosition(CartesianAxis::Right);
-        totalPlotter->addAxis(m_rightAxis);
+        m_totalPlotter->addAxis(m_rightAxis);
 
-        coordinatePlane->addDiagram(totalPlotter);
+        coordinatePlane->addDiagram(m_totalPlotter);
     }
 
     {
-        auto plotter = new Plotter(this);
-        plotter->setAntiAliasing(true);
-        plotter->setType(Plotter::Stacked);
+        m_detailedPlotter = new Plotter(this);
+        m_detailedPlotter->setAntiAliasing(true);
+        m_detailedPlotter->setType(Plotter::Stacked);
 
         auto proxy = new ChartProxy(false, this);
         proxy->setSourceModel(model);
-        plotter->setModel(proxy);
-        coordinatePlane->addDiagram(plotter);
+        m_detailedPlotter->setModel(proxy);
+        coordinatePlane->addDiagram(m_detailedPlotter);
     }
 
     updateToolTip();

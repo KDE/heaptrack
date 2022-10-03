@@ -19,6 +19,7 @@ class ChartModel;
 namespace KChart {
 class Chart;
 class CartesianAxis;
+class Plotter;
 }
 
 class ChartWidget : public QWidget
@@ -69,6 +70,8 @@ private:
     void updateRubberBand();
     bool eventFilter(QObject* watched, QEvent* event) override;
 
+    KChart::Plotter* m_totalPlotter = nullptr;
+    KChart::Plotter* m_detailedPlotter = nullptr;
     KChart::Chart* m_chart = nullptr;
     KChart::CartesianAxis* m_bottomAxis = nullptr;
     KChart::CartesianAxis* m_rightAxis = nullptr;
