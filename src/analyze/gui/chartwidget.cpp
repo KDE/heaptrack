@@ -148,10 +148,20 @@ ChartWidget::ChartWidget(QWidget* parent)
         m_chart->update();
     });
 
+    auto stackedLabel = new QLabel(i18n("Stacked diagrams:"));
+    m_stackedDiagrams = new QSpinBox(this);
+    m_stackedDiagrams->setMinimum(0);
+    m_stackedDiagrams->setMaximum(50);
+    connect(m_stackedDiagrams, qOverload<int>(&QSpinBox::valueChanged), this,
+            [=](int value) { m_model->setMaximumDatasetCount(value + 1); });
+
     m_chartToolBar->addWidget(m_exportAsButton);
     m_chartToolBar->addSeparator();
     m_chartToolBar->addWidget(m_showTotal);
     m_chartToolBar->addWidget(m_showDetailed);
+    m_chartToolBar->addSeparator();
+    m_chartToolBar->addWidget(stackedLabel);
+    m_chartToolBar->addWidget(m_stackedDiagrams);
 
     auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -281,6 +291,12 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
         m_detailedPlotter->setModel(proxy);
         coordinatePlane->addDiagram(m_detailedPlotter);
     }
+
+    // If the dataset has 10 entries, one is for the total plot and the
+    // remaining ones are for the detailed plot. We want to only change
+    // the number of detailed plots, so we have to correct it.
+    int maximumDatasetCount = m_model->maximumDatasetCount();
+    m_stackedDiagrams->setValue(maximumDatasetCount - 1);
 
     updateToolTip();
     updateAxesTitle();

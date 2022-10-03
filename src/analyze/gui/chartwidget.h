@@ -13,6 +13,7 @@
 
 class QRubberBand;
 class QAbstractItemModel;
+class QSpinBox;
 
 class ChartModel;
 
@@ -72,6 +73,7 @@ private:
 
     KChart::Plotter* m_totalPlotter = nullptr;
     KChart::Plotter* m_detailedPlotter = nullptr;
+    QSpinBox* m_stackedDiagrams = nullptr;
     KChart::Chart* m_chart = nullptr;
     KChart::CartesianAxis* m_bottomAxis = nullptr;
     KChart::CartesianAxis* m_rightAxis = nullptr;

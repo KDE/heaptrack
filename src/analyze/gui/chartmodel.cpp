@@ -21,13 +21,19 @@
 namespace {
 QColor colorForColumn(int column, int columnCount)
 {
-    return QColor::fromHsv((double(column + 1) / columnCount) * 255, 255, 255);
+    // The total cost graph (column 0) is always red.
+    if (column == 0) {
+        return Qt::red;
+    } else {
+        return QColor::fromHsv((double(column + 1) / columnCount) * 255, 255, 255);
+    }
 }
 }
 
 ChartModel::ChartModel(Type type, QObject* parent)
     : QAbstractTableModel(parent)
     , m_type(type)
+    , m_maxDatasetCount(11)
 {
     qRegisterMetaType<ChartData>();
 }
@@ -151,7 +157,7 @@ QVariant ChartModel::data(const QModelIndex& index, int role) const
 
 int ChartModel::columnCount(const QModelIndex& /*parent*/) const
 {
-    return m_data.labels.size() * 2;
+    return qMin(m_maxDatasetCount, m_data.labels.size()) * 2;
 }
 
 int ChartModel::rowCount(const QModelIndex& parent) const
@@ -163,12 +169,34 @@ int ChartModel::rowCount(const QModelIndex& parent) const
     }
 }
 
-void ChartModel::resetData(const ChartData& data)
+void ChartModel::setMaximumDatasetCount(int count)
 {
-    Q_ASSERT(data.resultData);
-    Q_ASSERT(data.labels.size() < ChartRows::MAX_NUM_COST);
-    beginResetModel();
-    m_data = data;
+    Q_ASSERT(count >= 0);
+
+    int currentColumns = qMin(m_data.labels.size(), m_maxDatasetCount);
+    int newColumnCount = qMin(m_data.labels.size(), count);
+
+    if (newColumnCount == currentColumns) {
+        return;
+    } else if (newColumnCount < currentColumns) {
+        beginRemoveColumns(QModelIndex(), newColumnCount * 2, currentColumns * 2 - 1);
+    } else {
+        beginInsertColumns(QModelIndex(), currentColumns * 2, newColumnCount * 2 - 1);
+    }
+
+    m_maxDatasetCount = count;
+    resetColors();
+
+    if (newColumnCount < currentColumns) {
+        endRemoveColumns();
+    } else {
+        endInsertColumns();
+    }
+    Q_ASSERT(columnCount() == newColumnCount * 2);
+}
+
+void ChartModel::resetColors()
+{
     m_columnDataSetBrushes.clear();
     m_columnDataSetPens.clear();
     const auto columns = columnCount();
@@ -177,6 +205,15 @@ void ChartModel::resetData(const ChartData& data)
         m_columnDataSetBrushes << QBrush(color);
         m_columnDataSetPens << QPen(color);
     }
+}
+
+void ChartModel::resetData(const ChartData& data)
+{
+    Q_ASSERT(data.resultData);
+    Q_ASSERT(data.labels.size() < ChartRows::MAX_NUM_COST);
+    beginResetModel();
+    m_data = data;
+    resetColors();
     endResetModel();
 }
 

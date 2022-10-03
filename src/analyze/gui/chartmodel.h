@@ -62,6 +62,12 @@ public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
+    int maximumDatasetCount() const
+    {
+        return m_maxDatasetCount;
+    }
+    void setMaximumDatasetCount(int count);
+
     qint64 totalCostAt(qint64 timeStamp) const;
 
 public slots:
@@ -69,12 +75,15 @@ public slots:
     void clearData();
 
 private:
+    void resetColors();
+
     ChartData m_data;
     Type m_type;
     // we cache the pens and brushes as constructing them requires allocations
     // otherwise
     QVector<QPen> m_columnDataSetPens;
     QVector<QBrush> m_columnDataSetBrushes;
+    int m_maxDatasetCount;
 };
 
 #endif // CHARTMODEL_H
