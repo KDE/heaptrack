@@ -46,6 +46,15 @@
 using namespace KChart;
 
 namespace {
+KChart::TextAttributes fixupTextAttributes(KChart::TextAttributes attributes, const QPen& foreground, float pointSize)
+{
+    attributes.setPen(foreground);
+    auto fontSize = attributes.fontSize();
+    fontSize.setAbsoluteValue(pointSize);
+    attributes.setFontSize(fontSize);
+    return attributes;
+}
+
 class TimeAxis : public CartesianAxis
 {
     Q_OBJECT
@@ -254,6 +263,9 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
         coordinatePlane->setGlobalGridAttributes(grid);
     }
 
+    KColorScheme scheme(QPalette::Active, KColorScheme::Window);
+    QPen foreground(scheme.foreground().color());
+
     {
         KChart::GridAttributes grid = coordinatePlane->gridAttributes(Qt::Horizontal);
         // Do not align view on main grid line, stretch grid to match datasets
@@ -276,18 +288,13 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
 
         m_chart->addLegend(m_legend);
 
-        KColorScheme scheme(QPalette::Active, KColorScheme::Window);
-        QPen foreground(scheme.foreground().color());
-
         BackgroundAttributes bkgAtt = m_legend->backgroundAttributes();
         QColor background = scheme.background(KColorScheme::AlternateBackground).color();
         background.setAlpha(200);
         bkgAtt.setBrush(QBrush(background));
         bkgAtt.setVisible(true);
 
-        TextAttributes textAttr = m_legend->textAttributes();
-        textAttr.setPen(foreground);
-        textAttr.setFontSize(Measure(18));
+        TextAttributes textAttr = fixupTextAttributes(m_legend->textAttributes(), foreground, font().pointSizeF() - 2);
         QFont legendFont(QStringLiteral("monospace"));
         legendFont.setStyleHint(QFont::TypeWriter);
         textAttr.setFont(legendFont);
@@ -304,21 +311,12 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
         m_totalPlotter->setModel(totalProxy);
         m_totalPlotter->setType(Plotter::Stacked);
 
-        KColorScheme scheme(QPalette::Active, KColorScheme::Window);
-        const QPen foreground(scheme.foreground().color());
-        auto fixupTextAttributes = [&foreground](KChart::TextAttributes attributes, float pointSize) {
-            attributes.setPen(foreground);
-            auto fontSize = attributes.fontSize();
-            fontSize.setAbsoluteValue(pointSize);
-            attributes.setFontSize(fontSize);
-            return attributes;
-        };
-
         m_bottomAxis = new TimeAxis(m_totalPlotter);
-        const auto axisTextAttributes = fixupTextAttributes(m_bottomAxis->textAttributes(), font().pointSizeF() - 2);
+        const auto axisTextAttributes =
+            fixupTextAttributes(m_bottomAxis->textAttributes(), foreground, font().pointSizeF() - 2);
         m_bottomAxis->setTextAttributes(axisTextAttributes);
-        const auto axisTitleTextAttributes =
-            fixupTextAttributes(m_bottomAxis->titleTextAttributes(), font().pointSizeF() + (minimalMode ? (-2) : (+2)));
+        const auto axisTitleTextAttributes = fixupTextAttributes(m_bottomAxis->titleTextAttributes(), foreground,
+                                                                 font().pointSizeF() + (minimalMode ? (-2) : (+2)));
         m_bottomAxis->setTitleTextAttributes(axisTitleTextAttributes);
         m_bottomAxis->setPosition(CartesianAxis::Bottom);
         m_totalPlotter->addAxis(m_bottomAxis);
