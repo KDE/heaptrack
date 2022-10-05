@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2022-06-16 00:50+0000\n"
+"POT-Creation-Date: 2022-10-05 00:48+0000\n"
 "PO-Revision-Date: 2021-11-12 12:12+0100\n"
 "Last-Translator: Freek de Kruijf <freekdekruijf@kde.nl>\n"
 "Language-Team: \n"
@@ -210,28 +210,51 @@ msgstr ""
 "<qt>De locatie in de broncode die een allocatiefunctie heeft aangeroepen. "
 "Kan onbekend zijn wanneer debug-informatie ontbreekt.</qt>"
 
-#: gui/chartmodel.cpp:54
-#, kde-format
-msgid "Elapsed Time"
-msgstr "Verstreken tijd"
-
-#: gui/chartmodel.cpp:58
+#: gui/chartmodel.cpp:52
 #, kde-format
 msgid "Memory Allocations"
 msgstr "Geheugenallocaties"
 
-#: gui/chartmodel.cpp:60
+#: gui/chartmodel.cpp:54
 #, kde-format
 msgid "Memory Consumed"
 msgstr "Gebruikt geheugen"
 
-#: gui/chartmodel.cpp:62 gui/flamegraph.cpp:443 gui/mainwindow.cpp:456
+#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:456
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
 msgstr "Tijdelijke allocaties"
 
-#: gui/chartmodel.cpp:115
+#: gui/chartmodel.cpp:74 gui/chartwidget.cpp:448
+#, kde-format
+msgid "Elapsed Time"
+msgstr "Verstreken tijd"
+
+#: gui/chartmodel.cpp:81
+#, fuzzy, kde-format
+#| msgid "Most Memory Allocations"
+msgid "Total Memory Allocations"
+msgstr "Meeste geheugenallocaties"
+
+#: gui/chartmodel.cpp:83
+#, fuzzy, kde-format
+#| msgid "%1 peak memory consumption"
+msgid "Total Memory Consumption"
+msgstr "%1 geheugengebruik in de piek"
+
+#: gui/chartmodel.cpp:85
+#, fuzzy, kde-format
+#| msgid "Most Temporary Allocations"
+msgid "Total Temporary Allocations"
+msgstr "Meeste tijdelijke allocaties"
+
+#: gui/chartmodel.cpp:111
+#, kde-format
+msgid "%1"
+msgstr ""
+
+#: gui/chartmodel.cpp:165
 #, kde-format
 msgctxt ""
 "%1: the formatted byte size, e.g. \"1.2KB\", %2: the raw byte size, e.g. "
@@ -239,28 +262,28 @@ msgctxt ""
 msgid "%1 (%2 bytes)"
 msgstr "%1 (%2 bytes)"
 
-#: gui/chartmodel.cpp:123
+#: gui/chartmodel.cpp:173
 #, kde-format
 msgid "<qt>%1 allocations in total after %2</qt>"
 msgstr "<qt>%1 allocaties in totaal na %2</qt>"
 
-#: gui/chartmodel.cpp:125
+#: gui/chartmodel.cpp:175
 #, kde-format
 msgid "<qt>%1 temporary allocations in total after %2</qt>"
 msgstr "<qt>%1 tijdelijke allocaties in totaal na %2</qt>"
 
-#: gui/chartmodel.cpp:127
+#: gui/chartmodel.cpp:177
 #, kde-format
 msgid "<qt>%1 consumed in total after %2</qt>"
 msgstr "<qt>%1 gebruikt in totaal na %2</qt>"
 
-#: gui/chartmodel.cpp:133
+#: gui/chartmodel.cpp:183
 #, kde-format
 msgid ""
 "<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>"
 msgstr "<qt>%2 allocaties na %3 van:<p style='margin-left:10px;'>%1</p></qt>"
 
-#: gui/chartmodel.cpp:137
+#: gui/chartmodel.cpp:187
 #, kde-format
 msgid ""
 "<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
@@ -269,50 +292,91 @@ msgstr ""
 "<qt>%2 tijdelijke allocaties na %3 van:<p style='margin-left:10px'>%1</p></"
 "qt>"
 
-#: gui/chartmodel.cpp:141
+#: gui/chartmodel.cpp:191
 #, kde-format
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
 msgstr "<qt>%2 gebruikt na %3 van:<p style='margin-left:10px'>%1</p></qt>"
 
-#: gui/chartwidget.cpp:151
+#: gui/chartwidget.cpp:144
+#, kde-format
+msgid "Export As..."
+msgstr ""
+
+#: gui/chartwidget.cpp:147
+#, kde-format
+msgid "Show legend"
+msgstr ""
+
+#: gui/chartwidget.cpp:154
+#, kde-format
+msgid "Show total cost graph"
+msgstr ""
+
+#: gui/chartwidget.cpp:162
+#, kde-format
+msgid "Show detailed cost graph"
+msgstr ""
+
+#: gui/chartwidget.cpp:169
+#, kde-format
+msgid "Stacked diagrams:"
+msgstr ""
+
+#: gui/chartwidget.cpp:216
 #, kde-format
 msgid "Filter In On Selection"
 msgstr "Erin filteren op selectie"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
-#: gui/chartwidget.cpp:161 gui/mainwindow.ui:899
+#: gui/chartwidget.cpp:226 gui/mainwindow.ui:899
 #, kde-format
 msgid "Reset Filter"
 msgstr "Filter resetten"
 
-#: gui/chartwidget.cpp:269
+#: gui/chartwidget.cpp:365
+#, kde-format
+msgid "Save %1"
+msgstr ""
+
+#: gui/chartwidget.cpp:366
+#, kde-format
+msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
+msgstr ""
+
+#: gui/chartwidget.cpp:382
+#, fuzzy, kde-format
+#| msgid "Failed to parse file %1."
+msgid "Failed to save the image to %1"
+msgstr "Ontleden is mislukt van bestand %1."
+
+#: gui/chartwidget.cpp:402
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
 msgstr "<tr><th></th><th>Begin</th><th>Einde</th><th>Delta</th></tr>"
 
-#: gui/chartwidget.cpp:270
+#: gui/chartwidget.cpp:403
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Tijd</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:274
+#: gui/chartwidget.cpp:407
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Gebruikt</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:278
+#: gui/chartwidget.cpp:411
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Toewijzingen</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:282
+#: gui/chartwidget.cpp:415
 #, kde-format
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr ""
 "<tr><th>Tijdelijke allocaties</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:290
+#: gui/chartwidget.cpp:423
 #, kde-format
 msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
@@ -321,7 +385,7 @@ msgstr ""
 "<qt>Toont het heap-geheugengebruik in de tijd.<br>Klik en versleep om een "
 "tijdreeks voor filtering te selecteren.</qt>"
 
-#: gui/chartwidget.cpp:294
+#: gui/chartwidget.cpp:427
 #, kde-format
 msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
@@ -330,7 +394,7 @@ msgstr ""
 "<qt>Toont het aantal allocaties van geheugen in de tijd.<br>Klik en sleep om "
 "een tijdreeks voor filtering te selecteren.</qt>"
 
-#: gui/chartwidget.cpp:298
+#: gui/chartwidget.cpp:431
 #, kde-format
 msgid ""
 "<qt>Shows number of temporary memory allocations over time. A temporary "
@@ -343,22 +407,22 @@ msgstr ""
 "deallocatie, zonder enige andere allocatie er tussendoor.<br>Klik en sleep "
 "om een tijdreeks voor filtering te selecteren.</qt>"
 
-#: gui/chartwidget.cpp:319
+#: gui/chartwidget.cpp:453
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
 msgstr "%1 (gefilterd uit %2 tot %3, Δ%4)"
 
-#: gui/chartwidget.cpp:323
+#: gui/chartwidget.cpp:457
 #, kde-format
 msgid "%1 (filtered delta)"
 msgstr "%1 (gefilterde  delta)"
 
-#: gui/chartwidget.cpp:412
+#: gui/chartwidget.cpp:546
 #, kde-format
 msgid "Click and drag to select time range for filtering."
 msgstr "Klik en sleep om een tijdreeks voor filtering te selecteren."
 
-#: gui/chartwidget.cpp:418
+#: gui/chartwidget.cpp:552
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
@@ -366,7 +430,7 @@ msgstr ""
 "T = %1, geconsumeerd: %2. Klik en sleep om een tijdreeks voor filtering te "
 "selecteren."
 
-#: gui/chartwidget.cpp:422
+#: gui/chartwidget.cpp:556
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
@@ -374,7 +438,7 @@ msgstr ""
 "T = %1, Toekenningen: %2. Klik en sleep om een tijdreeks voor filtering te "
 "selecteren."
 
-#: gui/chartwidget.cpp:426
+#: gui/chartwidget.cpp:560
 #, kde-format
 msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
@@ -537,29 +601,29 @@ msgstr "Zoeken..."
 msgid "<qt>Search the flame graph for a symbol.</qt>"
 msgstr "<qt>De waarschuwingsgrafiek doorzoek op een symbool een symbool.</qt>"
 
-#: gui/flamegraph.cpp:543
+#: gui/flamegraph.cpp:545
 #, kde-format
 msgid "Reset View"
 msgstr "Beeld herstellen"
 
-#: gui/flamegraph.cpp:553 gui/mainwindow.cpp:119
+#: gui/flamegraph.cpp:555 gui/mainwindow.cpp:119
 #, kde-format
 msgid "View Caller/Callee"
 msgstr "Aanroeper/aangeroepene tonen"
 
-#: gui/flamegraph.cpp:694
+#: gui/flamegraph.cpp:696
 #, kde-format
 msgid "generating flame graph..."
 msgstr "flame-grafiek genereren..."
 
-#: gui/flamegraph.cpp:771
+#: gui/flamegraph.cpp:773
 #, kde-format
 msgid "%1 (%2% of total of %3) allocations matched by search."
 msgstr ""
 "%1 (%2% van een totaal van %3) toekenningen kwamen overeen bij de "
 "zoekopdracht."
 
-#: gui/flamegraph.cpp:776
+#: gui/flamegraph.cpp:778
 #, kde-format
 msgid "%1 (%2% of total of %3) matched by search."
 msgstr "%1 (%2% van een totaal van %3) kwamen overeen bij de zoekopdracht."

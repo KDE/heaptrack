@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2022-06-16 00:50+0000\n"
+"POT-Creation-Date: 2022-10-05 00:48+0000\n"
 "PO-Revision-Date: 2022-05-07 02:01+0200\n"
 "Last-Translator: Shinjo Park <kde@peremen.name>\n"
 "Language-Team: Korean <kde-kr@kde.org>\n"
@@ -206,28 +206,51 @@ msgstr ""
 "<qt>할당 함수를 호출한 소스 코드 위치입니다. 디버그 정보가 없다면 파악하지 못"
 "할 수도 있습니다.</qt>"
 
-#: gui/chartmodel.cpp:54
-#, kde-format
-msgid "Elapsed Time"
-msgstr "경과 시간"
-
-#: gui/chartmodel.cpp:58
+#: gui/chartmodel.cpp:52
 #, kde-format
 msgid "Memory Allocations"
 msgstr "메모리 할당"
 
-#: gui/chartmodel.cpp:60
+#: gui/chartmodel.cpp:54
 #, kde-format
 msgid "Memory Consumed"
 msgstr "사용한 메모리"
 
-#: gui/chartmodel.cpp:62 gui/flamegraph.cpp:443 gui/mainwindow.cpp:456
+#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:456
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
 msgstr "임시 할당"
 
-#: gui/chartmodel.cpp:115
+#: gui/chartmodel.cpp:74 gui/chartwidget.cpp:448
+#, kde-format
+msgid "Elapsed Time"
+msgstr "경과 시간"
+
+#: gui/chartmodel.cpp:81
+#, fuzzy, kde-format
+#| msgid "Most Memory Allocations"
+msgid "Total Memory Allocations"
+msgstr "최대 메모리 할당"
+
+#: gui/chartmodel.cpp:83
+#, fuzzy, kde-format
+#| msgid "%1 peak memory consumption"
+msgid "Total Memory Consumption"
+msgstr "메모리 사용량 극값 %1"
+
+#: gui/chartmodel.cpp:85
+#, fuzzy, kde-format
+#| msgid "Most Temporary Allocations"
+msgid "Total Temporary Allocations"
+msgstr "최대 임시 할당"
+
+#: gui/chartmodel.cpp:111
+#, kde-format
+msgid "%1"
+msgstr ""
+
+#: gui/chartmodel.cpp:165
 #, kde-format
 msgctxt ""
 "%1: the formatted byte size, e.g. \"1.2KB\", %2: the raw byte size, e.g. "
@@ -235,28 +258,28 @@ msgctxt ""
 msgid "%1 (%2 bytes)"
 msgstr "%1(%2바이트)"
 
-#: gui/chartmodel.cpp:123
+#: gui/chartmodel.cpp:173
 #, kde-format
 msgid "<qt>%1 allocations in total after %2</qt>"
 msgstr "<qt>%2 이후 총 할당 %1회</qt>"
 
-#: gui/chartmodel.cpp:125
+#: gui/chartmodel.cpp:175
 #, kde-format
 msgid "<qt>%1 temporary allocations in total after %2</qt>"
 msgstr "<qt>%2 이후 총 임시 할당 %1회</qt>"
 
-#: gui/chartmodel.cpp:127
+#: gui/chartmodel.cpp:177
 #, kde-format
 msgid "<qt>%1 consumed in total after %2</qt>"
 msgstr "<qt>%2 이후 총 %1 사용됨</qt>"
 
-#: gui/chartmodel.cpp:133
+#: gui/chartmodel.cpp:183
 #, kde-format
 msgid ""
 "<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>"
 msgstr "<qt>%3 이후 할당 %2회, 위치:<p style='margin-left:10px;'>%1</p></qt>"
 
-#: gui/chartmodel.cpp:137
+#: gui/chartmodel.cpp:187
 #, kde-format
 msgid ""
 "<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
@@ -264,49 +287,90 @@ msgid ""
 msgstr ""
 "<qt>%3 이후 임시 할당 %2회, 위치:<p style='margin-left:10px'>%1</p></qt>"
 
-#: gui/chartmodel.cpp:141
+#: gui/chartmodel.cpp:191
 #, kde-format
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
 msgstr "<qt>%3 이후 %2 사용됨, 위치:<p style='margin-left:10px'>%1</p></qt>"
 
-#: gui/chartwidget.cpp:151
+#: gui/chartwidget.cpp:144
+#, kde-format
+msgid "Export As..."
+msgstr ""
+
+#: gui/chartwidget.cpp:147
+#, kde-format
+msgid "Show legend"
+msgstr ""
+
+#: gui/chartwidget.cpp:154
+#, kde-format
+msgid "Show total cost graph"
+msgstr ""
+
+#: gui/chartwidget.cpp:162
+#, kde-format
+msgid "Show detailed cost graph"
+msgstr ""
+
+#: gui/chartwidget.cpp:169
+#, kde-format
+msgid "Stacked diagrams:"
+msgstr ""
+
+#: gui/chartwidget.cpp:216
 #, kde-format
 msgid "Filter In On Selection"
 msgstr "선택할 때에 필터"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
-#: gui/chartwidget.cpp:161 gui/mainwindow.ui:899
+#: gui/chartwidget.cpp:226 gui/mainwindow.ui:899
 #, kde-format
 msgid "Reset Filter"
 msgstr "필터 초기화"
 
-#: gui/chartwidget.cpp:269
+#: gui/chartwidget.cpp:365
+#, kde-format
+msgid "Save %1"
+msgstr ""
+
+#: gui/chartwidget.cpp:366
+#, kde-format
+msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
+msgstr ""
+
+#: gui/chartwidget.cpp:382
+#, fuzzy, kde-format
+#| msgid "Failed to parse file %1."
+msgid "Failed to save the image to %1"
+msgstr "%1 파일을 해석할 수 없습니다."
+
+#: gui/chartwidget.cpp:402
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
 msgstr "<tr><th></th><th>시작</th><th>끝</th><th>차이</th></tr>"
 
-#: gui/chartwidget.cpp:270
+#: gui/chartwidget.cpp:403
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>시간</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:274
+#: gui/chartwidget.cpp:407
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>사용함</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:278
+#: gui/chartwidget.cpp:411
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>할당</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:282
+#: gui/chartwidget.cpp:415
 #, kde-format
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>임시 할당</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:290
+#: gui/chartwidget.cpp:423
 #, kde-format
 msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
@@ -315,7 +379,7 @@ msgstr ""
 "<qt>시간별 힙 메모리 사용량을 표시합니다.<br>필터링할 시간 범위를 선택하려면 "
 "클릭하고 드래그하십시오.</qt>"
 
-#: gui/chartwidget.cpp:294
+#: gui/chartwidget.cpp:427
 #, kde-format
 msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
@@ -324,7 +388,7 @@ msgstr ""
 "<qt>시간별 메모리 할당 횟수를 표시합니다.<br>필터링할 시간 범위를 선택하려면 "
 "클릭하고 드래그하십시오.</qt>"
 
-#: gui/chartwidget.cpp:298
+#: gui/chartwidget.cpp:431
 #, kde-format
 msgid ""
 "<qt>Shows number of temporary memory allocations over time. A temporary "
@@ -336,36 +400,36 @@ msgstr ""
 "당한 후 할당 해제하기 전까지 다른 할당이 일어나지 않은 메모리 할당입니다.<br>"
 "필터링할 시간 범위를 선택하려면 클릭하고 드래그하십시오.</qt>"
 
-#: gui/chartwidget.cpp:319
+#: gui/chartwidget.cpp:453
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
 msgstr "%1(%2부터 %3까지 필터링됨, Δ%4)"
 
-#: gui/chartwidget.cpp:323
+#: gui/chartwidget.cpp:457
 #, kde-format
 msgid "%1 (filtered delta)"
 msgstr "%1(필터된 차이)"
 
-#: gui/chartwidget.cpp:412
+#: gui/chartwidget.cpp:546
 #, kde-format
 msgid "Click and drag to select time range for filtering."
 msgstr "필터링할 시간 범위를 선택하려면 클릭하고 드래그하십시오."
 
-#: gui/chartwidget.cpp:418
+#: gui/chartwidget.cpp:552
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
 msgstr ""
 "T = %1, 사용함: %2. 필터링할 시간 범위를 선택하려면 클릭하고 드래그하십시오."
 
-#: gui/chartwidget.cpp:422
+#: gui/chartwidget.cpp:556
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
 msgstr ""
 "T = %1, 할당: %2. 필터링할 시간 범위를 선택하려면 클릭하고 드래그하십시오."
 
-#: gui/chartwidget.cpp:426
+#: gui/chartwidget.cpp:560
 #, kde-format
 msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
@@ -523,27 +587,27 @@ msgstr "찾기..."
 msgid "<qt>Search the flame graph for a symbol.</qt>"
 msgstr "<qt>불꽃 그래프에서 기호를 검색합니다.</qt>"
 
-#: gui/flamegraph.cpp:543
+#: gui/flamegraph.cpp:545
 #, kde-format
 msgid "Reset View"
 msgstr "보기 초기화"
 
-#: gui/flamegraph.cpp:553 gui/mainwindow.cpp:119
+#: gui/flamegraph.cpp:555 gui/mainwindow.cpp:119
 #, kde-format
 msgid "View Caller/Callee"
 msgstr "호출자/피호출자 보기"
 
-#: gui/flamegraph.cpp:694
+#: gui/flamegraph.cpp:696
 #, kde-format
 msgid "generating flame graph..."
 msgstr "불꽃 그래프 생성 중..."
 
-#: gui/flamegraph.cpp:771
+#: gui/flamegraph.cpp:773
 #, kde-format
 msgid "%1 (%2% of total of %3) allocations matched by search."
 msgstr "검색과 일치하는 할당이 총 %1회(전체 %3회 중 %2%) 있습니다."
 
-#: gui/flamegraph.cpp:776
+#: gui/flamegraph.cpp:778
 #, kde-format
 msgid "%1 (%2% of total of %3) matched by search."
 msgstr "검색과 일치하는 항목이 총 %1(전체 %3 중 %2%) 있습니다."
