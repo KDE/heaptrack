@@ -1184,7 +1184,7 @@ msgstr "Pila seleccionada:"
 #: gui/mainwindow.ui:875
 #, kde-format
 msgid "&File"
-msgstr "&Fitxer"
+msgstr "Fi&txer"
 
 #. i18n: ectx: property (title), widget (QMenu, menu_Settings)
 #: gui/mainwindow.ui:880
