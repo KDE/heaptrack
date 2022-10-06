@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: None
+# SPDX-License-Identifier: CC0-1.0
+
+Dependencies:
+- 'on': ['@all']
+  'require':
+    'frameworks/extra-cmake-modules': '@stable'
+    'frameworks/kcoreaddons': '@stable'
+    'frameworks/ki18n': '@stable'
+    'frameworks/kitemmodels': '@stable'
+    'frameworks/kconfigwidgets': '@stable'
+    'frameworks/kio': '@stable'
+    'frameworks/kiconthemes': '@stable'
+    'frameworks/threadweaver': '@stable'
+    'graphics/kdiagram': '@stable'
