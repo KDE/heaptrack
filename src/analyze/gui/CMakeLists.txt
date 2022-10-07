@@ -38,6 +38,11 @@ target_link_libraries(heaptrack_gui_private PUBLIC
     pthread
     ${CMAKE_THREAD_LIBS_INIT}
 )
+if (BUILD_COVERAGE)
+    # FIXME: this should be handled within ECM instead of workarounded here
+    target_link_libraries(heaptrack_gui_private PRIVATE -lgcov)
+endif()
+
 target_include_directories(heaptrack_gui_private PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../
