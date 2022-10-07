@@ -1,20 +1,15 @@
-if (ECM_FOUND)
-    include(ECMEnableSanitizers)
-endif()
 
 set(CMAKE_BUILD_TYPE Debug)
 configure_file(tst_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/tst_config.h @ONLY)
 
 include_directories(
+    ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../
     ${CMAKE_CURRENT_SOURCE_DIR}/../../src
+    ${CMAKE_CURRENT_BINARY_DIR}/../../src/
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../src/track
 )
-
-add_executable(tst_trace tst_trace.cpp)
-target_link_libraries(tst_trace heaptrack_unwind)
-target_compile_definitions(tst_trace PRIVATE -DCATCH_CONFIG_MAIN)
-add_test(NAME tst_trace COMMAND tst_trace)
 
 if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
     if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
@@ -23,9 +18,22 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
 
     include_directories(
         ${Boost_INCLUDE_DIRS}
-        ${CMAKE_CURRENT_BINARY_DIR}/../../src/
-        ${CMAKE_CURRENT_SOURCE_DIR}/../../src/track
     )
+endif()
+
+# tst_inject isn't asan-safe, so include it before we enable sanitizers
+add_subdirectory(no_asan)
+
+if (ECM_FOUND)
+    include(ECMEnableSanitizers)
+endif()
+
+add_executable(tst_trace tst_trace.cpp)
+target_link_libraries(tst_trace heaptrack_unwind)
+target_compile_definitions(tst_trace PRIVATE -DCATCH_CONFIG_MAIN)
+add_test(NAME tst_trace COMMAND tst_trace)
+
+if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
     add_executable(tst_libheaptrack
         tst_libheaptrack.cpp
         ../../src/track/libheaptrack.cpp)
@@ -64,14 +72,4 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
             add_test(NAME tst_parser COMMAND tst_parser)
         endif()
     endif()
-
-    add_executable(tst_inject tst_inject.cpp)
-    target_compile_definitions(tst_inject PRIVATE -DCATCH_CONFIG_MAIN)
-    target_link_libraries(tst_inject
-            ${CMAKE_DL_LIBS}
-            ${Boost_SYSTEM_LIBRARY}
-            ${Boost_FILESYSTEM_LIBRARY}
-    )
-    add_test(NAME tst_inject COMMAND tst_inject)
-
 endif()
