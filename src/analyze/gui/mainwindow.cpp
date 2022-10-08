@@ -11,6 +11,7 @@
 #include <cmath>
 
 #include <KConfigGroup>
+#include <KLazyLocalizedString>
 #include <KLocalizedString>
 #include <KShell>
 #include <KStandardAction>
@@ -69,16 +70,16 @@ struct IdeSettings
 {
     const char* const app;
     const char* const args;
-    const char* const name;
+    const KLazyLocalizedString name;
 };
 
 static const IdeSettings ideSettings[] = {
-    {"kdevelop", "%f:%l:%c", I18N_NOOP("KDevelop")},
-    {"kate", "%f --line %l --column %c", I18N_NOOP("Kate")},
-    {"kwrite", "%f --line %l --column %c", I18N_NOOP("KWrite")},
-    {"gedit", "%f +%l:%c", I18N_NOOP("gedit")},
-    {"gvim", "%f +%l", I18N_NOOP("gvim")},
-    {"qtcreator", "-client %f:%l", I18N_NOOP("Qt Creator")}
+    {"kdevelop", "%f:%l:%c", kli18n("KDevelop")},
+    {"kate", "%f --line %l --column %c", kli18n("Kate")},
+    {"kwrite", "%f --line %l --column %c", kli18n("KWrite")},
+    {"gedit", "%f +%l:%c", kli18n("gedit")},
+    {"gvim", "%f +%l", kli18n("gvim")},
+    {"qtcreator", "-client %f:%l", kli18n("Qt Creator")}
 };
 static const int ideSettingsSize = sizeof(ideSettings) / sizeof(IdeSettings);
 
@@ -761,7 +762,7 @@ void MainWindow::setupCodeNavigationMenu()
 
     for (int i = 0; i < ideSettingsSize; ++i) {
         auto action = new QAction(menu);
-        action->setText(i18n(ideSettings[i].name));
+        action->setText(ideSettings[i].name.toString());
         auto icon = QIcon::fromTheme(QString::fromUtf8(ideSettings[i].app));
         if (icon.isNull()) {
             icon = QIcon::fromTheme(QStringLiteral("application-x-executable"));
