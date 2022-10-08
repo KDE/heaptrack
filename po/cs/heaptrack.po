@@ -210,27 +210,24 @@ msgid "Elapsed Time"
 msgstr "Uplynulý čas"
 
 #: gui/chartmodel.cpp:81
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "Nejvíc alokací paměti"
+msgstr ""
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "%1 peak memory consumption"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "%1 spotřeba paměti ve špičce"
+msgstr ""
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "Most Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "Nejvíce dočasných alokací"
+msgstr ""
 
 #: gui/chartmodel.cpp:111
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:165
 #, kde-format
@@ -276,12 +273,12 @@ msgstr ""
 #: gui/chartwidget.cpp:144
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Exportovat jako..."
 
 #: gui/chartwidget.cpp:147
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Zobrazit vysvětlivky"
 
 #: gui/chartwidget.cpp:154
 #, kde-format
@@ -312,7 +309,7 @@ msgstr "Vyčistit filtr"
 #: gui/chartwidget.cpp:365
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Uložit %1"
 
 #: gui/chartwidget.cpp:366
 #, kde-format
