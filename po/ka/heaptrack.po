@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-10-09 00:51+0000\n"
-"PO-Revision-Date: 2022-10-09 04:33+0200\n"
+"PO-Revision-Date: 2022-10-12 06:16+0200\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
 "Language: ka\n"
@@ -210,27 +210,24 @@ msgid "Elapsed Time"
 msgstr "გასული დრო"
 
 #: gui/chartmodel.cpp:81
-#, fuzzy, kde-format
-#| msgid "Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "მეხსიერების გამოყოფები"
+msgstr "მეხსიერების გამოყოფები ჯამში"
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "Memory Consumed"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "დახარჯული მეხსიერება"
+msgstr "დახარჯული მეხსიერება ჯამში"
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "დროებით გამოყოფები"
+msgstr "დროებით გამოყოფები ჯამში"
 
 #: gui/chartmodel.cpp:111
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:165
 #, kde-format
@@ -276,12 +273,12 @@ msgstr ""
 #: gui/chartwidget.cpp:144
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "გატანა, როგორც..."
 
 #: gui/chartwidget.cpp:147
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "ახსნის ჩვენება"
 
 #: gui/chartwidget.cpp:154
 #, kde-format
@@ -312,7 +309,7 @@ msgstr ""
 #: gui/chartwidget.cpp:365
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "%1-ის შენახვა"
 
 #: gui/chartwidget.cpp:366
 #, kde-format
@@ -381,7 +378,7 @@ msgstr ""
 #: gui/chartwidget.cpp:457
 #, kde-format
 msgid "%1 (filtered delta)"
-msgstr ""
+msgstr "%1 (გაფილტრული დელტა)"
 
 #: gui/chartwidget.cpp:546
 #, kde-format
@@ -569,7 +566,7 @@ msgstr ""
 #: gui/gui.cpp:65
 #, kde-format
 msgid "Heaptrack GUI"
-msgstr ""
+msgstr "Heaptrack-ის ინტერფეისი"
 
 #: gui/gui.cpp:66
 #, kde-format
@@ -579,7 +576,7 @@ msgstr ""
 #: gui/gui.cpp:67
 #, kde-format
 msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
-msgstr ""
+msgstr "Copyright 2015, Milian Wolff <mail@milianw.de>"
 
 #: gui/gui.cpp:70
 #, kde-format
@@ -641,12 +638,12 @@ msgstr ""
 #: gui/histogramwidget.cpp:99
 #, kde-format
 msgid "Requested Allocation Size"
-msgstr ""
+msgstr "გამოყოფის მოთხოვნილი ზომა"
 
 #: gui/histogramwidget.cpp:105
 #, kde-format
 msgid "Number of Allocations"
-msgstr ""
+msgstr "გამოყოფების რაოდენობა"
 
 #: gui/mainwindow.cpp:77
 msgid "KDevelop"
