@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # André Marcelo Alvarenga <alvarenga@kde.org>, 2015, 2016.
-# Luiz Fernando Ranghetti <elchevive@opensuse.org>, 2017, 2018, 2019, 2020, 2021.
+# Luiz Fernando Ranghetti <elchevive@opensuse.org>, 2017, 2018, 2019, 2020, 2021, 2022.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-10-09 00:51+0000\n"
-"PO-Revision-Date: 2021-11-24 11:00-0300\n"
+"PO-Revision-Date: 2022-10-19 16:11-0300\n"
 "Last-Translator: Luiz Fernando Ranghetti <elchevive@opensuse.org>\n"
 "Language-Team: Portuguese <kde-i18n-pt_BR@kde.org>\n"
 "Language: pt_BR\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 20.04.2\n"
+"X-Generator: Lokalize 21.12.3\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -253,7 +253,7 @@ msgstr "Mais alocações temporárias"
 #: gui/chartmodel.cpp:111
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:165
 #, kde-format
@@ -301,12 +301,12 @@ msgstr "<qt>%2 consumidos após %3 de:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:144
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Exportar como..."
 
 #: gui/chartwidget.cpp:147
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Mostrar legenda"
 
 #: gui/chartwidget.cpp:154
 #, kde-format
@@ -337,18 +337,17 @@ msgstr "Redefinir filtro"
 #: gui/chartwidget.cpp:365
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Salvar %1"
 
 #: gui/chartwidget.cpp:366
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr ""
+msgstr "Imagem raster (*.png *.jpg *.tiff);;Imagem vetorial (*.svg)"
 
 #: gui/chartwidget.cpp:382
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to save the image to %1"
-msgstr "Não foi possível processar o arquivo %1."
+msgstr "Falha ao salvar a imagem em %1"
 
 #: gui/chartwidget.cpp:402
 #, kde-format

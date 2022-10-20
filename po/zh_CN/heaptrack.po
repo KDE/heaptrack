@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: kdeorg\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-10-09 00:51+0000\n"
-"PO-Revision-Date: 2022-10-02 15:49\n"
+"PO-Revision-Date: 2022-10-19 13:22\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -209,22 +209,19 @@ msgid "Elapsed Time"
 msgstr "已用时间"
 
 #: gui/chartmodel.cpp:81
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "最多内存分配"
+msgstr ""
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "最多内存分配"
+msgstr ""
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "Most Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "最临时的分配"
+msgstr ""
 
 #: gui/chartmodel.cpp:111
 #, kde-format
