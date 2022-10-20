@@ -16,6 +16,7 @@
   <name xml:lang="ia">Heaptrack</name>
   <name xml:lang="id">Heaptrack</name>
   <name xml:lang="it">Heaptrack</name>
+  <name xml:lang="ka">Heaptrack</name>
   <name xml:lang="ko">힙 추적</name>
   <name xml:lang="nl">Heaptrack</name>
   <name xml:lang="nn">Heaptrack</name>
@@ -40,6 +41,7 @@
   <summary xml:lang="ia">Un profilator de memoria heap per Linux</summary>
   <summary xml:lang="id">Sebuah profil memori tumpukan untuk Linux</summary>
   <summary xml:lang="it">Un profiler della memoria heap per Linux</summary>
+  <summary xml:lang="ka">დროებითი მეხსიერების პროფაილერი Linux-სთვის</summary>
   <summary xml:lang="ko">리눅스 힙 추적 메모리 프로파일러</summary>
   <summary xml:lang="nl">Een profiler van heap-geheugen voor Linux</summary>
   <summary xml:lang="nn">Profileringsprogram for heap-minne</summary>
