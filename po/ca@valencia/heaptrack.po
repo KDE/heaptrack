@@ -670,7 +670,7 @@ msgstr "Autor original, mantenidor"
 #: gui/gui.cpp:84
 #, kde-format
 msgid "Base profile data to compare other files to."
-msgstr "Dades de perfilat base a comparar amb altres fitxers."
+msgstr "Dades de perfilat base que es compararan amb altres fitxers."
 
 #: gui/gui.cpp:89
 #, kde-format
