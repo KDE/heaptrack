@@ -11,7 +11,6 @@
 #include <cmath>
 
 #include <KConfigGroup>
-#include <KLazyLocalizedString>
 #include <KLocalizedString>
 #include <KShell>
 #include <KStandardAction>
@@ -66,32 +65,53 @@ const char IDE[] = "IDE";
 }
 }
 
+enum IDE
+{
+    KDevelop,
+    Kate,
+    KWrite,
+    GEdit,
+    GVim,
+    QtCreator,
+    LAST_IDE
+};
 struct IdeSettings
 {
-    const char* const app;
-    const char* const args;
-    const KLazyLocalizedString name;
+    QString app;
+    QString args;
+    QString name;
+
+    bool isAppAvailable() const
+    {
+        return !QStandardPaths::findExecutable(app).isEmpty();
+    }
 };
 
-static const IdeSettings ideSettings[] = {
-    {"kdevelop", "%f:%l:%c", kli18n("KDevelop")},
-    {"kate", "%f --line %l --column %c", kli18n("Kate")},
-    {"kwrite", "%f --line %l --column %c", kli18n("KWrite")},
-    {"gedit", "%f +%l:%c", kli18n("gedit")},
-    {"gvim", "%f +%l", kli18n("gvim")},
-    {"qtcreator", "-client %f:%l", kli18n("Qt Creator")}
-};
-static const int ideSettingsSize = sizeof(ideSettings) / sizeof(IdeSettings);
-
-bool isAppAvailable(const char* app)
+IdeSettings ideSettings(IDE ide)
 {
-    return !QStandardPaths::findExecutable(QString::fromUtf8(app)).isEmpty();
-}
+    switch (ide) {
+    case KDevelop:
+        return {QStringLiteral("kdevelop"), QStringLiteral("%f:%l:%c"), MainWindow::tr("KDevelop")};
+    case Kate:
+        return {QStringLiteral("kate"), QStringLiteral("%f --line %l --column %c"), MainWindow::tr("Kate")};
+    case KWrite:
+        return {QStringLiteral("kwrite"), QStringLiteral("%f --line %l --column %c"), MainWindow::tr("KWrite")};
+    case GEdit:
+        return {QStringLiteral("gedit"), QStringLiteral("%f +%l:%c"), MainWindow::tr("gedit")};
+    case GVim:
+        return {QStringLiteral("gvim"), QStringLiteral("%f +%l"), MainWindow::tr("gvim")};
+    case QtCreator:
+        return {QStringLiteral("qtcreator"), QStringLiteral("-client %f:%l"), MainWindow::tr("Qt Creator")};
+    case LAST_IDE:
+        break;
+    };
+    Q_UNREACHABLE();
+};
 
 int firstAvailableIde()
 {
-    for (int i = 0; i < ideSettingsSize; ++i) {
-        if (isAppAvailable(ideSettings[i].app)) {
+    for (int i = 0; i < LAST_IDE; ++i) {
+        if (ideSettings(static_cast<IDE>(i)).isAppAvailable()) {
             return i;
         }
     }
@@ -760,10 +780,11 @@ void MainWindow::setupCodeNavigationMenu()
     const auto settings = m_config->group(Config::Groups::CodeNavigation);
     const auto currentIdx = settings.readEntry(Config::Entries::IDE, firstAvailableIde());
 
-    for (int i = 0; i < ideSettingsSize; ++i) {
+    for (int i = 0; i < LAST_IDE; ++i) {
         auto action = new QAction(menu);
-        action->setText(ideSettings[i].name.toString());
-        auto icon = QIcon::fromTheme(QString::fromUtf8(ideSettings[i].app));
+        auto ide = ideSettings(static_cast<IDE>(i));
+        action->setText(ide.name);
+        auto icon = QIcon::fromTheme(ide.app);
         if (icon.isNull()) {
             icon = QIcon::fromTheme(QStringLiteral("application-x-executable"));
         }
@@ -771,9 +792,7 @@ void MainWindow::setupCodeNavigationMenu()
         action->setCheckable(true);
         action->setChecked(currentIdx == i);
         action->setData(i);
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0) // It's not worth it to reimplement missing findExecutable for Qt4.
-        action->setEnabled(isAppAvailable(ideSettings[i].app));
-#endif
+        action->setEnabled(ide.isAppAvailable());
         group->addAction(action);
         menu->addAction(action);
     }
@@ -833,8 +852,9 @@ void MainWindow::navigateToCode(const QString& filePath, int lineNumber, int col
     const auto ideIdx = settings.readEntry(Config::Entries::IDE, firstAvailableIde());
 
     QString command;
-    if (ideIdx >= 0 && ideIdx < ideSettingsSize) {
-        command = QString::fromUtf8(ideSettings[ideIdx].app) + QLatin1Char(' ') + QString::fromUtf8(ideSettings[ideIdx].args);
+    if (ideIdx >= 0 && ideIdx < LAST_IDE) {
+        auto ide = ideSettings(static_cast<IDE>(ideIdx));
+        command = ide.app + QLatin1Char(' ') + ide.args;
     } else if (ideIdx == -1) {
         command = settings.readEntry(Config::Entries::CustomCommand);
     }
