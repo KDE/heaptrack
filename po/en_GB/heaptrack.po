@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2022-10-09 00:51+0000\n"
+"POT-Creation-Date: 2022-11-21 00:49+0000\n"
 "PO-Revision-Date: 2022-01-01 14:59+0000\n"
 "Last-Translator: Steve Allewell <steve.allewell@gmail.com>\n"
 "Language-Team: British English <kde-l10n-en_gb@kde.org>\n"
@@ -180,7 +180,7 @@ msgstr "Peak"
 msgid "Leaked"
 msgstr "Leaked"
 
-#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:455
+#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:475
 #: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
 #, kde-format
 msgid "Allocations"
@@ -219,7 +219,7 @@ msgstr "Memory Allocations"
 msgid "Memory Consumed"
 msgstr "Memory Consumed"
 
-#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:457
+#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:477
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
@@ -602,7 +602,7 @@ msgstr "<qt>Search the flame graph for a symbol.</qt>"
 msgid "Reset View"
 msgstr "Reset View"
 
-#: gui/flamegraph.cpp:555 gui/mainwindow.cpp:120
+#: gui/flamegraph.cpp:555 gui/mainwindow.cpp:140
 #, kde-format
 msgid "View Caller/Callee"
 msgstr "View Caller/Callee"
@@ -663,7 +663,7 @@ msgstr ""
 "suppression per line, and start each line with 'leak:', i.e. use the LSAN "
 "suppression file format."
 
-#: gui/gui.cpp:95 gui/mainwindow.cpp:610
+#: gui/gui.cpp:95 gui/mainwindow.cpp:630
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -716,36 +716,12 @@ msgstr "Requested Allocation Size"
 msgid "Number of Allocations"
 msgstr "Number of Allocations"
 
-#: gui/mainwindow.cpp:77
-msgid "KDevelop"
-msgstr "KDevelop"
-
-#: gui/mainwindow.cpp:78
-msgid "Kate"
-msgstr "Kate"
-
-#: gui/mainwindow.cpp:79
-msgid "KWrite"
-msgstr "KWrite"
-
-#: gui/mainwindow.cpp:80
-msgid "gedit"
-msgstr "gedit"
-
-#: gui/mainwindow.cpp:81
-msgid "gvim"
-msgstr "gvim"
-
-#: gui/mainwindow.cpp:82
-msgid "Qt Creator"
-msgstr "Qt Creator"
-
-#: gui/mainwindow.cpp:149
+#: gui/mainwindow.cpp:169
 #, kde-format
 msgid "Open file in editor"
 msgstr "Open file in editor"
 
-#: gui/mainwindow.cpp:372
+#: gui/mainwindow.cpp:392
 #, kde-format
 msgid ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
@@ -754,112 +730,112 @@ msgstr ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
 "<i>(attached)</i></dd>"
 
-#: gui/mainwindow.cpp:375
+#: gui/mainwindow.cpp:395
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 msgstr "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 
-#: gui/mainwindow.cpp:379
+#: gui/mainwindow.cpp:399
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
 msgstr "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
 
-#: gui/mainwindow.cpp:384
+#: gui/mainwindow.cpp:404
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:386
+#: gui/mainwindow.cpp:406
 #, kde-format
 msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:393
+#: gui/mainwindow.cpp:413
 #, kde-format
 msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
 msgstr "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
 
-#: gui/mainwindow.cpp:396
+#: gui/mainwindow.cpp:416
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 msgstr "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 
-#: gui/mainwindow.cpp:406
+#: gui/mainwindow.cpp:426
 #, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
 msgstr "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
 
-#: gui/mainwindow.cpp:409
+#: gui/mainwindow.cpp:429
 #, kde-format
 msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
 msgstr "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:413
+#: gui/mainwindow.cpp:433
 #, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:417
+#: gui/mainwindow.cpp:437
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
 msgstr "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
 
-#: gui/mainwindow.cpp:420
+#: gui/mainwindow.cpp:440
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:448
+#: gui/mainwindow.cpp:468
 #, kde-format
 msgid "Failed to parse file %1."
 msgstr "Failed to parse file %1."
 
-#: gui/mainwindow.cpp:453
+#: gui/mainwindow.cpp:473
 #, kde-format
 msgid "Consumed"
 msgstr "Consumed"
 
-#: gui/mainwindow.cpp:469
+#: gui/mainwindow.cpp:489
 #, kde-format
 msgid "Sizes"
 msgstr "Sizes"
 
-#: gui/mainwindow.cpp:533
+#: gui/mainwindow.cpp:553
 #, kde-format
 msgid "Input data %1 does not exist."
 msgstr "Input data %1 does not exist."
 
-#: gui/mainwindow.cpp:535
+#: gui/mainwindow.cpp:555
 #, kde-format
 msgid "Input data %1 is not a file."
 msgstr "Input data %1 is not a file."
 
-#: gui/mainwindow.cpp:537
+#: gui/mainwindow.cpp:557
 #, kde-format
 msgid "Input data %1 is not readable."
 msgstr "Input data %1 is not readable."
 
-#: gui/mainwindow.cpp:565
+#: gui/mainwindow.cpp:585
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr "Failed to parse suppression file."
 
-#: gui/mainwindow.cpp:580
+#: gui/mainwindow.cpp:600
 #, kde-format
 msgid "Heaptrack"
 msgstr "Heaptrack"
 
-#: gui/mainwindow.cpp:608
+#: gui/mainwindow.cpp:628
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr "Disable Embedded Suppressions"
 
-#: gui/mainwindow.cpp:620
+#: gui/mainwindow.cpp:640
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr "Disable Builtin Suppressions"
 
-#: gui/mainwindow.cpp:622
+#: gui/mainwindow.cpp:642
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -868,54 +844,54 @@ msgstr ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks from common system libraries."
 
-#: gui/mainwindow.cpp:650
+#: gui/mainwindow.cpp:670
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "Loading file %1, please wait..."
 
-#: gui/mainwindow.cpp:652
+#: gui/mainwindow.cpp:672
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "Heaptrack - %1"
 
-#: gui/mainwindow.cpp:655
+#: gui/mainwindow.cpp:675
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1 compared to %2"
 
-#: gui/mainwindow.cpp:671
+#: gui/mainwindow.cpp:691
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "Reparsing file, please wait..."
 
-#: gui/mainwindow.cpp:714
+#: gui/mainwindow.cpp:734
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:755
+#: gui/mainwindow.cpp:775
 #, kde-format
 msgid "Code Navigation"
 msgstr "Code Navigation"
 
-#: gui/mainwindow.cpp:783
+#: gui/mainwindow.cpp:802
 #, kde-format
 msgid "Custom..."
 msgstr "Custom..."
 
-#: gui/mainwindow.cpp:795
+#: gui/mainwindow.cpp:814
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "Automatic (No Line numbers)"
 
-#: gui/mainwindow.cpp:815
+#: gui/mainwindow.cpp:834
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "Custom Code Navigation"
 
-#: gui/mainwindow.cpp:816
+#: gui/mainwindow.cpp:835
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
@@ -1357,6 +1333,24 @@ msgstr "%1 in %2"
 #, kde-format
 msgid "<unresolved function>"
 msgstr "<unresolved function>"
+
+#~ msgid "KDevelop"
+#~ msgstr "KDevelop"
+
+#~ msgid "Kate"
+#~ msgstr "Kate"
+
+#~ msgid "KWrite"
+#~ msgstr "KWrite"
+
+#~ msgid "gedit"
+#~ msgstr "gedit"
+
+#~ msgid "gvim"
+#~ msgstr "gvim"
+
+#~ msgid "Qt Creator"
+#~ msgstr "Qt Creator"
 
 #~ msgid "%1 allocations from %2"
 #~ msgstr "%1 allocations from %2"
