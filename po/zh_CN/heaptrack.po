@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: kdeorg\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-11-21 00:49+0000\n"
-"PO-Revision-Date: 2022-11-19 14:48\n"
+"PO-Revision-Date: 2022-12-01 06:51\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -1237,21 +1237,3 @@ msgstr ""
 #, kde-format
 msgid "<unresolved function>"
 msgstr ""
-
-#~ msgid "KDevelop"
-#~ msgstr "KDevelop"
-
-#~ msgid "Kate"
-#~ msgstr "Kate"
-
-#~ msgid "KWrite"
-#~ msgstr "KWrite"
-
-#~ msgid "gedit"
-#~ msgstr "gedit"
-
-#~ msgid "gvim"
-#~ msgstr "gvim"
-
-#~ msgid "Qt Creator"
-#~ msgstr "Qt Creator"
