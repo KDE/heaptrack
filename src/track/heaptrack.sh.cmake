@@ -287,7 +287,8 @@ debuggee=$!
 cleanup() {
     if [ ! -z "$pid" ] && [ -d "/proc/$pid" ]; then
         echo "removing heaptrack injection via GDB, this might take some time..."
-        gdb --batch-silent -n -iex="set auto-solib-add off" -p $pid \
+        gdb --batch-silent -n -iex="set auto-solib-add off" \
+            -iex="set language c" -p $pid \
             --eval-command="sharedlibrary libheaptrack_inject" \
             --eval-command="call (void) heaptrack_stop()" \
             --eval-command="detach"
@@ -338,7 +339,8 @@ else
     dlopen=$($ENVCHECKER dlopen "$LIBHEAPTRACK_INJECT")
     if [ -z "$debug" ]; then
         unset DEBUGINFOD_URLS
-        gdb --batch-silent -n -iex="set auto-solib-add off" -p $pid \
+        gdb --batch-silent -n -iex="set auto-solib-add off" \
+            -iex="set language c" -p $pid \
             --eval-command="sharedlibrary libc.so" \
             --eval-command="call (void) $dlopen" \
             --eval-command="sharedlibrary libheaptrack_inject" \
@@ -346,7 +348,7 @@ else
             --eval-command="detach"
     else
         echo $dlopen
-        gdb --quiet -p $pid \
+        gdb --quiet -iex="set language c" -p $pid \
             --eval-command="sharedlibrary libc.so" \
             --eval-command="print (void*) $dlopen" \
             --eval-command="sharedlibrary libheaptrack_inject" \
