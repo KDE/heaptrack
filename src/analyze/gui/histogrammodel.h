@@ -9,6 +9,8 @@
 
 #include <QAbstractTableModel>
 
+#include <array>
+
 #include "treemodel.h"
 
 struct HistogramColumn
