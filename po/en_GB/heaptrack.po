@@ -7,15 +7,15 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-11-21 00:49+0000\n"
-"PO-Revision-Date: 2022-01-01 14:59+0000\n"
+"PO-Revision-Date: 2022-12-31 15:54+0000\n"
 "Last-Translator: Steve Allewell <steve.allewell@gmail.com>\n"
-"Language-Team: British English <kde-l10n-en_gb@kde.org>\n"
+"Language-Team: English <kde-i18n-doc@kde.org>\n"
 "Language: en_GB\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 21.12.0\n"
+"X-Generator: Lokalize 21.12.3\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -231,27 +231,24 @@ msgid "Elapsed Time"
 msgstr "Elapsed Time"
 
 #: gui/chartmodel.cpp:81
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "Most Memory Allocations"
+msgstr "Total Memory Allocations"
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "%1 peak memory consumption"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "%1 peak memory consumption"
+msgstr "Total Memory Consumption"
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "Most Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "Most Temporary Allocations"
+msgstr "Total Temporary Allocations"
 
 #: gui/chartmodel.cpp:111
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:165
 #, kde-format
@@ -300,27 +297,27 @@ msgstr "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:144
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Export As..."
 
 #: gui/chartwidget.cpp:147
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Show legend"
 
 #: gui/chartwidget.cpp:154
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "Show total cost graph"
 
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "Show detailed cost graph"
 
 #: gui/chartwidget.cpp:169
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "Stacked diagrams:"
 
 #: gui/chartwidget.cpp:216
 #, kde-format
@@ -336,18 +333,17 @@ msgstr "Reset Filter"
 #: gui/chartwidget.cpp:365
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Save %1"
 
 #: gui/chartwidget.cpp:366
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr ""
+msgstr "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
 
 #: gui/chartwidget.cpp:382
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to save the image to %1"
-msgstr "Failed to parse file %1."
+msgstr "Failed to save the image to %1"
 
 #: gui/chartwidget.cpp:402
 #, kde-format
