@@ -1,7 +1,7 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 # Vít Pelčák <vit@pelcak.org>, 2015, 2016, 2017, 2018, 2019.
-# Vit Pelcak <vpelcak@suse.cz>, 2021.
+# Vit Pelcak <vit@pelcak.org>, 2021.
 #
 msgid ""
 msgstr ""
@@ -1239,21 +1239,3 @@ msgstr "%1 v %2"
 #, kde-format
 msgid "<unresolved function>"
 msgstr ""
-
-#~ msgid "KDevelop"
-#~ msgstr "KDevelop"
-
-#~ msgid "Kate"
-#~ msgstr "Kate"
-
-#~ msgid "KWrite"
-#~ msgstr "KWrite"
-
-#~ msgid "gedit"
-#~ msgstr "gedit"
-
-#~ msgid "gvim"
-#~ msgstr "gvim"
-
-#~ msgid "Qt Creator"
-#~ msgstr "Qt Creator"
