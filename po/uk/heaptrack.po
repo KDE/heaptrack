@@ -1,0 +1,1555 @@
+# Translation of heaptrack.po to Ukrainian
+# Copyright (C) 2015-2020 This_file_is_part_of_KDE
+# This file is distributed under the license LGPL version 2.1 or
+# version 3 or later versions approved by the membership of KDE e.V.
+#
+# Yuri Chornoivan <yurchor@ukr.net>, 2015, 2016, 2017, 2018, 2019, 2020, 2021.
+msgid ""
+msgstr ""
+"Project-Id-Version: heaptrack\n"
+"Report-Msgid-Bugs-To: https://bugs.kde.org\n"
+"POT-Creation-Date: 2022-06-16 02:27+0000\n"
+"PO-Revision-Date: 2021-12-10 00:05+0200\n"
+"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+"Language-Team: Ukrainian <kde-i18n-uk@kde.org>\n"
+"Language: uk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
+"%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Lokalize 20.12.0\n"
+
+#, kde-format
+msgctxt "NAME OF TRANSLATORS"
+msgid "Your names"
+msgstr "Юрій Чорноіван"
+
+#, kde-format
+msgctxt "EMAIL OF TRANSLATORS"
+msgid "Your emails"
+msgstr "yurchor@ukr.net"
+
+#: gui/callercalleemodel.cpp:40 gui/callercalleemodel.h:333
+#: gui/treemodel.cpp:73
+#, kde-format
+msgid "Location"
+msgstr "Місце"
+
+#: gui/callercalleemodel.cpp:42 gui/callercalleemodel.h:335
+#, kde-format
+msgid "Allocations (Self)"
+msgstr "Розміщення (власне)"
+
+#: gui/callercalleemodel.cpp:44 gui/callercalleemodel.h:337
+#, kde-format
+msgid "Temporary (Self)"
+msgstr "Тимчасове (власне)"
+
+#: gui/callercalleemodel.cpp:46 gui/callercalleemodel.h:339
+#, kde-format
+msgid "Peak (Self)"
+msgstr "Пік (власне)"
+
+#: gui/callercalleemodel.cpp:48 gui/callercalleemodel.h:341
+#, kde-format
+msgid "Leaked (Self)"
+msgstr "Втрачено (власне)"
+
+#: gui/callercalleemodel.cpp:50 gui/callercalleemodel.h:343
+#, kde-format
+msgid "Allocations (Incl.)"
+msgstr "Розміщення (включене)"
+
+#: gui/callercalleemodel.cpp:52 gui/callercalleemodel.h:345
+#, kde-format
+msgid "Temporary (Incl.)"
+msgstr "Тимчасове (включене)"
+
+#: gui/callercalleemodel.cpp:54 gui/callercalleemodel.h:347
+#, kde-format
+msgid "Peak (Incl.)"
+msgstr "Пік (включене)"
+
+#: gui/callercalleemodel.cpp:56 gui/callercalleemodel.h:349
+#, kde-format
+msgid "Leaked (Incl.)"
+msgstr "Втрачено (включене)"
+
+#: gui/callercalleemodel.cpp:63
+#, kde-format
+msgid ""
+"<qt>The parent symbol that called an allocation function. The function name "
+"may be unresolved when debug information is missing.</qt>"
+msgstr ""
+"<qt>Батьківський символ, яким було викликано функцію розподілу. Назва "
+"функції може бути невідомою, якщо немає достатніх діагностичних даних.</qt>"
+
+#: gui/callercalleemodel.cpp:66 gui/callercalleemodel.h:359
+#, kde-format
+msgid ""
+"<qt>The number of times an allocation function was directly called from this "
+"location.</qt>"
+msgstr ""
+"<qt>Кількість викликів функції розподілу безпосередньо з цього місця.</qt>"
+
+#: gui/callercalleemodel.cpp:69 gui/callercalleemodel.h:362
+#, kde-format
+msgid ""
+"<qt>The number of direct temporary allocations. These allocations are "
+"directly followed by a free without any other allocations in-between.</qt>"
+msgstr ""
+"<qt>Кількість безпосередніх тимчасових розміщень у пам'яті. За цими "
+"розміщеннями безпосередньо слідують вивільнення без інших проміжних "
+"розміщень.</qt>"
+
+#: gui/callercalleemodel.cpp:73 gui/callercalleemodel.h:366
+#, kde-format
+msgid ""
+"<qt>The maximum heap memory in bytes consumed from allocations originating "
+"directly at this location. This takes deallocations into account.</qt>"
+msgstr ""
+"<qt>Максимальний об'єм резервної пам'яті, спожитої за викликами щодо "
+"розміщення, що надходили безпосередньо з цього місця. Тут беруться до уваги "
+"і скасування розподілу.</qt>"
+
+#: gui/callercalleemodel.cpp:78 gui/callercalleemodel.h:371
+#, kde-format
+msgid ""
+"<qt>The bytes allocated directly at this location that have not been "
+"deallocated.</qt>"
+msgstr ""
+"<qt>Байти розміщені безпосередньо за цією адресою, які не було вилучено із "
+"розподіленої пам'яті.</qt>"
+
+#: gui/callercalleemodel.cpp:81 gui/callercalleemodel.h:181
+#: gui/callercalleemodel.h:374
+#, kde-format
+msgid ""
+"<qt>The inclusive number of times an allocation function was called from "
+"this location or any functions called from here.</qt>"
+msgstr ""
+"<qt>Кількість включених викликів функції розподілу з цього місця або будь-"
+"яких функцій, викликаних звідси.</qt>"
+
+#: gui/callercalleemodel.cpp:85 gui/callercalleemodel.h:185
+#: gui/callercalleemodel.h:378
+#, kde-format
+msgid ""
+"<qt>The number of inclusive temporary allocations. These allocations are "
+"directly followed by a free without any other allocations in-between.</qt>"
+msgstr ""
+"<qt>Кількість включених тимчасових розміщень у пам'яті. За цими розміщеннями "
+"безпосередньо слідують вивільнення без інших проміжних розміщень.</qt>"
+
+#: gui/callercalleemodel.cpp:89 gui/callercalleemodel.h:173
+#: gui/callercalleemodel.h:382
+#, kde-format
+msgid ""
+"<qt>The inclusive maximum heap memory in bytes consumed from allocations "
+"originating at this location or from functions called from here. This takes "
+"deallocations into account.</qt>"
+msgstr ""
+"<qt>Включений максимальний об'єм резервної пам'яті, спожитої за викликами "
+"щодо розміщення, що надходили з цього місця або від функцій, викликаних "
+"звідси. Тут беруться до уваги і скасування розподілу.</qt>"
+
+#: gui/callercalleemodel.cpp:94 gui/callercalleemodel.h:178
+#: gui/callercalleemodel.h:387 gui/treemodel.cpp:91
+#, kde-format
+msgid ""
+"<qt>The bytes allocated at this location that have not been deallocated.</qt>"
+msgstr ""
+"<qt>Байти розміщені за цією адресою, які не було вилучено із розподіленої "
+"пам'яті.</qt>"
+
+#: gui/callercalleemodel.cpp:202
+#, kde-format
+msgid "Caller"
+msgstr "Зовнішній виклик"
+
+#: gui/callercalleemodel.cpp:214
+#, kde-format
+msgid "Callee"
+msgstr "Внутрішній виклик"
+
+#: gui/callercalleemodel.h:156 gui/treemodel.cpp:69 gui/util.cpp:112
+#: gui/util.cpp:141 gui/util.cpp:170
+#, kde-format
+msgid "Peak"
+msgstr "Пік"
+
+#: gui/callercalleemodel.h:158 gui/flamegraph.cpp:432 gui/treemodel.cpp:71
+#: gui/util.cpp:113 gui/util.cpp:142 gui/util.cpp:171
+#, kde-format
+msgid "Leaked"
+msgstr "Втрачено"
+
+#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:437 gui/mainwindow.cpp:454
+#: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
+#, kde-format
+msgid "Allocations"
+msgstr "Розміщення"
+
+#: gui/callercalleemodel.h:162 gui/treemodel.cpp:67
+#, kde-format
+msgid "Temporary"
+msgstr "Тимчасове"
+
+#: gui/callercalleemodel.h:170
+#, kde-format
+msgid ""
+"The location of the %1. The function name may be unresolved when debug "
+"information is missing."
+msgstr ""
+"Розташування %1. Назва функції може бути невідомою, якщо немає достатніх "
+"діагностичних даних."
+
+#: gui/callercalleemodel.h:356
+#, kde-format
+msgid ""
+"<qt>The source code location that called an allocation function. May be "
+"unknown when debug information is missing.</qt>"
+msgstr ""
+"<qt>Місце у коді, з якого було викликано функцію розподілу. Може бути "
+"невідомою, якщо немає достатніх діагностичних даних.</qt>"
+
+#: gui/chartmodel.cpp:54
+#, kde-format
+msgid "Elapsed Time"
+msgstr "Витрачений час"
+
+#: gui/chartmodel.cpp:58
+#, kde-format
+msgid "Memory Allocations"
+msgstr "Розміщення у пам'яті"
+
+#: gui/chartmodel.cpp:60
+#, kde-format
+msgid "Memory Consumed"
+msgstr "Спожита пам'ять"
+
+#: gui/chartmodel.cpp:62 gui/flamegraph.cpp:442 gui/mainwindow.cpp:456
+#: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
+#, kde-format
+msgid "Temporary Allocations"
+msgstr "Тимчасові розміщення у пам'яті"
+
+#: gui/chartmodel.cpp:115
+#, kde-format
+msgctxt ""
+"%1: the formatted byte size, e.g. \"1.2KB\", %2: the raw byte size, e.g. "
+"\"1300\""
+msgid "%1 (%2 bytes)"
+msgstr "%1 (%2 байтів)"
+
+#: gui/chartmodel.cpp:123
+#, kde-format
+msgid "<qt>%1 allocations in total after %2</qt>"
+msgstr "<qt>Загалом %1 розміщень за %2</qt>"
+
+#: gui/chartmodel.cpp:125
+#, kde-format
+msgid "<qt>%1 temporary allocations in total after %2</qt>"
+msgstr "<qt>Загалом %1 тимчасових розміщень за %2</qt>"
+
+#: gui/chartmodel.cpp:127
+#, kde-format
+msgid "<qt>%1 consumed in total after %2</qt>"
+msgstr "<qt>Загалом спожито %1 за %2</qt>"
+
+#: gui/chartmodel.cpp:133
+#, kde-format
+msgid ""
+"<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>"
+msgstr ""
+"<qt>%2 розміщення після %3 від:<p style='margin-left:10px;'>%1</p></qt>"
+
+#: gui/chartmodel.cpp:137
+#, kde-format
+msgid ""
+"<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
+"p></qt>"
+msgstr ""
+"<qt>%2 тимчасових розміщення після %3 від:<p style='margin-left:10px;'>%1</"
+"p></qt>"
+
+#: gui/chartmodel.cpp:141
+#, kde-format
+msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
+msgstr "<qt>%2 вжито після %3 від:<p style='margin-left:10px'>%1</p></qt>"
+
+#: gui/chartwidget.cpp:151
+#, kde-format
+msgid "Filter In On Selection"
+msgstr "Фільтрувати за позначеним"
+
+#. i18n: ectx: property (text), widget (QMenu, menuFilter)
+#: gui/chartwidget.cpp:161 gui/mainwindow.ui:899
+#, kde-format
+msgid "Reset Filter"
+msgstr "Скинути фільтрування"
+
+#: gui/chartwidget.cpp:268
+#, kde-format
+msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
+msgstr "<tr><th></th><th>Початок</th><th>Кінець</th><th>Різниця</th></tr>"
+
+#: gui/chartwidget.cpp:269
+#, kde-format
+msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr "<tr><th>Час</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+
+#: gui/chartwidget.cpp:273
+#, kde-format
+msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr "<tr><th>Спожито</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+
+#: gui/chartwidget.cpp:277
+#, kde-format
+msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr "<tr><th>Розміщення</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+
+#: gui/chartwidget.cpp:281
+#, kde-format
+msgid ""
+"<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr ""
+"<tr><th>Тимчасові розміщення</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+
+#: gui/chartwidget.cpp:289
+#, kde-format
+msgid ""
+"<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
+"a time range for filtering.</qt>"
+msgstr ""
+"<qt>Показує зміну споживання пам'яті з купи з часом.<br>Натисніть кнопку "
+"миші і перетягніть вказівник, щоб позначити діапазон часу для фільтрування.</"
+"qt>"
+
+#: gui/chartwidget.cpp:293
+#, kde-format
+msgid ""
+"<qt>Shows number of memory allocations over time.<br>Click and drag to "
+"select a time range for filtering.</qt>"
+msgstr ""
+"<qt>Показує зміну кількості операцій із отримання пам'яті з часом."
+"<br>Натисніть кнопку миші і перетягніть вказівник, щоб позначити діапазон "
+"часу для фільтрування.</qt>"
+
+#: gui/chartwidget.cpp:297
+#, kde-format
+msgid ""
+"<qt>Shows number of temporary memory allocations over time. A temporary "
+"allocation is one that is followed immediately by its corresponding "
+"deallocation, without other allocations happening in-between.<br>Click and "
+"drag to select a time range for filtering.</qt>"
+msgstr ""
+"<qt>Показує зміну кількості операцій тимчасових розміщень у пам'яті з часом. "
+"Тимчасовими вважаються розміщення, за якими безпосередньо слідують "
+"вивільнення без інших проміжних розміщень.<br>Натисніть кнопку миші і "
+"перетягніть вказівник, щоб позначити діапазон часу для фільтрування.</qt>"
+
+#: gui/chartwidget.cpp:318
+#, kde-format
+msgid "%1 (filtered from %2 to %3, Δ%4)"
+msgstr "%1 (фільтровано з %2 до %3, Δ%4)"
+
+#: gui/chartwidget.cpp:322
+#, kde-format
+msgid "%1 (filtered delta)"
+msgstr "%1 (фільтрована різниця)"
+
+#: gui/chartwidget.cpp:411
+#, kde-format
+msgid "Click and drag to select time range for filtering."
+msgstr ""
+"Натисніть кнопку миші і перетягніть вказівник, щоб позначити діапазон часу "
+"для фільтрування."
+
+#: gui/chartwidget.cpp:417
+#, kde-format
+msgid ""
+"T = %1, Consumed: %2. Click and drag to select time range for filtering."
+msgstr ""
+"T= %1, спожито %2. Натисніть кнопку миші і перетягніть вказівник, щоб "
+"позначити діапазон часу для фільтрування."
+
+#: gui/chartwidget.cpp:421
+#, kde-format
+msgid ""
+"T = %1, Allocations: %2. Click and drag to select time range for filtering."
+msgstr ""
+"T= %1, розподілів %2. Натисніть кнопку миші і перетягніть вказівник, щоб "
+"позначити діапазон часу для фільтрування."
+
+#: gui/chartwidget.cpp:425
+#, kde-format
+msgid ""
+"T = %1, Temporary Allocations: %2. Click and drag to select time range for "
+"filtering."
+msgstr ""
+"T= %1, тимчасових розподілів %2. Натисніть кнопку миші і перетягніть "
+"вказівник, щоб позначити діапазон часу для фільтрування."
+
+#: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
+#, kde-format
+msgid "%1 allocations in total"
+msgstr "%1 розміщень у пам'яті загалом"
+
+#: gui/flamegraph.cpp:177
+#, kde-format
+msgid "%1 temporary allocations in total"
+msgstr "Загалом тимчасових розміщень — %1"
+
+#: gui/flamegraph.cpp:179
+#, kde-format
+msgid "%1 peak memory consumption"
+msgstr "Пікове споживання пам'яті %1"
+
+#: gui/flamegraph.cpp:181
+#, kde-format
+msgid "%1 leaked in total"
+msgstr "Загалом витоки — %1"
+
+#: gui/flamegraph.cpp:234
+#, kde-format
+msgctxt "%1: number of allocations, %2: relative number, %3: function label"
+msgid "%1 (%2%) allocations in %3 and below."
+msgstr "%1 (%2%) розміщень у пам'яті у %3 і нижче."
+
+#: gui/flamegraph.cpp:239
+#, kde-format
+msgctxt ""
+"%1: number of temporary allocations, %2: relative number, %3 function label"
+msgid "%1 (%2%) temporary allocations in %3 and below."
+msgstr "%1 (%2%) тимчасових розміщено у %3 і нижче."
+
+#: gui/flamegraph.cpp:244
+#, kde-format
+msgctxt ""
+"%1: peak consumption in bytes, %2: relative number, %3: function label"
+msgid "%1 (%2%) contribution to peak consumption in %3 and below."
+msgstr "%1 (%2%) внесок до пікового споживання у %3 і нижче."
+
+#: gui/flamegraph.cpp:248
+#, kde-format
+msgctxt "%1: leaked bytes, %2: relative number, %3: function label"
+msgid "%1 (%2%) leaked in %3 and below."
+msgstr "%1 (%2%) витоків у %3 і нижче."
+
+#: gui/flamegraph.cpp:427
+#, kde-format
+msgid "Memory Peak"
+msgstr "Пік пам'яті"
+
+#: gui/flamegraph.cpp:429
+#, kde-format
+msgid ""
+"Show a flame graph over the contributions to the peak heap memory "
+"consumption of your application."
+msgstr ""
+"Показати графік внесків до пікового споживання пам'яті з купи у вашій "
+"програмі."
+
+#: gui/flamegraph.cpp:434
+#, kde-format
+msgid ""
+"Show a flame graph over the leaked heap memory of your application. Memory "
+"is considered to be leaked when it never got deallocated. "
+msgstr ""
+"Показати графік витоків пам'яті з купи у вашій програмі. Витоком вважається "
+"таке отримання пам'яті, яке не завершується її поверненням до купи "
+"розподілу. "
+
+#: gui/flamegraph.cpp:439
+#, kde-format
+msgid ""
+"Show a flame graph over the number of allocations triggered by functions in "
+"your code."
+msgstr ""
+"Показати графік кількості операцій із отримання областей пам'яті, які "
+"здійснюються функціями з вашого коду."
+
+#: gui/flamegraph.cpp:444
+#, kde-format
+msgid ""
+"Show a flame graph over the number of temporary allocations triggered by "
+"functions in your code. Allocations are marked as temporary when they are "
+"immediately followed by their deallocation."
+msgstr ""
+"Показати графік кількості операцій із тимчасового отримання областей "
+"пам'яті, які здійснюються функціями з вашого коду. Отримання областей "
+"пам'яті вважаються тимчасовими, якщо за отриманням негайно слідує "
+"скасовування такого отримання."
+
+#: gui/flamegraph.cpp:451
+#, kde-format
+msgid "Select the data source that should be visualized in the flame graph."
+msgstr "Виберіть джерело даних, які має бути показано на графіку."
+
+#: gui/flamegraph.cpp:466
+#, kde-format
+msgid "Bottom-Up View"
+msgstr "Перегляд внизу вгору"
+
+#: gui/flamegraph.cpp:467
+#, kde-format
+msgid ""
+"Enable the bottom-up flame graph view. When this is unchecked, the top-down "
+"view is enabled by default."
+msgstr ""
+"Увімкнути показ графіка у режимі «внизу-вгору». Якщо пункт не буде "
+"позначено, графік буде намальовано у режимі «згори-вниз»."
+
+#: gui/flamegraph.cpp:475
+#, kde-format
+msgid "Collapse Recursion"
+msgstr "Згортати рекурсію"
+
+#: gui/flamegraph.cpp:477
+#, kde-format
+msgid ""
+"Collapse stack frames for functions calling themselves. When this is "
+"unchecked, recursive frames will be visualized separately."
+msgstr ""
+"Згортати кадри стека для рекурсивних викликів функцій. Якщо цей пункт не "
+"буде позначено, рекурсивні кадри візуалізуватимуться окремо."
+
+#: gui/flamegraph.cpp:489
+#, kde-format
+msgid "Cost Threshold: "
+msgstr "Поріг вартості: "
+
+#: gui/flamegraph.cpp:493
+#, kde-format
+msgid ""
+"<qt>The cost threshold defines a fractional cut-off value. Items with a "
+"relative cost below this value will not be shown in the flame graph. This is "
+"done as an optimization to quickly generate graphs for large data sets with "
+"low memory overhead. If you need more details, decrease the threshold value, "
+"or set it to zero.</qt>"
+msgstr ""
+"<qt>Порогове значення вартості визначає максимальне відносне значення, яке "
+"слід враховувати. Записи із відносною вартістю, що є нижчою за вказану, не "
+"буде показано на графіку. Існування такого порогового значення передбачено "
+"для оптимізації швидкості побудови графіків для великих наборів даних із "
+"багатьма незначними записами. Якщо вам потрібна детальніша картина, зменшіть "
+"значення цього параметра або встановіть для нього нульове значення.</qt>"
+
+#: gui/flamegraph.cpp:505
+#, kde-format
+msgid "Search..."
+msgstr "Шукати…"
+
+#: gui/flamegraph.cpp:506
+#, kde-format
+msgid "<qt>Search the flame graph for a symbol.</qt>"
+msgstr "<qt>Шукати на графіку символ.</qt>"
+
+#: gui/flamegraph.cpp:542
+#, kde-format
+msgid "Reset View"
+msgstr "Оновити перегляд"
+
+#: gui/flamegraph.cpp:552 gui/mainwindow.cpp:119
+#, kde-format
+msgid "View Caller/Callee"
+msgstr "Переглянути зовнішні/внутрішні виклики"
+
+#: gui/flamegraph.cpp:693
+#, kde-format
+msgid "generating flame graph..."
+msgstr "створюємо графік-полум'я…"
+
+#: gui/flamegraph.cpp:769
+#, kde-format
+msgid "%1 (%2% of total of %3) allocations matched by search."
+msgstr ""
+"%1 (%2% із загальної кількості у %3) отримань пам'яті відповідають критеріям "
+"пошуку."
+
+#: gui/flamegraph.cpp:774
+#, kde-format
+msgid "%1 (%2% of total of %3) matched by search."
+msgstr "%1 (%2% із загальної кількості у %3) відповідають критеріям пошуку."
+
+#: gui/gui.cpp:65
+#, kde-format
+msgid "Heaptrack GUI"
+msgstr "Графічний інтерфейс Heaptrack"
+
+#: gui/gui.cpp:66
+#, kde-format
+msgid "A visualizer for heaptrack data files."
+msgstr "Засіб візуалізації даних із файлів heaptrack."
+
+#: gui/gui.cpp:67
+#, kde-format
+msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
+msgstr "© Milian Wolff <mail@milianw.de>, 2015"
+
+#: gui/gui.cpp:70
+#, kde-format
+msgid "Milian Wolff"
+msgstr "Milian Wolff"
+
+#: gui/gui.cpp:70
+#, kde-format
+msgid "Original author, maintainer"
+msgstr "Автор початкової версії, супровідник"
+
+#: gui/gui.cpp:84
+#, kde-format
+msgid "Base profile data to compare other files to."
+msgstr "Базові дані профілювання, з якими слід порівнювати інші файли."
+
+#: gui/gui.cpp:89
+#, kde-format
+msgid ""
+"Load list of leak suppressions from the specified file. Specify one "
+"suppression per line, and start each line with 'leak:', i.e. use the LSAN "
+"suppression file format."
+msgstr ""
+"Список придушень витоків із вказаного файла. Придушення слід вказувати по "
+"одному на рядок і починати кожен з рядків зі слова «leak:», тобто "
+"використовувати формат файлів придушень LSAN."
+
+#: gui/gui.cpp:95 gui/mainwindow.cpp:609
+#, kde-format
+msgid ""
+"Ignore suppression definitions that are embedded into the heaptrack data "
+"file. By default, heaptrack will copy the suppressions optionally defined "
+"via a `const char *__lsan_default_suppressions()` symbol in the debuggee "
+"application.  These are then always applied when analyzing the data, unless "
+"this feature is explicitly disabled using this command line option."
+msgstr ""
+"Ігнорувати визначення придушень, які вбудовано до файла даних heaptrack. "
+"Типово, heaptrack скопіює придушення, які додатково визначено за допомогою "
+"символу «const char *__lsan_default_suppressions()» у програмі, яку "
+"діагностують.  Ці символи далі завжди буде застосовано при аналізі даних, "
+"якщо відповідну можливість не буде явним чином вимкнено за допомогою цього "
+"параметра командного рядка."
+
+#: gui/gui.cpp:103
+#, kde-format
+msgid ""
+"Ignore suppression definitions that are built into heaptrack. By default, "
+"heaptrack will suppress certain known leaks in common system libraries."
+msgstr ""
+"Ігнорувати визначення придушень, які вбудовано до heaptrack. Типово, "
+"heaptrack придушуватиме певні відомі витоки у загальних бібліотеках системи."
+
+#: gui/gui.cpp:106
+#, kde-format
+msgid "Files to load"
+msgstr "Файли для завантаження"
+
+#: gui/gui.cpp:106
+#, kde-format
+msgid "[FILE...]"
+msgstr "[ФАЙЛ...]"
+
+#: gui/histogrammodel.cpp:65
+#, kde-format
+msgid ""
+"%1 allocations from %2, totalling %3 allocated with an average of %4 per "
+"allocation"
+msgstr ""
+"%1 розміщень з %2, загалом розміщено %3 із середнім значенням %4 на одне "
+"розміщення"
+
+#: gui/histogramwidget.cpp:99
+#, kde-format
+msgid "Requested Allocation Size"
+msgstr "Запитаний об'єм пам'яті"
+
+#: gui/histogramwidget.cpp:105
+#, kde-format
+msgid "Number of Allocations"
+msgstr "Кількість розміщень"
+
+#: gui/mainwindow.cpp:76
+#, kde-format
+msgid "KDevelop"
+msgstr "KDevelop"
+
+#: gui/mainwindow.cpp:77
+#, kde-format
+msgid "Kate"
+msgstr "Kate"
+
+#: gui/mainwindow.cpp:78
+#, kde-format
+msgid "KWrite"
+msgstr "KWrite"
+
+#: gui/mainwindow.cpp:79
+#, kde-format
+msgid "gedit"
+msgstr "gedit"
+
+#: gui/mainwindow.cpp:80
+#, kde-format
+msgid "gvim"
+msgstr "gvim"
+
+#: gui/mainwindow.cpp:81
+#, kde-format
+msgid "Qt Creator"
+msgstr "Qt Creator"
+
+#: gui/mainwindow.cpp:148
+#, kde-format
+msgid "Open file in editor"
+msgstr "Відкрити файл у редакторі"
+
+#: gui/mainwindow.cpp:371
+#, kde-format
+msgid ""
+"<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
+"<i>(attached)</i></dd>"
+msgstr ""
+"<dt><b>об'єкт діагностики</b>:</dt><dd style='font-family:monospace;'>%1 "
+"<i>(долучено)</i></dd>"
+
+#: gui/mainwindow.cpp:374
+#, kde-format
+msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
+msgstr ""
+"<dt><b>об'єкт діагностики</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
+
+#: gui/mainwindow.cpp:378
+#, kde-format
+msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
+msgstr ""
+"<dt><b>загальний час виконання</b>:</dt><dd>%1, фільтровано з %2 до %3 (%4)</"
+"dd>"
+
+#: gui/mainwindow.cpp:383
+#, kde-format
+msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>загальний час виконання</b>:</dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:385
+#, kde-format
+msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>загалом пам'яті системи</b>:</dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:392
+#, kde-format
+msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
+msgstr "<dt><b>виклики функцій розміщення</b>:</dt><dd>%1 (%2/c)</dd>"
+
+#: gui/mainwindow.cpp:395
+#, kde-format
+msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
+msgstr "<dt><b>тимчасові розміщення у пам'яті</b>:</dt><dd>%1 (%2%, %3/c)</dd>"
+
+#: gui/mainwindow.cpp:405
+#, kde-format
+msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
+msgstr "<dt><b>пікове споживання резервної пам'яті</b>:</dt><dd>%1 за %2</dd>"
+
+#: gui/mainwindow.cpp:408
+#, kde-format
+msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
+msgstr ""
+"<dt><b>пікове RSS</b> (разом із додатковими витратами heaptrack):</dt><dd>"
+"%1</dd>"
+
+#: gui/mainwindow.cpp:412
+#, kde-format
+msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>різниця у споживанні пам'яті</b>:</dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:416
+#, kde-format
+msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
+msgstr "<dt><b>загалом втрачено пам'яті</b>:</dt><dd>%1 (%2 придушено)</dd>"
+
+#: gui/mainwindow.cpp:419
+#, kde-format
+msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>загалом втрачено пам'яті</b>:</dt><dd>%1</dd>"
+
+#: gui/mainwindow.cpp:447
+#, kde-format
+msgid "Failed to parse file %1."
+msgstr "Не вдалося обробити файл %1."
+
+#: gui/mainwindow.cpp:452
+#, kde-format
+msgid "Consumed"
+msgstr "Спожито"
+
+#: gui/mainwindow.cpp:468
+#, kde-format
+msgid "Sizes"
+msgstr "Розміри"
+
+#: gui/mainwindow.cpp:532
+#, kde-format
+msgid "Input data %1 does not exist."
+msgstr "Вхідних даних %1 не існує."
+
+#: gui/mainwindow.cpp:534
+#, kde-format
+msgid "Input data %1 is not a file."
+msgstr "Вхідні дані %1 не є файлом."
+
+#: gui/mainwindow.cpp:536
+#, kde-format
+msgid "Input data %1 is not readable."
+msgstr "Вхідні дані %1 непридатні до читання."
+
+#: gui/mainwindow.cpp:564
+#, kde-format
+msgid "Failed to parse suppression file."
+msgstr "Не вдалося обробити файл придушення."
+
+#: gui/mainwindow.cpp:579
+#, kde-format
+msgid "Heaptrack"
+msgstr "Heaptrack"
+
+#: gui/mainwindow.cpp:607
+#, kde-format
+msgid "Disable Embedded Suppressions"
+msgstr "Вимкнути вбудовані придушення"
+
+#: gui/mainwindow.cpp:619
+#, kde-format
+msgid "Disable Builtin Suppressions"
+msgstr "Вимкнути вбудовані придушення"
+
+#: gui/mainwindow.cpp:621
+#, kde-format
+msgid ""
+"Ignore suppression definitions that are built into heaptrack. By default, "
+"heaptrack will suppress certain known leaks from common system libraries."
+msgstr ""
+"Ігнорувати визначення придушень, які вбудовано до heaptrack. Типово, "
+"heaptrack придушуватиме певні відомі витоки у загальних бібліотеках системи."
+
+#: gui/mainwindow.cpp:649
+#, kde-format
+msgid "Loading file %1, please wait..."
+msgstr "Завантажуємо файл %1, будь ласка, зачекайте…"
+
+#: gui/mainwindow.cpp:651
+#, kde-format
+msgctxt "%1: file name that is open"
+msgid "Heaptrack - %1"
+msgstr "Heaptrack — %1"
+
+#: gui/mainwindow.cpp:654
+#, kde-format
+msgctxt "%1, %2: file names that are open"
+msgid "Heaptrack - %1 compared to %2"
+msgstr "Heaptrack — порівняння %1 з %2"
+
+#: gui/mainwindow.cpp:670
+#, kde-format
+msgid "Reparsing file, please wait..."
+msgstr "Повторно обробляємо файл, будь ласка, зачекайте…"
+
+#: gui/mainwindow.cpp:713
+#, kde-format
+msgid " / %1"
+msgstr " / %1"
+
+#: gui/mainwindow.cpp:754
+#, kde-format
+msgid "Code Navigation"
+msgstr "Навігація кодом"
+
+#: gui/mainwindow.cpp:782
+#, kde-format
+msgid "Custom..."
+msgstr "Нетипова…"
+
+#: gui/mainwindow.cpp:794
+#, kde-format
+msgid "Automatic (No Line numbers)"
+msgstr "Автоматична (без номерів рядків)"
+
+#: gui/mainwindow.cpp:814
+#, kde-format
+msgid "Custom Code Navigation"
+msgstr "Нетипова навігація кодом"
+
+#: gui/mainwindow.cpp:815
+#, kde-format
+msgid ""
+"Specify command to use for code navigation, '%f' will be replaced by the "
+"file name, '%l' by the line number and '%c' by the column number."
+msgstr ""
+"Вкажіть команду, яку слід використовувати для навігації кодом. «%f» буде "
+"замінено на назву файла, «%l» — номер рядка, а «%c» — на номер позиції у "
+"рядку."
+
+#. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
+#: gui/mainwindow.ui:14
+#, kde-format
+msgid "MainWindow"
+msgstr "Головне вікно"
+
+#. i18n: ectx: property (toolTip), widget (QMainWindow, MainWindow)
+#. i18n: ectx: property (toolTip), widget (QLabel, suppressionsLabel)
+#: gui/mainwindow.ui:17 gui/mainwindow.ui:125
+#, kde-format
+msgid "Path to a file containing leak suppression rules in the LSAN format."
+msgstr ""
+"Шлях до файла, у якому містяться правила придушення витоків у форматі LSAN."
+
+#. i18n: ectx: property (title), widget (QGroupBox, groupBox)
+#: gui/mainwindow.ui:64
+#, kde-format
+msgid "Open Heaptrack Data"
+msgstr "Відкриття даних heaptrack"
+
+#. i18n: ectx: property (toolTip), widget (KUrlRequester, openFile)
+#: gui/mainwindow.ui:73
+#, kde-format
+msgid ""
+"<qt><p>This field specifies the primary heaptrack data file. These files are "
+"called <tt>heaptrack.$APP.$PID.gz</tt> or <tt>heaptrack.$APP.$PID.zst</tt>. "
+"You can produce such a file by profiling your application, e.g. via:</p>\n"
+"<pre><code>heaptrack &lt;yourapplication&gt; ...</code></pre>\n"
+"<p>Or, alternatively, you can attach to a running process via</p>\n"
+"<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
+msgstr ""
+"<qt><p>Вміст цього поля визначає основний файл даних heaptrack. Такі файли "
+"даних мають назви <tt>heaptrack.$APP.$PID.gz</tt> або <tt>heaptrack.$APP."
+"$PID.zst</tt>. Ви можете створити такий файл за допомогою профілювання вашої "
+"програми, наприклад так:</p>\n"
+"<pre><code>heaptrack &lt;ваша_програма&gt; ...</code></pre>\n"
+"<p>Крім того, ви можете приєднатися до запущеного процесу командою</p>\n"
+"<pre><code>heaptrack --pid $(pidof &lt;ваша_програма&gt;)</code></pre></qt>"
+
+#. i18n: ectx: property (filter), widget (KUrlRequester, openFile)
+#. i18n: ectx: property (filter), widget (KUrlRequester, compareTo)
+#: gui/mainwindow.ui:76 gui/mainwindow.ui:92
+#, kde-format
+msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
+
+#. i18n: ectx: property (placeholderText), widget (KUrlRequester, openFile)
+#. i18n: ectx: property (placeholderText), widget (KUrlRequester, compareTo)
+#: gui/mainwindow.ui:79 gui/mainwindow.ui:95
+#, kde-format
+msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
+msgstr "шлях/до/heaptrack.$APP.$PID.{gz,zst}"
+
+#. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
+#: gui/mainwindow.ui:89
+#, kde-format
+msgid ""
+"<qt>You can optionally specify a second heaptrack data file to compare to. "
+"If set, this file will be used as a base and its cost gets subtracted from "
+"the primary data costs.</qt>"
+msgstr ""
+"<qt>Крім того, ви можете вказати інший файл даних heaptrack для порівняння. "
+"Якщо вибрано цей варіант, цей другий файл буде використано як базу: його "
+"значення буде віднято від значень у основному файлі даних.</qt>"
+
+#. i18n: ectx: property (text), widget (QLabel, openFileLabel)
+#: gui/mainwindow.ui:105
+#, kde-format
+msgid "Profile &Data:"
+msgstr "&Дані профілювання:"
+
+#. i18n: ectx: property (text), widget (QLabel, compareToLabel)
+#: gui/mainwindow.ui:115
+#, kde-format
+msgid "Compare to:"
+msgstr "Порівняти з:"
+
+#. i18n: ectx: property (text), widget (QLabel, suppressionsLabel)
+#: gui/mainwindow.ui:128
+#, kde-format
+msgid "Suppressions:"
+msgstr "Придушення:"
+
+#. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
+#: gui/mainwindow.ui:138
+#, kde-format
+msgid "path/to/lsan_suppressions.txt"
+msgstr "шлях/до/lsan_suppressions.txt"
+
+#. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
+#: gui/mainwindow.ui:251
+#, kde-format
+msgid "Summary"
+msgstr "Резюме"
+
+#. i18n: ectx: property (toolTip), widget (QLabel, topPeakLabel)
+#. i18n: ectx: property (toolTip), widget (QTreeView, topPeak)
+#: gui/mainwindow.ui:352 gui/mainwindow.ui:365
+#, kde-format
+msgid "List of functions that allocated the most memory at a given time."
+msgstr ""
+"Список функцій, яким дісталося найбільше пам'яті у вказаний момент часу."
+
+#. i18n: ectx: property (text), widget (QLabel, topPeakLabel)
+#: gui/mainwindow.ui:355
+#, kde-format
+msgid "Peak Contributions"
+msgstr "Пікові внески"
+
+#. i18n: ectx: property (toolTip), widget (QLabel, topLeakedLabel)
+#. i18n: ectx: property (toolTip), widget (QTreeView, topLeaked)
+#: gui/mainwindow.ui:391 gui/mainwindow.ui:404
+#, kde-format
+msgid "List of functions that leak the most memory."
+msgstr "Список функцій, у яких сталися найбільші витоки пам'яті."
+
+#. i18n: ectx: property (text), widget (QLabel, topLeakedLabel)
+#: gui/mainwindow.ui:394
+#, kde-format
+msgid "Largest Memory Leaks"
+msgstr "Найбільші витоки пам'яті"
+
+#. i18n: ectx: property (toolTip), widget (QLabel, topAllocationsLabel)
+#. i18n: ectx: property (toolTip), widget (QTreeView, topAllocations)
+#: gui/mainwindow.ui:430 gui/mainwindow.ui:443
+#, kde-format
+msgid "List of functions that allocate memory most often."
+msgstr "Список функцій, які отримували пам'ять найчастіше."
+
+#. i18n: ectx: property (text), widget (QLabel, topAllocationsLabel)
+#: gui/mainwindow.ui:433
+#, kde-format
+msgid "Most Memory Allocations"
+msgstr "Найбільші розміщення у пам'яті"
+
+#. i18n: ectx: property (toolTip), widget (QLabel, topTemporaryLabel)
+#. i18n: ectx: property (toolTip), widget (QTreeView, topTemporary)
+#: gui/mainwindow.ui:472 gui/mainwindow.ui:485
+#, kde-format
+msgid "List of functions that produced the most temporary memory allocations."
+msgstr ""
+"Список функцій, які створювали більшу частину тимчасових розміщень даних у "
+"пам'яті."
+
+#. i18n: ectx: property (text), widget (QLabel, topTemporaryLabel)
+#: gui/mainwindow.ui:475
+#, kde-format
+msgid "Most Temporary Allocations"
+msgstr "Найбільші тимчасові розміщення у пам'яті"
+
+#. i18n: ectx: property (title), widget (KCollapsibleGroupBox, suppressionBox)
+#: gui/mainwindow.ui:508
+#, kde-format
+msgid "Suppressions"
+msgstr "Придушення"
+
+#. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
+#: gui/mainwindow.ui:540
+#, kde-format
+msgid "Bottom-Up"
+msgstr "Знизу-вгору"
+
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFunction)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterFunction)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFunction)
+#: gui/mainwindow.ui:564 gui/mainwindow.ui:632 gui/mainwindow.ui:753
+#, kde-format
+msgid "filter by function..."
+msgstr "фільтрувати за функцією…"
+
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
+#: gui/mainwindow.ui:571 gui/mainwindow.ui:760
+#, kde-format
+msgid "filter by file..."
+msgstr "фільтрувати за файлом…"
+
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
+#. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterModule)
+#: gui/mainwindow.ui:578 gui/mainwindow.ui:639 gui/mainwindow.ui:767
+#, kde-format
+msgid "filter by module..."
+msgstr "фільтрувати за модулем…"
+
+#. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
+#: gui/mainwindow.ui:608
+#, kde-format
+msgid "Caller / Callee"
+msgstr "Відправник/Отримувач"
+
+#. i18n: ectx: attribute (title), widget (QWidget, topDownTab)
+#: gui/mainwindow.ui:732
+#, kde-format
+msgid "Top-Down"
+msgstr "Згори вниз"
+
+#. i18n: ectx: attribute (title), widget (FlameGraph, flameGraphTab)
+#: gui/mainwindow.ui:797
+#, kde-format
+msgid "Flame Graph"
+msgstr "Графік-полум'я"
+
+#. i18n: ectx: property (windowTitle), widget (QDockWidget, stacksDock)
+#: gui/mainwindow.ui:813
+#, kde-format
+msgid "S&tacks"
+msgstr "С&теки"
+
+#. i18n: ectx: property (text), widget (QLabel, stackSpinnerLabel)
+#: gui/mainwindow.ui:838
+#, kde-format
+msgid "Selected Stack:"
+msgstr "Вибраний стек:"
+
+#. i18n: ectx: property (title), widget (QMenu, menu_File)
+#: gui/mainwindow.ui:875
+#, kde-format
+msgid "&File"
+msgstr "&Файл"
+
+#. i18n: ectx: property (title), widget (QMenu, menu_Settings)
+#: gui/mainwindow.ui:880
+#, kde-format
+msgid "Setti&ngs"
+msgstr "П&араметри"
+
+#. i18n: ectx: property (title), widget (QMenu, menuFilter)
+#: gui/mainwindow.ui:885
+#, kde-format
+msgid "Filter"
+msgstr "Фільтр"
+
+#: gui/parser.cpp:387
+#, kde-format
+msgid "merging allocations... %1%"
+msgstr "об'єднуємо розміщення у пам'яті… %1%"
+
+#: gui/parser.cpp:557
+#, kde-format
+msgid "total"
+msgstr "загалом"
+
+#: gui/parser.cpp:559
+#, kde-format
+msgid "0B to 8B"
+msgstr "від 0 Б до 8 Б"
+
+#: gui/parser.cpp:560
+#, kde-format
+msgid "9B to 16B"
+msgstr "від 9 Б до 16 Б"
+
+#: gui/parser.cpp:561
+#, kde-format
+msgid "17B to 32B"
+msgstr "від 17 Б до 32 Б"
+
+#: gui/parser.cpp:562
+#, kde-format
+msgid "33B to 64B"
+msgstr "від 33 Б до 64 Б"
+
+#: gui/parser.cpp:563
+#, kde-format
+msgid "65B to 128B"
+msgstr "від 65 Б до 128 Б"
+
+#: gui/parser.cpp:564
+#, kde-format
+msgid "129B to 256B"
+msgstr "від 129 Б до 256 Б"
+
+#: gui/parser.cpp:565
+#, kde-format
+msgid "257B to 512B"
+msgstr "від 257 Б до 512 Б"
+
+#: gui/parser.cpp:566
+#, kde-format
+msgid "512B to 1KB"
+msgstr "від 512 Б до 1 кБ"
+
+#: gui/parser.cpp:567
+#, kde-format
+msgid "more than 1KB"
+msgstr "понад 1 кБ"
+
+#: gui/parser.cpp:645
+#, kde-format
+msgid "reparsing data"
+msgstr "повторна обробка даних"
+
+#: gui/parser.cpp:645
+#, kde-format
+msgid "parsing data"
+msgstr "обробка даних"
+
+#: gui/parser.cpp:659
+#, kde-format
+msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
+msgstr "%1 прохід: %2 з %3 витрачено: %4 лишилося: %5"
+
+#: gui/parser.cpp:715
+#, kde-format
+msgid "merging allocations..."
+msgstr "об'єднуємо розміщення у пам'яті…"
+
+#: gui/parser.cpp:726
+#, kde-format
+msgid "building size histogram..."
+msgstr "будуємо гістограму розмірів…"
+
+#: gui/parser.cpp:739
+#, kde-format
+msgid "building charts..."
+msgstr "будуємо діаграми…"
+
+#: gui/stacksmodel.cpp:99
+#, kde-format
+msgid "Backtrace"
+msgstr "Зворотне трасування"
+
+#: gui/treemodel.cpp:80
+#, kde-format
+msgid ""
+"<qt>The number of times an allocation function was called from this location."
+"</qt>"
+msgstr "<qt>Кількість викликів функції розподілу з цього місця.</qt>"
+
+#: gui/treemodel.cpp:83
+#, kde-format
+msgid ""
+"<qt>The number of temporary allocations. These allocations are directly "
+"followed by a free without any other allocations in-between.</qt>"
+msgstr ""
+"<qt>Кількість тимчасових розміщень у пам'яті. За цими розміщеннями "
+"безпосередньо слідують вивільнення без інших проміжних розміщень.</qt>"
+
+#: gui/treemodel.cpp:87
+#, kde-format
+msgid ""
+"<qt>The contributions from a given location to the maximum heap memory "
+"consumption in bytes. This takes deallocations into account.</qt>"
+msgstr ""
+"<qt>Внески із заданого місця до максимального споживання резервної пам'яті у "
+"байтах. Тут беруться до уваги і скасування розподілу.</qt>"
+
+#: gui/treemodel.cpp:94
+#, kde-format
+msgid ""
+"<qt>The location from which an allocation function was called. Function "
+"symbol and file information may be unknown when debug information was "
+"missing when heaptrack was run.</qt>"
+msgstr ""
+"<qt>Місце, з якого було викликано функцію розподілу. Символ функції і дані "
+"щодо файла можуть бути невідомими, якщо під час запуску heaptrack не було "
+"знайдено достатніх діагностичних даних.</qt>"
+
+#: gui/treemodel.cpp:149 gui/treemodel.cpp:173
+#, kde-format
+msgctxt "1: function, 2: module, 3: module path"
+msgid ""
+"%1\n"
+"  in %2 (%3)"
+msgstr ""
+"%1\n"
+"  у %2 (%3)"
+
+#: gui/treemodel.cpp:159
+#, kde-format
+msgid "peak contribution: %1 (%2% of total)\n"
+msgstr "піковий внесок: %1 (%2% із загального)\n"
+
+#: gui/treemodel.cpp:160
+#, kde-format
+msgid "leaked: %1 (%2% of total)\n"
+msgstr "витоки: %1 (%2% від загального)\n"
+
+#: gui/treemodel.cpp:161
+#, kde-format
+msgid "allocations: %1 (%2% of total)\n"
+msgstr "розміщення: %1 (%2% від загального)\n"
+
+#: gui/treemodel.cpp:162
+#, kde-format
+msgid "temporary: %1 (%2% of allocations, %3% of total)\n"
+msgstr "тимчасово: %1 (%2% з розміщень, %3% з загального)\n"
+
+#: gui/treemodel.cpp:168
+#, kde-format
+msgid "backtrace:"
+msgstr "зворотне трасування:"
+
+#: gui/treemodel.cpp:180
+#, kde-format
+msgid "called from one location"
+msgid_plural "called from %1 locations"
+msgstr[0] "викликано з %1 місця"
+msgstr[1] "викликано з %1 місць"
+msgstr[2] "викликано з %1 місць"
+msgstr[3] "викликано з одного місця"
+
+#: gui/util.cpp:32
+#, kde-format
+msgid "??"
+msgstr "??"
+
+#: gui/util.cpp:108
+#, kde-format
+msgid "%1: %2<br/>&nbsp;&nbsp;%4% out of %3 total"
+msgstr "%1: %2<br/>&nbsp;&nbsp;%4% з %3 загалом"
+
+#: gui/util.cpp:134 gui/util.cpp:163
+#, kde-format
+msgid "%1 (self): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
+msgstr "%1 (лише сам): %2<br/>&nbsp;&nbsp;%4% з %3 загалом"
+
+#: gui/util.cpp:137 gui/util.cpp:166
+#, kde-format
+msgid "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
+msgstr "%1 (із включенням): %2<br/>&nbsp;&nbsp;%4% з %3 загалом"
+
+#: gui/util.cpp:183
+#, kde-format
+msgid "symbol: <tt>%1</tt><br/>binary: <tt>%2 (%3)</tt>"
+msgstr "символ: <tt>%1</tt><br/>двійковий: <tt>%2 (%3)</tt>"
+
+#: gui/util.cpp:187
+#, kde-format
+msgctxt "%1: function name, %2: binary basename"
+msgid "%1 in %2"
+msgstr "%1 у %2"
+
+#: gui/util.cpp:209
+#, kde-format
+msgid "<unresolved function>"
+msgstr "<невизначена функція>"
+
+#~ msgid "Symbol"
+#~ msgstr "Символ"
+
+#~ msgid "Binary"
+#~ msgstr "Двійковий"
+
+#~ msgid ""
+#~ "<qt>The parent function that called an allocation function. May be "
+#~ "unresolved when debug information is missing.</qt>"
+#~ msgstr ""
+#~ "<qt>Батьківська функція, якою було викликано функцію розподілу. Може бути "
+#~ "невідомою, якщо немає достатніх діагностичних даних.</qt>"
+
+#~ msgid ""
+#~ "<qt>The module, i.e. executable or shared library, from which an "
+#~ "allocation function was called.</qt>"
+#~ msgstr ""
+#~ "<qt>Модуль, тобто виконуваний файл або бібліотека спільного використання, "
+#~ "для якого було викликано функцію розподілу.</qt>"
+
+#~ msgid ""
+#~ "The function name of the %1. May be unresolved when debug information is "
+#~ "missing."
+#~ msgstr ""
+#~ "Назва функції %1. Може бути невідомою, якщо немає достатніх діагностичних "
+#~ "даних."
+
+#~ msgid "The name of the executable the symbol resides in."
+#~ msgstr "Назва виконуваного файла, у якому перебуває символ."
+
+#~ msgctxt "%1: function, %2: binary"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1 (%2)"
+
+#~ msgid "Function"
+#~ msgstr "Функція"
+
+#~ msgid "Module"
+#~ msgstr "Модуль"
+
+#~ msgid ""
+#~ "<qt>The parent function that called an allocation function. May be "
+#~ "unknown when debug information is missing.</qt>"
+#~ msgstr ""
+#~ "<qt>Батьківська функція, якою було викликано функцію розподілу. Може бути "
+#~ "невідомою, якщо немає достатніх діагностичних даних.</qt>"
+
+#~ msgid "%1 in %2 (%3)"
+#~ msgstr "%1 у %2 (%3)"
+
+#~ msgid "File"
+#~ msgstr "Файл"
+
+#~ msgid "Line"
+#~ msgstr "Рядок"
+
+#~ msgid "Allocated (Self)"
+#~ msgstr "Розміщено (власне)"
+
+#~ msgid "Allocated (Incl.)"
+#~ msgstr "Розміщено (включене)"
+
+#~ msgid ""
+#~ "<qt>The file where the allocation function was called from. May be empty "
+#~ "when debug information is missing.</qt>"
+#~ msgstr ""
+#~ "<qt>Файл, звідки було викликано функцію розподілу. Може мати порожнє "
+#~ "значення, якщо немає достатніх діагностичних даних.</qt>"
+
+#~ msgid ""
+#~ "<qt>The line number where the allocation function was called from. May be "
+#~ "empty when debug information is missing.</qt>"
+#~ msgstr ""
+#~ "<qt>Номер рядка коду, звідки було викликано функцію розподілу. Може мати "
+#~ "порожнє значення, якщо немає достатніх діагностичних даних.</qt>"
+
+#~ msgid ""
+#~ "<qt>The sum of all bytes directly allocated from this location, ignoring "
+#~ "deallocations.</qt>"
+#~ msgstr ""
+#~ "<qt>Сума усіх байтів, безпосередньо розподілених з цього місця, без "
+#~ "скасувань розподілу.</qt>"
+
+#~ msgid ""
+#~ "<qt>The inclusive sum of all bytes allocated from this location or "
+#~ "functions called from here, ignoring deallocations.</qt>"
+#~ msgstr ""
+#~ "<qt>Включена сума усіх байтів, розподілених з цього місця або функцій, "
+#~ "викликаних звідси, без скасувань розподілу.</qt>"
+
+#~ msgctxt "1: function, 2: file, 3: line, 4: module"
+#~ msgid ""
+#~ "%1\n"
+#~ "  at %2:%3\n"
+#~ "  in %4"
+#~ msgstr ""
+#~ "%1\n"
+#~ "  у %2:%3\n"
+#~ "  у %4"
+
+#~ msgid ""
+#~ "inclusive: allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at "
+#~ "%5, leaked %6"
+#~ msgstr ""
+#~ "включене: розміщено %1 за %2 викликами (%3 тимчасово, тобто %4%), пік у "
+#~ "%5, втрачено %6"
+
+#~ msgid ""
+#~ "self: allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, "
+#~ "leaked %6"
+#~ msgstr ""
+#~ "власне: розміщено %1 за %2 викликами (%3 тимчасово, тобто %4%), пік у %5, "
+#~ "втрачено %6"
+
+#~ msgid "Memory Allocated"
+#~ msgstr "Розподілена пам’ять"
+
+#~ msgid "<qt>%1 allocated in total after %2</qt>"
+#~ msgstr "<qt>Загалом розміщено %1 після %2</qt>"
+
+#~ msgid ""
+#~ "<qt>%2 allocated after %3 from:<p style='margin-left:10px'>%1</p></qt>"
+#~ msgstr ""
+#~ "<qt>%2 розміщено після %3 від:<p style='margin-left:10px'>%1</p></qt>"
+
+#~ msgid ""
+#~ "<qt>Displays total memory allocated over time. This value ignores "
+#~ "deallocations and just measures heap allocation throughput.</qt>"
+#~ msgstr ""
+#~ "<qt>Показує зміну загального споживання розподіленої пам’яті з часом. "
+#~ "Значення обчислено без враховування скасувань розподілу, це лише виміри "
+#~ "отримання пам’яті з купи.</qt>"
+
+#~ msgctxt "%1: allocated bytes, %2: relative number, %3: function label"
+#~ msgid "%1 (%2%) allocated in %3 and below."
+#~ msgstr "%1 (%2%) розміщено у %3 і нижче."
+
+#~ msgid "%1 contribution to peak consumption"
+#~ msgstr "Внесок %1 до пікового споживання"
+
+#~ msgid "%1 allocated in total"
+#~ msgstr "Загалом розміщено %1"
+
+#~ msgid "Allocated"
+#~ msgstr "Розміщено"
+
+#~ msgid ""
+#~ "Show a flame graph over the total memory allocated by functions in your "
+#~ "code. This aggregates all memory allocations and ignores deallocations."
+#~ msgstr ""
+#~ "Показати графік загального отримання пам’яті функціями у вашому коді. "
+#~ "Враховуються усі отримання пам’яті без врахування повернення пам’яті до "
+#~ "купи."
+
+#~ msgid "%1 allocations from %2 at %3:%4 in %5"
+#~ msgstr "%1 розміщень %2 у о %3:%4 у %5"
+
+#~ msgid ""
+#~ "<dt><b>bytes allocated in total</b> (ignoring deallocations):</dt><dd>%1 "
+#~ "(%2/s)</dd>"
+#~ msgstr ""
+#~ "<dt><b>загалом розподілено байтів</b> (без повернення до резерву):</"
+#~ "dt><dd>%1 (%2/с)</dd>"
+
+#~ msgid ""
+#~ "List of functions that allocated the most memory overall, ignoring "
+#~ "deallocations."
+#~ msgstr ""
+#~ "Список функцій, яким дісталося найбільше пам’яті загалом, без врахування "
+#~ "скасування розміщення даних у пам’яті."
+
+#~ msgid "Most Memory Allocated"
+#~ msgstr "Найбільші отримувачі пам’яті"
+
+#~ msgid ""
+#~ "<qt>The sum of all bytes allocated from this location, ignoring "
+#~ "deallocations.</qt>"
+#~ msgstr ""
+#~ "<qt>Сума усіх байтів, розподілених з цього місця, без скасувань розподілу."
+#~ "</qt>"
+
+#~ msgid "allocated: %1 (%2% of total)\n"
+#~ msgstr "розміщено: %1 (%2% від загального)\n"
+
+#~ msgid "Open Heaptrack Output File"
+#~ msgstr "Відкрити файл виведених результатів Heaptrack"
+
+#~ msgid "Heaptrack data files (heaptrack.*)"
+#~ msgstr "файли даних Heaptrack (heaptrack.*)"
+
+#~ msgid "&Graphs"
+#~ msgstr "&Графіки"
+
+#~ msgid ""
+#~ "allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, leaked %6"
+#~ msgstr ""
+#~ "розміщено %1 за %2 викликами (%3 тимчасово, тобто %4%), пік у %5, "
+#~ "втрачено %6"
+
+#~ msgid "<strong>debuggee</strong>: <code>%1</code>"
+#~ msgstr "<strong>debuggee</strong>: <code>%1</code>"
+
+#~ msgid "<strong>total runtime</strong>: %1s"
+#~ msgstr "<strong>загальний час виконання</strong>: %1 с"
+
+#~ msgid "%1: %2 at %3"
+#~ msgstr "%1: %2 за %3"
+
+#~ msgid "Allocations [-]"
+#~ msgstr "Розміщення [-]"
+
+#~ msgid "Temporary Allocations [-]"
+#~ msgstr "Тимчасові розміщення у пам’яті [-]"
+
+#~ msgid "Leaked [B]"
+#~ msgstr "Втрачено [Б]"
+
+#~ msgid "Allocated [B]"
+#~ msgstr "Розміщено [Б]"
+
+#~ msgid "time in ms"
+#~ msgstr "час у мс"
+
+#~ msgid "memory heap size"
+#~ msgstr "розмір динамічної пам’яті"
