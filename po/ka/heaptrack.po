@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-11-21 00:49+0000\n"
-"PO-Revision-Date: 2022-10-12 06:16+0200\n"
+"PO-Revision-Date: 2023-01-17 06:04+0100\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
 "Language: ka\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -37,42 +37,42 @@ msgstr "მდებარეობა"
 #: gui/callercalleemodel.cpp:42 gui/callercalleemodel.h:335
 #, kde-format
 msgid "Allocations (Self)"
-msgstr ""
+msgstr "გამოყოფები (თვით)"
 
 #: gui/callercalleemodel.cpp:44 gui/callercalleemodel.h:337
 #, kde-format
 msgid "Temporary (Self)"
-msgstr ""
+msgstr "დროებითი (თვით)"
 
 #: gui/callercalleemodel.cpp:46 gui/callercalleemodel.h:339
 #, kde-format
 msgid "Peak (Self)"
-msgstr ""
+msgstr "პიკი (თვით)"
 
 #: gui/callercalleemodel.cpp:48 gui/callercalleemodel.h:341
 #, kde-format
 msgid "Leaked (Self)"
-msgstr ""
+msgstr "გაჟონილი (თვით)"
 
 #: gui/callercalleemodel.cpp:50 gui/callercalleemodel.h:343
 #, kde-format
 msgid "Allocations (Incl.)"
-msgstr ""
+msgstr "გამოყოფები (ჩათვლ.)"
 
 #: gui/callercalleemodel.cpp:52 gui/callercalleemodel.h:345
 #, kde-format
 msgid "Temporary (Incl.)"
-msgstr ""
+msgstr "დროებითი (ჩათვლ.)"
 
 #: gui/callercalleemodel.cpp:54 gui/callercalleemodel.h:347
 #, kde-format
 msgid "Peak (Incl.)"
-msgstr ""
+msgstr "პიკი (ჩათვლ.)"
 
 #: gui/callercalleemodel.cpp:56 gui/callercalleemodel.h:349
 #, kde-format
 msgid "Leaked (Incl.)"
-msgstr ""
+msgstr "გაჟონილი (ჩათვლ.)"
 
 #: gui/callercalleemodel.cpp:63
 #, kde-format
@@ -139,17 +139,17 @@ msgstr ""
 #, kde-format
 msgid ""
 "<qt>The bytes allocated at this location that have not been deallocated.</qt>"
-msgstr ""
+msgstr "<qt>მდებარეობაზე ბაიტები გამოიყო, მაგრამ არ გათავისუფლებულა..</qt>"
 
 #: gui/callercalleemodel.cpp:202
 #, kde-format
 msgid "Caller"
-msgstr ""
+msgstr "გამომძახებელი"
 
 #: gui/callercalleemodel.cpp:214
 #, kde-format
 msgid "Callee"
-msgstr ""
+msgstr "გამოძახებული"
 
 #: gui/callercalleemodel.h:156 gui/treemodel.cpp:69 gui/util.cpp:112
 #: gui/util.cpp:141 gui/util.cpp:170
@@ -161,7 +161,7 @@ msgstr "პიკი"
 #: gui/util.cpp:113 gui/util.cpp:142 gui/util.cpp:171
 #, kde-format
 msgid "Leaked"
-msgstr ""
+msgstr "გაჟონილი"
 
 #: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:475
 #: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
@@ -283,28 +283,28 @@ msgstr "ახსნის ჩვენება"
 #: gui/chartwidget.cpp:154
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "ჯამური ღირებულების გრაფიკის ჩვენება"
 
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "დეტალური ღირებულების გრაფიკის ჩვენება"
 
 #: gui/chartwidget.cpp:169
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "მიწყობილი დიაგრამები:"
 
 #: gui/chartwidget.cpp:216
 #, kde-format
 msgid "Filter In On Selection"
-msgstr ""
+msgstr "ჩართული მონიშნულის გაფილტვრა"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
 #: gui/chartwidget.cpp:226 gui/mainwindow.ui:899
 #, kde-format
 msgid "Reset Filter"
-msgstr ""
+msgstr "ფილტრის გასუფთავება"
 
 #: gui/chartwidget.cpp:365
 #, kde-format
@@ -315,37 +315,38 @@ msgstr "%1-ის შენახვა"
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
 msgstr ""
+"რასტრული გამოსახულება (*.png *.jpg *.tiff);;ვექტორული გამოსახულება (*.svg)"
 
 #: gui/chartwidget.cpp:382
 #, kde-format
 msgid "Failed to save the image to %1"
-msgstr ""
+msgstr "გამოსახულების %1-ში შენახვის შეცდომა"
 
 #: gui/chartwidget.cpp:402
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
-msgstr ""
+msgstr "<tr><th></th><th>დასაწყისი</th><th>დასასრული</th><th>დელტა</th></tr>"
 
 #: gui/chartwidget.cpp:403
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>დრო</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:407
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>დახარჯული</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:411
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>გამოყოფები</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:415
 #, kde-format
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>დროებითი გამოყოფები</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:423
 #, kde-format
@@ -373,7 +374,7 @@ msgstr ""
 #: gui/chartwidget.cpp:453
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
-msgstr ""
+msgstr "%1 (გაფილტრულია %2-დან %3-მდე, Δ%4)"
 
 #: gui/chartwidget.cpp:457
 #, kde-format
@@ -407,22 +408,22 @@ msgstr ""
 #: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
 #, kde-format
 msgid "%1 allocations in total"
-msgstr ""
+msgstr "%1 გამოყოფები სულ"
 
 #: gui/flamegraph.cpp:177
 #, kde-format
 msgid "%1 temporary allocations in total"
-msgstr ""
+msgstr "%1 დროებითი გამოყოფები სულ"
 
 #: gui/flamegraph.cpp:179
 #, kde-format
 msgid "%1 peak memory consumption"
-msgstr ""
+msgstr "%1 პიკური მეხსიერების მოხმარება"
 
 #: gui/flamegraph.cpp:181
 #, kde-format
 msgid "%1 leaked in total"
-msgstr ""
+msgstr "%1 გაჟონილი სულ"
 
 #: gui/flamegraph.cpp:234
 #, kde-format
@@ -453,7 +454,7 @@ msgstr ""
 #: gui/flamegraph.cpp:428
 #, kde-format
 msgid "Memory Peak"
-msgstr ""
+msgstr "პიკური მეხსიერება"
 
 #: gui/flamegraph.cpp:430
 #, kde-format
@@ -504,7 +505,7 @@ msgstr ""
 #: gui/flamegraph.cpp:476
 #, kde-format
 msgid "Collapse Recursion"
-msgstr ""
+msgstr "რეკურსიის ჩაკეცვა"
 
 #: gui/flamegraph.cpp:478
 #, kde-format
@@ -516,7 +517,7 @@ msgstr ""
 #: gui/flamegraph.cpp:490
 #, kde-format
 msgid "Cost Threshold: "
-msgstr ""
+msgstr "ღირებულების ზღვარი: "
 
 #: gui/flamegraph.cpp:494
 #, kde-format
@@ -546,7 +547,7 @@ msgstr "ხედის საწყის მნიშვნელობაზ�
 #: gui/flamegraph.cpp:555 gui/mainwindow.cpp:140
 #, kde-format
 msgid "View Caller/Callee"
-msgstr ""
+msgstr "გამოძახებული/გამომძახებლის ნახვა"
 
 #: gui/flamegraph.cpp:696
 #, kde-format
@@ -626,7 +627,7 @@ msgstr "ჩასატვირთი ფაილები"
 #: gui/gui.cpp:106
 #, kde-format
 msgid "[FILE...]"
-msgstr ""
+msgstr "[ფაილი...]"
 
 #: gui/histogrammodel.cpp:65
 #, kde-format
@@ -656,11 +657,13 @@ msgid ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
 "<i>(attached)</i></dd>"
 msgstr ""
+"<dt><b>გამმართველი</b>:</dt><dd style='font-family:monospace;'>%1 "
+"<i>(მიმაგრებულია)</i></dd>"
 
 #: gui/mainwindow.cpp:395
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
-msgstr ""
+msgstr "<dt><b>გასამართი</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 
 #: gui/mainwindow.cpp:399
 #, kde-format
@@ -715,7 +718,7 @@ msgstr ""
 #: gui/mainwindow.cpp:468
 #, kde-format
 msgid "Failed to parse file %1."
-msgstr ""
+msgstr "%1 ფაილის დამუშავების შეცდომა."
 
 #: gui/mainwindow.cpp:473
 #, kde-format
@@ -730,22 +733,22 @@ msgstr "ზომები"
 #: gui/mainwindow.cpp:553
 #, kde-format
 msgid "Input data %1 does not exist."
-msgstr ""
+msgstr "შეყვანილი მონაცემი %1 არ არსებობს."
 
 #: gui/mainwindow.cpp:555
 #, kde-format
 msgid "Input data %1 is not a file."
-msgstr ""
+msgstr "შეყვანილი მონაცემი %1 ფაილი არაა."
 
 #: gui/mainwindow.cpp:557
 #, kde-format
 msgid "Input data %1 is not readable."
-msgstr ""
+msgstr "შეყვანილი მონაცემი %1 წაკითხვადი არაა."
 
 #: gui/mainwindow.cpp:585
 #, kde-format
 msgid "Failed to parse suppression file."
-msgstr ""
+msgstr "ჩახშობის ფაილის დამუშავების შეცდომა."
 
 #: gui/mainwindow.cpp:600
 #, kde-format
@@ -755,12 +758,12 @@ msgstr "Heaptrack"
 #: gui/mainwindow.cpp:628
 #, kde-format
 msgid "Disable Embedded Suppressions"
-msgstr ""
+msgstr "ჩაშენებული ჩახშობების გამორთვა"
 
 #: gui/mainwindow.cpp:640
 #, kde-format
 msgid "Disable Builtin Suppressions"
-msgstr ""
+msgstr "ჩადგმული ჩახშობების გამორთვა"
 
 #: gui/mainwindow.cpp:642
 #, kde-format
@@ -772,7 +775,7 @@ msgstr ""
 #: gui/mainwindow.cpp:670
 #, kde-format
 msgid "Loading file %1, please wait..."
-msgstr ""
+msgstr "იტვირთება ფაილი %1. მოითმინეთ..."
 
 #: gui/mainwindow.cpp:672
 #, kde-format
@@ -789,7 +792,7 @@ msgstr ""
 #: gui/mainwindow.cpp:691
 #, kde-format
 msgid "Reparsing file, please wait..."
-msgstr ""
+msgstr "ფაილის თავიდან დამუშავება. გთხოვთ მოიცადოთ..."
 
 #: gui/mainwindow.cpp:734
 #, kde-format
@@ -809,12 +812,12 @@ msgstr "ხელით..."
 #: gui/mainwindow.cpp:814
 #, kde-format
 msgid "Automatic (No Line numbers)"
-msgstr ""
+msgstr "ავტომატური (ხაზის ნომრების გარეშე)"
 
 #: gui/mainwindow.cpp:834
 #, kde-format
 msgid "Custom Code Navigation"
-msgstr ""
+msgstr "ხელით მითითებულ კოდში ნავიგაცია"
 
 #: gui/mainwindow.cpp:835
 #, kde-format
@@ -866,7 +869,7 @@ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
 #: gui/mainwindow.ui:79 gui/mainwindow.ui:95
 #, kde-format
 msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
-msgstr ""
+msgstr "ბილილი/heaptrack.$APP.$PID.{gz,zst}"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
 #: gui/mainwindow.ui:89
@@ -887,19 +890,19 @@ msgstr "პროფილის &მონაცემები:"
 #: gui/mainwindow.ui:115
 #, kde-format
 msgid "Compare to:"
-msgstr ""
+msgstr "შედარება:"
 
 #. i18n: ectx: property (text), widget (QLabel, suppressionsLabel)
 #: gui/mainwindow.ui:128
 #, kde-format
 msgid "Suppressions:"
-msgstr ""
+msgstr "ჩახშობები:"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
 #: gui/mainwindow.ui:138
 #, kde-format
 msgid "path/to/lsan_suppressions.txt"
-msgstr ""
+msgstr "ბილიკი/lsan_suppressions.txt"
 
 #. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
 #: gui/mainwindow.ui:251
@@ -918,33 +921,33 @@ msgstr ""
 #: gui/mainwindow.ui:355
 #, kde-format
 msgid "Peak Contributions"
-msgstr ""
+msgstr "უმაღლესი წვლილი"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topLeakedLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topLeaked)
 #: gui/mainwindow.ui:391 gui/mainwindow.ui:404
 #, kde-format
 msgid "List of functions that leak the most memory."
-msgstr ""
+msgstr "ფუნქციების სია, რომლებიც ყველაზე მეტ მეხსიერებას ჟონავენ."
 
 #. i18n: ectx: property (text), widget (QLabel, topLeakedLabel)
 #: gui/mainwindow.ui:394
 #, kde-format
 msgid "Largest Memory Leaks"
-msgstr ""
+msgstr "მეხსიერების ყველაზე დიდი გაჟონვები"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topAllocationsLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topAllocations)
 #: gui/mainwindow.ui:430 gui/mainwindow.ui:443
 #, kde-format
 msgid "List of functions that allocate memory most often."
-msgstr ""
+msgstr "ფუნქციების სია, რომლებიც მეხსიერებას ყველაზე ხშირად გამოყოფენ."
 
 #. i18n: ectx: property (text), widget (QLabel, topAllocationsLabel)
 #: gui/mainwindow.ui:433
 #, kde-format
 msgid "Most Memory Allocations"
-msgstr ""
+msgstr "მეხსიერების გამყოფების უმრავლესობა"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topTemporaryLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topTemporary)
@@ -957,7 +960,7 @@ msgstr ""
 #: gui/mainwindow.ui:475
 #, kde-format
 msgid "Most Temporary Allocations"
-msgstr ""
+msgstr "დროებით გამოყოფების უმრავლესობა"
 
 #. i18n: ectx: property (title), widget (KCollapsibleGroupBox, suppressionBox)
 #: gui/mainwindow.ui:508
@@ -1045,7 +1048,7 @@ msgstr "ფილტრი"
 #: gui/parser.cpp:387
 #, kde-format
 msgid "merging allocations... %1%"
-msgstr ""
+msgstr "გამოყოფების შერწყმა... %1%"
 
 #: gui/parser.cpp:557
 #, kde-format
@@ -1055,77 +1058,77 @@ msgstr "ჯამში"
 #: gui/parser.cpp:559
 #, kde-format
 msgid "0B to 8B"
-msgstr ""
+msgstr "0ბ-დან 8ბმ-მდე"
 
 #: gui/parser.cpp:560
 #, kde-format
 msgid "9B to 16B"
-msgstr ""
+msgstr "9ბ-დან 16ბ-მდე"
 
 #: gui/parser.cpp:561
 #, kde-format
 msgid "17B to 32B"
-msgstr ""
+msgstr "17ბ-დან 32ბ-მდე"
 
 #: gui/parser.cpp:562
 #, kde-format
 msgid "33B to 64B"
-msgstr ""
+msgstr "33ბ-დან 64ბ-მდე"
 
 #: gui/parser.cpp:563
 #, kde-format
 msgid "65B to 128B"
-msgstr ""
+msgstr "64ბ-დან 128ბ-მდე"
 
 #: gui/parser.cpp:564
 #, kde-format
 msgid "129B to 256B"
-msgstr ""
+msgstr "129ბ-დან 256ბ-მდე"
 
 #: gui/parser.cpp:565
 #, kde-format
 msgid "257B to 512B"
-msgstr ""
+msgstr "257ბ-დან 512ბ-მდე"
 
 #: gui/parser.cpp:566
 #, kde-format
 msgid "512B to 1KB"
-msgstr ""
+msgstr "512ბ-დან 1კბ-მდე"
 
 #: gui/parser.cpp:567
 #, kde-format
 msgid "more than 1KB"
-msgstr ""
+msgstr "1კბ-ზე მეტი"
 
 #: gui/parser.cpp:645
 #, kde-format
 msgid "reparsing data"
-msgstr ""
+msgstr "მონაცემების თავიდან დამუშავება"
 
 #: gui/parser.cpp:645
 #, kde-format
 msgid "parsing data"
-msgstr ""
+msgstr "მონაცემების დამუშავება"
 
 #: gui/parser.cpp:659
 #, kde-format
 msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
-msgstr ""
+msgstr "%1 გაიარა: %2/%3  დახარჯა: %4  დარჩა: %5"
 
 #: gui/parser.cpp:715
 #, kde-format
 msgid "merging allocations..."
-msgstr ""
+msgstr "გამოყოფების შერწყმა..."
 
 #: gui/parser.cpp:726
 #, kde-format
 msgid "building size histogram..."
-msgstr ""
+msgstr "ზომის ჰისტოგრამის აგება..."
 
 #: gui/parser.cpp:739
 #, kde-format
 msgid "building charts..."
-msgstr ""
+msgstr "გრაფიკების აგება...."
 
 #: gui/stacksmodel.cpp:99
 #, kde-format
@@ -1168,26 +1171,28 @@ msgid ""
 "%1\n"
 "  in %2 (%3)"
 msgstr ""
+"%1\n"
+"   %2-ში (%3)"
 
 #: gui/treemodel.cpp:159
 #, kde-format
 msgid "peak contribution: %1 (%2% of total)\n"
-msgstr ""
+msgstr "პიკური წვლილი: %1 (სულ %2%)\n"
 
 #: gui/treemodel.cpp:160
 #, kde-format
 msgid "leaked: %1 (%2% of total)\n"
-msgstr ""
+msgstr "გაჟონვა: %1 (სულ %2%)\n"
 
 #: gui/treemodel.cpp:161
 #, kde-format
 msgid "allocations: %1 (%2% of total)\n"
-msgstr ""
+msgstr "გამოყოფები: %1 (სულ %2%)\n"
 
 #: gui/treemodel.cpp:162
 #, kde-format
 msgid "temporary: %1 (%2% of allocations, %3% of total)\n"
-msgstr ""
+msgstr "დროებითი: %1 (გამოყოფების %2%, სულ %3%)\n"
 
 #: gui/treemodel.cpp:168
 #, kde-format
@@ -1198,8 +1203,8 @@ msgstr ""
 #, kde-format
 msgid "called from one location"
 msgid_plural "called from %1 locations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "გამოძახებულია 1 მდებარეობიდან"
+msgstr[1] "გამოძახებულია %1 მდებარეობიდან"
 
 #: gui/util.cpp:32
 #, kde-format
@@ -1209,33 +1214,33 @@ msgstr "??"
 #: gui/util.cpp:108
 #, kde-format
 msgid "%1: %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr ""
+msgstr "%1: %2<br/>&nbsp;&nbsp;%4% ჯამში %3-დან"
 
 #: gui/util.cpp:134 gui/util.cpp:163
 #, kde-format
 msgid "%1 (self): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr ""
+msgstr "%1 (თვით): %2<br/>&nbsp;&nbsp;%4% ჯამში %3-დან"
 
 #: gui/util.cpp:137 gui/util.cpp:166
 #, kde-format
 msgid "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr ""
+msgstr "%1 (ჩათვლით): %2<br/>&nbsp;&nbsp;%4% ჯამში %3-დან"
 
 #: gui/util.cpp:183
 #, kde-format
 msgid "symbol: <tt>%1</tt><br/>binary: <tt>%2 (%3)</tt>"
-msgstr ""
+msgstr "სიმბოლო: <tt>%1</tt><br/>ბინარული: <tt>%2 (%3)</tt>"
 
 #: gui/util.cpp:187
 #, kde-format
 msgctxt "%1: function name, %2: binary basename"
 msgid "%1 in %2"
-msgstr ""
+msgstr "%1-ი %2-ში"
 
 #: gui/util.cpp:209
 #, kde-format
 msgid "<unresolved function>"
-msgstr ""
+msgstr "<ამოუხსნელი ფუნქცია>"
 
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
