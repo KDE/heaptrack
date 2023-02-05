@@ -11,6 +11,7 @@
   <name xml:lang="de">Heaptrack</name>
   <name xml:lang="en-GB">Heaptrack</name>
   <name xml:lang="es">Heaptrack</name>
+  <name xml:lang="eu">Heaptrack</name>
   <name xml:lang="fr">Heaptrack</name>
   <name xml:lang="gl">Heaptrack</name>
   <name xml:lang="ia">Heaptrack</name>
@@ -37,6 +38,7 @@
   <summary xml:lang="da">En heap-hukommelsesprofilering til Linux</summary>
   <summary xml:lang="en-GB">A heap memory profiler for Linux</summary>
   <summary xml:lang="es">Un analizador de rendimiento de la memoria de almacenamiento libre para Linux</summary>
+  <summary xml:lang="eu">Linux-erako memoria dinamikoaren («heap») profilatzaile bat</summary>
   <summary xml:lang="fr">Un analyseur de mémoire dynamique pour Linux</summary>
   <summary xml:lang="gl">Un analizador de uso de memoria dinámica (heap) para Linux</summary>
   <summary xml:lang="ia">Un profilator de memoria heap per Linux</summary>
@@ -229,6 +231,7 @@
       <caption xml:lang="ca-valencia">Gràfic de les assignacions de memòria en monticles al llarg del temps</caption>
       <caption xml:lang="en-GB">Chart of heap memory allocations over time</caption>
       <caption xml:lang="es">Gráfico de asignaciones de memoria del almacenamiento libre a lo largo del tiempo</caption>
+      <caption xml:lang="eu">Denboran zehar, memoria dinamikoaren esleipenaren diagrama</caption>
       <caption xml:lang="fr">Graphique des allocations de mémoire dynamique en temps réel</caption>
       <caption xml:lang="id">Bagan alokasi memori tumpukan dari waktu ke waktu</caption>
       <caption xml:lang="it">Grafico delle allocazioni della memoria heap nel tempo</caption>
