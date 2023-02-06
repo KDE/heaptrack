@@ -3,20 +3,21 @@
 # Vincent Pinon <vpinon@kde.org>, 2015.
 # Xavier Besnard <xavier.besnard@neuf.fr>, 2020, 2021, 2022.
 #
+# Xavier BESNARD <xavier.besnard]neuf.fr>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-06-16 02:27+0000\n"
-"PO-Revision-Date: 2021-11-18 16:07+0100\n"
-"Last-Translator: Xavier Besnard <xavier.besnard@neuf.fr>\n"
-"Language-Team: French <kde-francophone@kde.org>\n"
+"PO-Revision-Date: 2023-02-05 16:26+0100\n"
+"Last-Translator: Xavier BESNARD <xavier.besnard]neuf.fr>\n"
+"Language-Team: fr\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 22.08.1\n"
+"X-Generator: Lokalize 22.12.1\n"
 "X-Environment: kde\n"
 "X-Accelerator-Marker: &\n"
 "X-Text-Markup: kde4\n"
@@ -60,22 +61,22 @@ msgstr "Fuite (Automatique)"
 #: gui/callercalleemodel.cpp:50 gui/callercalleemodel.h:343
 #, kde-format
 msgid "Allocations (Incl.)"
-msgstr "Allocations (Incl)"
+msgstr "Allocations (Inclus)"
 
 #: gui/callercalleemodel.cpp:52 gui/callercalleemodel.h:345
 #, kde-format
 msgid "Temporary (Incl.)"
-msgstr "Temporaire (Incl)"
+msgstr "Temporaire (Inclus)"
 
 #: gui/callercalleemodel.cpp:54 gui/callercalleemodel.h:347
 #, kde-format
 msgid "Peak (Incl.)"
-msgstr "Pic (Incl)"
+msgstr "Pic (Inclus)"
 
 #: gui/callercalleemodel.cpp:56 gui/callercalleemodel.h:349
 #, kde-format
 msgid "Leaked (Incl.)"
-msgstr "Fuite (Incl)"
+msgstr "Fuite (Inclus)"
 
 #: gui/callercalleemodel.cpp:63
 #, kde-format
@@ -588,7 +589,7 @@ msgstr "Interface pour Heaptrack"
 #: gui/gui.cpp:66
 #, kde-format
 msgid "A visualizer for heaptrack data files."
-msgstr "Un afficheur de fichiers de données « heaptrack »."
+msgstr "Un afficheur de fichiers de données « Heaptrack »."
 
 #: gui/gui.cpp:67
 #, kde-format
@@ -632,7 +633,7 @@ msgid ""
 "this feature is explicitly disabled using this command line option."
 msgstr ""
 "Ignorer les définitions de suppression qui sont intégrées dans le fichier de "
-"données « heaptrack ». Par défaut, heaptrack copiera les suppressions "
+"données « Heaptrack ». Par défaut, heaptrack copiera les suppressions "
 "définies optionnellement grâce à un symbole « const char "
 "*__lsan_default_suppressions() » dans l'application en cours de débogage. "
 "Celles-ci sont alors toujours appliquées lors de l'analyse des données, sauf "
@@ -646,7 +647,7 @@ msgid ""
 "heaptrack will suppress certain known leaks in common system libraries."
 msgstr ""
 "Ignorer les définitions de suppression intégrées dans heaptrack. Par défaut, "
-"heaptrack supprimera certaines fuites connues des bibliothèques communes du "
+"Heaptrack supprimera certaines fuites connues des bibliothèques communes du "
 "système."
 
 #: gui/gui.cpp:106
@@ -839,8 +840,8 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks from common system libraries."
 msgstr ""
-"Ignorer les définitions de suppression intégrées dans heaptrack. Par défaut, "
-"heaptrack supprimera certaines fuites connues des bibliothèques communes du "
+"Ignorer les définitions de suppression intégrées dans Heaptrack. Par défaut, "
+"Heaptrack supprimera certaines fuites connues des bibliothèques communes du "
 "système."
 
 #: gui/mainwindow.cpp:649
@@ -954,7 +955,7 @@ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
 #: gui/mainwindow.ui:79 gui/mainwindow.ui:95
 #, kde-format
 msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
-msgstr "path / to / heaptrack.$APP.$PID.{gz,zst}"
+msgstr "emplacement / vers / heaptrack.$APP.$PID.{gz,zst}"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
 #: gui/mainwindow.ui:89
@@ -1184,12 +1185,12 @@ msgstr "257B à 512B"
 #: gui/parser.cpp:566
 #, kde-format
 msgid "512B to 1KB"
-msgstr "512B à 1KB"
+msgstr "512 o à 1Ko"
 
 #: gui/parser.cpp:567
 #, kde-format
 msgid "more than 1KB"
-msgstr "plus de 1KB"
+msgstr "plus de 1Ko"
 
 #: gui/parser.cpp:645
 #, kde-format
@@ -1263,7 +1264,7 @@ msgid ""
 msgstr ""
 "<qt>L'emplacement depuis lequel une fonction d'allocation a été annulée. Les "
 "informations de symbole de fonction et de fichier peuvent être inconnues "
-"quand les informations de débogage n'étaient pas disponibles quand heaptrack "
+"quand les informations de débogage n'étaient pas disponibles quand Heaptrack "
 "a été exécuté.</qt>"
 
 #: gui/treemodel.cpp:149 gui/treemodel.cpp:173
