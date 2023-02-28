@@ -1,16 +1,16 @@
 # Translation of heaptrack.po to Catalan (Valencian)
-# Copyright (C) 2015-2022 This_file_is_part_of_KDE
+# Copyright (C) 2015-2023 This_file_is_part_of_KDE
 # This file is distributed under the license LGPL version 2.1 or
 # version 3 or later versions approved by the membership of KDE e.V.
 #
-# Josep M. Ferrer <txemaq@gmail.com>, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022.
+# Josep M. Ferrer <txemaq@gmail.com>, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023.
 # Antoni Bella Pérez <antonibella5@yahoo.com>, 2015, 2016, 2017, 2020, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-11-21 00:49+0000\n"
-"PO-Revision-Date: 2022-10-05 22:01+0200\n"
+"PO-Revision-Date: 2023-02-26 18:54+0100\n"
 "Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca@valencia\n"
@@ -683,7 +683,7 @@ msgstr ""
 "Especifiqueu una supressió per línia i comenceu cada línia amb «leak:», és a "
 "dir, utilitzeu el format de fitxer per a la supressió LSAN."
 
-# skip-rule: t-apo1
+# skip-rule: t-apo1,rst-link0italic,rst-italic2
 #: gui/gui.cpp:95 gui/mainwindow.cpp:630
 #, kde-format
 msgid ""
@@ -1370,21 +1370,3 @@ msgstr "%1 a %2"
 #, kde-format
 msgid "<unresolved function>"
 msgstr "<fu nció no resolta>"
-
-#~ msgid "KDevelop"
-#~ msgstr "KDevelop"
-
-#~ msgid "Kate"
-#~ msgstr "Kate"
-
-#~ msgid "KWrite"
-#~ msgstr "KWrite"
-
-#~ msgid "gedit"
-#~ msgstr "gedit"
-
-#~ msgid "gvim"
-#~ msgstr "gvim"
-
-#~ msgid "Qt Creator"
-#~ msgstr "Qt Creator"
