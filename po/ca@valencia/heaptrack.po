@@ -1,17 +1,17 @@
 # Translation of heaptrack.po to Catalan (Valencian)
-# Copyright (C) 2015-2021 This_file_is_part_of_KDE
+# Copyright (C) 2015-2023 This_file_is_part_of_KDE
 # This file is distributed under the license LGPL version 2.1 or
 # version 3 or later versions approved by the membership of KDE e.V.
 #
-# Josep M. Ferrer <txemaq@gmail.com>, 2015, 2016, 2017, 2018, 2019, 2020, 2021.
+# Josep M. Ferrer <txemaq@gmail.com>, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2023.
 # Antoni Bella Pérez <antonibella5@yahoo.com>, 2015, 2016, 2017, 2020, 2021.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-06-16 02:27+0000\n"
-"PO-Revision-Date: 2021-11-12 10:22+0100\n"
-"Last-Translator: Antoni Bella Pérez <antonibella5@yahoo.com>\n"
+"PO-Revision-Date: 2023-02-26 12:04+0100\n"
+"Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca@valencia\n"
 "MIME-Version: 1.0\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Accelerator-Marker: &\n"
-"X-Generator: Lokalize 21.08.1\n"
+"X-Generator: Lokalize 20.12.0\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -623,7 +623,7 @@ msgstr ""
 "Especifiqueu una supressió per línia i comenceu cada línia amb «leak:», és a "
 "dir, utilitzeu el format de fitxer per a la supressió LSAN."
 
-# skip-rule: t-apo1
+# skip-rule: t-apo1,rst-link0italic,rst-italic2
 #: gui/gui.cpp:95 gui/mainwindow.cpp:609
 #, kde-format
 msgid ""
