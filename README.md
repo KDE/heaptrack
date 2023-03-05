@@ -120,7 +120,7 @@ On macOS the dependencies can be installed easily using [homebrew](http://brew.s
     # install dependencies
     brew install kde-mac/kde/kf5-kcoreaddons kde-mac/kde/kf5-kitemmodels kde-mac/kde/kf5-kconfigwidgets \
                  kde-mac/kde/kf5-kio kde-mac/kde/kdiagram \
-                 kde-extra-cmake-modules kde-ki18n kde-threadweaver \
+                 extra-cmake-modules ki18n threadweaver \
                  boost zstd gettext
     
     # run manual steps as printed by brew
