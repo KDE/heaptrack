@@ -83,6 +83,7 @@
     <p xml:lang="tr">Heaptrack, tüm bellek ayırmalarını izler ve bu olayları yığın izleriyle açıklar. Özel çözümleme araçları, daha sonra yığın bellek profilini yorumlamanıza izin verir:</p>
     <p xml:lang="uk">Heaptrack трасує усі запити щодо розміщення даних у пам'яті і анотує ці події за допомогою трасування стека. Далі, спеціалізовані інструменти для аналізу надають вам змогу обробляти дані профілювання пам'яті з такою метою:</p>
     <p xml:lang="x-test">xxHeaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:xx</p>
+    <p xml:lang="zh-CN">Heaptrack跟踪所有内存分配，并使用堆栈跟踪注释这些事件。专用的分析工具允许你解释堆内存配置文件:</p>
     <ul>
       <li>find hotspots that need to be optimized to reduce the memory footprint of your application</li>
       <li xml:lang="ca">troba els punts d'accés que necessiten optimitzar-se per a reduir el consum de memòria de la vostra aplicació</li>
@@ -106,6 +107,7 @@
       <li xml:lang="tr">uygulamanızın kapladığı belleği azaltmak için eniyilenmesi gereken etkin noktaları bulun</li>
       <li xml:lang="uk">Виявлення проблемних місць, які має бути оптимізовано з метою зменшення споживання пам'яті вашою програмою.</li>
       <li xml:lang="x-test">xxfind hotspots that need to be optimized to reduce the memory footprint of your applicationxx</li>
+      <li xml:lang="zh-CN">寻找需要优化的热点，以减少应用程序的内存占用</li>
       <li>find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
       <li xml:lang="ca">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai es desassignarà</li>
       <li xml:lang="ca-valencia">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai es desassignarà</li>
@@ -128,6 +130,7 @@
       <li xml:lang="tr">bellek sızıntılarını, yani hiçbir zaman tahsis edilmemiş belleği ayıran yerleri bulun</li>
       <li xml:lang="uk">Виявлення витоків пам'яті, тобто розміщень даних у пам'яті без відповідних вивільнень, коли дані стають непотрібними.</li>
       <li xml:lang="x-test">xxfind memory leaks, i.e. locations that allocate memory which is never deallocatedxx</li>
+      <li xml:lang="zh-CN">查找内存泄漏，即分配内存的位置永远不会被释放</li>
       <li>find allocation hotspots, i.e. code locations that trigger a lot of memory allocation calls</li>
       <li xml:lang="ca">troba els punts d'accés d'assignació, és a dir, les ubicacions al codi que desencadenen un munt de crides d'assignació de memòria</li>
       <li xml:lang="ca-valencia">troba els punts d'accés d'assignació, és a dir, les ubicacions al codi que desencadenen un munt de crides d'assignació de memòria</li>
@@ -150,6 +153,7 @@
       <li xml:lang="tr">ayrılan noktaları, demeli bir çok bellek ayırma çağrısını tetikleyen kod yerlerini bulun</li>
       <li xml:lang="uk">Виявлення проблемних місць розміщення, тобто місць у програмному коді, які призводять до багатьох викликів щодо розміщення у пам'яті.</li>
       <li xml:lang="x-test">xxfind allocation hotspots, i.e. code locations that trigger a lot of memory allocation callsxx</li>
+      <li xml:lang="zh-CN">找到分配热点，即触发大量内存分配调用的代码位置</li>
       <li>find temporary allocations, which are allocations that are directly followed by their deallocation</li>
       <li xml:lang="ca">troba les assignacions temporals, són les assignacions que són seguides directament per la cancel·lació de la seva assignació</li>
       <li xml:lang="ca-valencia">troba les assignacions temporals, són les assignacions que són seguides directament per la cancel·lació de la seua assignació</li>
@@ -172,6 +176,7 @@
       <li xml:lang="tr">ayırmanın ardından bırakılacak olan, geçici ayırmaları bulun</li>
       <li xml:lang="uk">Виявлення тимчасових розміщень, тобто розміщень даних у пам'яті, за якими одразу ж слідують вивільнення відповідних ділянок пам'яті.</li>
       <li xml:lang="x-test">xxfind temporary allocations, which are allocations that are directly followed by their deallocationxx</li>
+      <li xml:lang="zh-CN">查找临时分配，即直接在其释放之后进行的分配</li>
     </ul>
   </description>
   <url type="homepage">https://phabricator.kde.org/dashboard/view/28/</url>
