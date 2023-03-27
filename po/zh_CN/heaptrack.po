@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: kdeorg\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-06-16 02:27+0000\n"
-"PO-Revision-Date: 2023-03-11 04:54\n"
+"PO-Revision-Date: 2023-03-26 02:20\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -36,42 +36,42 @@ msgstr "位置"
 #: gui/callercalleemodel.cpp:42 gui/callercalleemodel.h:335
 #, kde-format
 msgid "Allocations (Self)"
-msgstr ""
+msgstr "分配 (Self)"
 
 #: gui/callercalleemodel.cpp:44 gui/callercalleemodel.h:337
 #, kde-format
 msgid "Temporary (Self)"
-msgstr ""
+msgstr "临时(Self)"
 
 #: gui/callercalleemodel.cpp:46 gui/callercalleemodel.h:339
 #, kde-format
 msgid "Peak (Self)"
-msgstr ""
+msgstr "峰值 (Self)"
 
 #: gui/callercalleemodel.cpp:48 gui/callercalleemodel.h:341
 #, kde-format
 msgid "Leaked (Self)"
-msgstr ""
+msgstr "泄漏(Self)"
 
 #: gui/callercalleemodel.cpp:50 gui/callercalleemodel.h:343
 #, kde-format
 msgid "Allocations (Incl.)"
-msgstr ""
+msgstr "分配(内存)"
 
 #: gui/callercalleemodel.cpp:52 gui/callercalleemodel.h:345
 #, kde-format
 msgid "Temporary (Incl.)"
-msgstr ""
+msgstr "临时(内存)"
 
 #: gui/callercalleemodel.cpp:54 gui/callercalleemodel.h:347
 #, kde-format
 msgid "Peak (Incl.)"
-msgstr ""
+msgstr "峰值(内存)"
 
 #: gui/callercalleemodel.cpp:56 gui/callercalleemodel.h:349
 #, kde-format
 msgid "Leaked (Incl.)"
-msgstr ""
+msgstr "泄漏(内存)"
 
 #: gui/callercalleemodel.cpp:63
 #, kde-format
@@ -85,7 +85,7 @@ msgstr ""
 msgid ""
 "<qt>The number of times an allocation function was directly called from this "
 "location.</qt>"
-msgstr ""
+msgstr "<qt>从此位置直接调用分配函数的次数。</qt>"
 
 #: gui/callercalleemodel.cpp:69 gui/callercalleemodel.h:362
 #, kde-format
@@ -93,6 +93,7 @@ msgid ""
 "<qt>The number of direct temporary allocations. These allocations are "
 "directly followed by a free without any other allocations in-between.</qt>"
 msgstr ""
+"<qt>直接临时分配的数量。这些分配之后是免费分配，中间没有任何其他分配。。</qt>"
 
 #: gui/callercalleemodel.cpp:73 gui/callercalleemodel.h:366
 #, kde-format
@@ -100,13 +101,14 @@ msgid ""
 "<qt>The maximum heap memory in bytes consumed from allocations originating "
 "directly at this location. This takes deallocations into account.</qt>"
 msgstr ""
+"<qt>直接源自此位置的分配消耗的最大堆内存（以字节为单位）。这考虑了处置。</qt>"
 
 #: gui/callercalleemodel.cpp:78 gui/callercalleemodel.h:371
 #, kde-format
 msgid ""
 "<qt>The bytes allocated directly at this location that have not been "
 "deallocated.</qt>"
-msgstr ""
+msgstr "<qt>直接分配到这个位置的字节尚未被分配。</qt>"
 
 #: gui/callercalleemodel.cpp:81 gui/callercalleemodel.h:181
 #: gui/callercalleemodel.h:374
@@ -114,7 +116,7 @@ msgstr ""
 msgid ""
 "<qt>The inclusive number of times an allocation function was called from "
 "this location or any functions called from here.</qt>"
-msgstr ""
+msgstr "<qt>包含从此位置调用分配函数或从此处调用的任何函数的次数。</qt>"
 
 #: gui/callercalleemodel.cpp:85 gui/callercalleemodel.h:185
 #: gui/callercalleemodel.h:378
@@ -123,6 +125,7 @@ msgid ""
 "<qt>The number of inclusive temporary allocations. These allocations are "
 "directly followed by a free without any other allocations in-between.</qt>"
 msgstr ""
+"<qt>包含临时分配的数量。这些分配之后是免费分配，中间没有任何其他分配。</qt>"
 
 #: gui/callercalleemodel.cpp:89 gui/callercalleemodel.h:173
 #: gui/callercalleemodel.h:382
@@ -132,13 +135,15 @@ msgid ""
 "originating at this location or from functions called from here. This takes "
 "deallocations into account.</qt>"
 msgstr ""
+"<qt>源自此位置的分配或从此处调用的函数消耗的最大堆内存（以字节为单位）。这考"
+"虑了处置。</qt>"
 
 #: gui/callercalleemodel.cpp:94 gui/callercalleemodel.h:178
 #: gui/callercalleemodel.h:387 gui/treemodel.cpp:91
 #, kde-format
 msgid ""
 "<qt>The bytes allocated at this location that have not been deallocated.</qt>"
-msgstr ""
+msgstr "<qt>分配给这个位置的字节尚未分配。</qt>"
 
 #: gui/callercalleemodel.cpp:202
 #, kde-format
@@ -200,13 +205,13 @@ msgstr "内存申请"
 #: gui/chartmodel.cpp:60
 #, kde-format
 msgid "Memory Consumed"
-msgstr ""
+msgstr "内存已使用"
 
 #: gui/chartmodel.cpp:62 gui/flamegraph.cpp:442 gui/mainwindow.cpp:456
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
-msgstr ""
+msgstr "临时分配"
 
 #: gui/chartmodel.cpp:115
 #, kde-format
@@ -219,35 +224,35 @@ msgstr "%1 (%2 字节)"
 #: gui/chartmodel.cpp:123
 #, kde-format
 msgid "<qt>%1 allocations in total after %2</qt>"
-msgstr ""
+msgstr "<qt>%1 分配总在 %2之后</qt>"
 
 #: gui/chartmodel.cpp:125
 #, kde-format
 msgid "<qt>%1 temporary allocations in total after %2</qt>"
-msgstr ""
+msgstr "<qt>%1 临时分配次数总计在 %2之后</qt>"
 
 #: gui/chartmodel.cpp:127
 #, kde-format
 msgid "<qt>%1 consumed in total after %2</qt>"
-msgstr ""
+msgstr "<qt>%1 在 %2之后总消耗</qt>"
 
 #: gui/chartmodel.cpp:133
 #, kde-format
 msgid ""
 "<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>"
-msgstr ""
+msgstr "<qt>%2 在 %3 之后分配:<p style='margin-left:10px;'>%1</p></qt>"
 
 #: gui/chartmodel.cpp:137
 #, kde-format
 msgid ""
 "<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
 "p></qt>"
-msgstr ""
+msgstr "<qt>%2 临时分配后 %3 来自：<p style='margin-left:10px'>%1</p></qt>"
 
 #: gui/chartmodel.cpp:141
 #, kde-format
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
-msgstr ""
+msgstr "<qt>%2 在 %3 之后消费:<p style='margin-left:10px'>%1</p></qt>"
 
 #: gui/chartwidget.cpp:151
 #, kde-format
@@ -348,12 +353,12 @@ msgstr ""
 #: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
 #, kde-format
 msgid "%1 allocations in total"
-msgstr ""
+msgstr "%1 分配总计"
 
 #: gui/flamegraph.cpp:177
 #, kde-format
 msgid "%1 temporary allocations in total"
-msgstr ""
+msgstr "%1 临时分配总计"
 
 #: gui/flamegraph.cpp:179
 #, kde-format
@@ -369,14 +374,14 @@ msgstr "%1 泄露总量"
 #, kde-format
 msgctxt "%1: number of allocations, %2: relative number, %3: function label"
 msgid "%1 (%2%) allocations in %3 and below."
-msgstr ""
+msgstr "%1 (%2%) 在 %3 及以下的分配。"
 
 #: gui/flamegraph.cpp:239
 #, kde-format
 msgctxt ""
 "%1: number of temporary allocations, %2: relative number, %3 function label"
 msgid "%1 (%2%) temporary allocations in %3 and below."
-msgstr ""
+msgstr "%1 (%2%) 在 %3 及以下的临时分配。"
 
 #: gui/flamegraph.cpp:244
 #, kde-format
@@ -389,7 +394,7 @@ msgstr "%3 及以下共对峰值资源消耗贡献了 %1 (%2%)。"
 #, kde-format
 msgctxt "%1: leaked bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) leaked in %3 and below."
-msgstr ""
+msgstr "%1 (%2%) 泄漏在 %3 及以下地方。"
 
 #: gui/flamegraph.cpp:427
 #, kde-format
@@ -416,7 +421,7 @@ msgstr ""
 msgid ""
 "Show a flame graph over the number of allocations triggered by functions in "
 "your code."
-msgstr ""
+msgstr "在您的代码中显示由函数触发的分配数的火焰图。"
 
 #: gui/flamegraph.cpp:444
 #, kde-format
@@ -425,11 +430,13 @@ msgid ""
 "functions in your code. Allocations are marked as temporary when they are "
 "immediately followed by their deallocation."
 msgstr ""
+"显示代码中函数触发的临时分配数的火焰图。当分配紧随其后的是解除分配时，它们被"
+"标记为临时分配。"
 
 #: gui/flamegraph.cpp:451
 #, kde-format
 msgid "Select the data source that should be visualized in the flame graph."
-msgstr ""
+msgstr "选择在火焰图形中可视化的数据源。"
 
 #: gui/flamegraph.cpp:466
 #, kde-format
@@ -446,19 +453,19 @@ msgstr ""
 #: gui/flamegraph.cpp:475
 #, kde-format
 msgid "Collapse Recursion"
-msgstr ""
+msgstr "折叠递归"
 
 #: gui/flamegraph.cpp:477
 #, kde-format
 msgid ""
 "Collapse stack frames for functions calling themselves. When this is "
 "unchecked, recursive frames will be visualized separately."
-msgstr ""
+msgstr "折叠调用自身的函数的堆栈帧。如果未选中此选项，将单独可视化递归帧。"
 
 #: gui/flamegraph.cpp:489
 #, kde-format
 msgid "Cost Threshold: "
-msgstr ""
+msgstr "成本阈值： "
 
 #: gui/flamegraph.cpp:493
 #, kde-format
@@ -469,6 +476,9 @@ msgid ""
 "low memory overhead. If you need more details, decrease the threshold value, "
 "or set it to zero.</qt>"
 msgstr ""
+"<qt>成本阈值定义分数截止值。相对成本低于此值的项目将不会显示在火焰图中。这样"
+"做是为了优化，以便为内存开销低的大型数据集快速生成图形。如果需要更多详细信"
+"息，请减小阈值或将其设置为零。</qt>"
 
 #: gui/flamegraph.cpp:505
 #, kde-format
@@ -493,7 +503,7 @@ msgstr ""
 #: gui/flamegraph.cpp:693
 #, kde-format
 msgid "generating flame graph..."
-msgstr ""
+msgstr "正在生成火焰图..."
 
 #: gui/flamegraph.cpp:769
 #, kde-format
@@ -533,7 +543,7 @@ msgstr "原作者，维护者"
 #: gui/gui.cpp:84
 #, kde-format
 msgid "Base profile data to compare other files to."
-msgstr ""
+msgstr "比较其他文件的基本配置数据。"
 
 #: gui/gui.cpp:89
 #, kde-format
@@ -580,12 +590,12 @@ msgstr ""
 #: gui/histogramwidget.cpp:99
 #, kde-format
 msgid "Requested Allocation Size"
-msgstr ""
+msgstr "请求的分配大小"
 
 #: gui/histogramwidget.cpp:105
 #, kde-format
 msgid "Number of Allocations"
-msgstr ""
+msgstr "分配数量"
 
 #: gui/mainwindow.cpp:76
 #, kde-format
@@ -620,7 +630,7 @@ msgstr "Qt Creator"
 #: gui/mainwindow.cpp:148
 #, kde-format
 msgid "Open file in editor"
-msgstr ""
+msgstr "在编辑器中打开文件"
 
 #: gui/mainwindow.cpp:371
 #, kde-format
@@ -628,11 +638,14 @@ msgid ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
 "<i>(attached)</i></dd>"
 msgstr ""
+"<dt><b>调试器</b>:</dt><dd style='font-family:monospace;'>%1 <i>(附件)</i></"
+"dd>"
 
 #: gui/mainwindow.cpp:374
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 msgstr ""
+"<dt><b>调试器</b>:</dt><dd style='font-family:monospace;'>%1 </dd>(附件"
 
 #: gui/mainwindow.cpp:378
 #, kde-format
@@ -647,17 +660,17 @@ msgstr ""
 #: gui/mainwindow.cpp:385
 #, kde-format
 msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>系统内存总额</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:392
 #, kde-format
 msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
-msgstr ""
+msgstr "<dt><b>调用分配函数</b>:</dt><dd>%1 (%2/s)</dd>"
 
 #: gui/mainwindow.cpp:395
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
-msgstr ""
+msgstr "<dt><b>临时分配</b>:</dt><dd>%1 (%2%， %3/s)</dd>"
 
 #: gui/mainwindow.cpp:405
 #, kde-format
@@ -667,7 +680,7 @@ msgstr ""
 #: gui/mainwindow.cpp:408
 #, kde-format
 msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>峰RSS</b> (包括Heaptrack 间接费用)：</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:412
 #, kde-format
@@ -682,17 +695,17 @@ msgstr "<dt><b>总体内存泄漏</b>:</dt><dd>%1 (已排除 %2)</dd>"
 #: gui/mainwindow.cpp:419
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>整个内存泄漏</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:447
 #, kde-format
 msgid "Failed to parse file %1."
-msgstr ""
+msgstr "解析文件 %1 失败。"
 
 #: gui/mainwindow.cpp:452
 #, kde-format
 msgid "Consumed"
-msgstr ""
+msgstr "已消耗的"
 
 #: gui/mainwindow.cpp:468
 #, kde-format
@@ -702,17 +715,17 @@ msgstr "大小"
 #: gui/mainwindow.cpp:532
 #, kde-format
 msgid "Input data %1 does not exist."
-msgstr ""
+msgstr "输入数据 %1 不存在。"
 
 #: gui/mainwindow.cpp:534
 #, kde-format
 msgid "Input data %1 is not a file."
-msgstr ""
+msgstr "输入数据 %1 不是一个文件。"
 
 #: gui/mainwindow.cpp:536
 #, kde-format
 msgid "Input data %1 is not readable."
-msgstr ""
+msgstr "输入数据 %1 不可读。"
 
 #: gui/mainwindow.cpp:564
 #, kde-format
@@ -756,7 +769,7 @@ msgstr "Heaptrack - %1"
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
-msgstr ""
+msgstr "Heaptrack - %1 与 %2 比较"
 
 #: gui/mainwindow.cpp:670
 #, kde-format
@@ -812,7 +825,7 @@ msgstr ""
 #: gui/mainwindow.ui:64
 #, kde-format
 msgid "Open Heaptrack Data"
-msgstr ""
+msgstr "打开Heaptrack 数据"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, openFile)
 #: gui/mainwindow.ui:73
@@ -848,12 +861,14 @@ msgid ""
 "If set, this file will be used as a base and its cost gets subtracted from "
 "the primary data costs.</qt>"
 msgstr ""
+"<qt>您可以选择指定要与之比较的第二个heaptrack数据文件。如果设置，此文件将用作"
+"基础文件，其成本将从主数据成本中减去。</qt>"
 
 #. i18n: ectx: property (text), widget (QLabel, openFileLabel)
 #: gui/mainwindow.ui:105
 #, kde-format
 msgid "Profile &Data:"
-msgstr ""
+msgstr "个人资料&数据:"
 
 #. i18n: ectx: property (text), widget (QLabel, compareToLabel)
 #: gui/mainwindow.ui:115
@@ -988,7 +1003,7 @@ msgstr "火焰图"
 #: gui/mainwindow.ui:813
 #, kde-format
 msgid "S&tacks"
-msgstr ""
+msgstr "S&tacks"
 
 #. i18n: ectx: property (text), widget (QLabel, stackSpinnerLabel)
 #: gui/mainwindow.ui:838
@@ -1087,7 +1102,7 @@ msgstr ""
 #: gui/parser.cpp:715
 #, kde-format
 msgid "merging allocations..."
-msgstr ""
+msgstr "合并分配..."
 
 #: gui/parser.cpp:726
 #, kde-format
@@ -1109,7 +1124,7 @@ msgstr "回溯跟踪"
 msgid ""
 "<qt>The number of times an allocation function was called from this location."
 "</qt>"
-msgstr ""
+msgstr "<qt>分配函数从这个位置调用的次数</qt>"
 
 #: gui/treemodel.cpp:83
 #, kde-format
@@ -1117,6 +1132,7 @@ msgid ""
 "<qt>The number of temporary allocations. These allocations are directly "
 "followed by a free without any other allocations in-between.</qt>"
 msgstr ""
+"<qt>临时分配的数量。这些分配的直接后面是免费的，中间没有任何其他分配。</qt>"
 
 #: gui/treemodel.cpp:87
 #, kde-format
@@ -1132,6 +1148,8 @@ msgid ""
 "symbol and file information may be unknown when debug information was "
 "missing when heaptrack was run.</qt>"
 msgstr ""
+"<qt>调用函数的位置。 当运行Heaptrack 时缺少调试信息时，函数符号和文件信息可能"
+"未知</qt>"
 
 #: gui/treemodel.cpp:149 gui/treemodel.cpp:173
 #, kde-format
@@ -1149,17 +1167,17 @@ msgstr "峰值贡献: %1 (总共的 %2%)\n"
 #: gui/treemodel.cpp:160
 #, kde-format
 msgid "leaked: %1 (%2% of total)\n"
-msgstr ""
+msgstr "泄漏： %1 (占总数的%2%)\n"
 
 #: gui/treemodel.cpp:161
 #, kde-format
 msgid "allocations: %1 (%2% of total)\n"
-msgstr ""
+msgstr "分配: %1 (占总数的%2%)\n"
 
 #: gui/treemodel.cpp:162
 #, kde-format
 msgid "temporary: %1 (%2% of allocations, %3% of total)\n"
-msgstr ""
+msgstr "临时: %1 (%2%分配, %3%)\n"
 
 #: gui/treemodel.cpp:168
 #, kde-format
@@ -1206,4 +1224,4 @@ msgstr ""
 #: gui/util.cpp:209
 #, kde-format
 msgid "<unresolved function>"
-msgstr ""
+msgstr "<unresolved function>"
