@@ -7,7 +7,7 @@
 #
 
 usage() {
-    echo "Usage: $0 [--debug|-d] [--use-inject] DEBUGGEE [ARGUMENT]..."
+    echo "Usage: $0 [--debug|-d] [--use-inject] [--record-only] DEBUGGEE [ARGUMENT]..."
     echo "or:    $0 [--debug|-d] -p PID"
     echo "or:    $0 -a FILE"
     echo
@@ -39,6 +39,7 @@ usage() {
     echo "  -d, --debug    Run the debuggee in GDB and heaptrack."
     echo " --use-inject    Use the same heaptrack_inject symbol interception mechanism instead of relying on"
     echo "                 the dynamic linker and LD_PRELOAD. This is an experimental flag for now."
+    echo " --record-only   Only record and interpret the data, do not attempt to analyze it."
     echo "  ARGUMENT       Any number of arguments that will be passed verbatim"
     echo "                 to the debuggee."
     echo "  -h, --help     Show this help message and exit."
