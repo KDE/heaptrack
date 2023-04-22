@@ -1,6 +1,6 @@
 # Copyright (C) YEAR This file is copyright:
 # This file is distributed under the same license as the heaptrack package.
-# Shinjo Park <kde@peremen.name>, 2020, 2021, 2022.
+# Shinjo Park <kde@peremen.name>, 2020, 2021, 2022, 2023.
 #
 msgid ""
 msgstr ""
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Lokalize 21.12.3\n"
+"X-Generator: Lokalize 22.12.3\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
