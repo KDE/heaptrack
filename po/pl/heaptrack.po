@@ -1,13 +1,13 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>, 2015, 2016, 2017, 2018, 2020, 2021.
+# Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>, 2015, 2016, 2017, 2018, 2020, 2021, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-06-16 02:27+0000\n"
-"PO-Revision-Date: 2021-12-12 11:07+0100\n"
+"PO-Revision-Date: 2023-04-23 12:38+0200\n"
 "Last-Translator: Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>\n"
 "Language-Team: Polish <kde-i18n-doc@kde.org>\n"
 "Language: pl\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
-"X-Generator: Lokalize 22.03.70\n"
+"X-Generator: Lokalize 22.12.3\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -404,7 +404,7 @@ msgstr "szczytowe wykorzystanie pamięci %1"
 #: gui/flamegraph.cpp:181
 #, kde-format
 msgid "%1 leaked in total"
-msgstr "%1 wycieków w całości"
+msgstr "%1 wycieków łącznie"
 
 #: gui/flamegraph.cpp:234
 #, kde-format
@@ -711,7 +711,7 @@ msgstr ""
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
 msgstr ""
-"<dt><b>całkowity czas działania</b>:</dt><dd>%1, odfiltrowany od %2 do %3 "
+"<dt><b>czas działania łącznie</b>:</dt><dd>%1, odfiltrowany od %2 do %3 "
 "(%4)</dd>"
 
 #: gui/mainwindow.cpp:383
@@ -756,7 +756,7 @@ msgstr "<dt><b>delta wykorzystania pamięci</b>:</dt><dd>%1</dd>"
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
 msgstr ""
-"<dt><b>suma pamięci, która wyciekła</b>:</dt><dd>%1 (%2 wygaszone)</dd>"
+"<dt><b>łącznie pamięci, która wyciekła</b>:</dt><dd>%1 (%2 wygaszone)</dd>"
 
 #: gui/mainwindow.cpp:419
 #, kde-format
@@ -1116,7 +1116,7 @@ msgstr "scalanie przydzieleń... %1%"
 #: gui/parser.cpp:557
 #, kde-format
 msgid "total"
-msgstr "suma"
+msgstr "łącznie"
 
 #: gui/parser.cpp:559
 #, kde-format
