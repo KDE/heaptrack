@@ -1,13 +1,13 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>, 2015, 2016, 2017, 2018, 2019, 2021.
+# Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>, 2015, 2016, 2017, 2018, 2019, 2021, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-11-21 00:49+0000\n"
-"PO-Revision-Date: 2021-11-28 08:56+0100\n"
+"PO-Revision-Date: 2023-04-23 12:38+0200\n"
 "Last-Translator: Łukasz Wojniłowicz <lukasz.wojnilowicz@gmail.com>\n"
 "Language-Team: Polish <kde-i18n-doc@kde.org>\n"
 "Language: pl\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
-"X-Generator: Lokalize 22.03.70\n"
+"X-Generator: Lokalize 22.12.3\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -235,27 +235,24 @@ msgid "Elapsed Time"
 msgstr "Czas działania"
 
 #: gui/chartmodel.cpp:81
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "Najczęstsze przydzielenia pamięci"
+msgstr "Łącznie przydzieleń pamięci"
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "%1 peak memory consumption"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "szczytowe wykorzystanie pamięci %1"
+msgstr "Łączne wykorzystanie pamięci"
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "Most Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "Najczęstsze przydzielenia tymczasowe"
+msgstr "Łącznie przydzieleń tymczasowych"
 
 #: gui/chartmodel.cpp:111
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:165
 #, kde-format
@@ -303,27 +300,27 @@ msgstr "<qt>%2 wykorzystano po %3 od:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:144
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Wyeksportuj jako..."
 
 #: gui/chartwidget.cpp:147
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Pokaż legendę"
 
 #: gui/chartwidget.cpp:154
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "Pokaż graf łącznych kosztów"
 
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "Pokaż szczegółowy graf kosztów"
 
 #: gui/chartwidget.cpp:169
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "Skumulowane diagramy:"
 
 #: gui/chartwidget.cpp:216
 #, kde-format
@@ -339,18 +336,17 @@ msgstr "Wyzeruj filtr"
 #: gui/chartwidget.cpp:365
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Zapisz %1"
 
 #: gui/chartwidget.cpp:366
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr ""
+msgstr "Obraz rastrowy (*.png *.jpg *.tiff);;Obraz wektorowy (*.svg)"
 
 #: gui/chartwidget.cpp:382
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to save the image to %1"
-msgstr "Nieudane przetwarzanie pliku: %1."
+msgstr "Nie udało się zapisać obrazu do %1"
 
 #: gui/chartwidget.cpp:402
 #, kde-format
@@ -468,7 +464,7 @@ msgstr "szczytowe wykorzystanie pamięci %1"
 #: gui/flamegraph.cpp:181
 #, kde-format
 msgid "%1 leaked in total"
-msgstr "%1 wycieków w całości"
+msgstr "%1 wycieków łącznie"
 
 #: gui/flamegraph.cpp:234
 #, kde-format
@@ -745,7 +741,7 @@ msgstr ""
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
 msgstr ""
-"<dt><b>całkowity czas działania</b>:</dt><dd>%1, odfiltrowany od %2 do %3 "
+"<dt><b>czas działania łącznie</b>:</dt><dd>%1, odfiltrowany od %2 do %3 "
 "(%4)</dd>"
 
 #: gui/mainwindow.cpp:404
@@ -790,7 +786,7 @@ msgstr "<dt><b>delta wykorzystania pamięci</b>:</dt><dd>%1</dd>"
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
 msgstr ""
-"<dt><b>suma pamięci, która wyciekła</b>:</dt><dd>%1 (%2 wygaszone)</dd>"
+"<dt><b>łącznie pamięci, która wyciekła</b>:</dt><dd>%1 (%2 wygaszone)</dd>"
 
 #: gui/mainwindow.cpp:440
 #, kde-format
@@ -1151,7 +1147,7 @@ msgstr "scalanie przydziałów... %1%"
 #: gui/parser.cpp:557
 #, kde-format
 msgid "total"
-msgstr "suma"
+msgstr "łącznie"
 
 #: gui/parser.cpp:559
 #, kde-format
