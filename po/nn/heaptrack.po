@@ -273,8 +273,8 @@ msgid ""
 "<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
 "p></qt>"
 msgstr ""
-"<qt>%2 mellombelse reserveringar etter %3 frå:<p style='margin-left:10px'>"
-"%1</p></qt>"
+"<qt>%2 mellombelse reserveringar etter %3 frå:<p style='margin-"
+"left:10px'>%1</p></qt>"
 
 #: gui/chartmodel.cpp:141
 #, kde-format
