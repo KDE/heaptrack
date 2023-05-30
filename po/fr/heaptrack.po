@@ -2,8 +2,8 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Vincent Pinon <vpinon@kde.org>, 2015.
 # Xavier Besnard <xavier.besnard@neuf.fr>, 2020, 2021, 2022.
+# Xavier BESNARD <xavier.besnard@neuf.fr>, 2023.
 #
-# Xavier BESNARD <xavier.besnard]neuf.fr>, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
