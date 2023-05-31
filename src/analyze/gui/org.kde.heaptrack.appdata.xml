@@ -33,7 +33,7 @@
   <name xml:lang="x-test">xxHeaptrackxx</name>
   <name xml:lang="zh-CN">堆栈追踪</name>
   <summary>A heap memory profiler for Linux</summary>
-  <summary xml:lang="ca">Un perfilador de memòria en monticles per a Linux</summary>
+  <summary xml:lang="ca">Un analitzador del rendiment de la memòria en monticles per al Linux</summary>
   <summary xml:lang="ca-valencia">Un perfilador de memòria en monticles per a Linux</summary>
   <summary xml:lang="da">En heap-hukommelsesprofilering til Linux</summary>
   <summary xml:lang="en-GB">A heap memory profiler for Linux</summary>
@@ -62,7 +62,7 @@
     <p>
       Heaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:
     </p>
-    <p xml:lang="ca">El «heaptrack» rastreja totes les assignacions de memòria i anota aquests esdeveniments amb seguiments de pila. Les eines d'anàlisi dedicades que hi ha a continuació, us permetran interpretar el perfil de memòria en monticles:</p>
+    <p xml:lang="ca">El «heaptrack» rastreja totes les assignacions de memòria i anota aquests esdeveniments amb seguiments de pila. Les eines d'anàlisi dedicades que hi ha a continuació, us permetran interpretar l'anàlisi de rendiment de la memòria en monticles:</p>
     <p xml:lang="ca-valencia">«heaptrack» rastreja totes les assignacions de memòria i anota estos esdeveniments amb seguiments de pila. Les eines d'anàlisi dedicades que hi ha a continuació, vos permetran interpretar el perfil de memòria en monticles:</p>
     <p xml:lang="da">Heaptrack sporer alle hukommelsesallokeringer og anmærker begivenhederne med stakspor. Dedikerede analyseværktøjer som giver dig mulighed for at fortolke heapens hukommelsesprofil til:</p>
     <p xml:lang="en-GB">Heaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:</p>
@@ -86,7 +86,7 @@
     <p xml:lang="zh-CN">Heaptrack跟踪所有内存分配，并使用堆栈跟踪注释这些事件。专用的分析工具允许你解释堆内存配置文件:</p>
     <ul>
       <li>find hotspots that need to be optimized to reduce the memory footprint of your application</li>
-      <li xml:lang="ca">troba els punts d'accés que necessiten optimitzar-se per a reduir el consum de memòria de la vostra aplicació</li>
+      <li xml:lang="ca">troba els punts crítics que necessiten optimitzar-se per a reduir el consum de memòria de la vostra aplicació</li>
       <li xml:lang="ca-valencia">troba els punts d'accés que necessiten optimitzar-se per a reduir el consum de memòria de la vostra aplicació</li>
       <li xml:lang="da">find hotspots som behøver optimering for at reducere dit programs hukommelsesfodaftryk</li>
       <li xml:lang="en-GB">find hotspots that need to be optimized to reduce the memory footprint of your application</li>
@@ -132,7 +132,7 @@
       <li xml:lang="x-test">xxfind memory leaks, i.e. locations that allocate memory which is never deallocatedxx</li>
       <li xml:lang="zh-CN">查找内存泄漏，即分配内存的位置永远不会被释放</li>
       <li>find allocation hotspots, i.e. code locations that trigger a lot of memory allocation calls</li>
-      <li xml:lang="ca">troba els punts d'accés d'assignació, és a dir, les ubicacions al codi que desencadenen un munt de crides d'assignació de memòria</li>
+      <li xml:lang="ca">troba els punts crítics d'assignació, és a dir, les ubicacions al codi que desencadenen un munt de crides d'assignació de memòria</li>
       <li xml:lang="ca-valencia">troba els punts d'accés d'assignació, és a dir, les ubicacions al codi que desencadenen un munt de crides d'assignació de memòria</li>
       <li xml:lang="da">find allokerede hotspots, dvs. kodepositioner som udløser en masse kald for hukommelsesallokering</li>
       <li xml:lang="en-GB">find allocation hotspots, i.e. code locations that trigger a lot of memory allocation calls</li>
