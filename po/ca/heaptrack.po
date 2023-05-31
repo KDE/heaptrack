@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-11-21 00:49+0000\n"
-"PO-Revision-Date: 2023-02-26 18:54+0100\n"
+"PO-Revision-Date: 2023-05-30 11:03+0200\n"
 "Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
 "Language: ca\n"
@@ -669,7 +669,7 @@ msgstr "Autor original, mantenidor"
 #: gui/gui.cpp:84
 #, kde-format
 msgid "Base profile data to compare other files to."
-msgstr "Dades de perfilat base a comparar amb altres fitxers."
+msgstr "Dades d'anàlisi de rendiment base a comparar amb altres fitxers."
 
 #: gui/gui.cpp:89
 #, kde-format
@@ -963,8 +963,8 @@ msgid ""
 msgstr ""
 "<qt><p>Aquest camp especifica el fitxer de dades primàries de «heaptrack». "
 "Aquests fitxers s'anomenen <tt>heaptrack.$APP.$PID.gz</tt> o <tt>heaptrack."
-"$APP.$PID.zst</tt>. Podeu crear aquests fitxers amb el perfilat de "
-"l'aplicació, p. ex. via:</p>\n"
+"$APP.$PID.zst</tt>. Podeu crear aquests fitxers amb l'anàlisi del rendiment "
+"de l'aplicació, p. ex. via:</p>\n"
 "<pre><code>heaptrack &lt;aplicació&gt; ...</code></pre>\n"
 "<p>O, alternativament, podeu annexar un procés en execució via</p>\n"
 "<pre><code>heaptrack --pid $(pidof &lt;aplicació&gt;)</code></pre></qt>"
@@ -999,7 +999,7 @@ msgstr ""
 #: gui/mainwindow.ui:105
 #, kde-format
 msgid "Profile &Data:"
-msgstr "&Dades de perfilat:"
+msgstr "&Dades d'anàlisi del rendiment:"
 
 #. i18n: ectx: property (text), widget (QLabel, compareToLabel)
 #: gui/mainwindow.ui:115
@@ -1369,21 +1369,3 @@ msgstr "%1 a %2"
 #, kde-format
 msgid "<unresolved function>"
 msgstr "<fu nció no resolta>"
-
-#~ msgid "KDevelop"
-#~ msgstr "KDevelop"
-
-#~ msgid "Kate"
-#~ msgstr "Kate"
-
-#~ msgid "KWrite"
-#~ msgstr "KWrite"
-
-#~ msgid "gedit"
-#~ msgstr "gedit"
-
-#~ msgid "gvim"
-#~ msgstr "gvim"
-
-#~ msgid "Qt Creator"
-#~ msgstr "Qt Creator"
