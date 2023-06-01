@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # André Marcelo Alvarenga <alvarenga@kde.org>, 2015, 2016.
-# Luiz Fernando Ranghetti <elchevive@opensuse.org>, 2017, 2018, 2019, 2020, 2021, 2022.
+# Luiz Fernando Ranghetti <elchevive@opensuse.org>, 2017, 2018, 2019, 2020, 2021, 2022, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-11-21 00:49+0000\n"
-"PO-Revision-Date: 2022-10-19 16:11-0300\n"
+"PO-Revision-Date: 2023-05-31 14:33-0300\n"
 "Last-Translator: Luiz Fernando Ranghetti <elchevive@opensuse.org>\n"
-"Language-Team: Portuguese <kde-i18n-pt_BR@kde.org>\n"
+"Language-Team: Brazilian Portuguese <kde-i18n-pt_BR@kde.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -233,22 +233,19 @@ msgid "Elapsed Time"
 msgstr "Tempo decorrido"
 
 #: gui/chartmodel.cpp:81
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "Mais alocações de memória"
+msgstr "Total de alocações de memória"
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "%1 peak memory consumption"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "%1 pico de consumo de memória"
+msgstr "Total de consumo de memória"
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "Most Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "Mais alocações temporárias"
+msgstr "Total de alocações temporárias"
 
 #: gui/chartmodel.cpp:111
 #, kde-format
@@ -311,17 +308,17 @@ msgstr "Mostrar legenda"
 #: gui/chartwidget.cpp:154
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "Mostrar gráfico de custo total"
 
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "Mostrar gráfico de custo detalhado"
 
 #: gui/chartwidget.cpp:169
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "Diagramas empilhados:"
 
 #: gui/chartwidget.cpp:216
 #, kde-format
