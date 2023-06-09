@@ -189,6 +189,7 @@
       <caption xml:lang="en-GB">Summary of tracked heap memory allocation data</caption>
       <caption xml:lang="es">Sumario de datos de asignación de memoria de almacenamiento libre rastreada</caption>
       <caption xml:lang="fr">Résumé des données d'allocation pour la mémoire dynamique surveillée.</caption>
+      <caption xml:lang="gl">Resumo dos datos de asignación de memoria dinámica (heap) da que se fai seguimento.</caption>
       <caption xml:lang="id">Ringkasan data alokasi memori tumpukan yang terlacak</caption>
       <caption xml:lang="it">Riepilogo dei dati delle allocazioni di memoria heap tracciati</caption>
       <caption xml:lang="ko">추적된 힙 메모리 할당 데이터 요약</caption>
@@ -212,6 +213,7 @@
       <caption xml:lang="en-GB">Flamegraph visualisation of number of heap memory allocations</caption>
       <caption xml:lang="es">Visualización de gráfico de llamas del número de asignaciones de memoria de almacenamiento libre</caption>
       <caption xml:lang="fr">Affichage graphe en chandelles du nombre d'allocations de mémoire dynamique.</caption>
+      <caption xml:lang="gl">Visualización mediante un gráfico de chamas do número de asignacións de memoria dinámica (heap).</caption>
       <caption xml:lang="id">Visualisasi Flamegraph dari jumlah alokasi memori tumpukan</caption>
       <caption xml:lang="it">Visualizzazione di tipo Flamegraph del totale di allocazioni di memoria heap</caption>
       <caption xml:lang="ko">힙 메모리 할당 횟수를 플레임 그래프로 보기</caption>
@@ -236,6 +238,7 @@
       <caption xml:lang="es">Gráfico de asignaciones de memoria del almacenamiento libre a lo largo del tiempo</caption>
       <caption xml:lang="eu">Denboran zehar, memoria dinamikoaren esleipenaren diagrama</caption>
       <caption xml:lang="fr">Graphique des allocations de mémoire dynamique en temps réel</caption>
+      <caption xml:lang="gl">Gráfica das asignacións de memoria dinámica (heap) co paso do tempo.</caption>
       <caption xml:lang="id">Bagan alokasi memori tumpukan dari waktu ke waktu</caption>
       <caption xml:lang="it">Grafico delle allocazioni della memoria heap nel tempo</caption>
       <caption xml:lang="ko">시간별 힙 메모리 할당 횟수를 그래프로 보기</caption>
