@@ -120,7 +120,7 @@ while true; do
             if [ ! -d $(dirname $output) ]; then
               mkdir -p $(dirname $output)
             fi
-            output=$(readlink -f $2)
+            output=$(readlink -f $output)
             shift 2
             ;;
         "-p" | "--pid")
