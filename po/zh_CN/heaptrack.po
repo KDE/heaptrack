@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: kdeorg\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-11-21 00:49+0000\n"
-"PO-Revision-Date: 2023-05-22 14:00\n"
+"PO-Revision-Date: 2023-06-17 04:11\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -190,7 +190,7 @@ msgstr ""
 msgid ""
 "<qt>The source code location that called an allocation function. May be "
 "unknown when debug information is missing.</qt>"
-msgstr ""
+msgstr "<qt>调用分配函数的源代码位置。当缺少调试信息时其可能是未知的。</qt>"
 
 #: gui/chartmodel.cpp:52
 #, kde-format
@@ -216,22 +216,22 @@ msgstr "已用时间"
 #: gui/chartmodel.cpp:81
 #, kde-format
 msgid "Total Memory Allocations"
-msgstr ""
+msgstr "合计内存分配"
 
 #: gui/chartmodel.cpp:83
 #, kde-format
 msgid "Total Memory Consumption"
-msgstr ""
+msgstr "合计内存消耗"
 
 #: gui/chartmodel.cpp:85
 #, kde-format
 msgid "Total Temporary Allocations"
-msgstr ""
+msgstr "合计临时分配"
 
 #: gui/chartmodel.cpp:111
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:165
 #, kde-format
@@ -277,12 +277,12 @@ msgstr "<qt>%2 在 %3 之后消费:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:144
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "导出为..."
 
 #: gui/chartwidget.cpp:147
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "显示图例"
 
 #: gui/chartwidget.cpp:154
 #, kde-format
@@ -313,17 +313,17 @@ msgstr "重置过滤器"
 #: gui/chartwidget.cpp:365
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "保存 %1"
 
 #: gui/chartwidget.cpp:366
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr ""
+msgstr "栅格图像（*.png *.jpg *.tiff）；矢量图形 (*.svg)"
 
 #: gui/chartwidget.cpp:382
 #, kde-format
 msgid "Failed to save the image to %1"
-msgstr ""
+msgstr "保存图像到 %1 失败"
 
 #: gui/chartwidget.cpp:402
 #, kde-format
@@ -333,7 +333,7 @@ msgstr "<tr><th></th><th>开始</th><th>结束</th><th>差值</th></tr>"
 #: gui/chartwidget.cpp:403
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>时间</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:407
 #, kde-format
@@ -366,6 +366,7 @@ msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
 "select a time range for filtering.</qt>"
 msgstr ""
+"<qt>显示随时间变化的内存分配数。<br>点击并拖拽以选择要筛选的时间范围。</qt>"
 
 #: gui/chartwidget.cpp:431
 #, kde-format
@@ -375,40 +376,42 @@ msgid ""
 "deallocation, without other allocations happening in-between.<br>Click and "
 "drag to select a time range for filtering.</qt>"
 msgstr ""
+"<qt>显示随时间变化的临时内存分配数。临时分配是指相应内存分配后紧接着被释放，"
+"中间没有发生其他分配。<br>点击并拖拽以选择要筛选的时间范围。</qt>"
 
 #: gui/chartwidget.cpp:453
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
-msgstr ""
+msgstr "%1（筛选自 %2 到 %3，Δ%4）"
 
 #: gui/chartwidget.cpp:457
 #, kde-format
 msgid "%1 (filtered delta)"
-msgstr ""
+msgstr "%1（筛选的差值）"
 
 #: gui/chartwidget.cpp:546
 #, kde-format
 msgid "Click and drag to select time range for filtering."
-msgstr ""
+msgstr "点击并拖动以选择要筛选的时间范围。"
 
 #: gui/chartwidget.cpp:552
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
-msgstr ""
+msgstr "T = %1，已消耗：%2。点击并拖动以选择要筛选的时间范围。"
 
 #: gui/chartwidget.cpp:556
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
-msgstr ""
+msgstr "T = %1，已分配：%2。点击并拖动以选择要筛选的时间范围。"
 
 #: gui/chartwidget.cpp:560
 #, kde-format
 msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
 "filtering."
-msgstr ""
+msgstr "T = %1，临时分配：%2。点击并拖动以选择要筛选的时间范围。"
 
 #: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
 #, kde-format
@@ -423,7 +426,7 @@ msgstr "%1 临时分配总计"
 #: gui/flamegraph.cpp:179
 #, kde-format
 msgid "%1 peak memory consumption"
-msgstr ""
+msgstr "%1 内存消耗峰值"
 
 #: gui/flamegraph.cpp:181
 #, kde-format
@@ -501,14 +504,14 @@ msgstr "选择在火焰图形中可视化的数据源。"
 #: gui/flamegraph.cpp:467
 #, kde-format
 msgid "Bottom-Up View"
-msgstr ""
+msgstr "从下至上视图"
 
 #: gui/flamegraph.cpp:468
 #, kde-format
 msgid ""
 "Enable the bottom-up flame graph view. When this is unchecked, the top-down "
 "view is enabled by default."
-msgstr ""
+msgstr "启用自下而上的火焰图视图。如果不勾选，默认启用自上而下的视图。"
 
 #: gui/flamegraph.cpp:476
 #, kde-format
@@ -558,7 +561,7 @@ msgstr "重置视图"
 #: gui/flamegraph.cpp:555 gui/mainwindow.cpp:140
 #, kde-format
 msgid "View Caller/Callee"
-msgstr ""
+msgstr "查看调用方/被调用方"
 
 #: gui/flamegraph.cpp:696
 #, kde-format
@@ -705,7 +708,7 @@ msgstr "<dt><b>临时分配</b>:</dt><dd>%1 (%2%， %3/s)</dd>"
 #: gui/mainwindow.cpp:426
 #, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
-msgstr ""
+msgstr "<dt><b>内存消耗峰值</b>：</dt><dd>%2 后 %1</dd>"
 
 #: gui/mainwindow.cpp:429
 #, kde-format
@@ -715,7 +718,7 @@ msgstr "<dt><b>峰RSS</b> (包括Heaptrack 间接费用)：</dt><dd>%1</dd>"
 #: gui/mainwindow.cpp:433
 #, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>内存消耗差值</b>：</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:437
 #, kde-format
@@ -814,12 +817,12 @@ msgstr " / %1"
 #: gui/mainwindow.cpp:775
 #, kde-format
 msgid "Code Navigation"
-msgstr ""
+msgstr "代码导航"
 
 #: gui/mainwindow.cpp:802
 #, kde-format
 msgid "Custom..."
-msgstr ""
+msgstr "自定义..."
 
 #: gui/mainwindow.cpp:814
 #, kde-format
@@ -829,7 +832,7 @@ msgstr "自动（无行号）"
 #: gui/mainwindow.cpp:834
 #, kde-format
 msgid "Custom Code Navigation"
-msgstr ""
+msgstr "自定义代码导航"
 
 #: gui/mainwindow.cpp:835
 #, kde-format
@@ -837,6 +840,8 @@ msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
 "file name, '%l' by the line number and '%c' by the column number."
 msgstr ""
+"指定用于代码导航的命令，'%f' 会被替换成文件名，'%l' 会被替换成行号，'%c' 会被"
+"替换成列号。"
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
@@ -849,7 +854,7 @@ msgstr "主窗口"
 #: gui/mainwindow.ui:17 gui/mainwindow.ui:125
 #, kde-format
 msgid "Path to a file containing leak suppression rules in the LSAN format."
-msgstr ""
+msgstr "包含 LSAN 格式的泄漏抑制规则的文件的路径。"
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: gui/mainwindow.ui:64
@@ -881,7 +886,7 @@ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
 #: gui/mainwindow.ui:79 gui/mainwindow.ui:95
 #, kde-format
 msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
-msgstr ""
+msgstr "path/to/heaptrack.$APP.$PID.{gz,zst}"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
 #: gui/mainwindow.ui:89
@@ -916,7 +921,7 @@ msgstr ""
 #: gui/mainwindow.ui:138
 #, kde-format
 msgid "path/to/lsan_suppressions.txt"
-msgstr ""
+msgstr "path/to/lsan_suppressions.txt"
 
 #. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
 #: gui/mainwindow.ui:251
@@ -1057,12 +1062,12 @@ msgstr "设置(&N)"
 #: gui/mainwindow.ui:885
 #, kde-format
 msgid "Filter"
-msgstr ""
+msgstr "筛选"
 
 #: gui/parser.cpp:387
 #, kde-format
 msgid "merging allocations... %1%"
-msgstr ""
+msgstr "合并分配... %1%"
 
 #: gui/parser.cpp:557
 #, kde-format
@@ -1117,7 +1122,7 @@ msgstr "超过 1KB"
 #: gui/parser.cpp:645
 #, kde-format
 msgid "reparsing data"
-msgstr ""
+msgstr "正在重新解析数据"
 
 #: gui/parser.cpp:645
 #, kde-format
@@ -1127,7 +1132,7 @@ msgstr "正在解析数据"
 #: gui/parser.cpp:659
 #, kde-format
 msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
-msgstr ""
+msgstr "%1 轮数：%2/%3  花费：%4  剩余：%5"
 
 #: gui/parser.cpp:715
 #, kde-format
@@ -1192,7 +1197,7 @@ msgstr ""
 #: gui/treemodel.cpp:159
 #, kde-format
 msgid "peak contribution: %1 (%2% of total)\n"
-msgstr "峰值贡献: %1 (总共的 %2%)\n"
+msgstr "峰值贡献: %1 (合计的 %2%)\n"
 
 #: gui/treemodel.cpp:160
 #, kde-format
