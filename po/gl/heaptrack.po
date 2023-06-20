@@ -305,7 +305,7 @@ msgstr "Exportar como…"
 #: gui/chartwidget.cpp:147
 #, kde-format
 msgid "Show legend"
-msgstr "Mostrar a lenda"
+msgstr "Amosar a lenda"
 
 #: gui/chartwidget.cpp:154
 #, kde-format
@@ -381,8 +381,8 @@ msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
 "a time range for filtering.</qt>"
 msgstr ""
-"<qt>Mostrar o consumo de memoria dinámica no tempo.<br> Prema e arrastre "
-"para seleccionar un intervalo de tempo polo que filtrar.</qt>"
+"<qt>Amosar o consumo de memoria dinámica no tempo.<br> Prema e arrastre para "
+"seleccionar un intervalo de tempo polo que filtrar.</qt>"
 
 #: gui/chartwidget.cpp:427
 #, kde-format
@@ -504,8 +504,8 @@ msgid ""
 "Show a flame graph over the contributions to the peak heap memory "
 "consumption of your application."
 msgstr ""
-"Mostrar un gráfico de chamas coas contribucións ao pico de consumo de "
-"memoria dinámica (heap) da aplicación."
+"Amosar un gráfico de chamas coas contribucións ao pico de consumo de memoria "
+"dinámica (heap) da aplicación."
 
 #: gui/flamegraph.cpp:435
 #, kde-format
@@ -513,7 +513,7 @@ msgid ""
 "Show a flame graph over the leaked heap memory of your application. Memory "
 "is considered to be leaked when it never got deallocated. "
 msgstr ""
-"Mostrar un gráfico de chamas coa memoria dinámica (heap) perdida pola "
+"Amosar un gráfico de chamas coa memoria dinámica (heap) perdida pola "
 "aplicación. A memoria considérase perdida cando nunca se libera."
 
 #: gui/flamegraph.cpp:440
@@ -522,8 +522,8 @@ msgid ""
 "Show a flame graph over the number of allocations triggered by functions in "
 "your code."
 msgstr ""
-"Mostrar un gráfico de chamas co número de asignacións realizadas por "
-"funcións do seu código."
+"Amosar un gráfico de chamas co número de asignacións realizadas por funcións "
+"do seu código."
 
 #: gui/flamegraph.cpp:445
 #, kde-format
@@ -532,7 +532,7 @@ msgid ""
 "functions in your code. Allocations are marked as temporary when they are "
 "immediately followed by their deallocation."
 msgstr ""
-"Mostrar un gráfico de chamas co número de asignacións temporais realizadas "
+"Amosar un gráfico de chamas co número de asignacións temporais realizadas "
 "por funcións do seu código. As asignacións márcanse como temporais cando van "
 "seguidas inmediatamente pola súa liberación."
 
@@ -584,7 +584,7 @@ msgid ""
 "or set it to zero.</qt>"
 msgstr ""
 "<qt>O límite de custo define unha fracción para usar como valor de corte. Os "
-"elementos cun custo relativo inferior ao valor indicado non se mostran no "
+"elementos cun custo relativo inferior ao valor indicado non se amosan no "
 "gráfico de chamas. Isto faise por motivos de rendemento, para poder xerar "
 "rapidamente gráficos para grandes conxuntos de datos sen consumir demasiada "
 "memoria. Se quere máis detalles, reduza o valor límite, ou póñao a cero.</qt>"
