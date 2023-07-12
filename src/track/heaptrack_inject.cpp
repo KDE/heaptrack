@@ -176,9 +176,80 @@ struct dlopen
     static constexpr auto name = "dlopen";
     static constexpr auto original = &::dlopen;
 
+    static Dl_serinfo* load_serinfo(const char* module_path) noexcept
+    {
+        Dl_serinfo *serinfo = NULL;
+        Dl_serinfo serinfo_size;
+        void *module;
+
+        module = original(module_path, RTLD_LAZY);
+        if (module == NULL) {
+            return NULL;
+        }
+
+        int res = dlinfo(module, RTLD_DI_SERINFOSIZE, &serinfo_size);
+        if (res) {
+            dlclose(module);
+            return NULL;
+        }
+
+        serinfo = (Dl_serinfo*) ::malloc(serinfo_size.dls_size);
+        *serinfo = serinfo_size;
+        res = dlinfo(module, RTLD_DI_SERINFO, serinfo);
+        if (res) {
+            ::free(serinfo);
+            serinfo = NULL;
+        }
+        dlclose(module);
+        return serinfo;
+    }
+
     static void* hook(const char* filename, int flag) noexcept
     {
-        auto ret = original(filename, flag);
+        void *ret = NULL;
+        bool fallback = false;
+        if (filename == NULL || filename[0] == '/') {
+            // absolute path
+            ret = original(filename, flag);
+        }
+        if (!ret) {
+            // need to respect rpath
+            // get module info
+            Dl_info dl_info;
+            int res = dladdr(__builtin_return_address(0), &dl_info);
+            if (!res) {
+                fallback = true;
+            } else {
+                Dl_serinfo *serinfo;
+                serinfo = load_serinfo(dl_info.dli_fname);
+                if (serinfo == NULL) {
+                    fallback = true;
+                } else {
+                    struct stat file_stat;
+                    char file_path[PATH_MAX];
+                    for (unsigned int i = 0; i < serinfo->dls_cnt; i++) {
+                        file_path[0] = 0;
+                        strcat(file_path, serinfo->dls_serpath[i].dls_name);
+                        strcat(file_path, "/");
+                        strcat(file_path, filename);
+                        int res = stat(file_path, &file_stat);
+                        if (res) {
+                            continue;
+                        }
+                        ::free(serinfo);
+                        // found file
+                        ret = original(file_path, flag);
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (!ret && fallback) {
+            ret = original(filename, flag);
+        }
+
+
         if (ret) {
             heaptrack_invalidate_module_cache();
             overwrite_symbols();
