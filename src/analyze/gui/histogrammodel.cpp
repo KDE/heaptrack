@@ -100,3 +100,5 @@ void HistogramModel::clearData()
     m_data = {};
     endResetModel();
 }
+
+#include "moc_histogrammodel.cpp"

@@ -786,3 +786,5 @@ void Parser::reparse(const FilterParameters& parameters_)
 
     parseImpl(m_path, {}, filterParameters, StopAfter::Finished);
 }
+
+#include "moc_parser.cpp"

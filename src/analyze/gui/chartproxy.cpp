@@ -24,3 +24,5 @@ bool ChartProxy::filterAcceptsColumn(int sourceColumn, const QModelIndex& /*sour
         return false;
     return true;
 }
+
+#include "moc_chartproxy.cpp"

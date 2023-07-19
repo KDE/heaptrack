@@ -289,3 +289,5 @@ qint64 ChartModel::totalCostAt(qint64 timeStamp) const
         return 0;
     return it->cost[0];
 }
+
+#include "moc_chartmodel.cpp"

@@ -62,3 +62,5 @@ void CostDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, 
         QStyledItemDelegate::paint(painter, option, index);
     }
 }
+
+#include "moc_costdelegate.cpp"

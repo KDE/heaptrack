@@ -896,3 +896,5 @@ void MainWindow::setSuppressions(std::vector<std::string> suppressions)
 {
     m_lastFilterParameters.suppressions = std::move(suppressions);
 }
+
+#include "moc_mainwindow.cpp"

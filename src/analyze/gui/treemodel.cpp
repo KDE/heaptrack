@@ -270,3 +270,5 @@ int TreeModel::rowOf(const RowData* row) const
         return indexOf(row, m_data.rows);
     }
 }
+
+#include "moc_treemodel.cpp"

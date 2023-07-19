@@ -808,3 +808,5 @@ void FlameGraph::updateNavigationActions()
     m_backButton->setEnabled(hasItems);
     m_forwardButton->setEnabled(isNotLastItem);
 }
+
+#include "moc_flamegraph.cpp"

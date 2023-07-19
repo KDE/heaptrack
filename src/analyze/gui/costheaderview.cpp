@@ -109,3 +109,5 @@ void CostHeaderView::resizeColumns(bool reset)
         }
     }
 }
+
+#include "moc_costheaderview.cpp"

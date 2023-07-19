@@ -571,3 +571,5 @@ void ChartWidget::updateStatusTip(qint64 time)
 }
 
 #include "chartwidget.moc"
+
+#include "moc_chartwidget.cpp"

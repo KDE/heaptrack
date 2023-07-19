@@ -137,3 +137,5 @@ void HistogramWidget::setModel(QAbstractItemModel* model)
 }
 
 #include "histogramwidget.moc"
+
+#include "moc_histogramwidget.cpp"

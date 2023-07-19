@@ -70,3 +70,5 @@ void TopProxy::updateCostThreshold()
     m_costThreshold = sourceModel()->index(0, toSource(m_type)).data(TreeModel::MaxCostRole).toLongLong() * 0.01;
     invalidate();
 }
+
+#include "moc_topproxy.cpp"

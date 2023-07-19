@@ -225,3 +225,5 @@ int CallerCalleeModel::numColumns() const
 {
     return NUM_COLUMNS;
 }
+
+#include "moc_callercalleemodel.cpp"

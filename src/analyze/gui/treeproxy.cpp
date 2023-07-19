@@ -84,3 +84,5 @@ bool TreeProxy::lessThan(const QModelIndex& source_left, const QModelIndex& sour
 
     return toShortPath(path_left) < toShortPath(path_right);
 }
+
+#include "moc_treeproxy.cpp"
