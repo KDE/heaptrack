@@ -72,9 +72,6 @@
 &lt;p&gt;Or, alternatively, you can attach to a running process via&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;heaptrack --pid $(pidof &amp;lt;yourapplication&amp;gt;)&lt;/code&gt;&lt;/pre&gt;&lt;/qt&gt;</string>
              </property>
-             <property name="filter">
-              <string>heaptrack.*.*.gz heaptrack.*.*.zst</string>
-             </property>
              <property name="placeholderText">
               <string>path/to/heaptrack.$APP.$PID.{gz,zst}</string>
              </property>
@@ -87,9 +84,6 @@
             <widget class="KUrlRequester" name="compareTo">
              <property name="toolTip">
               <string>&lt;qt&gt;You can optionally specify a second heaptrack data file to compare to. If set, this file will be used as a base and its cost gets subtracted from the primary data costs.&lt;/qt&gt;</string>
-             </property>
-             <property name="filter">
-              <string>heaptrack.*.*.gz heaptrack.*.*.zst</string>
              </property>
              <property name="placeholderText">
               <string>path/to/heaptrack.$APP.$PID.{gz,zst}</string>
