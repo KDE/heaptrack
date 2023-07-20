@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2022-11-21 00:49+0000\n"
+"POT-Creation-Date: 2023-07-20 00:51+0000\n"
 "PO-Revision-Date: 2023-05-30 11:03+0200\n"
 "Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
@@ -193,7 +193,7 @@ msgstr "Pic"
 msgid "Leaked"
 msgstr "Perduts"
 
-#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:475
+#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:476
 #: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
 #, kde-format
 msgid "Allocations"
@@ -232,7 +232,7 @@ msgstr "Assignacions de memòria"
 msgid "Memory Consumed"
 msgstr "Memòria consumida"
 
-#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:477
+#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:478
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
@@ -341,7 +341,7 @@ msgid "Filter In On Selection"
 msgstr "Filtre en la selecció"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
-#: gui/chartwidget.cpp:226 gui/mainwindow.ui:899
+#: gui/chartwidget.cpp:226 gui/mainwindow.ui:893
 #, kde-format
 msgid "Reset Filter"
 msgstr "Reinicia el filtratge"
@@ -621,7 +621,7 @@ msgstr "<qt>Carca un símbol al gràfic de flames.</qt>"
 msgid "Reset View"
 msgstr "Restaura la vista"
 
-#: gui/flamegraph.cpp:555 gui/mainwindow.cpp:140
+#: gui/flamegraph.cpp:555 gui/mainwindow.cpp:141
 #, kde-format
 msgid "View Caller/Callee"
 msgstr "Vista del Cridador / Cridat"
@@ -683,7 +683,7 @@ msgstr ""
 "dir, useu el format de fitxer per a la supressió LSAN."
 
 # skip-rule: t-apo1,rst-link0italic,rst-italic2
-#: gui/gui.cpp:95 gui/mainwindow.cpp:630
+#: gui/gui.cpp:95 gui/mainwindow.cpp:641
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -739,12 +739,12 @@ msgstr "Mida de l'assignació requerida"
 msgid "Number of Allocations"
 msgstr "Nombre d'assignacions"
 
-#: gui/mainwindow.cpp:169
+#: gui/mainwindow.cpp:170
 #, kde-format
 msgid "Open file in editor"
 msgstr "Obre el fitxer a l'editor"
 
-#: gui/mainwindow.cpp:392
+#: gui/mainwindow.cpp:393
 #, kde-format
 msgid ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
@@ -753,117 +753,117 @@ msgstr ""
 "<dt><b>depuració</b>:</dt><dd style='font-family:monospace;'>%1 "
 "<i>(annexat)</i></dd>"
 
-#: gui/mainwindow.cpp:395
+#: gui/mainwindow.cpp:396
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 msgstr "<dt><b>depuració</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 
-#: gui/mainwindow.cpp:399
+#: gui/mainwindow.cpp:400
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
 msgstr ""
 "<dt><b>temps total d'execució</b>:</dt><dd>%1, filtrat des de %2 a %3 (%4)</"
 "dd>"
 
-#: gui/mainwindow.cpp:404
+#: gui/mainwindow.cpp:405
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>temps total d'execució</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:406
+#: gui/mainwindow.cpp:407
 #, kde-format
 msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>memòria total del sistema</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:413
+#: gui/mainwindow.cpp:414
 #, kde-format
 msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
 msgstr "<dt><b>crides a funcions d'assignació</b>:</dt><dd>%1 (%2/s)</dd>"
 
-#: gui/mainwindow.cpp:416
+#: gui/mainwindow.cpp:417
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 msgstr "<dt><b>assignacions temporals</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 
-#: gui/mainwindow.cpp:426
+#: gui/mainwindow.cpp:427
 #, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
 msgstr ""
 "<dt><b>pic de consum de memòria en monticles</b>:</dt><dd>%1 després %2</dd>"
 
-#: gui/mainwindow.cpp:429
+#: gui/mainwindow.cpp:430
 #, kde-format
 msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
 msgstr ""
 "<dt><b>pic RSS</b> (incloent-hi la sobrecàrrega del «heaptrack»):</dt><dd>"
 "%1</dd>"
 
-#: gui/mainwindow.cpp:433
+#: gui/mainwindow.cpp:434
 #, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>delta de consum de memòria en monticles</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:437
+#: gui/mainwindow.cpp:438
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
 msgstr "<dt><b>memòria total perduda</b>:</dt><dd>%1 (%2 suprimida)</dd>"
 
-#: gui/mainwindow.cpp:440
+#: gui/mainwindow.cpp:441
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>memòria total perduda</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:468
+#: gui/mainwindow.cpp:469
 #, kde-format
 msgid "Failed to parse file %1."
 msgstr "Ha fallat en analitzar el fitxer %1."
 
-#: gui/mainwindow.cpp:473
+#: gui/mainwindow.cpp:474
 #, kde-format
 msgid "Consumed"
 msgstr "Consumida"
 
-#: gui/mainwindow.cpp:489
+#: gui/mainwindow.cpp:490
 #, kde-format
 msgid "Sizes"
 msgstr "Mides"
 
-#: gui/mainwindow.cpp:553
+#: gui/mainwindow.cpp:554
 #, kde-format
 msgid "Input data %1 does not exist."
 msgstr "La dada d'entrada %1 no existeix."
 
-#: gui/mainwindow.cpp:555
+#: gui/mainwindow.cpp:556
 #, kde-format
 msgid "Input data %1 is not a file."
 msgstr "La dada d'entrada %1 no és cap fitxer."
 
-#: gui/mainwindow.cpp:557
+#: gui/mainwindow.cpp:558
 #, kde-format
 msgid "Input data %1 is not readable."
 msgstr "La dada d'entrada %1 no es pot llegir."
 
-#: gui/mainwindow.cpp:585
+#: gui/mainwindow.cpp:596
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr "Ha fallat en analitzar la supressió del fitxer."
 
-#: gui/mainwindow.cpp:600
+#: gui/mainwindow.cpp:611
 #, kde-format
 msgid "Heaptrack"
 msgstr "Heaptrack"
 
-#: gui/mainwindow.cpp:628
+#: gui/mainwindow.cpp:639
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr "Inhabilita les supressions incrustades"
 
-#: gui/mainwindow.cpp:640
+#: gui/mainwindow.cpp:651
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr "Inhabilita les supressions integrades"
 
-#: gui/mainwindow.cpp:642
+#: gui/mainwindow.cpp:653
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -873,54 +873,54 @@ msgstr ""
 "manera predeterminada, el Heaptrack suprimirà certes pèrdues conegudes de "
 "les biblioteques habituals del de sistema."
 
-#: gui/mainwindow.cpp:670
+#: gui/mainwindow.cpp:681
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "S'està carregant el fitxer %1. Si us plau, espereu..."
 
-#: gui/mainwindow.cpp:672
+#: gui/mainwindow.cpp:683
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "Heaptrack - %1"
 
-#: gui/mainwindow.cpp:675
+#: gui/mainwindow.cpp:686
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1 comparat amb %2"
 
-#: gui/mainwindow.cpp:691
+#: gui/mainwindow.cpp:702
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "S'està tornant a analitzar el fitxer. Espereu..."
 
-#: gui/mainwindow.cpp:734
+#: gui/mainwindow.cpp:745
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:775
+#: gui/mainwindow.cpp:786
 #, kde-format
 msgid "Code Navigation"
 msgstr "Navegació pel codi"
 
-#: gui/mainwindow.cpp:802
+#: gui/mainwindow.cpp:813
 #, kde-format
 msgid "Custom..."
 msgstr "Personalitzada..."
 
-#: gui/mainwindow.cpp:814
+#: gui/mainwindow.cpp:825
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "Automàtic (Sense nombre de línies)"
 
-#: gui/mainwindow.cpp:834
+#: gui/mainwindow.cpp:845
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "Navegació personalitzada pel codi"
 
-#: gui/mainwindow.cpp:835
+#: gui/mainwindow.cpp:846
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
@@ -937,7 +937,7 @@ msgstr "Finestra principal"
 
 #. i18n: ectx: property (toolTip), widget (QMainWindow, MainWindow)
 #. i18n: ectx: property (toolTip), widget (QLabel, suppressionsLabel)
-#: gui/mainwindow.ui:17 gui/mainwindow.ui:125
+#: gui/mainwindow.ui:17 gui/mainwindow.ui:119
 #, kde-format
 msgid "Path to a file containing leak suppression rules in the LSAN format."
 msgstr ""
@@ -969,22 +969,15 @@ msgstr ""
 "<p>O, alternativament, podeu annexar un procés en execució via</p>\n"
 "<pre><code>heaptrack --pid $(pidof &lt;aplicació&gt;)</code></pre></qt>"
 
-#. i18n: ectx: property (filter), widget (KUrlRequester, openFile)
-#. i18n: ectx: property (filter), widget (KUrlRequester, compareTo)
-#: gui/mainwindow.ui:76 gui/mainwindow.ui:92
-#, kde-format
-msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, openFile)
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, compareTo)
-#: gui/mainwindow.ui:79 gui/mainwindow.ui:95
+#: gui/mainwindow.ui:76 gui/mainwindow.ui:89
 #, kde-format
 msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
 msgstr "camí/a/heaptrack.$APP.$PID.{gz,zst}"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
-#: gui/mainwindow.ui:89
+#: gui/mainwindow.ui:86
 #, kde-format
 msgid ""
 "<qt>You can optionally specify a second heaptrack data file to compare to. "
@@ -996,78 +989,78 @@ msgstr ""
 "seu cost es restarà dels costos de dades primaris.</qt>"
 
 #. i18n: ectx: property (text), widget (QLabel, openFileLabel)
-#: gui/mainwindow.ui:105
+#: gui/mainwindow.ui:99
 #, kde-format
 msgid "Profile &Data:"
 msgstr "&Dades d'anàlisi del rendiment:"
 
 #. i18n: ectx: property (text), widget (QLabel, compareToLabel)
-#: gui/mainwindow.ui:115
+#: gui/mainwindow.ui:109
 #, kde-format
 msgid "Compare to:"
 msgstr "Compara amb:"
 
 #. i18n: ectx: property (text), widget (QLabel, suppressionsLabel)
-#: gui/mainwindow.ui:128
+#: gui/mainwindow.ui:122
 #, kde-format
 msgid "Suppressions:"
 msgstr "Supressions:"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
-#: gui/mainwindow.ui:138
+#: gui/mainwindow.ui:132
 #, kde-format
 msgid "path/to/lsan_suppressions.txt"
 msgstr "camí/a/supressions_lsan.txt"
 
 #. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
-#: gui/mainwindow.ui:251
+#: gui/mainwindow.ui:245
 #, kde-format
 msgid "Summary"
 msgstr "Resum"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topPeakLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topPeak)
-#: gui/mainwindow.ui:352 gui/mainwindow.ui:365
+#: gui/mainwindow.ui:346 gui/mainwindow.ui:359
 #, kde-format
 msgid "List of functions that allocated the most memory at a given time."
 msgstr ""
 "Llista de funcions que assignen la majoria de la memòria en un moment donat."
 
 #. i18n: ectx: property (text), widget (QLabel, topPeakLabel)
-#: gui/mainwindow.ui:355
+#: gui/mainwindow.ui:349
 #, kde-format
 msgid "Peak Contributions"
 msgstr "Contribucions al pic"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topLeakedLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topLeaked)
-#: gui/mainwindow.ui:391 gui/mainwindow.ui:404
+#: gui/mainwindow.ui:385 gui/mainwindow.ui:398
 #, kde-format
 msgid "List of functions that leak the most memory."
 msgstr "Llista de funcions que perden la majoria de la memòria."
 
 #. i18n: ectx: property (text), widget (QLabel, topLeakedLabel)
-#: gui/mainwindow.ui:394
+#: gui/mainwindow.ui:388
 #, kde-format
 msgid "Largest Memory Leaks"
 msgstr "Pèrdues més grans de memòria"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topAllocationsLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topAllocations)
-#: gui/mainwindow.ui:430 gui/mainwindow.ui:443
+#: gui/mainwindow.ui:424 gui/mainwindow.ui:437
 #, kde-format
 msgid "List of functions that allocate memory most often."
 msgstr "Llista de funcions que assignen la memòria més sovint."
 
 #. i18n: ectx: property (text), widget (QLabel, topAllocationsLabel)
-#: gui/mainwindow.ui:433
+#: gui/mainwindow.ui:427
 #, kde-format
 msgid "Most Memory Allocations"
 msgstr "Assignacions de memòria més freqüents"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topTemporaryLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topTemporary)
-#: gui/mainwindow.ui:472 gui/mainwindow.ui:485
+#: gui/mainwindow.ui:466 gui/mainwindow.ui:479
 #, kde-format
 msgid "List of functions that produced the most temporary memory allocations."
 msgstr ""
@@ -1075,19 +1068,19 @@ msgstr ""
 "de memòria."
 
 #. i18n: ectx: property (text), widget (QLabel, topTemporaryLabel)
-#: gui/mainwindow.ui:475
+#: gui/mainwindow.ui:469
 #, kde-format
 msgid "Most Temporary Allocations"
 msgstr "Assignacions temporals més freqüents"
 
 #. i18n: ectx: property (title), widget (KCollapsibleGroupBox, suppressionBox)
-#: gui/mainwindow.ui:508
+#: gui/mainwindow.ui:502
 #, kde-format
 msgid "Suppressions"
 msgstr "Supressions"
 
 #. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
-#: gui/mainwindow.ui:540
+#: gui/mainwindow.ui:534
 #, kde-format
 msgid "Bottom-Up"
 msgstr "De baix a dalt"
@@ -1095,14 +1088,14 @@ msgstr "De baix a dalt"
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFunction)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterFunction)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFunction)
-#: gui/mainwindow.ui:564 gui/mainwindow.ui:632 gui/mainwindow.ui:753
+#: gui/mainwindow.ui:558 gui/mainwindow.ui:626 gui/mainwindow.ui:747
 #, kde-format
 msgid "filter by function..."
 msgstr "filtra per funció..."
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
-#: gui/mainwindow.ui:571 gui/mainwindow.ui:760
+#: gui/mainwindow.ui:565 gui/mainwindow.ui:754
 #, kde-format
 msgid "filter by file..."
 msgstr "filtra per fitxer..."
@@ -1110,55 +1103,55 @@ msgstr "filtra per fitxer..."
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterModule)
-#: gui/mainwindow.ui:578 gui/mainwindow.ui:639 gui/mainwindow.ui:767
+#: gui/mainwindow.ui:572 gui/mainwindow.ui:633 gui/mainwindow.ui:761
 #, kde-format
 msgid "filter by module..."
 msgstr "filtra per mòdul..."
 
 #. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
-#: gui/mainwindow.ui:608
+#: gui/mainwindow.ui:602
 #, kde-format
 msgid "Caller / Callee"
 msgstr "Cridador / Cridat"
 
 #. i18n: ectx: attribute (title), widget (QWidget, topDownTab)
-#: gui/mainwindow.ui:732
+#: gui/mainwindow.ui:726
 #, kde-format
 msgid "Top-Down"
 msgstr "De dalt a baix"
 
 #. i18n: ectx: attribute (title), widget (FlameGraph, flameGraphTab)
-#: gui/mainwindow.ui:797
+#: gui/mainwindow.ui:791
 #, kde-format
 msgid "Flame Graph"
 msgstr "Gràfic de flames"
 
 #. i18n: ectx: property (windowTitle), widget (QDockWidget, stacksDock)
-#: gui/mainwindow.ui:813
+#: gui/mainwindow.ui:807
 #, kde-format
 msgid "S&tacks"
 msgstr "&Piles"
 
 #. i18n: ectx: property (text), widget (QLabel, stackSpinnerLabel)
-#: gui/mainwindow.ui:838
+#: gui/mainwindow.ui:832
 #, kde-format
 msgid "Selected Stack:"
 msgstr "Pila seleccionada:"
 
 #. i18n: ectx: property (title), widget (QMenu, menu_File)
-#: gui/mainwindow.ui:875
+#: gui/mainwindow.ui:869
 #, kde-format
 msgid "&File"
 msgstr "&Fitxer"
 
 #. i18n: ectx: property (title), widget (QMenu, menu_Settings)
-#: gui/mainwindow.ui:880
+#: gui/mainwindow.ui:874
 #, kde-format
 msgid "Setti&ngs"
 msgstr "Co&nfiguració"
 
 #. i18n: ectx: property (title), widget (QMenu, menuFilter)
-#: gui/mainwindow.ui:885
+#: gui/mainwindow.ui:879
 #, kde-format
 msgid "Filter"
 msgstr "Filtre"
@@ -1369,3 +1362,6 @@ msgstr "%1 a %2"
 #, kde-format
 msgid "<unresolved function>"
 msgstr "<fu nció no resolta>"
+
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2022-11-21 00:49+0000\n"
+"POT-Creation-Date: 2023-07-20 00:51+0000\n"
 "PO-Revision-Date: 2023-04-21 23:40+0200\n"
 "Last-Translator: Shinjo Park <kde@peremen.name>\n"
 "Language-Team: Korean <kde-kr@kde.org>\n"
@@ -177,7 +177,7 @@ msgstr "극"
 msgid "Leaked"
 msgstr "누수됨"
 
-#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:475
+#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:476
 #: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
 #, kde-format
 msgid "Allocations"
@@ -216,7 +216,7 @@ msgstr "메모리 할당"
 msgid "Memory Consumed"
 msgstr "사용한 메모리"
 
-#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:477
+#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:478
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
@@ -320,7 +320,7 @@ msgid "Filter In On Selection"
 msgstr "선택할 때에 필터"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
-#: gui/chartwidget.cpp:226 gui/mainwindow.ui:899
+#: gui/chartwidget.cpp:226 gui/mainwindow.ui:893
 #, kde-format
 msgid "Reset Filter"
 msgstr "필터 초기화"
@@ -588,7 +588,7 @@ msgstr "<qt>불꽃 그래프에서 기호를 검색합니다.</qt>"
 msgid "Reset View"
 msgstr "보기 초기화"
 
-#: gui/flamegraph.cpp:555 gui/mainwindow.cpp:140
+#: gui/flamegraph.cpp:555 gui/mainwindow.cpp:141
 #, kde-format
 msgid "View Caller/Callee"
 msgstr "호출자/피호출자 보기"
@@ -648,7 +648,7 @@ msgstr ""
 "지정한 파일에서 누수 억제 목록을 불러옵니다. 한 줄에 하나씩 지정하십시오. 각 "
 "줄은 'leak:'으로 시작하는 LSAN 억제 파일 형식이어야 합니다."
 
-#: gui/gui.cpp:95 gui/mainwindow.cpp:630
+#: gui/gui.cpp:95 gui/mainwindow.cpp:641
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -698,12 +698,12 @@ msgstr "요청한 할당 크기"
 msgid "Number of Allocations"
 msgstr "할당 횟수"
 
-#: gui/mainwindow.cpp:169
+#: gui/mainwindow.cpp:170
 #, kde-format
 msgid "Open file in editor"
 msgstr "편집기에서 파일 열기"
 
-#: gui/mainwindow.cpp:392
+#: gui/mainwindow.cpp:393
 #, kde-format
 msgid ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
@@ -712,113 +712,113 @@ msgstr ""
 "<dt><b>디버그할 파일</b>:</dt><dd style='font-family:monospace;'>%1<i>(디버"
 "거 연결됨)</i></dd>"
 
-#: gui/mainwindow.cpp:395
+#: gui/mainwindow.cpp:396
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 msgstr ""
 "<dt><b>디버그할 파일</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 
-#: gui/mainwindow.cpp:399
+#: gui/mainwindow.cpp:400
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
 msgstr "<dt><b>총 실행 시간</b>:</dt><dd>%1, %2부터 %3깨지 필터링됨(%4)</dd>"
 
-#: gui/mainwindow.cpp:404
+#: gui/mainwindow.cpp:405
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>총 실행 시간</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:406
+#: gui/mainwindow.cpp:407
 #, kde-format
 msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>총 시스템 메모리</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:413
+#: gui/mainwindow.cpp:414
 #, kde-format
 msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
 msgstr "<dt><b>할당 함수 호출</b>:</dt><dd>%1(%2/초)</dd>"
 
-#: gui/mainwindow.cpp:416
+#: gui/mainwindow.cpp:417
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 msgstr "<dt><b>임시 할당</b>:</dt><dd>%1(%2%, %3/초)</dd>"
 
-#: gui/mainwindow.cpp:426
+#: gui/mainwindow.cpp:427
 #, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
 msgstr "<dt><b>힙 메모리 할당 극값</b>:</dt><dd>%2 후 %1</dd>"
 
-#: gui/mainwindow.cpp:429
+#: gui/mainwindow.cpp:430
 #, kde-format
 msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
 msgstr "<dt><b>RSS 극값</b>(힙 추적 오버헤드 포함):</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:433
+#: gui/mainwindow.cpp:434
 #, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>메모리 사용량 차이</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:437
+#: gui/mainwindow.cpp:438
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
 msgstr "<dt><b>총 메모리 누수</b>:</dt><dd>%1(%2 억제됨)</dd>"
 
-#: gui/mainwindow.cpp:440
+#: gui/mainwindow.cpp:441
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>총 메모리 누수</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:468
+#: gui/mainwindow.cpp:469
 #, kde-format
 msgid "Failed to parse file %1."
 msgstr "%1 파일을 해석할 수 없습니다."
 
-#: gui/mainwindow.cpp:473
+#: gui/mainwindow.cpp:474
 #, kde-format
 msgid "Consumed"
 msgstr "사용함"
 
-#: gui/mainwindow.cpp:489
+#: gui/mainwindow.cpp:490
 #, kde-format
 msgid "Sizes"
 msgstr "크기"
 
-#: gui/mainwindow.cpp:553
+#: gui/mainwindow.cpp:554
 #, kde-format
 msgid "Input data %1 does not exist."
 msgstr "입력 데이터 %1이(가) 없습니다."
 
-#: gui/mainwindow.cpp:555
+#: gui/mainwindow.cpp:556
 #, kde-format
 msgid "Input data %1 is not a file."
 msgstr "입력 데이터 %1이(가) 파일이 아닙니다."
 
-#: gui/mainwindow.cpp:557
+#: gui/mainwindow.cpp:558
 #, kde-format
 msgid "Input data %1 is not readable."
 msgstr "입력 데이터 %1에서 읽을 수 없습니다."
 
-#: gui/mainwindow.cpp:585
+#: gui/mainwindow.cpp:596
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr "억제 파일을 해석할 수 없습니다."
 
-#: gui/mainwindow.cpp:600
+#: gui/mainwindow.cpp:611
 #, kde-format
 msgid "Heaptrack"
 msgstr "힙 추적"
 
-#: gui/mainwindow.cpp:628
+#: gui/mainwindow.cpp:639
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr "임베드된 억제 비활성화"
 
-#: gui/mainwindow.cpp:640
+#: gui/mainwindow.cpp:651
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr "내장된 억제 비활성화"
 
-#: gui/mainwindow.cpp:642
+#: gui/mainwindow.cpp:653
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -827,54 +827,54 @@ msgstr ""
 "힙 추적에 내장된 억제 정의를 무시합니다. 기본값으로 힙 추적에서는 시스템 라이"
 "브러리에 있는 알려진 메모리 누수를 무시합니다."
 
-#: gui/mainwindow.cpp:670
+#: gui/mainwindow.cpp:681
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "파일 %1 불러오는 중, 잠시 기다려 주십시오..."
 
-#: gui/mainwindow.cpp:672
+#: gui/mainwindow.cpp:683
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "힙 추적 - %1"
 
-#: gui/mainwindow.cpp:675
+#: gui/mainwindow.cpp:686
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "힙 추적 - %1, %2 비교"
 
-#: gui/mainwindow.cpp:691
+#: gui/mainwindow.cpp:702
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "파일 다시 분석하는 중, 잠시 기다려 주십시오..."
 
-#: gui/mainwindow.cpp:734
+#: gui/mainwindow.cpp:745
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:775
+#: gui/mainwindow.cpp:786
 #, kde-format
 msgid "Code Navigation"
 msgstr "코드 탐색"
 
-#: gui/mainwindow.cpp:802
+#: gui/mainwindow.cpp:813
 #, kde-format
 msgid "Custom..."
 msgstr "사용자 정의..."
 
-#: gui/mainwindow.cpp:814
+#: gui/mainwindow.cpp:825
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "자동(줄 번호 없음)"
 
-#: gui/mainwindow.cpp:834
+#: gui/mainwindow.cpp:845
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "사용자 정의 코드 탐색"
 
-#: gui/mainwindow.cpp:835
+#: gui/mainwindow.cpp:846
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
@@ -891,7 +891,7 @@ msgstr "주 창"
 
 #. i18n: ectx: property (toolTip), widget (QMainWindow, MainWindow)
 #. i18n: ectx: property (toolTip), widget (QLabel, suppressionsLabel)
-#: gui/mainwindow.ui:17 gui/mainwindow.ui:125
+#: gui/mainwindow.ui:17 gui/mainwindow.ui:119
 #, kde-format
 msgid "Path to a file containing leak suppression rules in the LSAN format."
 msgstr "LSAN 형식으로 되어 있는 누수 억제 규칙 파일의 경로입니다."
@@ -921,22 +921,15 @@ msgstr ""
 "<p>실행 중인 프로그램에 연결할 수도 있습니다:</p>\n"
 "<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
 
-#. i18n: ectx: property (filter), widget (KUrlRequester, openFile)
-#. i18n: ectx: property (filter), widget (KUrlRequester, compareTo)
-#: gui/mainwindow.ui:76 gui/mainwindow.ui:92
-#, kde-format
-msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, openFile)
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, compareTo)
-#: gui/mainwindow.ui:79 gui/mainwindow.ui:95
+#: gui/mainwindow.ui:76 gui/mainwindow.ui:89
 #, kde-format
 msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
 msgstr "path/to/heaptrack.$APP.$PID.{gz,zst}"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
-#: gui/mainwindow.ui:89
+#: gui/mainwindow.ui:86
 #, kde-format
 msgid ""
 "<qt>You can optionally specify a second heaptrack data file to compare to. "
@@ -948,95 +941,95 @@ msgstr ""
 "용에서 뺍니다.</qt>"
 
 #. i18n: ectx: property (text), widget (QLabel, openFileLabel)
-#: gui/mainwindow.ui:105
+#: gui/mainwindow.ui:99
 #, kde-format
 msgid "Profile &Data:"
 msgstr "프로필 데이터(&D):"
 
 #. i18n: ectx: property (text), widget (QLabel, compareToLabel)
-#: gui/mainwindow.ui:115
+#: gui/mainwindow.ui:109
 #, kde-format
 msgid "Compare to:"
 msgstr "다음과 비교:"
 
 #. i18n: ectx: property (text), widget (QLabel, suppressionsLabel)
-#: gui/mainwindow.ui:128
+#: gui/mainwindow.ui:122
 #, kde-format
 msgid "Suppressions:"
 msgstr "억제:"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
-#: gui/mainwindow.ui:138
+#: gui/mainwindow.ui:132
 #, kde-format
 msgid "path/to/lsan_suppressions.txt"
 msgstr "path/to/lsan_suppressions.txt"
 
 #. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
-#: gui/mainwindow.ui:251
+#: gui/mainwindow.ui:245
 #, kde-format
 msgid "Summary"
 msgstr "요약"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topPeakLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topPeak)
-#: gui/mainwindow.ui:352 gui/mainwindow.ui:365
+#: gui/mainwindow.ui:346 gui/mainwindow.ui:359
 #, kde-format
 msgid "List of functions that allocated the most memory at a given time."
 msgstr "지정한 시간에 최대로 메모리를 많이 할당한 함수 목록입니다."
 
 #. i18n: ectx: property (text), widget (QLabel, topPeakLabel)
-#: gui/mainwindow.ui:355
+#: gui/mainwindow.ui:349
 #, kde-format
 msgid "Peak Contributions"
 msgstr "극값 비중"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topLeakedLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topLeaked)
-#: gui/mainwindow.ui:391 gui/mainwindow.ui:404
+#: gui/mainwindow.ui:385 gui/mainwindow.ui:398
 #, kde-format
 msgid "List of functions that leak the most memory."
 msgstr "최대로 메모리 누수가 큰 함수 목록입니다."
 
 #. i18n: ectx: property (text), widget (QLabel, topLeakedLabel)
-#: gui/mainwindow.ui:394
+#: gui/mainwindow.ui:388
 #, kde-format
 msgid "Largest Memory Leaks"
 msgstr "최대 메모리 누수"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topAllocationsLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topAllocations)
-#: gui/mainwindow.ui:430 gui/mainwindow.ui:443
+#: gui/mainwindow.ui:424 gui/mainwindow.ui:437
 #, kde-format
 msgid "List of functions that allocate memory most often."
 msgstr "가장 자주 메모리를 할당한 함수 목록입니다."
 
 #. i18n: ectx: property (text), widget (QLabel, topAllocationsLabel)
-#: gui/mainwindow.ui:433
+#: gui/mainwindow.ui:427
 #, kde-format
 msgid "Most Memory Allocations"
 msgstr "최대 메모리 할당"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topTemporaryLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topTemporary)
-#: gui/mainwindow.ui:472 gui/mainwindow.ui:485
+#: gui/mainwindow.ui:466 gui/mainwindow.ui:479
 #, kde-format
 msgid "List of functions that produced the most temporary memory allocations."
 msgstr "최대로 임시 할당 횟수가 많은 함수 목록입니다."
 
 #. i18n: ectx: property (text), widget (QLabel, topTemporaryLabel)
-#: gui/mainwindow.ui:475
+#: gui/mainwindow.ui:469
 #, kde-format
 msgid "Most Temporary Allocations"
 msgstr "최대 임시 할당"
 
 #. i18n: ectx: property (title), widget (KCollapsibleGroupBox, suppressionBox)
-#: gui/mainwindow.ui:508
+#: gui/mainwindow.ui:502
 #, kde-format
 msgid "Suppressions"
 msgstr "억제"
 
 #. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
-#: gui/mainwindow.ui:540
+#: gui/mainwindow.ui:534
 #, kde-format
 msgid "Bottom-Up"
 msgstr "아래에서 위로"
@@ -1044,14 +1037,14 @@ msgstr "아래에서 위로"
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFunction)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterFunction)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFunction)
-#: gui/mainwindow.ui:564 gui/mainwindow.ui:632 gui/mainwindow.ui:753
+#: gui/mainwindow.ui:558 gui/mainwindow.ui:626 gui/mainwindow.ui:747
 #, kde-format
 msgid "filter by function..."
 msgstr "함수로 필터하기..."
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
-#: gui/mainwindow.ui:571 gui/mainwindow.ui:760
+#: gui/mainwindow.ui:565 gui/mainwindow.ui:754
 #, kde-format
 msgid "filter by file..."
 msgstr "파일로 필터하기..."
@@ -1059,55 +1052,55 @@ msgstr "파일로 필터하기..."
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterModule)
-#: gui/mainwindow.ui:578 gui/mainwindow.ui:639 gui/mainwindow.ui:767
+#: gui/mainwindow.ui:572 gui/mainwindow.ui:633 gui/mainwindow.ui:761
 #, kde-format
 msgid "filter by module..."
 msgstr "모듈로 필터하기..."
 
 #. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
-#: gui/mainwindow.ui:608
+#: gui/mainwindow.ui:602
 #, kde-format
 msgid "Caller / Callee"
 msgstr "호출자/피호출자"
 
 #. i18n: ectx: attribute (title), widget (QWidget, topDownTab)
-#: gui/mainwindow.ui:732
+#: gui/mainwindow.ui:726
 #, kde-format
 msgid "Top-Down"
 msgstr "위에서 아래로"
 
 #. i18n: ectx: attribute (title), widget (FlameGraph, flameGraphTab)
-#: gui/mainwindow.ui:797
+#: gui/mainwindow.ui:791
 #, kde-format
 msgid "Flame Graph"
 msgstr "불꽃 그래프"
 
 #. i18n: ectx: property (windowTitle), widget (QDockWidget, stacksDock)
-#: gui/mainwindow.ui:813
+#: gui/mainwindow.ui:807
 #, kde-format
 msgid "S&tacks"
 msgstr "스택(&T)"
 
 #. i18n: ectx: property (text), widget (QLabel, stackSpinnerLabel)
-#: gui/mainwindow.ui:838
+#: gui/mainwindow.ui:832
 #, kde-format
 msgid "Selected Stack:"
 msgstr "선택한 스택:"
 
 #. i18n: ectx: property (title), widget (QMenu, menu_File)
-#: gui/mainwindow.ui:875
+#: gui/mainwindow.ui:869
 #, kde-format
 msgid "&File"
 msgstr "파일(&F)"
 
 #. i18n: ectx: property (title), widget (QMenu, menu_Settings)
-#: gui/mainwindow.ui:880
+#: gui/mainwindow.ui:874
 #, kde-format
 msgid "Setti&ngs"
 msgstr "설정(&N)"
 
 #. i18n: ectx: property (title), widget (QMenu, menuFilter)
-#: gui/mainwindow.ui:885
+#: gui/mainwindow.ui:879
 #, kde-format
 msgid "Filter"
 msgstr "필터"
@@ -1313,6 +1306,9 @@ msgstr "%2의 %1"
 #, kde-format
 msgid "<unresolved function>"
 msgstr "<해결되지 않은 함수>"
+
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
 
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
