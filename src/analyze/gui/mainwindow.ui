@@ -36,8 +36,7 @@
        <enum>KMessageWidget::Information</enum>
       </property>
       <property name="icon">
-       <iconset theme="dialog-error">
-        <normaloff>.</normaloff>.</iconset>
+       <iconset theme="dialog-error"/>
       </property>
      </widget>
     </item>
@@ -886,8 +885,7 @@
   </widget>
   <action name="actionResetFilter">
    <property name="icon">
-    <iconset theme="timeline-use-zone-off">
-     <normaloff>.</normaloff>.</iconset>
+    <iconset theme="timeline-use-zone-off"/>
    </property>
    <property name="text">
     <string>Reset Filter</string>
