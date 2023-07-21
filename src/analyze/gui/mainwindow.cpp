@@ -17,6 +17,7 @@
 #include <KStandardAction>
 
 #include <QAction>
+#include <QActionGroup>
 #include <QClipboard>
 #include <QDebug>
 #include <QDesktopServices>
