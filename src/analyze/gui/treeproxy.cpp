@@ -79,7 +79,7 @@ bool TreeProxy::lessThan(const QModelIndex& source_left, const QModelIndex& sour
 
     auto toShortPath = [](const QString& path) {
         int idx = path.lastIndexOf(QLatin1Char('/'));
-        return path.midRef(idx + 1);
+        return QStringView(path).mid(idx + 1);
     };
 
     return toShortPath(path_left) < toShortPath(path_right);
