@@ -55,6 +55,24 @@ KChart::TextAttributes fixupTextAttributes(KChart::TextAttributes attributes, co
     return attributes;
 }
 
+QPointF localPos(QMouseEvent *event)
+{
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    return event->localPos();
+#else
+    return event->position();
+#endif
+}
+
+QPoint globalPos(QMouseEvent *event)
+{
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    return event->globalPos();
+#else
+    return event->globalPosition().toPoint();
+#endif
+}
+
 class TimeAxis : public CartesianAxis
 {
     Q_OBJECT
@@ -506,7 +524,7 @@ bool ChartWidget::eventFilter(QObject* watched, QEvent* event)
 
     if (auto* mouseEvent = dynamic_cast<QMouseEvent*>(event)) {
         if (mouseEvent->button() == Qt::LeftButton || mouseEvent->buttons() == Qt::LeftButton) {
-            const auto time = mapPosToTime(mouseEvent->localPos());
+            const auto time = mapPosToTime(localPos(mouseEvent));
 
             auto selection = m_selection;
             selection.end = time;
@@ -520,10 +538,10 @@ bool ChartWidget::eventFilter(QObject* watched, QEvent* event)
             }
 
             setSelection(selection);
-            QToolTip::showText(mouseEvent->globalPos(), toolTip(), this);
+            QToolTip::showText(globalPos(mouseEvent), toolTip(), this);
             return true;
         } else if (event->type() == QEvent::MouseMove && !mouseEvent->buttons()) {
-            updateStatusTip(mapPosToTime(mouseEvent->localPos()));
+            updateStatusTip(mapPosToTime(localPos(mouseEvent)));
         }
     } else if (event->type() == QEvent::Paint && !m_cachedChart.isNull()) {
         // use the cached chart while interacting with the rubber band

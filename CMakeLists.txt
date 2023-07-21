@@ -87,9 +87,23 @@ option(
 
 option(
   HEAPTRACK_BUILD_GUI
-  "Disable this option to skip building the Qt5 / KF5 based GUI for heaptrack."
+  "Disable this option to skip building the Qt / KDE Frameworks based GUI for heaptrack."
   ${HEAPTRACK_BUILD_ANALYZE_DEFAULT}
 )
+
+option(
+  HEAPTRACK_USE_QT6
+  "Use Qt6/KF6 when building the Qt / KDE Frameworks based GUI for heaptrack."
+  OFF
+)
+if(HEAPTRACK_USE_QT6)
+    set(QT_VERSION_MAJOR 6)
+    # possibly works with older Qt6, but I didn't test that yet
+    set(QT_MIN_VERSION 6.5.0)
+else()
+    set(QT_VERSION_MAJOR 5)
+    set(QT_MIN_VERSION 5.10.0)
+endif()
 
 option(
   HEAPTRACK_USE_LIBUNWIND

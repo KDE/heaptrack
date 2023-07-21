@@ -30,10 +30,10 @@ add_library(heaptrack_gui_private STATIC
     parser.cpp
 )
 target_link_libraries(heaptrack_gui_private PUBLIC
-    KF5::I18n
-    KF5::CoreAddons # KFormat
-    KF5::ThreadWeaver
-    Qt5::Core
+    KF${QT_VERSION_MAJOR}::I18n
+    KF${QT_VERSION_MAJOR}::CoreAddons # KFormat
+    KF${QT_VERSION_MAJOR}::ThreadWeaver
+    Qt${QT_VERSION_MAJOR}::Core
     sharedprint
     pthread
     ${CMAKE_THREAD_LIBS_INIT}
@@ -71,12 +71,12 @@ ecm_add_app_icon(SRCFILES ICONS
 )
 
 set(LIBRARIES
-    Qt5::Widgets
-    KF5::ItemModels
-    KF5::ConfigWidgets
-    KF5::I18n
-    KF5::KIOWidgets
-    KF5::IconThemes
+    Qt${QT_VERSION_MAJOR}::Widgets
+    KF${QT_VERSION_MAJOR}::ItemModels
+    KF${QT_VERSION_MAJOR}::ConfigWidgets
+    KF${QT_VERSION_MAJOR}::I18n
+    KF${QT_VERSION_MAJOR}::KIOWidgets
+    KF${QT_VERSION_MAJOR}::IconThemes
     sharedprint
     heaptrack_gui_private
 )
@@ -91,7 +91,7 @@ if (KChart_FOUND)
     )
     list(APPEND LIBRARIES
         KChart
-        Qt5::Svg
+        Qt${QT_VERSION_MAJOR}::Svg
     )
 endif()
 
