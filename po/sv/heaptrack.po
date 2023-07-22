@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-07-20 00:51+0000\n"
+"POT-Creation-Date: 2023-07-22 00:52+0000\n"
 "PO-Revision-Date: 2021-11-12 18:35+0100\n"
 "Last-Translator: Stefan Asserhäll <stefan.asserhall@bredband.net>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -179,7 +179,7 @@ msgstr "Störst"
 msgid "Leaked"
 msgstr "Läckt"
 
-#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:476
+#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:477
 #: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
 #, kde-format
 msgid "Allocations"
@@ -218,13 +218,13 @@ msgstr "Minnestilldelningar"
 msgid "Memory Consumed"
 msgstr "Använt minne"
 
-#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:478
+#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:479
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
 msgstr "Tillfälliga tilldelningar"
 
-#: gui/chartmodel.cpp:74 gui/chartwidget.cpp:448
+#: gui/chartmodel.cpp:74 gui/chartwidget.cpp:466
 #, kde-format
 msgid "Elapsed Time"
 msgstr "Förfluten tid"
@@ -296,86 +296,86 @@ msgstr ""
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
 msgstr "<qt>%2 använt efter %3 från:<p style='margin-left:10px'>%1</p></qt>"
 
-#: gui/chartwidget.cpp:144
+#: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
 msgstr ""
 
-#: gui/chartwidget.cpp:147
+#: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
 msgstr ""
 
-#: gui/chartwidget.cpp:154
+#: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
 msgstr ""
 
-#: gui/chartwidget.cpp:162
+#: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
 msgstr ""
 
-#: gui/chartwidget.cpp:169
+#: gui/chartwidget.cpp:187
 #, kde-format
 msgid "Stacked diagrams:"
 msgstr ""
 
-#: gui/chartwidget.cpp:216
+#: gui/chartwidget.cpp:234
 #, kde-format
 msgid "Filter In On Selection"
 msgstr "Filtrera in enligt markering"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
-#: gui/chartwidget.cpp:226 gui/mainwindow.ui:893
+#: gui/chartwidget.cpp:244 gui/mainwindow.ui:893
 #, kde-format
 msgid "Reset Filter"
 msgstr "Nollställ filter"
 
-#: gui/chartwidget.cpp:365
+#: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
 msgstr ""
 
-#: gui/chartwidget.cpp:366
+#: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
 msgstr ""
 
-#: gui/chartwidget.cpp:382
+#: gui/chartwidget.cpp:400
 #, fuzzy, kde-format
 #| msgid "Failed to parse file %1."
 msgid "Failed to save the image to %1"
 msgstr "Misslyckades tolka filen %1."
 
-#: gui/chartwidget.cpp:402
+#: gui/chartwidget.cpp:420
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
 msgstr "<tr><th></th><th>Start</th><th>Slut</th><th>Delta</th></tr>"
 
-#: gui/chartwidget.cpp:403
+#: gui/chartwidget.cpp:421
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Tid</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:407
+#: gui/chartwidget.cpp:425
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Använt</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:411
+#: gui/chartwidget.cpp:429
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Tilldelningar</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:415
+#: gui/chartwidget.cpp:433
 #, kde-format
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr ""
 "<tr><th>Tillfälliga tilldelningar</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:423
+#: gui/chartwidget.cpp:441
 #, kde-format
 msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
@@ -384,7 +384,7 @@ msgstr ""
 "<qt>Visar heap-minnesanvändningen över tiden.<br>Klicka och dra för att "
 "välja ett tidsintervall för filtrering.</qt>"
 
-#: gui/chartwidget.cpp:427
+#: gui/chartwidget.cpp:445
 #, kde-format
 msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
@@ -393,7 +393,7 @@ msgstr ""
 "<qt>Visar antal minnestilldelningar över tiden.<br>Klicka och dra för att "
 "välja ett tidsintervall för filtrering.</qt>"
 
-#: gui/chartwidget.cpp:431
+#: gui/chartwidget.cpp:449
 #, kde-format
 msgid ""
 "<qt>Shows number of temporary memory allocations over time. A temporary "
@@ -406,22 +406,22 @@ msgstr ""
 "andra mellanliggande tilldelningar.<br>Klicka och dra för att välja ett "
 "tidsintervall för filtrering.</qt>"
 
-#: gui/chartwidget.cpp:453
+#: gui/chartwidget.cpp:471
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
 msgstr "%1 (filtrerat från %2 till %3, Δ%4)"
 
-#: gui/chartwidget.cpp:457
+#: gui/chartwidget.cpp:475
 #, kde-format
 msgid "%1 (filtered delta)"
 msgstr "%1 (filtrerat delta)"
 
-#: gui/chartwidget.cpp:546
+#: gui/chartwidget.cpp:564
 #, kde-format
 msgid "Click and drag to select time range for filtering."
 msgstr "Klicka och dra för att välja tidsintervall för filtrering."
 
-#: gui/chartwidget.cpp:552
+#: gui/chartwidget.cpp:570
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
@@ -429,7 +429,7 @@ msgstr ""
 "T = %1, använt: %2. Klicka och dra för att välja tidsintervall för "
 "filtrering."
 
-#: gui/chartwidget.cpp:556
+#: gui/chartwidget.cpp:574
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
@@ -437,7 +437,7 @@ msgstr ""
 "T = %1, tilldelningar: %2. Klicka och dra för att välja tidsintervall för "
 "filtrering."
 
-#: gui/chartwidget.cpp:560
+#: gui/chartwidget.cpp:578
 #, kde-format
 msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
@@ -602,7 +602,7 @@ msgstr "<qt>Sök i efter en symbol i flamdiagrammet.</qt>"
 msgid "Reset View"
 msgstr "Återställ vy"
 
-#: gui/flamegraph.cpp:555 gui/mainwindow.cpp:141
+#: gui/flamegraph.cpp:555 gui/mainwindow.cpp:142
 #, kde-format
 msgid "View Caller/Callee"
 msgstr "Visa anropare och anropad"
@@ -622,37 +622,37 @@ msgstr "%1 (%2 % av totalt %3) tilldelningar matchade sökningen."
 msgid "%1 (%2% of total of %3) matched by search."
 msgstr "%1 (%2 % av totalt %3) matchade sökningen."
 
-#: gui/gui.cpp:65
+#: gui/gui.cpp:67
 #, kde-format
 msgid "Heaptrack GUI"
 msgstr "Heaptrack grafiskt användargränssnitt"
 
-#: gui/gui.cpp:66
+#: gui/gui.cpp:68
 #, kde-format
 msgid "A visualizer for heaptrack data files."
 msgstr "Ett visualiseringsverktyg för Heaptrack-datafiler."
 
-#: gui/gui.cpp:67
+#: gui/gui.cpp:69
 #, kde-format
 msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
 msgstr "Copyright 2015, Milian Wolff <mail@milianw.de>"
 
-#: gui/gui.cpp:70
+#: gui/gui.cpp:72
 #, kde-format
 msgid "Milian Wolff"
 msgstr "Milian Wolff"
 
-#: gui/gui.cpp:70
+#: gui/gui.cpp:72
 #, kde-format
 msgid "Original author, maintainer"
 msgstr "Ursprunglig upphovsman, underhåll"
 
-#: gui/gui.cpp:84
+#: gui/gui.cpp:86
 #, kde-format
 msgid "Base profile data to compare other files to."
 msgstr "Profileringsbasdata att jämföra med andra filer."
 
-#: gui/gui.cpp:89
+#: gui/gui.cpp:91
 #, kde-format
 msgid ""
 "Load list of leak suppressions from the specified file. Specify one "
@@ -663,7 +663,7 @@ msgstr ""
 "en undertryckning per rad, och börja varje rad med 'leak:', dvs. använd LSAN-"
 "filformatet för undertryckningar."
 
-#: gui/gui.cpp:95 gui/mainwindow.cpp:641
+#: gui/gui.cpp:97 gui/mainwindow.cpp:642
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -678,7 +678,7 @@ msgstr ""
 "används sedan alltid när data analyseras, om inte funktionen explicit "
 "inaktiveras genom att använda den här kommandoradsväljaren."
 
-#: gui/gui.cpp:103
+#: gui/gui.cpp:105
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -687,12 +687,12 @@ msgstr ""
 "Ignorera undertryckningsdefinitioner som är inbyggda i heaptrack. Normalt "
 "undertrycker heaptrack vissa kända läckor i vanliga systembibliotek."
 
-#: gui/gui.cpp:106
+#: gui/gui.cpp:108
 #, kde-format
 msgid "Files to load"
 msgstr "Filer att läsa in"
 
-#: gui/gui.cpp:106
+#: gui/gui.cpp:108
 #, kde-format
 msgid "[FILE...]"
 msgstr "[FIL...]"
@@ -716,12 +716,12 @@ msgstr "Begärd tilldelningsstorlek"
 msgid "Number of Allocations"
 msgstr "Antal tilldelningar"
 
-#: gui/mainwindow.cpp:170
+#: gui/mainwindow.cpp:171
 #, kde-format
 msgid "Open file in editor"
 msgstr "Öppna fil i editor"
 
-#: gui/mainwindow.cpp:393
+#: gui/mainwindow.cpp:394
 #, kde-format
 msgid ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
@@ -730,115 +730,115 @@ msgstr ""
 "<dt><b>avlusat program</b>:</dt><dd style='font-family:monospace;'>"
 "%1<i>(anslutet)</i></dd>"
 
-#: gui/mainwindow.cpp:396
+#: gui/mainwindow.cpp:397
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 msgstr ""
 "<dt><b>avlusat program</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 
-#: gui/mainwindow.cpp:400
+#: gui/mainwindow.cpp:401
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
 msgstr ""
 "<dt><b>total körtid</b>:</dt><dd>%1, filtrerad från %2 till %3 (%4)</dd>"
 
-#: gui/mainwindow.cpp:405
+#: gui/mainwindow.cpp:406
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>total körtid</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:407
+#: gui/mainwindow.cpp:408
 #, kde-format
 msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>totalt systemminne</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:414
+#: gui/mainwindow.cpp:415
 #, kde-format
 msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
 msgstr "<dt><b>anrop till tilldelningsfunktioner</b>:</dt><dd>%1 (%2/s)</dd>"
 
-#: gui/mainwindow.cpp:417
+#: gui/mainwindow.cpp:418
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 msgstr "<dt><b>tillfälliga tilldelningar</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 
-#: gui/mainwindow.cpp:427
+#: gui/mainwindow.cpp:428
 #, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
 msgstr "<dt><b>största heap-minnesanvändning</b>:</dt><dd>%1 efter %2</dd>"
 
-#: gui/mainwindow.cpp:430
+#: gui/mainwindow.cpp:431
 #, kde-format
 msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
 msgstr ""
 "<dt><b>topp-RSS</b> (inklusive overhead från heaptrack):</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:434
+#: gui/mainwindow.cpp:435
 #, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>deltaminnesanvändning</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:438
+#: gui/mainwindow.cpp:439
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
 msgstr "<dt><b>totalt läckt minne</b>:</dt><dd>%1 (%2 undertryckt)</dd>"
 
-#: gui/mainwindow.cpp:441
+#: gui/mainwindow.cpp:442
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>totalt läckt minne</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:469
+#: gui/mainwindow.cpp:470
 #, kde-format
 msgid "Failed to parse file %1."
 msgstr "Misslyckades tolka filen %1."
 
-#: gui/mainwindow.cpp:474
+#: gui/mainwindow.cpp:475
 #, kde-format
 msgid "Consumed"
 msgstr "Använt"
 
-#: gui/mainwindow.cpp:490
+#: gui/mainwindow.cpp:491
 #, kde-format
 msgid "Sizes"
 msgstr "Storlekar"
 
-#: gui/mainwindow.cpp:554
+#: gui/mainwindow.cpp:555
 #, kde-format
 msgid "Input data %1 does not exist."
 msgstr "Indata %1 finns inte."
 
-#: gui/mainwindow.cpp:556
+#: gui/mainwindow.cpp:557
 #, kde-format
 msgid "Input data %1 is not a file."
 msgstr "Indata %1 är inte en fil."
 
-#: gui/mainwindow.cpp:558
+#: gui/mainwindow.cpp:559
 #, kde-format
 msgid "Input data %1 is not readable."
 msgstr "Indata %1 är inte läsbar."
 
-#: gui/mainwindow.cpp:596
+#: gui/mainwindow.cpp:597
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr "Misslyckades tolka undertryckningsfil."
 
-#: gui/mainwindow.cpp:611
+#: gui/mainwindow.cpp:612
 #, kde-format
 msgid "Heaptrack"
 msgstr "Heaptrack"
 
-#: gui/mainwindow.cpp:639
+#: gui/mainwindow.cpp:640
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr "Inaktivera inbäddade undertryckningar"
 
-#: gui/mainwindow.cpp:651
+#: gui/mainwindow.cpp:652
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr "Inaktivera inbyggda undertryckningar"
 
-#: gui/mainwindow.cpp:653
+#: gui/mainwindow.cpp:654
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -847,54 +847,54 @@ msgstr ""
 "Ignorera undertryckningsdefinitioner som är inbyggda i heaptrack. Normalt "
 "undertrycker heaptrack vissa kända läckor från vanliga systembibliotek."
 
-#: gui/mainwindow.cpp:681
+#: gui/mainwindow.cpp:682
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "Läser in filen %1. Vänta..."
 
-#: gui/mainwindow.cpp:683
+#: gui/mainwindow.cpp:684
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "Heaptrack - %1"
 
-#: gui/mainwindow.cpp:686
+#: gui/mainwindow.cpp:687
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1 jämförd med %2"
 
-#: gui/mainwindow.cpp:702
+#: gui/mainwindow.cpp:703
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "Tolkar filen igen. Vänta..."
 
-#: gui/mainwindow.cpp:745
+#: gui/mainwindow.cpp:746
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:786
+#: gui/mainwindow.cpp:787
 #, kde-format
 msgid "Code Navigation"
 msgstr "Kodnavigering"
 
-#: gui/mainwindow.cpp:813
+#: gui/mainwindow.cpp:814
 #, kde-format
 msgid "Custom..."
 msgstr "Egen..."
 
-#: gui/mainwindow.cpp:825
+#: gui/mainwindow.cpp:826
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "Automatisk (inga radnummer)"
 
-#: gui/mainwindow.cpp:845
+#: gui/mainwindow.cpp:846
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "Egen kodnavigering"
 
-#: gui/mainwindow.cpp:846
+#: gui/mainwindow.cpp:847
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
