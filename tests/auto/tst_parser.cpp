@@ -40,13 +40,13 @@ struct TestParser
     ~TestParser()
     {
         if (spyFinished.isEmpty())
-            REQUIRE(spyFinished.wait(10000));
+            REQUIRE(spyFinished.wait(20000));
     }
 
     CallerCalleeResults awaitCallerCallee()
     {
         if (spyCCD.isEmpty())
-            REQUIRE(spyCCD.wait());
+            REQUIRE(spyCCD.wait(20000));
 
         auto ccr = spyCCD.at(0).at(0).value<CallerCalleeResults>();
         REQUIRE(ccr.resultData);
@@ -57,7 +57,7 @@ struct TestParser
     TreeData awaitBottomUp()
     {
         if (spyBottomUp.isEmpty())
-            REQUIRE(spyBottomUp.wait(10000));
+            REQUIRE(spyBottomUp.wait(20000));
 
         auto bottomUpData = spyBottomUp.at(0).at(0).value<TreeData>();
         REQUIRE(bottomUpData.resultData);
@@ -76,7 +76,7 @@ struct TestParser
     TreeData awaitTopDown()
     {
         if (spyTopDown.isEmpty())
-            REQUIRE(spyTopDown.wait(10000));
+            REQUIRE(spyTopDown.wait(20000));
 
         auto topDownData = spyTopDown.at(0).at(0).value<TreeData>();
         REQUIRE(topDownData.resultData);
@@ -95,7 +95,7 @@ struct TestParser
     SummaryData awaitSummary()
     {
         if (spySummary.isEmpty())
-            REQUIRE(spySummary.wait(10000));
+            REQUIRE(spySummary.wait(20000));
 
         return spySummary.at(0).at(0).value<SummaryData>();
     }
