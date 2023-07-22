@@ -43,6 +43,8 @@ if (BUILD_COVERAGE)
     target_link_libraries(heaptrack_gui_private PRIVATE -lgcov)
 endif()
 
+target_compile_definitions(heaptrack_gui_private PRIVATE TRANSLATION_DOMAIN="heaptrack")
+
 target_include_directories(heaptrack_gui_private PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/../../
