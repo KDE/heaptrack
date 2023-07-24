@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-06-16 02:27+0000\n"
-"PO-Revision-Date: 2022-05-07 02:01+0200\n"
+"PO-Revision-Date: 2023-04-21 23:40+0200\n"
 "Last-Translator: Shinjo Park <kde@peremen.name>\n"
 "Language-Team: Korean <kde-kr@kde.org>\n"
 "Language: ko\n"
@@ -431,8 +431,8 @@ msgid ""
 "Show a flame graph over the contributions to the peak heap memory "
 "consumption of your application."
 msgstr ""
-"프로그램의 힙 메모리 사용량 극값에서 차지하는 비중을 나타내는 불꽃 그래프를 "
-"표시합니다."
+"앱의 힙 메모리 사용량 극값에서 차지하는 비중을 나타내는 불꽃 그래프를 표시합"
+"니다."
 
 #: gui/flamegraph.cpp:434
 #, kde-format
@@ -440,8 +440,8 @@ msgid ""
 "Show a flame graph over the leaked heap memory of your application. Memory "
 "is considered to be leaked when it never got deallocated. "
 msgstr ""
-"프로그램의 힙 메모리 누수량에서 차지하는 비중을 나타내는 불꽃 그래프를 표시합"
-"니다. 할당 해제되지 않은 메모리는 누수된 것으로 간주합니다."
+"앱의 힙 메모리 누수량에서 차지하는 비중을 나타내는 불꽃 그래프를 표시합니다. "
+"할당 해제되지 않은 메모리는 누수된 것으로 간주합니다."
 
 #: gui/flamegraph.cpp:439
 #, kde-format
@@ -598,9 +598,9 @@ msgid ""
 "this feature is explicitly disabled using this command line option."
 msgstr ""
 "힙 추적 데이터 파일에 임베드된 억제 정의를 무시합니다. 기본적으로 힙 추적에서"
-"는 디버그되는 프로그램의 `const char *__lsan_default_suppressions()` 기호를 "
-"통해 추가로 정의된 억제 정의를 복사합니다. 이 명령행 옵션으로 명시적으로 비활"
-"성화하지 않는 한 데이터를 분석할 때 항상 적용됩니다."
+"는 디버그되는 앱의 `const char *__lsan_default_suppressions()` 기호를 통해 추"
+"가로 정의된 억제 정의를 복사합니다. 이 명령행 옵션으로 명시적으로 비활성화하"
+"지 않는 한 데이터를 분석할 때 항상 적용됩니다."
 
 #: gui/gui.cpp:103
 #, kde-format
@@ -885,10 +885,10 @@ msgid ""
 msgstr ""
 "<qt><p>이 필드는 주 힙 추적 데이터 파일을 지정합니다. 이 파일은 "
 "<tt>heaptrack.$APP.$PID.gz</tt> 또는 <tt>heaptrack.$APP.$PID.zst</tt> 형식을 "
-"갖고 있습니다. 다음 명령을 통해서 프로그램 프로필 데이터를 생성할 수 있습니"
-"다:</p>\n"
+"갖고 있습니다. 다음 명령을 통해서 앱 프로필 데이터를 생성할 수 있습니다:</"
+"p>\n"
 "<pre><code>heaptrack &lt;yourapplication&gt; ...</code></pre>\n"
-"<p>실행 중인 프로그램에 연결할 수도 있습니다:</p>\n"
+"<p>실행 중인 앱에 연결할 수도 있습니다:</p>\n"
 "<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
 
 #. i18n: ectx: property (filter), widget (KUrlRequester, openFile)
