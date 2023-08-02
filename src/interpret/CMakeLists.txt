@@ -2,7 +2,7 @@ if (ECM_FOUND)
     include(ECMEnableSanitizers)
 endif()
 
-find_package(Elfutils REQUIRED)
+find_package(Elfutils 0.158 REQUIRED)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/3rdparty/
