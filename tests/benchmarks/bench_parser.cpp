@@ -36,8 +36,7 @@ int main(int argc, char** argv)
     qRegisterMetaType<TreeData>();
 
     Parser parser;
-    QObject::connect(&parser, &Parser::finished,
-                     &app, &QCoreApplication::quit);
+    QObject::connect(&parser, &Parser::finished, &app, &QCoreApplication::quit);
     QObject::connect(&parser, &Parser::failedToOpen, &app, [&](const QString& path) {
         qWarning() << "failed to open" << path;
         app.exit(1);

@@ -23,11 +23,11 @@
 #include <syscall.h>
 #endif
 #ifdef __FreeBSD__
-#include <pthread_np.h>
-#include <sys/types.h>
-#include <sys/sysctl.h>
-#include <sys/user.h>
 #include <libutil.h>
+#include <pthread_np.h>
+#include <sys/sysctl.h>
+#include <sys/types.h>
+#include <sys/user.h>
 #endif
 #include <sys/file.h>
 
@@ -170,13 +170,13 @@ void printBacktrace()
  * Set to true in an atexit handler. In such conditions, the stop callback
  * will not be called.
  */
-atomic<bool> s_atexit{false};
+atomic<bool> s_atexit {false};
 
 /**
  * Set to true in heaptrack_stop, when s_atexit was not yet set. In such conditions,
  * we always fully unload and cleanup behind ourselves
  */
-atomic<bool> s_forceCleanup{false};
+atomic<bool> s_forceCleanup {false};
 
 // based on: https://stackoverflow.com/a/24315631/35250
 void replaceAll(string& str, const string& search, const string& replace)
@@ -445,7 +445,7 @@ public:
 #ifdef __linux__
         ssize_t size = readlink("/proc/self/exe", buf, BUF_SIZE);
 #elif defined(__FreeBSD__)
-        int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1 };
+        int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
         size_t size = BUF_SIZE;
         sysctl(mib, 4, buf, &size, NULL, 0);
 #endif
@@ -467,7 +467,7 @@ public:
         int bytesRead = read(fd, buf, BUF_SIZE);
         close(fd);
 #elif defined(__FreeBSD__)
-        int mib[4] = { CTL_KERN, KERN_PROC, KERN_PROC_ARGS, getpid() };
+        int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_ARGS, getpid()};
         size_t bytesRead = BUF_SIZE;
         sysctl(mib, 4, buf, &bytesRead, NULL, 0);
 #endif
@@ -631,7 +631,9 @@ private:
         shutdown();
     }
 
-    struct LockCheckFailed{};
+    struct LockCheckFailed
+    {
+    };
 
     /**
      * To prevent deadlocks on shutdown, we try to lock from the timer thread
@@ -754,7 +756,7 @@ private:
 
         TraceTree traceTree;
 
-        atomic<bool> stopTimerThread{false};
+        atomic<bool> stopTimerThread {false};
         std::thread timerThread;
 
         heaptrack_callback_t stopCallback = nullptr;
@@ -772,8 +774,8 @@ private:
 };
 
 std::mutex HeapTrack::s_lock;
-HeapTrack::LockedData* HeapTrack::s_data{nullptr};
-std::atomic<bool> HeapTrack::s_paused{false};
+HeapTrack::LockedData* HeapTrack::s_data {nullptr};
+std::atomic<bool> HeapTrack::s_paused {false};
 }
 
 static void heaptrack_realloc_impl(void* ptr_in, size_t size, void* ptr_out)

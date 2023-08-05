@@ -58,7 +58,7 @@ struct Trace
 
 private:
     static int unwind(void** data);
-    
+
 private:
     int m_size = 0;
     int m_skip = 0;

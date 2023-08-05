@@ -10,11 +10,11 @@
 
 #include <cmath>
 
-#include <kio_version.h>
 #include <KConfigGroup>
 #include <KLocalizedString>
 #include <KShell>
 #include <KStandardAction>
+#include <kio_version.h>
 
 #include <QAction>
 #include <QActionGroup>
@@ -22,11 +22,11 @@
 #include <QDebug>
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QMenu>
+#include <QProcess>
 #include <QShortcut>
 #include <QStatusBar>
-#include <QProcess>
-#include <QInputDialog>
 
 #include "analyze/suppressions.h"
 
@@ -779,7 +779,6 @@ void MainWindow::setupStacks()
     m_ui->stacksDock->setVisible(false);
 }
 
-
 void MainWindow::setupCodeNavigationMenu()
 {
     // Code Navigation
@@ -845,7 +844,7 @@ void MainWindow::setCodeNavigationIDE(QAction* action)
         const auto customCmd =
             QInputDialog::getText(this, i18n("Custom Code Navigation"),
                                   i18n("Specify command to use for code navigation, '%f' will be replaced by the file "
-                                     "name, '%l' by the line number and '%c' by the column number."),
+                                       "name, '%l' by the line number and '%c' by the column number."),
                                   QLineEdit::Normal, settings.readEntry(Config::Entries::CustomCommand));
         if (!customCmd.isEmpty()) {
             settings.writeEntry(Config::Entries::CustomCommand, customCmd);

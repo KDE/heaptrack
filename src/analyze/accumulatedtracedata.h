@@ -27,9 +27,7 @@ struct Frame
 
     bool operator==(const Frame& rhs) const
     {
-        return functionIndex == rhs.functionIndex &&
-                fileIndex == rhs.fileIndex &&
-                line == rhs.line;
+        return functionIndex == rhs.functionIndex && fileIndex == rhs.fileIndex && line == rhs.line;
     }
 
     bool operator<(const Frame& rhs) const

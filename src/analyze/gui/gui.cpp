@@ -7,9 +7,9 @@
 #include <QApplication>
 #include <QCommandLineParser>
 
-#include <kcoreaddons_version.h>
 #include <KAboutData>
 #include <KLocalizedString>
+#include <kcoreaddons_version.h>
 
 #include "analyze/suppressions.h"
 #include "util/config.h"
@@ -82,9 +82,9 @@ int main(int argc, char** argv)
     QCommandLineParser parser;
     aboutData.setupCommandLine(&parser);
 
-    QCommandLineOption diffOption{{QStringLiteral("d"), QStringLiteral("diff")},
-                                  i18n("Base profile data to compare other files to."),
-                                  QStringLiteral("<file>")};
+    QCommandLineOption diffOption {{QStringLiteral("d"), QStringLiteral("diff")},
+                                   i18n("Base profile data to compare other files to."),
+                                   QStringLiteral("<file>")};
     parser.addOption(diffOption);
     QCommandLineOption suppressionsOption {
         {QStringLiteral("s"), QStringLiteral("suppressions")},

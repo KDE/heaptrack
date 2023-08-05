@@ -8,13 +8,13 @@
 #include "track/libheaptrack.h"
 #include "util/linewriter.h"
 
-#include <cstdio>
 #include <cmath>
+#include <cstdio>
 
-#include <thread>
 #include <future>
-#include <vector>
 #include <iostream>
+#include <thread>
+#include <vector>
 
 #include "tempfile.h"
 
@@ -28,25 +28,26 @@ TEST_CASE ("api") {
     TempFile tmp; // opened/closed by heaptrack_init
 
     SECTION ("init") {
-        heaptrack_init(tmp.fileName.c_str(),
-                       []() {
-                           REQUIRE(!initBeforeCalled);
-                           REQUIRE(!initAfterCalled);
-                           REQUIRE(!stopCalled);
-                           initBeforeCalled = true;
-                       },
-                       [](LineWriter& out) {
-                           REQUIRE(initBeforeCalled);
-                           REQUIRE(!initAfterCalled);
-                           REQUIRE(!stopCalled);
-                           initAfterCalled = true;
-                       },
-                       []() {
-                           REQUIRE(initBeforeCalled);
-                           REQUIRE(initAfterCalled);
-                           REQUIRE(!stopCalled);
-                           stopCalled = true;
-                       });
+        heaptrack_init(
+            tmp.fileName.c_str(),
+            []() {
+                REQUIRE(!initBeforeCalled);
+                REQUIRE(!initAfterCalled);
+                REQUIRE(!stopCalled);
+                initBeforeCalled = true;
+            },
+            [](LineWriter& out) {
+                REQUIRE(initBeforeCalled);
+                REQUIRE(!initAfterCalled);
+                REQUIRE(!stopCalled);
+                initAfterCalled = true;
+            },
+            []() {
+                REQUIRE(initBeforeCalled);
+                REQUIRE(initAfterCalled);
+                REQUIRE(!stopCalled);
+                stopCalled = true;
+            });
 
         REQUIRE(initBeforeCalled);
         REQUIRE(initAfterCalled);
@@ -87,7 +88,7 @@ TEST_CASE ("api") {
             {
                 vector<future<void>> futures;
                 for (unsigned i = 0; i < numThreads; ++i) {
-                    futures.emplace_back(async(launch::async, [](){
+                    futures.emplace_back(async(launch::async, []() {
                         for (int i = 0; i < 10000; ++i) {
                             heaptrack_malloc(&i, i);
                             heaptrack_realloc(&i, i + 1, &i);

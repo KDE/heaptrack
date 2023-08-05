@@ -55,7 +55,7 @@ KChart::TextAttributes fixupTextAttributes(KChart::TextAttributes attributes, co
     return attributes;
 }
 
-QPointF localPos(QMouseEvent *event)
+QPointF localPos(QMouseEvent* event)
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     return event->localPos();
@@ -64,7 +64,7 @@ QPointF localPos(QMouseEvent *event)
 #endif
 }
 
-QPoint globalPos(QMouseEvent *event)
+QPoint globalPos(QMouseEvent* event)
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     return event->globalPos();

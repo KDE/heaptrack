@@ -714,61 +714,58 @@ int main(int argc, char** argv)
     if (printAllocs) {
         // sort by amount of allocations
         cout << "MOST CALLS TO ALLOCATION FUNCTIONS\n";
-        data.printAllocations(&AllocationData::allocations,
-                              [](const AllocationData& data) {
-                                  cout << data.allocations << " calls to allocation functions with "
-                                       << formatBytes(data.peak) << " peak consumption from\n";
-                              },
-                              [](const AllocationData& data) {
-                                  cout << data.allocations << " calls with " << formatBytes(data.peak)
-                                       << " peak consumption from:\n";
-                              });
+        data.printAllocations(
+            &AllocationData::allocations,
+            [](const AllocationData& data) {
+                cout << data.allocations << " calls to allocation functions with " << formatBytes(data.peak)
+                     << " peak consumption from\n";
+            },
+            [](const AllocationData& data) {
+                cout << data.allocations << " calls with " << formatBytes(data.peak) << " peak consumption from:\n";
+            });
         cout << endl;
     }
 
     if (printPeaks) {
         cout << "PEAK MEMORY CONSUMERS\n";
-        data.printAllocations(&AllocationData::peak,
-                              [](const AllocationData& data) {
-                                  cout << formatBytes(data.peak) << " peak memory consumed over " << data.allocations
-                                       << " calls from\n";
-                              },
-                              [](const AllocationData& data) {
-                                  cout << formatBytes(data.peak) << " consumed over " << data.allocations
-                                       << " calls from:\n";
-                              });
+        data.printAllocations(
+            &AllocationData::peak,
+            [](const AllocationData& data) {
+                cout << formatBytes(data.peak) << " peak memory consumed over " << data.allocations << " calls from\n";
+            },
+            [](const AllocationData& data) {
+                cout << formatBytes(data.peak) << " consumed over " << data.allocations << " calls from:\n";
+            });
         cout << endl;
     }
 
     if (printLeaks) {
         // sort by amount of leaks
         cout << "MEMORY LEAKS\n";
-        data.printAllocations(&AllocationData::leaked,
-                              [](const AllocationData& data) {
-                                  cout << formatBytes(data.leaked) << " leaked over " << data.allocations
-                                       << " calls from\n";
-                              },
-                              [](const AllocationData& data) {
-                                  cout << formatBytes(data.leaked) << " leaked over " << data.allocations
-                                       << " calls from:\n";
-                              });
+        data.printAllocations(
+            &AllocationData::leaked,
+            [](const AllocationData& data) {
+                cout << formatBytes(data.leaked) << " leaked over " << data.allocations << " calls from\n";
+            },
+            [](const AllocationData& data) {
+                cout << formatBytes(data.leaked) << " leaked over " << data.allocations << " calls from:\n";
+            });
         cout << endl;
     }
 
     if (printTemporary) {
         // sort by amount of temporary allocations
         cout << "MOST TEMPORARY ALLOCATIONS\n";
-        data.printAllocations(&AllocationData::temporary,
-                              [](const AllocationData& data) {
-                                  cout << data.temporary << " temporary allocations of " << data.allocations
-                                       << " allocations in total (" << fixed << setprecision(2)
-                                       << (float(data.temporary) * 100.f / data.allocations) << "%) from\n";
-                              },
-                              [](const AllocationData& data) {
-                                  cout << data.temporary << " temporary allocations of " << data.allocations
-                                       << " allocations in total (" << fixed << setprecision(2)
-                                       << (float(data.temporary) * 100.f / data.allocations) << "%) from:\n";
-                              });
+        data.printAllocations(
+            &AllocationData::temporary,
+            [](const AllocationData& data) {
+                cout << data.temporary << " temporary allocations of " << data.allocations << " allocations in total ("
+                     << fixed << setprecision(2) << (float(data.temporary) * 100.f / data.allocations) << "%) from\n";
+            },
+            [](const AllocationData& data) {
+                cout << data.temporary << " temporary allocations of " << data.allocations << " allocations in total ("
+                     << fixed << setprecision(2) << (float(data.temporary) * 100.f / data.allocations) << "%) from:\n";
+            });
         cout << endl;
     }
 

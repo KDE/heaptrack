@@ -38,8 +38,7 @@ extern "C" {
 void* mi_malloc(size_t size) LIBC_FUN_ATTRS;
 void* mi_calloc(size_t count, size_t size) LIBC_FUN_ATTRS;
 void* mi_realloc(void* p, size_t newsize) LIBC_FUN_ATTRS;
-void  mi_free(void* p) LIBC_FUN_ATTRS;
-
+void mi_free(void* p) LIBC_FUN_ATTRS;
 }
 
 namespace {
@@ -166,36 +165,37 @@ void init()
     // heaptrack_init itself calls calloc via std::mutex/_libpthread_init on FreeBSD
     hooks::calloc.original = &dummy_calloc;
     hooks::calloc.init();
-    heaptrack_init(getenv("DUMP_HEAPTRACK_OUTPUT"),
-                   [] {
-                       hooks::dlopen.init();
-                       hooks::dlclose.init();
-                       hooks::malloc.init();
-                       hooks::free.init();
-                       hooks::calloc.init();
+    heaptrack_init(
+        getenv("DUMP_HEAPTRACK_OUTPUT"),
+        [] {
+            hooks::dlopen.init();
+            hooks::dlclose.init();
+            hooks::malloc.init();
+            hooks::free.init();
+            hooks::calloc.init();
 #if HAVE_CFREE
-                       hooks::cfree.init();
+            hooks::cfree.init();
 #endif
-                       hooks::realloc.init();
-                       hooks::posix_memalign.init();
+            hooks::realloc.init();
+            hooks::posix_memalign.init();
 #if HAVE_VALLOC
-                       hooks::valloc.init();
+            hooks::valloc.init();
 #endif
 #if HAVE_ALIGNED_ALLOC
-                       hooks::aligned_alloc.init();
+            hooks::aligned_alloc.init();
 #endif
 
-                       // mimalloc functions
-                       hooks::mi_malloc.init();
-                       hooks::mi_calloc.init();
-                       hooks::mi_realloc.init();
-                       hooks::mi_free.init();
+            // mimalloc functions
+            hooks::mi_malloc.init();
+            hooks::mi_calloc.init();
+            hooks::mi_realloc.init();
+            hooks::mi_free.init();
 
-                       // cleanup environment to prevent tracing of child apps
-                       unsetenv("LD_PRELOAD");
-                       unsetenv("DUMP_HEAPTRACK_OUTPUT");
-                   },
-                   nullptr, nullptr);
+            // cleanup environment to prevent tracing of child apps
+            unsetenv("LD_PRELOAD");
+            unsetenv("DUMP_HEAPTRACK_OUTPUT");
+        },
+        nullptr, nullptr);
 }
 }
 }

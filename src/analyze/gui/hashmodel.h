@@ -13,7 +13,7 @@
 #include <QHash>
 #include <QVector>
 
-template<typename Rows, typename ModelImpl>
+template <typename Rows, typename ModelImpl>
 class HashModel : public QAbstractTableModel
 {
 public:

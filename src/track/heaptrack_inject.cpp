@@ -71,8 +71,7 @@ extern "C" {
 __attribute__((weak)) void* mi_malloc(size_t size) LIBC_FUN_ATTRS;
 __attribute__((weak)) void* mi_calloc(size_t count, size_t size) LIBC_FUN_ATTRS;
 __attribute__((weak)) void* mi_realloc(void* p, size_t newsize) LIBC_FUN_ATTRS;
-__attribute__((weak)) void  mi_free(void* p) LIBC_FUN_ATTRS;
-
+__attribute__((weak)) void mi_free(void* p) LIBC_FUN_ATTRS;
 }
 
 namespace {
@@ -308,8 +307,8 @@ void apply(const char* symname, Elf::Addr addr, bool restore)
         || hook<posix_memalign>(symname, addr, restore) || hook<dlopen>(symname, addr, restore)
         || hook<dlclose>(symname, addr, restore)
         // mimalloc functions
-        || hook<mi_malloc>(symname, addr, restore) || hook<mi_free>(symname, addr, restore) || hook<mi_realloc>(symname, addr, restore)
-        || hook<mi_calloc>(symname, addr, restore);
+        || hook<mi_malloc>(symname, addr, restore) || hook<mi_free>(symname, addr, restore)
+        || hook<mi_realloc>(symname, addr, restore) || hook<mi_calloc>(symname, addr, restore);
 }
 }
 

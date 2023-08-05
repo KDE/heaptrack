@@ -301,7 +301,7 @@ void CuDieRangeMapping::addSubprograms()
         cudie());
 }
 
-const std::string &CuDieRangeMapping::dieName(Dwarf_Die* die)
+const std::string& CuDieRangeMapping::dieName(Dwarf_Die* die)
 {
     const auto offset = dwarf_dieoffset(die);
     auto it = m_dieNameCache.find(offset);

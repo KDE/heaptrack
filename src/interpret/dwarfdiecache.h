@@ -98,7 +98,7 @@ public:
     SubProgramDie* findSubprogramDie(Dwarf_Addr offset);
 
     /// @return a fully qualified, demangled symbol name for @p die
-    const std::string &dieName(Dwarf_Die* die);
+    const std::string& dieName(Dwarf_Die* die);
 
 private:
     void addSubprograms();

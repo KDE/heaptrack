@@ -331,7 +331,7 @@ struct AccumulatedTraceData
         }
 
         auto resolveFrame = [this](const Frame& frame) {
-            return ResolvedFrame{intern(frame.function), intern(frame.file), frame.line};
+            return ResolvedFrame {intern(frame.function), intern(frame.file), frame.line};
         };
 
         ResolvedIP data;
