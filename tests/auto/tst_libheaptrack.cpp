@@ -4,7 +4,9 @@
     SPDX-License-Identifier: LGPL-2.1-or-later
 */
 
-#include "3rdparty/catch.hpp"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "3rdparty/doctest.h"
+
 #include "track/libheaptrack.h"
 #include "util/linewriter.h"
 
@@ -27,7 +29,8 @@ using namespace std;
 TEST_CASE ("api") {
     TempFile tmp; // opened/closed by heaptrack_init
 
-    SECTION ("init") {
+    SUBCASE("init")
+    {
         heaptrack_init(
             tmp.fileName.c_str(),
             []() {
@@ -55,33 +58,40 @@ TEST_CASE ("api") {
 
         int data[2] = {0};
 
-        SECTION ("no-op-malloc") {
+        SUBCASE("no-op-malloc")
+        {
             heaptrack_malloc(0, 0);
         }
-        SECTION ("no-op-malloc-free") {
+        SUBCASE("no-op-malloc-free")
+        {
             heaptrack_free(0);
         }
-        SECTION ("no-op-malloc-realloc") {
+        SUBCASE("no-op-malloc-realloc")
+        {
             heaptrack_realloc(data, 1, 0);
         }
 
-        SECTION ("malloc-free") {
+        SUBCASE("malloc-free")
+        {
             heaptrack_malloc(data, 4);
             heaptrack_free(data);
         }
 
-        SECTION ("realloc") {
+        SUBCASE("realloc")
+        {
             heaptrack_malloc(data, 4);
             heaptrack_realloc(data, 8, data);
             heaptrack_realloc(data, 16, data + 1);
             heaptrack_free(data + 1);
         }
 
-        SECTION ("invalidate-cache") {
+        SUBCASE("invalidate-cache")
+        {
             heaptrack_invalidate_module_cache();
         }
 
-        SECTION ("multi-threaded") {
+        SUBCASE("multi-threaded")
+        {
             const auto numThreads = min(4u, thread::hardware_concurrency());
 
             cout << "start threads" << endl;
@@ -103,7 +113,8 @@ TEST_CASE ("api") {
             cout << "threads finished" << endl;
         }
 
-        SECTION ("stop") {
+        SUBCASE("stop")
+        {
             heaptrack_stop();
             REQUIRE(stopCalled);
         }

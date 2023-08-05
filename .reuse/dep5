@@ -11,7 +11,7 @@ Files: 3rdparty/boost-zstd/*
 Copyright: Boost developers <http://www.boost.org/libs/iostreams>
 License: BSL-1.0
 
-Files: 3rdparty/catch.hpp
-Copyright: Boost developers <http://www.boost.org/libs/iostreams>
-License: BSL-1.0
+Files: 3rdparty/doctest.h
+Copyright: Copyright (c) 2016-2023 Viktor Kirilov
+License: MIT
 

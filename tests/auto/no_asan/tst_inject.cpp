@@ -4,7 +4,8 @@
     SPDX-License-Identifier: LGPL-2.1-or-later
 */
 
-#include "3rdparty/catch.hpp"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "3rdparty/doctest.h"
 
 #include "tempfile.h"
 #include "tst_config.h"
@@ -75,7 +76,7 @@ void runInjectTest(Load load, Unload unload)
 }
 }
 
-TEST_CASE ("inject via dlopen", "[inject]") {
+TEST_CASE ("inject via dlopen") {
     runInjectTest(
         []() -> void* {
             dlerror(); // clear error
@@ -89,7 +90,7 @@ TEST_CASE ("inject via dlopen", "[inject]") {
 }
 
 #ifdef __USE_GNU
-TEST_CASE ("inject via dlmopen", "[inject]") {
+TEST_CASE ("inject via dlmopen") {
     runInjectTest(
         []() -> void* {
             dlerror(); // clear error
@@ -108,7 +109,7 @@ __attribute__((weak)) void* __libc_dlopen_mode(const char* filename, int flag);
 __attribute__((weak)) int __libc_dlclose(void* handle);
 }
 
-TEST_CASE ("inject via libc", "[inject]") {
+TEST_CASE ("inject via libc") {
     if (!__libc_dlopen_mode) {
         INFO("__libc_dlopen_mode symbol not available");
         return;

@@ -4,7 +4,8 @@
     SPDX-License-Identifier: LGPL-2.1-or-later
 */
 
-#include "3rdparty/catch.hpp"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "3rdparty/doctest.h"
 
 #include "util/linereader.h"
 #include "util/linewriter.h"
@@ -20,7 +21,7 @@ constexpr uint64_t operator"" _u64(unsigned long long v)
     return static_cast<uint64_t>(v);
 }
 
-TEST_CASE ("write data", "[write]") {
+TEST_CASE ("write data") {
     TempFile file;
     REQUIRE(file.open());
 
@@ -45,7 +46,7 @@ TEST_CASE ("write data", "[write]") {
     REQUIRE(file.readContents() == expectedContents);
 }
 
-TEST_CASE ("buffered write", "[write]") {
+TEST_CASE ("buffered write") {
     TempFile file;
     REQUIRE(file.open());
 
@@ -75,7 +76,7 @@ TEST_CASE ("buffered write", "[write]") {
     REQUIRE(file.readContents() == expectedContents.str());
 }
 
-TEST_CASE ("buffered writeHex", "[write]") {
+TEST_CASE ("buffered writeHex") {
     TempFile file;
     REQUIRE(file.open());
 
@@ -92,7 +93,7 @@ TEST_CASE ("buffered writeHex", "[write]") {
     REQUIRE(file.readContents() == expectedContents);
 }
 
-TEST_CASE ("write flush", "[write]") {
+TEST_CASE ("write flush") {
     TempFile file;
     REQUIRE(file.open());
 
@@ -115,7 +116,7 @@ TEST_CASE ("write flush", "[write]") {
     REQUIRE(file.readContents() == data1 + data2);
 }
 
-TEST_CASE ("read line 64bit", "[read]") {
+TEST_CASE ("read line 64bit") {
     const string contents =
         "m /tmp/KDevelop-5.2.1-x86_64/usr/lib/libKF5Completion.so.5 7f48beedc00 0 36854 236858 2700\n";
     stringstream stream(contents);
@@ -127,12 +128,12 @@ TEST_CASE ("read line 64bit", "[read]") {
     REQUIRE(reader.mode() == 'm');
 
     string module;
-    REQUIRE(reader >> module);
+    REQUIRE((reader >> module));
     REQUIRE(module == "/tmp/KDevelop-5.2.1-x86_64/usr/lib/libKF5Completion.so.5");
 
     for (auto expected : {0x7f48beedc00_u64, 0x0_u64, 0x36854_u64, 0x236858_u64, 0x2700_u64}) {
         uint64_t addr = 0;
-        REQUIRE(reader >> addr);
+        REQUIRE((reader >> addr));
         REQUIRE(addr == expected);
     }
 
@@ -141,7 +142,7 @@ TEST_CASE ("read line 64bit", "[read]") {
     REQUIRE(!(reader >> module));
 }
 
-TEST_CASE ("read line 32bit", "[read]") {
+TEST_CASE ("read line 32bit") {
     const string contents = "t 4 3\n"
                             "a 11c00 4\n"
                             "+ 0\n";
@@ -152,18 +153,18 @@ TEST_CASE ("read line 32bit", "[read]") {
     REQUIRE(reader.getLine(stream));
     REQUIRE(reader.line() == "t 4 3");
     REQUIRE(reader.mode() == 't');
-    REQUIRE(reader >> idx);
+    REQUIRE((reader >> idx));
     REQUIRE(idx == 0x4);
-    REQUIRE(reader >> idx);
+    REQUIRE((reader >> idx));
     REQUIRE(idx == 0x3);
     REQUIRE(!(reader >> idx));
 
     REQUIRE(reader.getLine(stream));
     REQUIRE(reader.line() == "a 11c00 4");
     REQUIRE(reader.mode() == 'a');
-    REQUIRE(reader >> idx);
+    REQUIRE((reader >> idx));
     REQUIRE(idx == 0x11c00);
-    REQUIRE(reader >> idx);
+    REQUIRE((reader >> idx));
     REQUIRE(idx == 0x4);
     REQUIRE(!(reader >> idx));
 
@@ -171,7 +172,7 @@ TEST_CASE ("read line 32bit", "[read]") {
     REQUIRE(reader.line() == "+ 0");
     REQUIRE(reader.mode() == '+');
 
-    REQUIRE(reader >> idx);
+    REQUIRE((reader >> idx));
     REQUIRE(idx == 0x0);
     REQUIRE(!(reader >> idx));
 }

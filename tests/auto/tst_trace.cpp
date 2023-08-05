@@ -4,7 +4,9 @@
     SPDX-License-Identifier: LGPL-2.1-or-later
 */
 
-#include "3rdparty/catch.hpp"
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "3rdparty/doctest.h"
+
 #include "track/trace.h"
 
 #include <algorithm>
@@ -23,27 +25,31 @@ bool __attribute__((noinline)) fill(Trace& trace, int depth, int skip)
 
 void validateTrace(const Trace& trace, int expectedSize)
 {
-    SECTION ("validate the trace size") {
+    SUBCASE("validate the trace size")
+    {
         REQUIRE(trace.size() == expectedSize);
         REQUIRE(distance(trace.begin(), trace.end()) == trace.size());
     }
-    SECTION ("validate trace contents") {
+    SUBCASE("validate trace contents")
+    {
         REQUIRE(find(trace.begin(), trace.end(), Trace::ip_t(0)) == trace.end());
     }
 }
 }
 
-TEST_CASE ("getting backtrace traces", "[trace]") {
+TEST_CASE ("getting backtrace traces") {
     Trace trace;
     validateTrace(trace, 0);
 
-    SECTION ("fill without skipping") {
+    SUBCASE("fill without skipping")
+    {
         REQUIRE(trace.fill(0));
         const auto offset = trace.size();
         REQUIRE(offset > 1);
         validateTrace(trace, offset);
 
-        SECTION ("fill with skipping") {
+        SUBCASE("fill with skipping")
+        {
             for (auto skip : {0, 1, 2}) {
                 for (int i = 0; i < 2 * Trace::MAX_SIZE; ++i) {
                     REQUIRE(fill(trace, i, skip));

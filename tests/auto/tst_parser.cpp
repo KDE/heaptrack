@@ -4,7 +4,8 @@
     SPDX-License-Identifier: LGPL-2.1-or-later
 */
 
-#include "3rdparty/catch.hpp"
+#define DOCTEST_CONFIG_IMPLEMENT
+#include "3rdparty/doctest.h"
 
 #include "analyze/suppressions.h"
 #include "locationdata.h"
@@ -135,7 +136,7 @@ private:
     QSignalSpy spyFinished;
 };
 
-TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
+TEST_CASE ("heaptrack.david.18594.gz") {
     TestParser parser;
 
     FilterParameters params;
@@ -202,7 +203,7 @@ TEST_CASE ("heaptrack.david.18594.gz", "[parser]") {
     REQUIRE(summary.fromAttached == false);
 }
 
-TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst", "[parser]") {
+TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst") {
     TestParser parser;
 
     parser.parser.parse(SRC_DIR "/heaptrack.embedded_lsan_suppressions.84207.zst", QString(), {});
@@ -217,7 +218,7 @@ TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst", "[parser]") {
     REQUIRE(summary.totalSystemMemory == 33643876352);
 }
 
-TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst without suppressions", "[parser]") {
+TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst without suppressions") {
     TestParser parser;
 
     FilterParameters params;
@@ -231,7 +232,7 @@ TEST_CASE ("heaptrack.embedded_lsan_suppressions.84207.zst without suppressions"
     REQUIRE(summary.totalLeakedSuppressed == 0);
 }
 
-TEST_CASE ("heaptrack.heaptrack_gui.99454.zst", "[parser]") {
+TEST_CASE ("heaptrack.heaptrack_gui.99454.zst") {
     TestParser parser;
 
     FilterParameters params;
@@ -262,7 +263,7 @@ TEST_CASE ("heaptrack.heaptrack_gui.99454.zst", "[parser]") {
     CHECK(cost.selfCost.peak == 56152);
 }
 
-TEST_CASE ("heaptrack.heaptrack_gui.99529.zst", "[parser]") {
+TEST_CASE ("heaptrack.heaptrack_gui.99529.zst") {
     TestParser parser;
 
     FilterParameters params;
@@ -293,7 +294,7 @@ TEST_CASE ("heaptrack.heaptrack_gui.99529.zst", "[parser]") {
     CHECK(cost.selfCost.peak == 68952);
 }
 
-TEST_CASE ("heaptrack.heaptrack_gui.{99454,99529}.zst diff", "[parser]") {
+TEST_CASE ("heaptrack.heaptrack_gui.{99454,99529}.zst diff") {
     TestParser parser;
 
     parser.parser.parse(SRC_DIR "/heaptrack.heaptrack_gui.99529.zst", SRC_DIR "/heaptrack.heaptrack_gui.99454.zst", {});
@@ -327,6 +328,8 @@ int main(int argc, char** argv)
 
     qRegisterMetaType<CallerCalleeResults>();
 
-    const int res = Catch::Session().run(argc, argv);
-    return (res < 0xff ? res : 0xff);
+    doctest::Context context;
+    context.applyCommandLine(argc, argv);
+
+    return context.run();
 }
