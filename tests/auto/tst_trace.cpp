@@ -8,8 +8,11 @@
 #include "3rdparty/doctest.h"
 
 #include "track/trace.h"
+#include "track/tracetree.h"
 
 #include <algorithm>
+#include <future>
+#include <thread>
 
 using namespace std;
 
@@ -57,6 +60,90 @@ TEST_CASE ("getting backtrace traces") {
                     validateTrace(trace, expectedSize);
                 }
             }
+        }
+    }
+}
+
+TEST_CASE ("tracetree indexing") {
+    TraceTree tree;
+
+    std::mutex mutex;
+    const auto numTasks = std::thread::hardware_concurrency();
+    std::vector<std::future<void>> tasks(numTasks);
+
+    struct IpToParent
+    {
+        uintptr_t ip;
+        uint32_t parentIndex;
+    };
+    std::vector<IpToParent> ipsToParent;
+
+    struct IndexedTrace
+    {
+        Trace trace;
+        uint32_t index;
+    };
+    std::vector<IndexedTrace> traces;
+
+    // fill the tree
+    for (auto i = 0u; i < numTasks; ++i) {
+        tasks[i] = std::async(std::launch::async, [&mutex, &tree, &ipsToParent, &traces, i]() {
+            Trace trace;
+
+            const auto leaf = uintptr_t((i + 1) * 100);
+
+            for (int k = 0; k < 100; ++k) {
+                uint32_t lastIndex = 0;
+                for (uintptr_t j = 0; j < 32; ++j) {
+                    trace.fillTestData(j, leaf);
+                    REQUIRE(trace.size() == j + 1);
+
+                    const std::lock_guard<std::mutex> guard(mutex);
+                    uint32_t lastParent = 0;
+                    auto index =
+                        tree.index(trace, [k, j, leaf, &lastParent, &ipsToParent](uintptr_t ip, uint32_t parentIndex) {
+                            // for larger k, the trace is known and thus we won't hit this branch
+                            REQUIRE(k == 0);
+
+                            REQUIRE(ip > 0);
+                            REQUIRE((ip <= (j + 1) || ip == leaf));
+                            REQUIRE(((!lastParent && !parentIndex) || parentIndex > lastParent));
+                            REQUIRE(parentIndex <= ipsToParent.size());
+                            lastParent = parentIndex;
+
+                            ipsToParent.push_back({ip, parentIndex});
+                            return true;
+                        });
+                    REQUIRE(index > lastIndex);
+                    REQUIRE(index <= ipsToParent.size());
+
+                    if (k == 0) {
+                        traces.push_back({trace, index});
+                    }
+                }
+            }
+        });
+    }
+
+    // wait for threads to finish
+    for (auto& task : tasks) {
+        task.get();
+    }
+
+    // verify that we can rebuild the traces
+    for (const auto& trace : traces) {
+        uint32_t index = trace.index;
+        int i = 0;
+        while (index) {
+            REQUIRE(i < trace.trace.size());
+            REQUIRE(index > 0);
+            REQUIRE(index <= ipsToParent.size());
+
+            auto map = ipsToParent[index - 1];
+            REQUIRE(map.ip == reinterpret_cast<uintptr_t>(trace.trace[i]));
+
+            index = map.parentIndex;
+            ++i;
         }
     }
 }

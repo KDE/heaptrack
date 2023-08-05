@@ -7,6 +7,9 @@
 #ifndef TRACE_H
 #define TRACE_H
 
+#include <cassert>
+#include <cstdint>
+
 /**
  * @brief Backtrace interface.
  */
@@ -50,6 +53,18 @@ struct Trace
         m_size = size > skip ? size - skip : 0;
         m_skip = skip;
         return m_size > 0;
+    }
+
+    void fillTestData(uintptr_t n, uintptr_t leaf)
+    {
+        assert(n < MAX_SIZE);
+        m_data[0] = reinterpret_cast<ip_t>(leaf);
+        for (uintptr_t i = 1; i <= n; ++i) {
+            m_data[i] = reinterpret_cast<ip_t>(i);
+        }
+
+        m_size = n + 1;
+        m_skip = 0;
     }
 
     static void setup();
