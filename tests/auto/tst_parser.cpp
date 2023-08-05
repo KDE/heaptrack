@@ -13,6 +13,8 @@
 #include "treemodel.h"
 #include "tst_config.h" // for SRC_DIR
 
+#include <KLocalizedString>
+
 #include <QDebug>
 #include <QSignalSpy>
 
@@ -327,6 +329,7 @@ int main(int argc, char** argv)
     QCoreApplication app(argc, argv);
 
     qRegisterMetaType<CallerCalleeResults>();
+    KLocalizedString::setApplicationDomain("heaptrack");
 
     doctest::Context context;
     context.applyCommandLine(argc, argv);
