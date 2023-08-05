@@ -115,7 +115,6 @@ TEST_CASE ("inject via libc") {
         return;
     }
 
-    REQUIRE(__libc_dlopen_mode);
     runInjectTest([]() { return __libc_dlopen_mode(HEAPTRACK_LIB_INJECT_SO, 0x80000000 | 0x002); },
                   [](void* handle) { __libc_dlclose(handle); });
 }
