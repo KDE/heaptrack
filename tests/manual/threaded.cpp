@@ -39,10 +39,10 @@ int main()
         auto f2 = async(launch::async, alloc);
         auto f3 = async(launch::async, alloc);
         auto f4 = async(launch::async, alloc);
-        futures.emplace_back(async(launch::async, dealloc, move(f1)));
-        futures.emplace_back(async(launch::async, dealloc, move(f2)));
-        futures.emplace_back(async(launch::async, dealloc, move(f3)));
-        futures.emplace_back(async(launch::async, dealloc, move(f4)));
+        futures.emplace_back(async(launch::async, dealloc, std::move(f1)));
+        futures.emplace_back(async(launch::async, dealloc, std::move(f2)));
+        futures.emplace_back(async(launch::async, dealloc, std::move(f3)));
+        futures.emplace_back(async(launch::async, dealloc, std::move(f4)));
     }
     return 0;
 }

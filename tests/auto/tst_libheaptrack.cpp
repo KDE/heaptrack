@@ -36,7 +36,7 @@ TEST_CASE ("api") {
                 REQUIRE(!stopCalled);
                 initBeforeCalled = true;
             },
-            [](LineWriter& out) {
+            [](LineWriter& /*out*/) {
                 REQUIRE(initBeforeCalled);
                 REQUIRE(!initAfterCalled);
                 REQUIRE(!stopCalled);

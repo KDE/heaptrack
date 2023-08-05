@@ -114,7 +114,7 @@ option(
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if (NOT MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wpedantic")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
 endif()
 
 set(CMAKE_CXX_STANDARD 14)
