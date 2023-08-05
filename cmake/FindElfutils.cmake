@@ -8,7 +8,7 @@
 #
 
 if (LIBDW_LIBRARIES AND LIBDW_INCLUDE_DIRS)
-  set (ElfUtils_FIND_QUIETLY TRUE)
+  set (Elfutils_FIND_QUIETLY TRUE)
 endif (LIBDW_LIBRARIES AND LIBDW_INCLUDE_DIRS)
 
 find_path (DWARF_INCLUDE_DIR
@@ -48,7 +48,7 @@ include (FindPackageHandleStandardArgs)
 
 # handle the QUIETLY and REQUIRED arguments and set LIBDW_FOUND to TRUE
 # if all listed variables are TRUE
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(ElfUtils DEFAULT_MSG
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(Elfutils DEFAULT_MSG
     LIBDW_LIBRARIES
     LIBDW_INCLUDE_DIR)
 
