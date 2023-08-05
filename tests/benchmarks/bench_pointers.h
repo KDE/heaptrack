@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <iostream>
+#include <random>
 #include <vector>
 
 #include <malloc.h>
@@ -19,6 +20,8 @@
 template <typename Map>
 void benchPointers()
 {
+    auto randGenerator = std::mt19937(0);
+
     uint32_t matches = 0;
     constexpr uint32_t NUM_POINTERS = 10000000;
     {
@@ -35,7 +38,7 @@ void benchPointers()
         }
         std::cerr << "freed input pointers:    \t" << (mallinfo2().uordblks - baseline) << std::endl;
         srand(0);
-        std::random_shuffle(pointers.begin(), pointers.end());
+        std::shuffle(pointers.begin(), pointers.end(), randGenerator);
         malloc_trim(0);
         std::cerr << "begin actual benchmark:  \t" << (mallinfo2().uordblks - baseline) << std::endl;
 
@@ -51,7 +54,7 @@ void benchPointers()
             std::cerr << "pointers added:          \t" << added << " (" << (float(added) * 100.f / allocated)
                       << "% overhead)" << std::endl;
 
-            std::random_shuffle(pointers.begin(), pointers.end());
+            std::shuffle(pointers.begin(), pointers.end(), randGenerator);
             for (auto ptr : pointers) {
                 AllocationInfoIndex index;
                 index.index = static_cast<uint32_t>(ptr);
