@@ -1,12 +1,12 @@
 # Translation of heaptrack to Norwegian Nynorsk
 #
-# Karl Ove Hufthammer <karl@huftis.org>, 2018, 2020.
+# Karl Ove Hufthammer <karl@huftis.org>, 2018, 2020, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2023-07-29 00:47+0000\n"
-"PO-Revision-Date: 2020-12-06 14:19+0100\n"
+"PO-Revision-Date: 2023-08-05 23:31+0200\n"
 "Last-Translator: Karl Ove Hufthammer <karl@huftis.org>\n"
 "Language-Team: Norwegian Nynorsk <l10n-no@lister.huftis.org>\n"
 "Language: nn\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 21.03.70\n"
+"X-Generator: Lokalize 23.04.3\n"
 "X-Environment: kde\n"
 "X-Accelerator-Marker: &\n"
 "X-Text-Markup: kde4\n"
@@ -240,22 +240,22 @@ msgstr "Tid gått"
 #: gui/chartmodel.cpp:81
 #, kde-format
 msgid "Total Memory Allocations"
-msgstr ""
+msgstr "Minnereserveringar til saman"
 
 #: gui/chartmodel.cpp:83
 #, kde-format
 msgid "Total Memory Consumption"
-msgstr ""
+msgstr "Minneforbruk til saman"
 
 #: gui/chartmodel.cpp:85
 #, kde-format
 msgid "Total Temporary Allocations"
-msgstr ""
+msgstr "Mellombelse reserveringar til saman"
 
 #: gui/chartmodel.cpp:111
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:165
 #, kde-format
@@ -304,27 +304,27 @@ msgstr "<qt>%2 brukt etter %3 frå:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Eksporter som …"
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Vis forklaring"
 
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "Vis graf for totalkostnad"
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "Vis detaljert kostnadsgraf"
 
 #: gui/chartwidget.cpp:187
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "Stabla diagram:"
 
 #: gui/chartwidget.cpp:234
 #, kde-format
@@ -340,17 +340,17 @@ msgstr "Fjern filter"
 #: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Lagra %1"
 
 #: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr ""
+msgstr "Punktbilete (*.png *.jpg *.tiff);;Vektorbilete (*.svg)"
 
 #: gui/chartwidget.cpp:400
 #, kde-format
 msgid "Failed to save the image to %1"
-msgstr ""
+msgstr "Klarte ikkje lagra biletet til %1"
 
 #: gui/chartwidget.cpp:420
 #, kde-format
@@ -770,7 +770,7 @@ msgstr "<dt><b>Minnebruk-delta</b>:</dt><dd>%1</dd>"
 #: gui/mainwindow.cpp:439
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
-msgstr ""
+msgstr "<dt><b>Minne leke til saman</b>:</dt><dd>%1 (%2 undertrykt)</dd>"
 
 #: gui/mainwindow.cpp:442
 #, kde-format

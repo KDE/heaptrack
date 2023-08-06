@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-07-29 00:47+0000\n"
+"POT-Creation-Date: 2023-08-06 00:48+0000\n"
 "PO-Revision-Date: 2023-02-05 16:26+0100\n"
 "Last-Translator: Xavier BESNARD <xavier.besnard]neuf.fr>\n"
 "Language-Team: fr\n"
@@ -901,27 +901,27 @@ msgstr "Nouvelle analyse du fichier, veuillez patienter..."
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:787
+#: gui/mainwindow.cpp:786
 #, kde-format
 msgid "Code Navigation"
 msgstr "Navigation dans le code"
 
-#: gui/mainwindow.cpp:814
+#: gui/mainwindow.cpp:813
 #, kde-format
 msgid "Custom..."
 msgstr "Personnaliser..."
 
-#: gui/mainwindow.cpp:826
+#: gui/mainwindow.cpp:825
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "Automatique (Aucun numéro de lignes)"
 
-#: gui/mainwindow.cpp:846
+#: gui/mainwindow.cpp:845
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "Navigation personnalisée dans le code"
 
-#: gui/mainwindow.cpp:847
+#: gui/mainwindow.cpp:846
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
