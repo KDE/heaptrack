@@ -1,12 +1,12 @@
 # Translation of heaptrack to Norwegian Nynorsk
 #
-# Karl Ove Hufthammer <karl@huftis.org>, 2018, 2020.
+# Karl Ove Hufthammer <karl@huftis.org>, 2018, 2020, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-06-16 02:27+0000\n"
-"PO-Revision-Date: 2020-12-06 14:19+0100\n"
+"PO-Revision-Date: 2023-08-05 23:31+0200\n"
 "Last-Translator: Karl Ove Hufthammer <karl@huftis.org>\n"
 "Language-Team: Norwegian Nynorsk <l10n-no@lister.huftis.org>\n"
 "Language: nn\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 21.03.70\n"
+"X-Generator: Lokalize 23.04.3\n"
 "X-Environment: kde\n"
 "X-Accelerator-Marker: &\n"
 "X-Text-Markup: kde4\n"
@@ -740,7 +740,7 @@ msgstr "<dt><b>Minnebruk-delta</b>:</dt><dd>%1</dd>"
 #: gui/mainwindow.cpp:416
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
-msgstr ""
+msgstr "<dt><b>Minne leke til saman</b>:</dt><dd>%1 (%2 undertrykt)</dd>"
 
 #: gui/mainwindow.cpp:419
 #, kde-format
