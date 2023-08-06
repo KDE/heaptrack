@@ -98,26 +98,30 @@ TEST_CASE ("tracetree indexing") {
                     trace.fillTestData(j, leaf);
                     REQUIRE(trace.size() == j + 1);
 
-                    const std::lock_guard<std::mutex> guard(mutex);
                     uint32_t lastParent = 0;
-                    auto index =
-                        tree.index(trace, [k, j, leaf, &lastParent, &ipsToParent](uintptr_t ip, uint32_t parentIndex) {
+                    auto index = tree.index(
+                        trace, [k, j, leaf, &lastParent, &ipsToParent, &mutex](uintptr_t ip, uint32_t parentIndex) {
                             // for larger k, the trace is known and thus we won't hit this branch
                             REQUIRE(k == 0);
 
                             REQUIRE(ip > 0);
                             REQUIRE((ip <= (j + 1) || ip == leaf));
                             REQUIRE(((!lastParent && !parentIndex) || parentIndex > lastParent));
-                            REQUIRE(parentIndex <= ipsToParent.size());
                             lastParent = parentIndex;
 
+                            const std::lock_guard<std::mutex> guard(mutex);
+                            REQUIRE(parentIndex <= ipsToParent.size());
                             ipsToParent.push_back({ip, parentIndex});
                             return true;
                         });
                     REQUIRE(index > lastIndex);
-                    REQUIRE(index <= ipsToParent.size());
+                    {
+                        const std::lock_guard<std::mutex> guard(mutex);
+                        REQUIRE(index <= ipsToParent.size());
+                    }
 
                     if (k == 0) {
+                        const std::lock_guard<std::mutex> guard(mutex);
                         traces.push_back({trace, index});
                     }
                 }
