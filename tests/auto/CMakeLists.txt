@@ -30,7 +30,7 @@ endif()
 
 add_executable(tst_trace tst_trace.cpp)
 set_target_properties(tst_trace PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
-target_link_libraries(tst_trace heaptrack_unwind)
+target_link_libraries(tst_trace heaptrack_unwind Threads::Threads)
 target_compile_definitions(tst_trace PRIVATE -DCATCH_CONFIG_MAIN)
 add_test(NAME tst_trace COMMAND tst_trace)
 
