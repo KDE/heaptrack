@@ -31,7 +31,6 @@ endif()
 add_executable(tst_trace tst_trace.cpp)
 set_target_properties(tst_trace PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
 target_link_libraries(tst_trace heaptrack_unwind Threads::Threads)
-target_compile_definitions(tst_trace PRIVATE -DCATCH_CONFIG_MAIN)
 add_test(NAME tst_trace COMMAND tst_trace)
 
 if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
@@ -39,7 +38,6 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
         tst_libheaptrack.cpp
         ../../src/track/libheaptrack.cpp)
     set_target_properties(tst_libheaptrack PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
-    target_compile_definitions(tst_libheaptrack PRIVATE -DCATCH_CONFIG_MAIN)
     target_link_libraries(tst_libheaptrack
         LINK_PRIVATE
             ${CMAKE_DL_LIBS}
@@ -54,7 +52,6 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
 
     add_executable(tst_io tst_io.cpp)
     set_target_properties(tst_io PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
-    target_compile_definitions(tst_io PRIVATE -DCATCH_CONFIG_MAIN)
     target_link_libraries(tst_io
             ${Boost_SYSTEM_LIBRARY}
             ${Boost_FILESYSTEM_LIBRARY}
@@ -72,7 +69,6 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
                     heaptrack_gui_private
                     Qt${QT_VERSION_MAJOR}::Test
             )
-            target_compile_definitions(tst_parser PRIVATE -DCATCH_CONFIG_RUNNER)
             add_test(NAME tst_parser COMMAND tst_parser)
         endif()
     endif()
