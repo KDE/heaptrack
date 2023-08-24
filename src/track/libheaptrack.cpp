@@ -631,24 +631,47 @@ private:
         shutdown();
     }
 
-    struct LockCheckFailed
+    class LockStatus
     {
+    public:
+        LockStatus(bool isLocked)
+            : isLocked(isLocked)
+        {
+        }
+        explicit operator bool() const
+        {
+            return isLocked;
+        }
+
+    private:
+        bool isLocked = false;
     };
 
     /**
      * To prevent deadlocks on shutdown, we try to lock from the timer thread
-     * and throw an LockCheckFailed exception otherwise.
+     *
+     * TODO: c++17 return std::optional<HeapTrack>
      */
     template <typename AdditionalLockCheck>
-    HeapTrack(AdditionalLockCheck lockCheck)
+    static LockStatus tryLock(AdditionalLockCheck lockCheck)
     {
         debugLog<VeryVerboseOutput>("%s", "trying to acquire lock");
         while (!s_lock.try_lock()) {
-            if (!lockCheck())
-                throw LockCheckFailed();
+            if (!lockCheck()) {
+                return false;
+            }
             this_thread::sleep_for(chrono::microseconds(1));
         }
         debugLog<VeryVerboseOutput>("%s", "lock acquired");
+        return true;
+    }
+
+    /**
+     * Create locked HeapTrack instance after a successful call to tryLock
+     */
+    HeapTrack(LockStatus lockStatus)
+    {
+        assert(lockStatus);
     }
 
     struct LockedData
@@ -684,30 +707,19 @@ private:
                 RecursionGuard::isActive = true;
                 debugLog<MinimalOutput>("%s", "timer thread started");
 
-                // HACK: throw the exception once and directly catch it
-                //       without this, tst_inject reproducibly calls
-                //       std::terminate instead of catching the exception
-                //       in the loop below
-                //       I suspect it's some strange side-effect of heaptrack
-                //       intercepting the memory allocations that happen when
-                //       an exception is thrown?
-                try {
-                    throw LockCheckFailed {};
-                } catch (LockCheckFailed) {
-                }
-
                 // now loop and repeatedly print the timestamp and RSS usage to the data stream
                 while (!stopTimerThread) {
                     // TODO: make interval customizable
                     this_thread::sleep_for(chrono::milliseconds(10));
 
-                    try {
-                        HeapTrack heaptrack([&] { return !stopTimerThread.load(); });
-                        heaptrack.writeTimestamp();
-                        heaptrack.writeRSS();
-                    } catch (LockCheckFailed) {
+                    const auto locked = tryLock([&] { return !stopTimerThread.load(); });
+                    if (!locked) {
                         break;
                     }
+
+                    HeapTrack heaptrack(locked);
+                    heaptrack.writeTimestamp();
+                    heaptrack.writeRSS();
                 }
             });
 
