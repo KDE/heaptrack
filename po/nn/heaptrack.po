@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2022-06-16 02:27+0000\n"
-"PO-Revision-Date: 2023-08-05 23:31+0200\n"
+"PO-Revision-Date: 2023-08-24 21:38+0200\n"
 "Last-Translator: Karl Ove Hufthammer <karl@huftis.org>\n"
 "Language-Team: Norwegian Nynorsk <l10n-no@lister.huftis.org>\n"
 "Language: nn\n"
@@ -940,13 +940,13 @@ msgstr "Samanlikna med:"
 #: gui/mainwindow.ui:128
 #, kde-format
 msgid "Suppressions:"
-msgstr ""
+msgstr "Undertrykking:"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
 #: gui/mainwindow.ui:138
 #, kde-format
 msgid "path/to/lsan_suppressions.txt"
-msgstr ""
+msgstr "adresse/til/lsan_undertrykking.txt"
 
 #. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
 #: gui/mainwindow.ui:251
@@ -1011,7 +1011,7 @@ msgstr "Flest mellombelse reserveringar"
 #: gui/mainwindow.ui:508
 #, kde-format
 msgid "Suppressions"
-msgstr ""
+msgstr "Undertrykkingar"
 
 #. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
 #: gui/mainwindow.ui:540
