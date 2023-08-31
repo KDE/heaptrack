@@ -43,6 +43,7 @@
 #include "util/config.h"
 #include "util/libunwind_config.h"
 #include "util/linewriter.h"
+#include "util/macroutils.h"
 
 extern "C" {
 // see upstream "documentation" at:
@@ -669,7 +670,7 @@ private:
     /**
      * Create locked HeapTrack instance after a successful call to tryLock
      */
-    HeapTrack(LockStatus lockStatus)
+    HeapTrack(POTENTIALLY_UNUSED LockStatus lockStatus)
     {
         assert(lockStatus);
     }

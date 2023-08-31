@@ -27,15 +27,10 @@
 
 #include "util/config.h"
 #include "util/linereader.h"
+#include "util/macroutils.h"
 #include "util/pointermap.h"
 
 #include "suppressions.h"
-
-#ifdef __GNUC__
-#define POTENTIALLY_UNUSED __attribute__((unused))
-#else
-#define POTENTIALLY_UNUSED
-#endif
 
 using namespace std;
 
