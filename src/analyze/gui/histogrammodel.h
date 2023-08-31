@@ -7,6 +7,8 @@
 #ifndef HISTOGRAMMODEL_H
 #define HISTOGRAMMODEL_H
 
+#include <array>
+
 #include <QAbstractTableModel>
 
 #include "treemodel.h"

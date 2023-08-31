@@ -7,6 +7,7 @@
 #ifndef LINEREADER_H
 #define LINEREADER_H
 
+#include <cstdint>
 #include <istream>
 #include <string>
 
