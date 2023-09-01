@@ -21,6 +21,18 @@
 /// @return the demangled symbol name
 std::string demangle(const std::string& mangledName);
 
+/// @return the absolute source path for the potential @p path in the given @p cuDie
+std::string absoluteSourcePath(const char* path, Dwarf_Die* cuDie);
+
+struct SourceLocation
+{
+    std::string file;
+    int line = 0;
+};
+
+/// @return the file and line location encoded in the DW_AT_call_{file,line} data of @p die
+SourceLocation callSourceLocation(Dwarf_Die* die, Dwarf_Files* files, Dwarf_Die* cuDie);
+
 struct DwarfRange
 {
     Dwarf_Addr low;

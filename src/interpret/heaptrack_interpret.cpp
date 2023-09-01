@@ -29,7 +29,9 @@
 #include "util/pointermap.h"
 
 #include <dwarf.h>
-#include <signal.h>
+#include <elfutils/libdwelf.h>
+
+#include <csignal>
 #include <unistd.h>
 
 using namespace std;
@@ -211,44 +213,42 @@ struct Module
             return info;
         }
 
+        // resolve the inline chain if possible
         auto scopes = findInlineScopes(subprogram->die(), offset);
 
-        // setup function location, i.e. entry point of the (inlined) frame
-        auto setupEntry = [&](Dwarf_Die die) {
-            info.frame.function = cuDie->dieName(&die); // use name of inlined function as symbol
-            if (auto file = dwarf_decl_file(&die)) {
-                info.frame.file = file;
-                dwarf_decl_line(&die, &info.frame.line);
-            }
-        };
         if (scopes.empty()) {
-            setupEntry(*subprogram->die());
-        } else {
-            setupEntry(scopes.back());
-            scopes.pop_back();
-        }
-
-        // resolve the inline chain if possible
-        if (scopes.empty()) {
+            // no inline frames, use subprogram name directly and return
+            info.frame.function = cuDie->dieName(subprogram->die());
             return info;
         }
 
-        auto handleDie = [&](Dwarf_Die scope) {
-            const auto tag = dwarf_tag(&scope);
-            if (tag == DW_TAG_inlined_subroutine || tag == DW_TAG_subprogram) {
-                int line = 0;
-                std::string file;
-                if (auto f = dwarf_decl_file(&scope)) {
-                    file = f;
-                    dwarf_decl_line(&scope, &line);
-                }
+        // use name of the last inlined function as symbol
+        info.frame.function = cuDie->dieName(&scopes.back());
 
-                info.inlined.push_back({cuDie->dieName(&scope), file, line});
+        Dwarf_Files* files = nullptr;
+        dwarf_getsrcfiles(cuDie->cudie(), &files, nullptr);
+
+        auto handleDie = [&](Dwarf_Die *scope, Dwarf_Die *prevScope) {
+            const auto tag = dwarf_tag(prevScope);
+            if (tag != DW_TAG_inlined_subroutine) {
+                error_out << "unexpected prev scope tag: " << std::hex << tag << '\n';
+                return;
             }
+
+            auto call = callSourceLocation(prevScope, files, cuDie->cudie());
+            info.inlined.push_back({cuDie->dieName(scope), std::move(call.file), call.line});
         };
 
-        std::for_each(scopes.rbegin(), scopes.rend(), handleDie);
-        handleDie(*subprogram->die());
+        // iterate in reverse, to properly rebuild the inline stack
+        // note that we need to take the DW_AT_call_{file,line} from the previous scope DIE
+        const auto numScopes = scopes.size();
+        for (std::size_t scopeIndex = numScopes - 1; scopeIndex >= 1; --scopeIndex) {
+            handleDie(&scopes[scopeIndex - 1], &scopes[scopeIndex]);
+        }
+
+        // the very last frame is the one where all the code got inlined into
+        handleDie(subprogram->die(), &scopes.front());
+
         return info;
     }
 

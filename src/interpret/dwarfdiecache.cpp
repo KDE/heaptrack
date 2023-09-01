@@ -13,6 +13,8 @@
 
 #include <cxxabi.h>
 
+#include <cstring>
+
 namespace {
 enum class WalkResult
 {
@@ -227,6 +229,44 @@ std::string demangle(const std::string& mangledName)
         }
     }
     return mangledName;
+}
+
+std::string absoluteSourcePath(const char* path, Dwarf_Die* cuDie)
+{
+    if (!path || !cuDie || path[0] == '/')
+        return path;
+
+    Dwarf_Attribute attr;
+    auto compDir = dwarf_formstring(dwarf_attr(cuDie, DW_AT_comp_dir, &attr));
+    if (!compDir)
+        return path;
+
+    std::string ret;
+    ret.reserve(static_cast<int>(strlen(compDir) + strlen(path) + 1));
+    ret.append(compDir);
+    ret.append("/");
+    ret.append(path);
+    return ret;
+}
+
+SourceLocation callSourceLocation(Dwarf_Die* die, Dwarf_Files* files, Dwarf_Die* cuDie)
+{
+    SourceLocation ret;
+
+    Dwarf_Attribute attr;
+    Dwarf_Word val = 0;
+
+    const auto hasCallFile = dwarf_formudata(dwarf_attr(die, DW_AT_call_file, &attr), &val) == 0;
+    if (hasCallFile) {
+        ret.file = absoluteSourcePath(dwarf_filesrc(files, val, nullptr, nullptr), cuDie);
+    }
+
+    const auto hasCallLine = dwarf_formudata(dwarf_attr(die, DW_AT_call_line, &attr), &val) == 0;
+    if (hasCallLine) {
+        ret.line = static_cast<int>(val);
+    }
+
+    return ret;
 }
 
 std::vector<Dwarf_Die> findInlineScopes(Dwarf_Die* subprogram, Dwarf_Addr offset)
