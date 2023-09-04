@@ -61,55 +61,56 @@ QString ChartModel::typeString() const
 
 QVariant ChartModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    Q_ASSERT(orientation == Qt::Horizontal || section < columnCount());
-    if (orientation == Qt::Horizontal) {
-        if (role == KChart::DatasetPenRole) {
-            return QVariant::fromValue(m_columnDataSetPens.at(section));
-        } else if (role == KChart::DatasetBrushRole) {
-            return QVariant::fromValue(m_columnDataSetBrushes.at(section));
+    if (section < 0 || section >= columnCount() || orientation != Qt::Horizontal) {
+        return {};
+    }
+
+    if (role == KChart::DatasetPenRole) {
+        return QVariant::fromValue(m_columnDataSetPens.at(section));
+    } else if (role == KChart::DatasetBrushRole) {
+        return QVariant::fromValue(m_columnDataSetBrushes.at(section));
+    }
+
+    if (role == Qt::ToolTipRole) {
+        if (section == 0) {
+            return i18n("Elapsed Time");
         }
-
-        if (role == Qt::ToolTipRole) {
-            if (section == 0) {
-                return i18n("Elapsed Time");
+        return typeString();
+    } else if (role == Qt::DisplayRole) {
+        if (section == 0) {
+            switch (m_type) {
+            case Allocations:
+                return i18n("Total Memory Allocations");
+            case Consumed:
+                return i18n("Total Memory Consumption");
+            case Temporary:
+                return i18n("Total Temporary Allocations");
             }
-            return typeString();
-        } else if (role == Qt::DisplayRole) {
-            if (section == 0) {
-                switch (m_type) {
-                case Allocations:
-                    return i18n("Total Memory Allocations");
-                case Consumed:
-                    return i18n("Total Memory Consumption");
-                case Temporary:
-                    return i18n("Total Temporary Allocations");
-                }
-            } else {
-                auto id = m_data.labels.value(section / 2).functionId;
-                QString label = m_data.resultData->string(id);
+        } else {
+            auto id = m_data.labels.value(section / 2).functionId;
+            QString label = m_data.resultData->string(id);
 
-                // Experimental symbol name shortening, currently only truncating
-                // and left-justified labels. The length is also fixed and should
-                // be adjusted later on.
-                //
-                // The justified text is also a workaround to setTextAlignment as
-                // this does not seem to work on KChartLegend objects. This might
-                // be because it is not supported for these instances, as the re-
-                // ference suggests: https://doc.qt.io/qt-6/stylesheet-reference.html
-                // (see "text-align" entry).
-                int symbolNameLength = 60;
+            // Experimental symbol name shortening, currently only truncating
+            // and left-justified labels. The length is also fixed and should
+            // be adjusted later on.
+            //
+            // The justified text is also a workaround to setTextAlignment as
+            // this does not seem to work on KChartLegend objects. This might
+            // be because it is not supported for these instances, as the re-
+            // ference suggests: https://doc.qt.io/qt-6/stylesheet-reference.html
+            // (see "text-align" entry).
+            int symbolNameLength = 60;
 
-                if (label.size() < symbolNameLength) {
-                    label = label.leftJustified(symbolNameLength);
-                } else if (label.size() > symbolNameLength) {
-                    label.truncate(symbolNameLength - 3);
-                    label = label.leftJustified(symbolNameLength, QLatin1Char('.'));
-                }
-
-                label = label.rightJustified(symbolNameLength + 1);
-
-                return i18n("%1", label);
+            if (label.size() < symbolNameLength) {
+                label = label.leftJustified(symbolNameLength);
+            } else if (label.size() > symbolNameLength) {
+                label.truncate(symbolNameLength - 3);
+                label = label.leftJustified(symbolNameLength, QLatin1Char('.'));
             }
+
+            label = label.rightJustified(symbolNameLength + 1);
+
+            return i18n("%1", label);
         }
     }
 
