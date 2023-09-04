@@ -216,7 +216,8 @@ TEST_CASE ("symbolizing") {
     REQUIRE(data.mod);
 
     DwarfDieCache cache(data.mod);
-    for (uint i = 0; i < 6; ++i) {
+    uint j = 0;
+    for (uint i = 0; i < 6 + j; ++i) {
         auto addr = reinterpret_cast<Dwarf_Addr>(trace[i]);
 
         auto cuDie = cache.findCuDie(addr);
@@ -226,14 +227,17 @@ TEST_CASE ("symbolizing") {
         auto die = cuDie->findSubprogramDie(offset);
         REQUIRE(die);
 
-        if (i == 0) {
-            REQUIRE(cuDie->dieName(die->die()) == "Trace::fill(int)");
+        auto dieName = cuDie->dieName(die->die());
+        auto isDebugBuild = i == 0 && dieName == "Trace::unwind(void**)";
+        if (i == 0 + j) {
+            if (!isDebugBuild)
+                REQUIRE(dieName == "Trace::fill(int)");
         } else {
-            REQUIRE(cuDie->dieName(die->die()) == "bar");
+            REQUIRE(dieName == "bar");
         }
 
         auto scopes = findInlineScopes(die->die(), offset);
-        if (i <= 1) {
+        if (i <= 1 + j) {
             REQUIRE(scopes.size() == 0);
         } else {
             REQUIRE(scopes.size() == 2);
@@ -251,6 +255,10 @@ TEST_CASE ("symbolizing") {
             loc = callSourceLocation(&scopes[1], files, cuDie->cudie());
             // called from foo
             REQUIRE(loc.line == 44);
+        }
+
+        if (isDebugBuild) {
+            ++j;
         }
     }
 }
