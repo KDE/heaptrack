@@ -257,16 +257,28 @@ int createFile(const char* fileName)
 class HeapTrack
 {
 public:
-    HeapTrack(const RecursionGuard& /*recursionGuard*/)
+    template <typename Op>
+    static bool op(const RecursionGuard& /*recursionGuard*/, const Op& op)
     {
         debugLog<VeryVerboseOutput>("%s", "acquiring lock");
-        s_lock.lock();
+
+        auto locked = tryLock([]() { return s_forceCleanup.load(); });
+        if (!locked) {
+            return false;
+        }
+
         debugLog<VeryVerboseOutput>("%s", "lock acquired");
+
+        HeapTrack heaptrack(locked);
+        op(heaptrack);
+
+        return true;
     }
 
     ~HeapTrack()
     {
         debugLog<VeryVerboseOutput>("%s", "releasing lock");
+
         s_lock.unlock();
     }
 
@@ -653,12 +665,12 @@ private:
      *
      * TODO: c++17 return std::optional<HeapTrack>
      */
-    template <typename AdditionalLockCheck>
-    static LockStatus tryLock(AdditionalLockCheck lockCheck)
+    template <typename StopLockCheck>
+    static LockStatus tryLock(StopLockCheck stopLockCheck)
     {
         debugLog<VeryVerboseOutput>("%s", "trying to acquire lock");
         while (!s_lock.try_lock()) {
-            if (!lockCheck()) {
+            if (stopLockCheck()) {
                 return false;
             }
             this_thread::sleep_for(chrono::microseconds(1));
@@ -713,7 +725,7 @@ private:
                     // TODO: make interval customizable
                     this_thread::sleep_for(chrono::milliseconds(10));
 
-                    const auto locked = tryLock([&] { return !stopTimerThread.load(); });
+                    const auto locked = tryLock([&] { return stopTimerThread.load(); });
                     if (!locked) {
                         break;
                     }
@@ -801,11 +813,12 @@ static void heaptrack_realloc_impl(void* ptr_in, size_t size, void* ptr_out)
         Trace trace;
         trace.fill(2 + HEAPTRACK_DEBUG_BUILD * 3);
 
-        HeapTrack heaptrack(guard);
-        if (ptr_in) {
-            heaptrack.handleFree(ptr_in);
-        }
-        heaptrack.handleMalloc(ptr_out, size, trace);
+        HeapTrack::op(guard, [&](HeapTrack& heaptrack) {
+            if (ptr_in) {
+                heaptrack.handleFree(ptr_in);
+            }
+            heaptrack.handleMalloc(ptr_out, size, trace);
+        });
     }
 }
 
@@ -817,11 +830,14 @@ void heaptrack_init(const char* outputFileName, heaptrack_callback_t initBeforeC
     RecursionGuard guard;
     // initialize
     startTime();
+    s_forceCleanup.store(false);
 
     debugLog<MinimalOutput>("heaptrack_init(%s)", outputFileName);
 
-    HeapTrack heaptrack(guard);
-    heaptrack.initialize(outputFileName, initBeforeCallback, initAfterCallback, stopCallback);
+    auto ret = HeapTrack::op(guard, [&](HeapTrack& heaptrack) {
+        heaptrack.initialize(outputFileName, initBeforeCallback, initAfterCallback, stopCallback);
+    });
+    assert(ret);
 }
 
 void heaptrack_stop()
@@ -830,13 +846,15 @@ void heaptrack_stop()
 
     debugLog<MinimalOutput>("%s", "heaptrack_stop()");
 
-    HeapTrack heaptrack(guard);
+    assert(!s_forceCleanup);
+    auto ret = HeapTrack::op(guard, [&](HeapTrack& heaptrack) {
+        if (!s_atexit) {
+            s_forceCleanup.store(true);
+        }
 
-    if (!s_atexit) {
-        s_forceCleanup.store(true);
-    }
-
-    heaptrack.shutdown();
+        heaptrack.shutdown();
+    });
+    assert(ret);
 }
 
 void heaptrack_pause()
@@ -859,8 +877,7 @@ void heaptrack_malloc(void* ptr, size_t size)
         Trace trace;
         trace.fill(2 + HEAPTRACK_DEBUG_BUILD * 2);
 
-        HeapTrack heaptrack(guard);
-        heaptrack.handleMalloc(ptr, size, trace);
+        HeapTrack::op(guard, [&](HeapTrack& heaptrack) { heaptrack.handleMalloc(ptr, size, trace); });
     }
 }
 
@@ -871,8 +888,7 @@ void heaptrack_free(void* ptr)
 
         debugLog<VeryVerboseOutput>("heaptrack_free(%p)", ptr);
 
-        HeapTrack heaptrack(guard);
-        heaptrack.handleFree(ptr);
+        HeapTrack::op(guard, [&](HeapTrack& heaptrack) { heaptrack.handleFree(ptr); });
     }
 }
 
@@ -892,8 +908,7 @@ void heaptrack_invalidate_module_cache()
 
     debugLog<VerboseOutput>("%s", "heaptrack_invalidate_module_cache()");
 
-    HeapTrack heaptrack(guard);
-    heaptrack.invalidateModuleCache();
+    HeapTrack::op(guard, [&](HeapTrack& heaptrack) { heaptrack.invalidateModuleCache(); });
 }
 
 void heaptrack_warning(heaptrack_warning_callback_t callback)
