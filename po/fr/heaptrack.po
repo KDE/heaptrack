@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-08-06 00:48+0000\n"
+"POT-Creation-Date: 2023-09-05 00:47+0000\n"
 "PO-Revision-Date: 2023-02-05 16:26+0100\n"
 "Last-Translator: Xavier BESNARD <xavier.besnard]neuf.fr>\n"
 "Language-Team: fr\n"
@@ -233,32 +233,32 @@ msgstr "Mémoire consommée"
 msgid "Temporary Allocations"
 msgstr "Allocations temporaires"
 
-#: gui/chartmodel.cpp:74 gui/chartwidget.cpp:466
+#: gui/chartmodel.cpp:76 gui/chartwidget.cpp:466
 #, kde-format
 msgid "Elapsed Time"
 msgstr "Temps écoulé"
 
-#: gui/chartmodel.cpp:81
+#: gui/chartmodel.cpp:83
 #, kde-format
 msgid "Total Memory Allocations"
 msgstr "Total des allocations de mémoire"
 
-#: gui/chartmodel.cpp:83
+#: gui/chartmodel.cpp:85
 #, kde-format
 msgid "Total Memory Consumption"
 msgstr "Total des consommations de mémoire"
 
-#: gui/chartmodel.cpp:85
+#: gui/chartmodel.cpp:87
 #, kde-format
 msgid "Total Temporary Allocations"
 msgstr "Total des allocations temporaires"
 
-#: gui/chartmodel.cpp:111
+#: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
 msgstr "%1"
 
-#: gui/chartmodel.cpp:165
+#: gui/chartmodel.cpp:166
 #, kde-format
 msgctxt ""
 "%1: the formatted byte size, e.g. \"1.2KB\", %2: the raw byte size, e.g. "
@@ -266,22 +266,22 @@ msgctxt ""
 msgid "%1 (%2 bytes)"
 msgstr "%1 (%2 octets)"
 
-#: gui/chartmodel.cpp:173
+#: gui/chartmodel.cpp:174
 #, kde-format
 msgid "<qt>%1 allocations in total after %2</qt>"
 msgstr "<qt>Total de %1 allocations après %2</qt>"
 
-#: gui/chartmodel.cpp:175
+#: gui/chartmodel.cpp:176
 #, kde-format
 msgid "<qt>%1 temporary allocations in total after %2</qt>"
 msgstr "<qt>Total de %1 allocations temporaires après %2</qt>"
 
-#: gui/chartmodel.cpp:177
+#: gui/chartmodel.cpp:178
 #, kde-format
 msgid "<qt>%1 consumed in total after %2</qt>"
 msgstr "<qt>Total de %1 consommé après %2</qt>"
 
-#: gui/chartmodel.cpp:183
+#: gui/chartmodel.cpp:184
 #, kde-format
 msgid ""
 "<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>"
@@ -289,7 +289,7 @@ msgstr ""
 "<qt>%2 allocations après %3 à partir :<p style='margin-left:10px;'>%1</p></"
 "qt>"
 
-#: gui/chartmodel.cpp:187
+#: gui/chartmodel.cpp:188
 #, kde-format
 msgid ""
 "<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
@@ -298,7 +298,7 @@ msgstr ""
 "<qt>%2 allocations temporaires après %3 à partir de :<p style='margin-"
 "left:10px'>%1</p></qt>"
 
-#: gui/chartmodel.cpp:191
+#: gui/chartmodel.cpp:192
 #, kde-format
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
 msgstr ""

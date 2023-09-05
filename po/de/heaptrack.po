@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-08-06 00:48+0000\n"
+"POT-Creation-Date: 2023-09-05 00:47+0000\n"
 "PO-Revision-Date: 2022-02-26 03:08+0100\n"
 "Last-Translator: Frederik Schwarzer <schwarzer@kde.org>\n"
 "Language-Team: German <kde-i18n-de@kde.org>\n"
@@ -228,35 +228,35 @@ msgstr "Belegter Speicher"
 msgid "Temporary Allocations"
 msgstr "Temporäre Speicherzuordnungen"
 
-#: gui/chartmodel.cpp:74 gui/chartwidget.cpp:466
+#: gui/chartmodel.cpp:76 gui/chartwidget.cpp:466
 #, kde-format
 msgid "Elapsed Time"
 msgstr "Verstrichene Zeit"
 
-#: gui/chartmodel.cpp:81
+#: gui/chartmodel.cpp:83
 #, fuzzy, kde-format
 #| msgid "Memory Allocations"
 msgid "Total Memory Allocations"
 msgstr "Speicherzuordnungen"
 
-#: gui/chartmodel.cpp:83
+#: gui/chartmodel.cpp:85
 #, fuzzy, kde-format
 #| msgid "%1 allocations in total"
 msgid "Total Memory Consumption"
 msgstr "%1 Zuordnungen gesamt"
 
-#: gui/chartmodel.cpp:85
+#: gui/chartmodel.cpp:87
 #, fuzzy, kde-format
 #| msgid "Temporary Allocations"
 msgid "Total Temporary Allocations"
 msgstr "Temporäre Speicherzuordnungen"
 
-#: gui/chartmodel.cpp:111
+#: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
 msgstr ""
 
-#: gui/chartmodel.cpp:165
+#: gui/chartmodel.cpp:166
 #, kde-format
 msgctxt ""
 "%1: the formatted byte size, e.g. \"1.2KB\", %2: the raw byte size, e.g. "
@@ -264,25 +264,25 @@ msgctxt ""
 msgid "%1 (%2 bytes)"
 msgstr "%1 (%2 Bytes)"
 
-#: gui/chartmodel.cpp:173
+#: gui/chartmodel.cpp:174
 #, fuzzy, kde-format
 #| msgid "%1 allocations in total"
 msgid "<qt>%1 allocations in total after %2</qt>"
 msgstr "%1 Zuordnungen gesamt"
 
-#: gui/chartmodel.cpp:175
+#: gui/chartmodel.cpp:176
 #, fuzzy, kde-format
 #| msgid "%1 allocations in total"
 msgid "<qt>%1 temporary allocations in total after %2</qt>"
 msgstr "%1 Zuordnungen gesamt"
 
-#: gui/chartmodel.cpp:177
+#: gui/chartmodel.cpp:178
 #, fuzzy, kde-format
 #| msgid "%1 allocations in total"
 msgid "<qt>%1 consumed in total after %2</qt>"
 msgstr "%1 Zuordnungen gesamt"
 
-#: gui/chartmodel.cpp:183
+#: gui/chartmodel.cpp:184
 #, kde-format
 msgid ""
 "<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>"
@@ -290,7 +290,7 @@ msgstr ""
 "<qt>%2 Speicherzuordnungen nach %3 von:<p style='margin-left:10px;'>%1</p></"
 "qt>"
 
-#: gui/chartmodel.cpp:187
+#: gui/chartmodel.cpp:188
 #, kde-format
 msgid ""
 "<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
@@ -299,7 +299,7 @@ msgstr ""
 "<qt>%2 temporäre Speicherzuordnungen nach %3 von:<p style='margin-"
 "left:10px;'>%1</p></qt>"
 
-#: gui/chartmodel.cpp:191
+#: gui/chartmodel.cpp:192
 #, fuzzy, kde-format
 #| msgid ""
 #| "<qt>%2 allocated after %3 from:<p style='margin-left:10px'>%1</p></qt>"

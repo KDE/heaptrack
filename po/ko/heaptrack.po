@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-08-06 00:48+0000\n"
+"POT-Creation-Date: 2023-09-05 00:47+0000\n"
 "PO-Revision-Date: 2023-04-21 23:40+0200\n"
 "Last-Translator: Shinjo Park <kde@peremen.name>\n"
 "Language-Team: Korean <kde-kr@kde.org>\n"
@@ -222,32 +222,32 @@ msgstr "사용한 메모리"
 msgid "Temporary Allocations"
 msgstr "임시 할당"
 
-#: gui/chartmodel.cpp:74 gui/chartwidget.cpp:466
+#: gui/chartmodel.cpp:76 gui/chartwidget.cpp:466
 #, kde-format
 msgid "Elapsed Time"
 msgstr "경과 시간"
 
-#: gui/chartmodel.cpp:81
+#: gui/chartmodel.cpp:83
 #, kde-format
 msgid "Total Memory Allocations"
 msgstr "총 메모리 할당"
 
-#: gui/chartmodel.cpp:83
+#: gui/chartmodel.cpp:85
 #, kde-format
 msgid "Total Memory Consumption"
 msgstr "총 메모리 사용량"
 
-#: gui/chartmodel.cpp:85
+#: gui/chartmodel.cpp:87
 #, kde-format
 msgid "Total Temporary Allocations"
 msgstr "최대 임시 할당"
 
-#: gui/chartmodel.cpp:111
+#: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
 msgstr "%1"
 
-#: gui/chartmodel.cpp:165
+#: gui/chartmodel.cpp:166
 #, kde-format
 msgctxt ""
 "%1: the formatted byte size, e.g. \"1.2KB\", %2: the raw byte size, e.g. "
@@ -255,28 +255,28 @@ msgctxt ""
 msgid "%1 (%2 bytes)"
 msgstr "%1(%2바이트)"
 
-#: gui/chartmodel.cpp:173
+#: gui/chartmodel.cpp:174
 #, kde-format
 msgid "<qt>%1 allocations in total after %2</qt>"
 msgstr "<qt>%2 이후 총 할당 %1회</qt>"
 
-#: gui/chartmodel.cpp:175
+#: gui/chartmodel.cpp:176
 #, kde-format
 msgid "<qt>%1 temporary allocations in total after %2</qt>"
 msgstr "<qt>%2 이후 총 임시 할당 %1회</qt>"
 
-#: gui/chartmodel.cpp:177
+#: gui/chartmodel.cpp:178
 #, kde-format
 msgid "<qt>%1 consumed in total after %2</qt>"
 msgstr "<qt>%2 이후 총 %1 사용됨</qt>"
 
-#: gui/chartmodel.cpp:183
+#: gui/chartmodel.cpp:184
 #, kde-format
 msgid ""
 "<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>"
 msgstr "<qt>%3 이후 할당 %2회, 위치:<p style='margin-left:10px;'>%1</p></qt>"
 
-#: gui/chartmodel.cpp:187
+#: gui/chartmodel.cpp:188
 #, kde-format
 msgid ""
 "<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
@@ -284,7 +284,7 @@ msgid ""
 msgstr ""
 "<qt>%3 이후 임시 할당 %2회, 위치:<p style='margin-left:10px'>%1</p></qt>"
 
-#: gui/chartmodel.cpp:191
+#: gui/chartmodel.cpp:192
 #, kde-format
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
 msgstr "<qt>%3 이후 %2 사용됨, 위치:<p style='margin-left:10px'>%1</p></qt>"
