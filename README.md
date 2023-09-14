@@ -66,6 +66,7 @@ Both parts require the following tools and libraries:
 - a C\+\+11 enabled compiler like g\+\+ or clang\+\+
 - zlib
 - optionally: zstd for faster (de)compression
+- elfutils
 - libdl
 - pthread
 - libc
