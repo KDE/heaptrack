@@ -71,7 +71,6 @@ private:
     FrameGraphicsItem* m_rootItem = nullptr;
     QVector<FrameGraphicsItem*> m_selectionHistory;
     int m_selectedItem = -1;
-    int m_minRootWidth = 0;
     bool m_showBottomUpData = false;
     bool m_collapseRecursion = true;
     bool m_buildingScene = false;
