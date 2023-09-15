@@ -10,7 +10,6 @@
   <name xml:lang="da">Heaptrack</name>
   <name xml:lang="de">Heaptrack</name>
   <name xml:lang="en-GB">Heaptrack</name>
-  <name xml:lang="eo">Heaptrack</name>
   <name xml:lang="es">Heaptrack</name>
   <name xml:lang="eu">Heaptrack</name>
   <name xml:lang="fr">Heaptrack</name>
@@ -36,9 +35,7 @@
   <summary>A heap memory profiler for Linux</summary>
   <summary xml:lang="ca">Un analitzador del rendiment de la memòria en monticles per al Linux</summary>
   <summary xml:lang="ca-valencia">Un analitzador del rendiment de la memòria en monticles per a Linux</summary>
-  <summary xml:lang="da">En heap-hukommelsesprofilering til Linux</summary>
   <summary xml:lang="en-GB">A heap memory profiler for Linux</summary>
-  <summary xml:lang="eo">Staplomemora profililo por Linukso</summary>
   <summary xml:lang="es">Un analizador de rendimiento de la memoria de almacenamiento libre para Linux</summary>
   <summary xml:lang="eu">Linux-erako memoria dinamikoaren («heap») profilatzaile bat</summary>
   <summary xml:lang="fr">Un analyseur de mémoire dynamique pour Linux</summary>
@@ -53,10 +50,9 @@
   <summary xml:lang="pl">Program profilujący pamięć na stosie dla Linuksa</summary>
   <summary xml:lang="pt">Um analisador da memória de dados para o Linux</summary>
   <summary xml:lang="pt-BR">Um analisador de performance de memória de dados para o Linux</summary>
-  <summary xml:lang="sk">Profiler pamäťovej haldy pre Linux</summary>
+  <summary xml:lang="sk">Profiler pamäťovej haldy pre Linux.</summary>
   <summary xml:lang="sl">Analizator profila pomnilnika kopice za Linux</summary>
   <summary xml:lang="sv">Ett heap-profileringsverktyg för Linux</summary>
-  <summary xml:lang="tr">Linux için yığın bellek profilleyici</summary>
   <summary xml:lang="uk">Засіб профілювання «купи» пам'яті для Linux</summary>
   <summary xml:lang="x-test">xxA heap memory profiler for Linuxxx</summary>
   <summary xml:lang="zh-CN">用于 Linux 的堆内存分析器</summary>
@@ -68,14 +64,13 @@
     <p xml:lang="ca-valencia">«heaptrack» rastreja totes les assignacions de memòria i anota estos esdeveniments amb seguiments de pila. Les eines d'anàlisi dedicades que hi ha a continuació, vos permetran interpretar l'anàlisi de rendiment de la memòria en monticles:</p>
     <p xml:lang="da">Heaptrack sporer alle hukommelsesallokeringer og anmærker begivenhederne med stakspor. Dedikerede analyseværktøjer som giver dig mulighed for at fortolke heapens hukommelsesprofil til:</p>
     <p xml:lang="en-GB">Heaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:</p>
-    <p xml:lang="eo">Heaptrack spuras ĉiujn memorajn atribuojn kaj notas ĉi tiujn eventojn per stakspuroj. Dediĉitaj analiziloj tiam permesas vin interpreti la staplomemoran profilon al:</p>
     <p xml:lang="es">Heaptrack rastrea todas las asignaciones de memoria y anota estos eventos con trazas de la pila para poder usar herramientas de dedicadas que le permitan interpretar el análisis de rendimiento de la memoria de almacenamiento libre para:</p>
     <p xml:lang="fr">Le logiciel « Heaptrack » permet le suivi des allocations de mémoire. Il annote les demandes par des traces dans la pile. Des outils dédiés d'analyse vous permettent ensuite d'interpréter le profil de la mémoire dynamique pour :</p>
     <p xml:lang="gl">Heaptrack fai un seguimento de todas as asociacións de memoria e apunta os eventos co historial da rima. Logo pode usar ferramentas de análise para interpretar os datos de uso da memoria dinámica (heap) para:</p>
     <p xml:lang="id">Heaptrack melacak semua alokasi memori dan membubuhi keterangan peristiwa ini dengan jejak tumpukan. Alat analisis khusus kemudian memungkinkan kamu untuk menginterpretasikan profil memori tumpukan untuk:</p>
     <p xml:lang="it">Heaptrack traccia tutte le allocazioni di memoria e le annota con tracciati dello stack. Degli strumenti dedicati di analisi ti permettono quindi di interpretare il profilo della memoria heap in modo da:</p>
     <p xml:lang="ko">힙 추적은 모든 메모리 할당을 추적하고 스택 추적과 메모리 할당을 연결합니다. 분석 도구를 사용하여 힙 메모리 프로필을 해석할 수 있습니다:</p>
-    <p xml:lang="nl">Heaptrack traceert alle toewijzingen van geheugen en annoteert deze gebeurtenissen met stacktraces. Specifieke hulpmiddelen voor analyse bieden u de mogelijkheid om het geheugenprofiel van de heap te interpreteren:</p>
+    <p xml:lang="nl">Heaptrack traceert alle toewijzigingen van geheugen en annoteert deze gebeurtenissen met stacktraces. Specifieke hulpmiddelen voor analyse bieden u de mogelijkheid om het geheugenprofiel van de heap te interpreteren:</p>
     <p xml:lang="nn">Heaptrack sporar alle minnereserveringar og merkjer dei med tilhøyrande stabelspor. Analyseverktøyet lèt deg så tolka minneprofilen for å:</p>
     <p xml:lang="pl">Heaptrack rejestruje wszystkie przydziały pamięci i przypisuje tym zdarzeniom ślady stosu. Dedykowane narzędzia analizy, które umożliwiają interpretację profilu pamięcy aby:</p>
     <p xml:lang="pt">O Heaptrack faz uma análise de todas as alocações de memória e anota esses eventos com os registos de chamadas. As ferramentas de análise dedicadas permitem-lhe então interpretar o perfil da memória de dados para:</p>
@@ -93,7 +88,6 @@
       <li xml:lang="ca-valencia">troba els punts crítics que necessiten optimitzar-se per a reduir el consum de memòria de la vostra aplicació</li>
       <li xml:lang="da">find hotspots som behøver optimering for at reducere dit programs hukommelsesfodaftryk</li>
       <li xml:lang="en-GB">find hotspots that need to be optimized to reduce the memory footprint of your application</li>
-      <li xml:lang="eo">trovi retpunktojn, kiuj bezonas esti optimumigitaj por redukti la memorspuron de via aplikaĵo</li>
       <li xml:lang="es">encontrar cuellos de botella que es necesario optimizar para reducir el impacto de su aplicación en la memoria</li>
       <li xml:lang="fr">trouver les zones principales de code à améliorer pour réduire l'empreinte mémoire de votre application</li>
       <li xml:lang="gl">Atopar puntos quentes que cómpre optimizar para reducir o consumo de memoria da aplicación</li>
@@ -117,7 +111,6 @@
       <li xml:lang="ca-valencia">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai es desassignarà</li>
       <li xml:lang="da">find hukommelseslæk, dvs. positioner som allokerer hukommelse som aldrig deallokeres</li>
       <li xml:lang="en-GB">find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
-      <li xml:lang="eo">trovi memorlikojn, t.e. lokojn kiuj asignas memoron kiu neniam estas deasignita</li>
       <li xml:lang="es">encontrar fugas de memoria (es decir, lugares donde se asigna memoria que no se llega a liberar)</li>
       <li xml:lang="fr">trouver les fuites de mémoires, c'est-à-dire, des parties de logiciels, qui s'allouent de la mémoire mais qui ne la libèrent jamais</li>
       <li xml:lang="gl">Atopar perdas de memoria, é dicir, lugares que asignan memoria que nunca se libera.</li>
@@ -141,7 +134,6 @@
       <li xml:lang="ca-valencia">troba els punts crítics d'assignació, és a dir, les ubicacions al codi que desencadenen un munt de crides d'assignació de memòria</li>
       <li xml:lang="da">find allokerede hotspots, dvs. kodepositioner som udløser en masse kald for hukommelsesallokering</li>
       <li xml:lang="en-GB">find allocation hotspots, i.e. code locations that trigger a lot of memory allocation calls</li>
-      <li xml:lang="eo">trovi atribuajn retpunktojn, t.e. kodlokojn, kiuj ekigas multajn memorajn alvokojn</li>
       <li xml:lang="es">encontrar cuellos de botella de asignaciones (es decir, lugares del código fuente que desencadenan numerosas llamadas de asignación de memoria)</li>
       <li xml:lang="fr">trouver les zones principales de code faisant des allocations mémoire, c'est-à-dire celles faisant de nombreuses requêtes d'allocation mémoire</li>
       <li xml:lang="gl">Atopar puntos quentes de asignación, é dicir, lugares do código que causan moitas chamadas de asignación de memoria.</li>
@@ -165,7 +157,6 @@
       <li xml:lang="ca-valencia">troba les assignacions temporals, són les assignacions que són seguides directament per la cancel·lació de la seua assignació</li>
       <li xml:lang="da">find midlertidige allokeringer, som er allokeringer der direkte følges af deres deallokering</li>
       <li xml:lang="en-GB">find temporary allocations, which are allocations that are directly followed by their deallocation</li>
-      <li xml:lang="eo">trovi provizorajn asignojn, kiuj estas asignoj, kiuj estas rekte sekvataj de sia malasignado</li>
       <li xml:lang="es">encontrar asignaciones de memoria temporales, que son asignaciones que son inmediatamente seguidas por sus correspondientes liberaciones</li>
       <li xml:lang="fr">trouver les allocations transitoires, c'est-à-dire enchaînant une allocation suivie directement par une désallocation.</li>
       <li xml:lang="gl">Atopar asignacións temporais, asignacións que se liberan no momento.</li>
@@ -196,7 +187,6 @@
       <caption xml:lang="ca">Resum del seguiment de les dades d'assignació de la memòria en monticles</caption>
       <caption xml:lang="ca-valencia">Resum del seguiment de les dades d'assignació de la memòria en monticles</caption>
       <caption xml:lang="en-GB">Summary of tracked heap memory allocation data</caption>
-      <caption xml:lang="eo">Resumo de spuritaj amasomemoraj asignodatenoj</caption>
       <caption xml:lang="es">Sumario de datos de asignación de memoria de almacenamiento libre rastreada</caption>
       <caption xml:lang="fr">Résumé des données d'allocation pour la mémoire dynamique surveillée.</caption>
       <caption xml:lang="gl">Resumo dos datos de asignación de memoria dinámica (heap) da que se fai seguimento.</caption>
@@ -206,8 +196,8 @@
       <caption xml:lang="nl">Samenvatting van gevolgde gegevens voor heap-geheugen toewijzen</caption>
       <caption xml:lang="nn">Samandrag av minnereserveringsdata</caption>
       <caption xml:lang="pl">Podsumować śledzonych danych przydzielonych na pamięci stosu</caption>
-      <caption xml:lang="pt">Um resumo dos dados de alocação de memória de dados registados</caption>
       <caption xml:lang="pt-BR">Resumo dos dados rastreados de alocação de memória de dados</caption>
+      <caption xml:lang="sk">Sumár alokačných údajov sledovanej pamäťovej haldy.</caption>
       <caption xml:lang="sl">Povzetek podatkov o dodelitvi pomnilnika v kopici</caption>
       <caption xml:lang="sv">Sammanfattning av spårad heap-minnestilldelningsdata</caption>
       <caption xml:lang="tr">İzlenen yığın bellek ayırma verisinin özeti</caption>
@@ -221,7 +211,6 @@
       <caption xml:lang="ca">Visualització del gràfic de flames del nombre d'assignacions de memòria en monticles</caption>
       <caption xml:lang="ca-valencia">Visualització del gràfic de flames del nombre d'assignacions de memòria en monticles</caption>
       <caption xml:lang="en-GB">Flamegraph visualisation of number of heap memory allocations</caption>
-      <caption xml:lang="eo">Flamgrafea bildigo de nombro da amasmemor-asignoj</caption>
       <caption xml:lang="es">Visualización de gráfico de llamas del número de asignaciones de memoria de almacenamiento libre</caption>
       <caption xml:lang="fr">Affichage graphe en chandelles du nombre d'allocations de mémoire dynamique.</caption>
       <caption xml:lang="gl">Visualización mediante un gráfico de chamas do número de asignacións de memoria dinámica (heap).</caption>
@@ -231,8 +220,8 @@
       <caption xml:lang="nl">Flamegraph visualisatie van het aantal toewijzingen van heap-geheugen</caption>
       <caption xml:lang="nn">Flammegraf-visualisering av talet på minnereserveringar</caption>
       <caption xml:lang="pl">Zobrazowanie liczby przydzieleń pamięci na stosie na wykresie płomieni</caption>
-      <caption xml:lang="pt">Uma visualização em mapa de calor das alocações de memória de dados</caption>
       <caption xml:lang="pt-BR">Visualização em gráfico de chamas do número de alocações de memória de dados</caption>
+      <caption xml:lang="sk">Plameňový graf vizualizácie počtu alokácií pamäťovej hromady.</caption>
       <caption xml:lang="sl">Grafična vizualizacija števila dodelitev pomnilnika v kopici</caption>
       <caption xml:lang="sv">Visualisering av antal heap-minnestilldelningar med Flamegraph</caption>
       <caption xml:lang="tr">Yığın bellek ayırma sayısının Flamegraph görselleştirmesi</caption>
@@ -246,7 +235,6 @@
       <caption xml:lang="ca">Gràfic de les assignacions de memòria en monticles al llarg del temps</caption>
       <caption xml:lang="ca-valencia">Gràfic de les assignacions de memòria en monticles al llarg del temps</caption>
       <caption xml:lang="en-GB">Chart of heap memory allocations over time</caption>
-      <caption xml:lang="eo">Diagramo de amasmemor-asignoj laŭlonge de la tempo</caption>
       <caption xml:lang="es">Gráfico de asignaciones de memoria del almacenamiento libre a lo largo del tiempo</caption>
       <caption xml:lang="eu">Denboran zehar, memoria dinamikoaren esleipenaren diagrama</caption>
       <caption xml:lang="fr">Graphique des allocations de mémoire dynamique en temps réel</caption>
@@ -257,9 +245,9 @@
       <caption xml:lang="nl">Grafiek van toewijzingen van heap-geheugen in de tijd</caption>
       <caption xml:lang="nn">Diagram over minnereserveringar over tid</caption>
       <caption xml:lang="pl">Wykres przydzieleń pamięci na stosie na osi czasu</caption>
-      <caption xml:lang="pt">Gráfico das alocações de memória de dados ao longo do tempo</caption>
       <caption xml:lang="pt-BR">Gráfico das alocações de memória de dado no período de tempo</caption>
-      <caption xml:lang="sl">Tabela dodelitev pomnilnika za kopico skozi čas</caption>
+      <caption xml:lang="sk">Graf alokácií pamäťovej hromady v čase.</caption>
+      <caption xml:lang="sl">Graf dodelitev pomnilnika za kopico skozi čas</caption>
       <caption xml:lang="sv">Diagram över heap-minnestilldelningar över tiden</caption>
       <caption xml:lang="tr">Zaman içinde yığın bellek ayırmalarının grafiği</caption>
       <caption xml:lang="uk">Діаграма розміщення даних у «купі» пам'яті за часом</caption>
