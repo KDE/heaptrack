@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-05 00:47+0000\n"
+"POT-Creation-Date: 2023-09-15 02:28+0000\n"
 "PO-Revision-Date: 2022-02-26 03:08+0100\n"
 "Last-Translator: Frederik Schwarzer <schwarzer@kde.org>\n"
 "Language-Team: German <kde-i18n-de@kde.org>\n"
@@ -412,9 +412,9 @@ msgstr ""
 
 #: gui/chartwidget.cpp:471
 #, fuzzy, kde-format
-#| msgid "%1 allocations from %2 in %3 (%4)"
+#| msgid "%1 allocations from %2 in %3"
 msgid "%1 (filtered from %2 to %3, Δ%4)"
-msgstr "%1 Speicherzuordnungen von %2 in %3 (%4)"
+msgstr "%1 Speicherzuordnungen von %2 in %3"
 
 #: gui/chartwidget.cpp:475
 #, kde-format
@@ -1303,9 +1303,6 @@ msgstr "%1 in %2"
 msgid "<unresolved function>"
 msgstr ""
 
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
 
@@ -1324,21 +1321,8 @@ msgstr ""
 #~ msgid "Qt Creator"
 #~ msgstr "Qt Creator"
 
-#~ msgid "%1 allocations from %2"
-#~ msgstr "%1 Speicherzuordnungen von %2"
-
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 (%2)"
-
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 in %2 (%3)"
-
-#~ msgid "Symbol"
-#~ msgstr "Symbol"
-
-#~ msgid "Binary"
-#~ msgstr "Programmdatei"
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
 
 #, fuzzy
 #~| msgid ""
@@ -1362,6 +1346,12 @@ msgstr ""
 #~ "<qt>Die Datei, aus der die allozierende Funktion aufgerufen wurde. Kann "
 #~ "leer sein, wenn Debug-Informationen fehlen.</qt>"
 
+#, fuzzy
+#~| msgid "%1 in ?? (%2)"
+#~ msgctxt "%1: function, %2: binary"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1 in ?? (%2)"
+
 #~ msgid "Function"
 #~ msgstr "Funktion"
 
@@ -1369,17 +1359,9 @@ msgstr ""
 #~ msgstr "Modul"
 
 #, fuzzy
-#~| msgctxt "1: function, 2: module"
-#~| msgid ""
-#~| "%1\n"
-#~| "  in %2"
-#~ msgctxt "1: function, 2: module, 3: module path"
-#~ msgid ""
-#~ "%1\n"
-#~ "  in %2"
-#~ msgstr ""
-#~ "%1\n"
-#~ "  in %2"
+#~| msgid "%1 in %2:%3 (%4)"
+#~ msgid "%1 in %2 (%3)"
+#~ msgstr "%1 in %2:%3 (%4)"
 
 #~ msgid "File"
 #~ msgstr "Datei"

@@ -1,13 +1,13 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Steve Allewell <steve.allewell@gmail.com>, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022.
+# Steve Allewell <steve.allewell@gmail.com>, 2015, 2016, 2017, 2018, 2019, 2022.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-05 00:47+0000\n"
-"PO-Revision-Date: 2022-12-31 15:54+0000\n"
+"POT-Creation-Date: 2023-09-15 02:28+0000\n"
+"PO-Revision-Date: 2022-01-01 16:53+0000\n"
 "Last-Translator: Steve Allewell <steve.allewell@gmail.com>\n"
 "Language-Team: British English <kde-l10n-en_gb@kde.org>\n"
 "Language: en_GB\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 21.12.3\n"
+"X-Generator: Lokalize 21.12.0\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -231,24 +231,27 @@ msgid "Elapsed Time"
 msgstr "Elapsed Time"
 
 #: gui/chartmodel.cpp:83
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Most Memory Allocations"
 msgid "Total Memory Allocations"
-msgstr "Total Memory Allocations"
+msgstr "Most Memory Allocations"
 
 #: gui/chartmodel.cpp:85
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "%1 peak memory consumption"
 msgid "Total Memory Consumption"
-msgstr "Total Memory Consumption"
+msgstr "%1 peak memory consumption"
 
 #: gui/chartmodel.cpp:87
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Most Temporary Allocations"
 msgid "Total Temporary Allocations"
-msgstr "Total Temporary Allocations"
+msgstr "Most Temporary Allocations"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
-msgstr "%1"
+msgstr ""
 
 #: gui/chartmodel.cpp:166
 #, kde-format
@@ -297,27 +300,27 @@ msgstr "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr "Export As..."
+msgstr ""
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr "Show legend"
+msgstr ""
 
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr "Show total cost graph"
+msgstr ""
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr "Show detailed cost graph"
+msgstr ""
 
 #: gui/chartwidget.cpp:187
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr "Stacked diagrams:"
+msgstr ""
 
 #: gui/chartwidget.cpp:234
 #, kde-format
@@ -333,17 +336,18 @@ msgstr "Reset Filter"
 #: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
-msgstr "Save %1"
+msgstr ""
 
 #: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
+msgstr ""
 
 #: gui/chartwidget.cpp:400
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Failed to parse file %1."
 msgid "Failed to save the image to %1"
-msgstr "Failed to save the image to %1"
+msgstr "Failed to parse file %1."
 
 #: gui/chartwidget.cpp:420
 #, kde-format
@@ -1323,9 +1327,6 @@ msgstr "%1 in %2"
 msgid "<unresolved function>"
 msgstr "<unresolved function>"
 
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
 
@@ -1344,15 +1345,8 @@ msgstr "<unresolved function>"
 #~ msgid "Qt Creator"
 #~ msgstr "Qt Creator"
 
-#~ msgid "%1 allocations from %2"
-#~ msgstr "%1 allocations from %2"
-
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 (%2)"
-
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 in %2 (%3)"
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
 
 #~ msgid "Symbol"
 #~ msgstr "Symbol"
@@ -1384,6 +1378,10 @@ msgstr "<unresolved function>"
 #~ msgid "The name of the executable the symbol resides in."
 #~ msgstr "The name of the executable the symbol resides in."
 
+#~ msgctxt "%1: function, %2: binary"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1 (%2)"
+
 #~ msgid "Function"
 #~ msgstr "Function"
 
@@ -1397,18 +1395,8 @@ msgstr "<unresolved function>"
 #~ "<qt>The parent function that called an allocation function. May be "
 #~ "unknown when debug information is missing.</qt>"
 
-#, fuzzy
-#~| msgctxt "1: function, 2: module"
-#~| msgid ""
-#~| "%1\n"
-#~| "  in %2"
-#~ msgctxt "1: function, 2: module, 3: module path"
-#~ msgid ""
-#~ "%1\n"
-#~ "  in %2"
-#~ msgstr ""
-#~ "%1\n"
-#~ "  in %2"
+#~ msgid "%1 in %2 (%3)"
+#~ msgstr "%1 in %2 (%3)"
 
 #~ msgid "File"
 #~ msgstr "File"

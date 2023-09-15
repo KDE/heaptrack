@@ -1,82 +1,77 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
-# Vincent Pinon <vpinon@kde.org>, 2015.
-# Xavier Besnard <xavier.besnard@neuf.fr>, 2020, 2021, 2022.
-# Xavier BESNARD <xavier.besnard@neuf.fr>, 2023.
 #
+# enolp <enolp@softastur.org>, 2016.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2023-09-15 02:28+0000\n"
-"PO-Revision-Date: 2023-02-05 16:26+0100\n"
-"Last-Translator: Xavier BESNARD <xavier.besnard]neuf.fr>\n"
-"Language-Team: fr\n"
-"Language: fr\n"
+"PO-Revision-Date: 2016-12-21 16:20+0100\n"
+"Last-Translator: enolp <enolp@softastur.org>\n"
+"Language-Team: Asturian <alministradores@softastur.org>\n"
+"Language: ast\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 22.12.1\n"
-"X-Environment: kde\n"
-"X-Accelerator-Marker: &\n"
-"X-Text-Markup: kde4\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Lokalize 2.0\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
 msgid "Your names"
-msgstr "Vincent Pinon, Xavier Besnard"
+msgstr "Softastur"
 
 #, kde-format
 msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
-msgstr "vpinon@kde.org, xavier.besnard@neuf.fr"
+msgstr "alministradores@softastur.org"
 
 #: gui/callercalleemodel.cpp:40 gui/callercalleemodel.h:333
 #: gui/treemodel.cpp:73
 #, kde-format
 msgid "Location"
-msgstr "Emplacement"
+msgstr ""
 
 #: gui/callercalleemodel.cpp:42 gui/callercalleemodel.h:335
 #, kde-format
 msgid "Allocations (Self)"
-msgstr "Allocations (Automatique)"
+msgstr ""
 
 #: gui/callercalleemodel.cpp:44 gui/callercalleemodel.h:337
 #, kde-format
 msgid "Temporary (Self)"
-msgstr "Temporaire (Automatique)"
+msgstr ""
 
 #: gui/callercalleemodel.cpp:46 gui/callercalleemodel.h:339
 #, kde-format
 msgid "Peak (Self)"
-msgstr "Pic (automatique)"
+msgstr ""
 
 #: gui/callercalleemodel.cpp:48 gui/callercalleemodel.h:341
 #, kde-format
 msgid "Leaked (Self)"
-msgstr "Fuite (Automatique)"
+msgstr ""
 
 #: gui/callercalleemodel.cpp:50 gui/callercalleemodel.h:343
 #, kde-format
 msgid "Allocations (Incl.)"
-msgstr "Allocations (Inclus)"
+msgstr ""
 
 #: gui/callercalleemodel.cpp:52 gui/callercalleemodel.h:345
 #, kde-format
 msgid "Temporary (Incl.)"
-msgstr "Temporaire (Inclus)"
+msgstr ""
 
 #: gui/callercalleemodel.cpp:54 gui/callercalleemodel.h:347
 #, kde-format
 msgid "Peak (Incl.)"
-msgstr "Pic (Inclus)"
+msgstr ""
 
 #: gui/callercalleemodel.cpp:56 gui/callercalleemodel.h:349
 #, kde-format
 msgid "Leaked (Incl.)"
-msgstr "Fuite (Inclus)"
+msgstr ""
 
 #: gui/callercalleemodel.cpp:63
 #, kde-format
@@ -84,9 +79,6 @@ msgid ""
 "<qt>The parent symbol that called an allocation function. The function name "
 "may be unresolved when debug information is missing.</qt>"
 msgstr ""
-"<qt>La fonction parente qui a appelé une fonction d'allocation. Le nom de la "
-"fonction peut être non résolu quand les informations de débogage sont "
-"absentes.</qt>"
 
 #: gui/callercalleemodel.cpp:66 gui/callercalleemodel.h:359
 #, kde-format
@@ -94,8 +86,6 @@ msgid ""
 "<qt>The number of times an allocation function was directly called from this "
 "location.</qt>"
 msgstr ""
-"<qt>Le nombre de fois que la fonction d'allocation a été appelée depuis cet "
-"emplacement.</qt>"
 
 #: gui/callercalleemodel.cpp:69 gui/callercalleemodel.h:362
 #, kde-format
@@ -103,8 +93,6 @@ msgid ""
 "<qt>The number of direct temporary allocations. These allocations are "
 "directly followed by a free without any other allocations in-between.</qt>"
 msgstr ""
-"<qt>Le nombre d'allocations temporaires. Ces allocations sont directement "
-"suivies par leur désallocation, sans aucune autre allocation entre.</qt>"
 
 #: gui/callercalleemodel.cpp:73 gui/callercalleemodel.h:366
 #, kde-format
@@ -112,9 +100,6 @@ msgid ""
 "<qt>The maximum heap memory in bytes consumed from allocations originating "
 "directly at this location. This takes deallocations into account.</qt>"
 msgstr ""
-"<qt>La mémoire maximale du tas local, en octets, consommée par des "
-"allocations venant directement de cet emplacement. Ceci prend en compte les "
-"libérations.</qt>"
 
 #: gui/callercalleemodel.cpp:78 gui/callercalleemodel.h:371
 #, kde-format
@@ -122,8 +107,6 @@ msgid ""
 "<qt>The bytes allocated directly at this location that have not been "
 "deallocated.</qt>"
 msgstr ""
-"<qt>Les octets alloués directement à cet emplacement qui n'ont pas été "
-"libérés.</qt>"
 
 #: gui/callercalleemodel.cpp:81 gui/callercalleemodel.h:181
 #: gui/callercalleemodel.h:374
@@ -132,8 +115,6 @@ msgid ""
 "<qt>The inclusive number of times an allocation function was called from "
 "this location or any functions called from here.</qt>"
 msgstr ""
-"<qt>Le nombre de fois que la fonction d'allocation a été appelée depuis cet "
-"emplacement ou toute fonction appelée à partir d'ici.</qt>"
 
 #: gui/callercalleemodel.cpp:85 gui/callercalleemodel.h:185
 #: gui/callercalleemodel.h:378
@@ -142,8 +123,6 @@ msgid ""
 "<qt>The number of inclusive temporary allocations. These allocations are "
 "directly followed by a free without any other allocations in-between.</qt>"
 msgstr ""
-"<qt>Le nombre d'allocations temporaires. Ces allocations sont directement "
-"suivies par leur désallocation, sans aucune autre allocation entre.</qt>"
 
 #: gui/callercalleemodel.cpp:89 gui/callercalleemodel.h:173
 #: gui/callercalleemodel.h:382
@@ -153,9 +132,6 @@ msgid ""
 "originating at this location or from functions called from here. This takes "
 "deallocations into account.</qt>"
 msgstr ""
-"<qt>La mémoire maximale en octets du tas local inclus et consommé par des "
-"allocations provenant de cet emplacement pour des fonctions appelés ici. "
-"Ceci prend en compte les désallocations.</qt>"
 
 #: gui/callercalleemodel.cpp:94 gui/callercalleemodel.h:178
 #: gui/callercalleemodel.h:387 gui/treemodel.cpp:91
@@ -163,40 +139,39 @@ msgstr ""
 msgid ""
 "<qt>The bytes allocated at this location that have not been deallocated.</qt>"
 msgstr ""
-"<qt>Les octets alloués à cet emplacement qui n'ont pas été libérés.</qt>"
 
 #: gui/callercalleemodel.cpp:202
 #, kde-format
 msgid "Caller"
-msgstr "Fonction appelante"
+msgstr ""
 
 #: gui/callercalleemodel.cpp:214
 #, kde-format
 msgid "Callee"
-msgstr "Fonction appelée"
+msgstr ""
 
 #: gui/callercalleemodel.h:156 gui/treemodel.cpp:69 gui/util.cpp:112
 #: gui/util.cpp:141 gui/util.cpp:170
 #, kde-format
 msgid "Peak"
-msgstr "Pic"
+msgstr ""
 
 #: gui/callercalleemodel.h:158 gui/flamegraph.cpp:433 gui/treemodel.cpp:71
 #: gui/util.cpp:113 gui/util.cpp:142 gui/util.cpp:171
 #, kde-format
 msgid "Leaked"
-msgstr "Fuite"
+msgstr ""
 
 #: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:477
 #: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
 #, kde-format
 msgid "Allocations"
-msgstr "Allocations"
+msgstr ""
 
 #: gui/callercalleemodel.h:162 gui/treemodel.cpp:67
 #, kde-format
 msgid "Temporary"
-msgstr "Temporaire"
+msgstr ""
 
 #: gui/callercalleemodel.h:170
 #, kde-format
@@ -204,8 +179,6 @@ msgid ""
 "The location of the %1. The function name may be unresolved when debug "
 "information is missing."
 msgstr ""
-"L'emplacement de %1. Le nom de fonction peut être non résolu quand les "
-"informations de débogage sont manquantes."
 
 #: gui/callercalleemodel.h:356
 #, kde-format
@@ -213,48 +186,42 @@ msgid ""
 "<qt>The source code location that called an allocation function. May be "
 "unknown when debug information is missing.</qt>"
 msgstr ""
-"<qt>L'emplacement du code dans la source ayant appelé une fonction "
-"d'allocation. Peut être non résolu quand les informations de débogage sont "
-"manquantes.</qt>"
 
 #: gui/chartmodel.cpp:52
 #, kde-format
 msgid "Memory Allocations"
-msgstr "Allocations mémoire"
+msgstr ""
 
 #: gui/chartmodel.cpp:54
 #, kde-format
 msgid "Memory Consumed"
-msgstr "Mémoire consommée"
+msgstr ""
 
 #: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:479
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
-msgstr "Allocations temporaires"
+msgstr ""
 
 #: gui/chartmodel.cpp:76 gui/chartwidget.cpp:466
 #, kde-format
 msgid "Elapsed Time"
-msgstr "Temps écoulé"
+msgstr ""
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "La plupart des allocations de mémoire"
+msgstr ""
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "%1 peak memory consumption"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "Consommation de mémoire du pic %1"
+msgstr ""
 
 #: gui/chartmodel.cpp:87
-#, fuzzy, kde-format
-#| msgid "Most Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "Allocations de mémoire les plus temporaires"
+msgstr ""
 
 #: gui/chartmodel.cpp:113
 #, kde-format
@@ -267,30 +234,28 @@ msgctxt ""
 "%1: the formatted byte size, e.g. \"1.2KB\", %2: the raw byte size, e.g. "
 "\"1300\""
 msgid "%1 (%2 bytes)"
-msgstr "%1 (%2 octets)"
+msgstr ""
 
 #: gui/chartmodel.cpp:174
 #, kde-format
 msgid "<qt>%1 allocations in total after %2</qt>"
-msgstr "<qt>Total de %1 allocations après %2</qt>"
+msgstr ""
 
 #: gui/chartmodel.cpp:176
 #, kde-format
 msgid "<qt>%1 temporary allocations in total after %2</qt>"
-msgstr "<qt>Total de %1 allocations temporaires après %2</qt>"
+msgstr ""
 
 #: gui/chartmodel.cpp:178
 #, kde-format
 msgid "<qt>%1 consumed in total after %2</qt>"
-msgstr "<qt>Total de %1 consommé après %2</qt>"
+msgstr ""
 
 #: gui/chartmodel.cpp:184
 #, kde-format
 msgid ""
 "<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>"
 msgstr ""
-"<qt>%2 allocations après %3 à partir :<p style='margin-left:10px;'>%1</p></"
-"qt>"
 
 #: gui/chartmodel.cpp:188
 #, kde-format
@@ -298,14 +263,11 @@ msgid ""
 "<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
 "p></qt>"
 msgstr ""
-"<qt>%2 allocations temporaires après %3 à partir de :<p style='margin-"
-"left:10px'>%1</p></qt>"
 
 #: gui/chartmodel.cpp:192
 #, kde-format
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
 msgstr ""
-"<qt>%2 consommé après %3 à partir de :<p style='margin-left:10px'>%1</p></qt>"
 
 #: gui/chartwidget.cpp:162
 #, kde-format
@@ -335,13 +297,13 @@ msgstr ""
 #: gui/chartwidget.cpp:234
 #, kde-format
 msgid "Filter In On Selection"
-msgstr "Filtrer selon la sélection..."
+msgstr ""
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
 #: gui/chartwidget.cpp:244 gui/mainwindow.ui:891
 #, kde-format
 msgid "Reset Filter"
-msgstr "Réinitialiser le filtre"
+msgstr ""
 
 #: gui/chartwidget.cpp:383
 #, kde-format
@@ -354,37 +316,35 @@ msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
 msgstr ""
 
 #: gui/chartwidget.cpp:400
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to save the image to %1"
-msgstr "Impossible d'analyser le fichier %1."
+msgstr ""
 
 #: gui/chartwidget.cpp:420
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
-msgstr "<tr><th></th><th>Début</th><th>Fin</th><th>Delta</th></tr>"
+msgstr ""
 
 #: gui/chartwidget.cpp:421
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr "<tr><th>Temps</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr ""
 
 #: gui/chartwidget.cpp:425
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr "<tr><th>Consommé</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr ""
 
 #: gui/chartwidget.cpp:429
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr ""
 
 #: gui/chartwidget.cpp:433
 #, kde-format
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr ""
-"<tr><th>Allocations temporaires</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:441
 #, kde-format
@@ -392,9 +352,6 @@ msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
 "a time range for filtering.</qt>"
 msgstr ""
-"<qt> Affiche la consommation de mémoire dans le tas local dans le temps."
-"<br>Cliquez et faites glisser pour sélectionner un intervalle de temps pour "
-"le filtrage.</qt>"
 
 #: gui/chartwidget.cpp:445
 #, kde-format
@@ -402,9 +359,6 @@ msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
 "select a time range for filtering.</qt>"
 msgstr ""
-"<qt>Affiche le nombre d'allocations de mémoire durant la période de temps."
-"<br>Cliquez et faites glisser pour sélectionner un intervalle de temps pour "
-"le filtrage.</qt>"
 
 #: gui/chartwidget.cpp:449
 #, kde-format
@@ -414,44 +368,33 @@ msgid ""
 "deallocation, without other allocations happening in-between.<br>Click and "
 "drag to select a time range for filtering.</qt>"
 msgstr ""
-"<qt>Affiche le nombre d'allocations temporaires de mémoire sur une période "
-"donnée. Une allocation temporaire est celle qui est suivie directement par "
-"sa désallocation, sans autre allocation réalisée entre les deux. <br>Cliquez "
-"et faites glisser pour sélectionner l'intervalle de temps pour le filtrage.</"
-"qt>"
 
 #: gui/chartwidget.cpp:471
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
-msgstr "%1 (Filtré à partir de %2 à %3, Δ%4)"
+msgstr ""
 
 #: gui/chartwidget.cpp:475
 #, kde-format
 msgid "%1 (filtered delta)"
-msgstr "%1 (données filtrées)"
+msgstr ""
 
 #: gui/chartwidget.cpp:564
 #, kde-format
 msgid "Click and drag to select time range for filtering."
 msgstr ""
-"Cliquez et faites glisser pour sélectionner l'intervalle de temps pour le "
-"filtrage."
 
 #: gui/chartwidget.cpp:570
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
 msgstr ""
-"T = %1, Consommé : %2. Cliquez et faites glisser pour sélectionner "
-"l'intervalle de temps pour le filtrage."
 
 #: gui/chartwidget.cpp:574
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
 msgstr ""
-"T = %1, Allocations : %2. Cliquez et faites glisser pour sélectionner "
-"l'intervalle de temps pour le filtrage."
 
 #: gui/chartwidget.cpp:578
 #, kde-format
@@ -459,59 +402,57 @@ msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
 "filtering."
 msgstr ""
-"T = %1, Allocations temporaires : %2. Cliquez et faites glisser pour "
-"sélectionner l'intervalle de temps pour le filtrage."
 
 #: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
 #, kde-format
 msgid "%1 allocations in total"
-msgstr "Total de %1 allocations"
+msgstr ""
 
 #: gui/flamegraph.cpp:177
 #, kde-format
 msgid "%1 temporary allocations in total"
-msgstr "Total des %1 allocations temporaires"
+msgstr ""
 
 #: gui/flamegraph.cpp:179
 #, kde-format
 msgid "%1 peak memory consumption"
-msgstr "Consommation de mémoire du pic %1"
+msgstr ""
 
 #: gui/flamegraph.cpp:181
 #, kde-format
 msgid "%1 leaked in total"
-msgstr "Total de %1 en fuite"
+msgstr ""
 
 #: gui/flamegraph.cpp:234
 #, kde-format
 msgctxt "%1: number of allocations, %2: relative number, %3: function label"
 msgid "%1 (%2%) allocations in %3 and below."
-msgstr "%1 (%2 %) allocations dans %3 et ci-dessous."
+msgstr ""
 
 #: gui/flamegraph.cpp:239
 #, kde-format
 msgctxt ""
 "%1: number of temporary allocations, %2: relative number, %3 function label"
 msgid "%1 (%2%) temporary allocations in %3 and below."
-msgstr "%1 (%2 %) allocations temporaires dans %3 et ci-dessous."
+msgstr ""
 
 #: gui/flamegraph.cpp:244
 #, kde-format
 msgctxt ""
 "%1: peak consumption in bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) contribution to peak consumption in %3 and below."
-msgstr "%1 (%2 %) contribution à la consommation du pic pour %3 et en dessous."
+msgstr ""
 
 #: gui/flamegraph.cpp:248
 #, kde-format
 msgctxt "%1: leaked bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) leaked in %3 and below."
-msgstr "%1 (%2%) en fuite dans %3 et ci-dessous."
+msgstr ""
 
 #: gui/flamegraph.cpp:428
 #, kde-format
 msgid "Memory Peak"
-msgstr "Pic de mémoire"
+msgstr ""
 
 #: gui/flamegraph.cpp:430
 #, kde-format
@@ -519,8 +460,6 @@ msgid ""
 "Show a flame graph over the contributions to the peak heap memory "
 "consumption of your application."
 msgstr ""
-"Afficher un graphique en flammes concernant les contributions au pic de "
-"consommation mémoire pour le tas local."
 
 #: gui/flamegraph.cpp:435
 #, kde-format
@@ -528,9 +467,6 @@ msgid ""
 "Show a flame graph over the leaked heap memory of your application. Memory "
 "is considered to be leaked when it never got deallocated. "
 msgstr ""
-"Afficher un graphique en flammes concernant les contributions au pic de "
-"consommation mémoire pour le tas local. La mémoire est considérée comme une "
-"fuite quand elle n'est jamais désallouée."
 
 #: gui/flamegraph.cpp:440
 #, kde-format
@@ -538,8 +474,6 @@ msgid ""
 "Show a flame graph over the number of allocations triggered by functions in "
 "your code."
 msgstr ""
-"Afficher un graphique en flammes concernant le nombre d'allocations "
-"demandées par les fonctions de votre code."
 
 #: gui/flamegraph.cpp:445
 #, kde-format
@@ -548,21 +482,16 @@ msgid ""
 "functions in your code. Allocations are marked as temporary when they are "
 "immediately followed by their deallocation."
 msgstr ""
-"Afficher un graphique en flammes concernant le nombre d'allocations "
-"demandées par les fonctions de votre code. Les allocations sont marquées "
-"comme temporaires quand elles sont immédiatement suivies par une "
-"désallocation."
 
 #: gui/flamegraph.cpp:452
 #, kde-format
 msgid "Select the data source that should be visualized in the flame graph."
 msgstr ""
-"Sélectionner la source de données à afficher dans un graphe en flammes."
 
 #: gui/flamegraph.cpp:467
 #, kde-format
 msgid "Bottom-Up View"
-msgstr "Affichage de bas en haut"
+msgstr ""
 
 #: gui/flamegraph.cpp:468
 #, kde-format
@@ -570,14 +499,11 @@ msgid ""
 "Enable the bottom-up flame graph view. When this is unchecked, the top-down "
 "view is enabled by default."
 msgstr ""
-"Active l'affichage d'un graphique en flammes de bas en haut. Quand cette "
-"option est désactivée, l'affichage du haut vers le base est activé par "
-"défaut."
 
 #: gui/flamegraph.cpp:476
 #, kde-format
 msgid "Collapse Recursion"
-msgstr "Réduite la récursion"
+msgstr ""
 
 #: gui/flamegraph.cpp:478
 #, kde-format
@@ -585,14 +511,11 @@ msgid ""
 "Collapse stack frames for functions calling themselves. When this is "
 "unchecked, recursive frames will be visualized separately."
 msgstr ""
-"Éliminer les structures de pile pour les fonctions s'appelant elles-même. "
-"Lorsque cette option est activée, les structures récursives seront affichées "
-"séparément."
 
 #: gui/flamegraph.cpp:490
 #, kde-format
 msgid "Cost Threshold: "
-msgstr "Seuil de coût :"
+msgstr ""
 
 #: gui/flamegraph.cpp:494
 #, kde-format
@@ -603,77 +526,71 @@ msgid ""
 "low memory overhead. If you need more details, decrease the threshold value, "
 "or set it to zero.</qt>"
 msgstr ""
-"<qt> Le seuil de coût définit une valeur fractionnaire de coupure. Les "
-"éléments avec un coût relatif sous cette valeur ne seront pas affichés dans "
-"le graphique en flammes. Ceci est fait comme une optimisation pour générer "
-"rapidement des graphiques avec des ensembles de données importants avec peu "
-"de consommation de mémoire. Si vous avez besoin de plus de détails, diminuer "
-"la valeur du seuil ou régler le à zéro.</qt>"
 
 #: gui/flamegraph.cpp:506
 #, kde-format
 msgid "Search..."
-msgstr "Chercher…"
+msgstr ""
 
 #: gui/flamegraph.cpp:507
 #, kde-format
 msgid "<qt>Search the flame graph for a symbol.</qt>"
-msgstr "<qt>Rechercher un symbole dans le graphique en flammes.</qt>"
+msgstr ""
 
 #: gui/flamegraph.cpp:545
 #, kde-format
 msgid "Reset View"
-msgstr "Remettre l'affichage à zéro"
+msgstr ""
 
 #: gui/flamegraph.cpp:555 gui/mainwindow.cpp:142
 #, kde-format
 msgid "View Caller/Callee"
-msgstr "Affichage des Appelant / Appelé"
+msgstr ""
 
 #: gui/flamegraph.cpp:696
 #, kde-format
 msgid "generating flame graph..."
-msgstr "Génération du graphique en flammes..."
+msgstr ""
 
 #: gui/flamegraph.cpp:773
 #, kde-format
 msgid "%1 (%2% of total of %3) allocations matched by search."
-msgstr "%1 (Total de %2 % parmi %3) allocations correspondant à la recherche."
+msgstr ""
 
 #: gui/flamegraph.cpp:778
 #, kde-format
 msgid "%1 (%2% of total of %3) matched by search."
-msgstr "%1 (Total %2 % de %3) correspondant à la recherche."
+msgstr ""
 
 #: gui/gui.cpp:67
 #, kde-format
 msgid "Heaptrack GUI"
-msgstr "Interface pour Heaptrack"
+msgstr ""
 
 #: gui/gui.cpp:68
 #, kde-format
 msgid "A visualizer for heaptrack data files."
-msgstr "Un afficheur de fichiers de données « Heaptrack »."
+msgstr ""
 
 #: gui/gui.cpp:69
 #, kde-format
 msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
-msgstr "Copyright 2015, Milian Wolff <mail@milianw.de>"
+msgstr ""
 
 #: gui/gui.cpp:72
 #, kde-format
 msgid "Milian Wolff"
-msgstr "Milian Wolff"
+msgstr ""
 
 #: gui/gui.cpp:72
 #, kde-format
 msgid "Original author, maintainer"
-msgstr "Auteur initial, mainteneur"
+msgstr ""
 
 #: gui/gui.cpp:86
 #, kde-format
 msgid "Base profile data to compare other files to."
-msgstr "Les données de base du profil à comparer aux autres fichiers."
+msgstr ""
 
 #: gui/gui.cpp:91
 #, kde-format
@@ -682,10 +599,6 @@ msgid ""
 "suppression per line, and start each line with 'leak:', i.e. use the LSAN "
 "suppression file format."
 msgstr ""
-"Charger la lises des suppressions de fuite à partir du fichier spécifié. "
-"Veuillez spécifier une suppression par ligne et démarrer chaque ligne par "
-"« leak », c'est-à-dire en utilisant le format de fichier de suppression "
-"« LSAN »."
 
 #: gui/gui.cpp:97 gui/mainwindow.cpp:642
 #, kde-format
@@ -696,13 +609,6 @@ msgid ""
 "application.  These are then always applied when analyzing the data, unless "
 "this feature is explicitly disabled using this command line option."
 msgstr ""
-"Ignorer les définitions de suppression qui sont intégrées dans le fichier de "
-"données « Heaptrack ». Par défaut, heaptrack copiera les suppressions "
-"définies optionnellement grâce à un symbole « const char "
-"*__lsan_default_suppressions() » dans l'application en cours de débogage. "
-"Celles-ci sont alors toujours appliquées lors de l'analyse des données, sauf "
-"si cette fonctionnalité est explicitement désactivée en utilisant cette "
-"option de ligne de commandes."
 
 #: gui/gui.cpp:105
 #, kde-format
@@ -710,19 +616,16 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks in common system libraries."
 msgstr ""
-"Ignorer les définitions de suppression intégrées dans heaptrack. Par défaut, "
-"Heaptrack supprimera certaines fuites connues des bibliothèques communes du "
-"système."
 
 #: gui/gui.cpp:108
 #, kde-format
 msgid "Files to load"
-msgstr "Fichiers à charger"
+msgstr ""
 
 #: gui/gui.cpp:108
 #, kde-format
 msgid "[FILE...]"
-msgstr "[FICHIER...]"
+msgstr ""
 
 #: gui/histogrammodel.cpp:65
 #, kde-format
@@ -730,23 +633,21 @@ msgid ""
 "%1 allocations from %2, totalling %3 allocated with an average of %4 per "
 "allocation"
 msgstr ""
-"%1 allocations parmi %2, totalisant %3 alloués avec une moyenne de %4 par "
-"allocation"
 
 #: gui/histogramwidget.cpp:99
 #, kde-format
 msgid "Requested Allocation Size"
-msgstr "Taille de l'allocation demandée"
+msgstr ""
 
 #: gui/histogramwidget.cpp:105
 #, kde-format
 msgid "Number of Allocations"
-msgstr "Nombre d'allocations"
+msgstr ""
 
 #: gui/mainwindow.cpp:171
 #, kde-format
 msgid "Open file in editor"
-msgstr "Ouvrir le fichier dans l'éditeur"
+msgstr ""
 
 #: gui/mainwindow.cpp:394
 #, kde-format
@@ -754,119 +655,111 @@ msgid ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
 "<i>(attached)</i></dd>"
 msgstr ""
-"<dt><b>Sujet de débogage</b> : </dt><dd style='font-family:monospace;'>%1 "
-"<i>(attaché)</i></dd>"
 
 #: gui/mainwindow.cpp:397
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
-msgstr "<dt><b>débogueur</b> :</dt><dd style='font-family:monospace;'>%1</dd>"
+msgstr ""
 
 #: gui/mainwindow.cpp:401
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
 msgstr ""
-"<dt><b>Total du temps d'exécution</b> : </dt><dd>%1 filtré à partir de %2 à "
-"%3 (%4)</dd>"
 
 #: gui/mainwindow.cpp:406
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
-msgstr "<dt><b>Total du temps d'exécution</b> : </dt><dd>%1</dd>"
+msgstr ""
 
 #: gui/mainwindow.cpp:408
 #, kde-format
 msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
-msgstr "<dt><b>Mémoire totale du système</b> : </dt><dd>%1</dd>"
+msgstr ""
 
 #: gui/mainwindow.cpp:415
 #, kde-format
 msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
 msgstr ""
-"<dt><b>Appels aux fonctions d'allocation</b> : </dt><dd>%1 (%2 / s)</dd>"
 
 #: gui/mainwindow.cpp:418
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
-msgstr "<dt><b>Allocations temporaires</b> : </dt><dd>%1 (%2%, %3 / s)</dd>"
+msgstr ""
 
 #: gui/mainwindow.cpp:428
 #, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
 msgstr ""
-"<dt><b>Consommation de mémoire du pic sur le tas local</b> : </dt><dd>%1 "
-"après %2</dd>"
 
 #: gui/mainwindow.cpp:431
 #, kde-format
 msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
 msgstr ""
-"<dt><b>Pic « RSS » </b> (Y compris le surplus du tas local) :</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:435
 #, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
-msgstr "<dt><b>Delta de consommation de mémoire</b> : </dt><dd>%1</dd>"
+msgstr ""
 
 #: gui/mainwindow.cpp:439
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
-msgstr "<dt><b>Total des fuites mémoire</b> : </dt><dd>%1 (%2 supprimé)</dd>"
+msgstr ""
 
 #: gui/mainwindow.cpp:442
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
-msgstr "<dt><b>Total des fuites mémoire</b> : </dt><dd>%1</dd>"
+msgstr ""
 
 #: gui/mainwindow.cpp:470
 #, kde-format
 msgid "Failed to parse file %1."
-msgstr "Impossible d'analyser le fichier %1."
+msgstr ""
 
 #: gui/mainwindow.cpp:475
 #, kde-format
 msgid "Consumed"
-msgstr "Consommé"
+msgstr ""
 
 #: gui/mainwindow.cpp:491
 #, kde-format
 msgid "Sizes"
-msgstr "Tailles"
+msgstr ""
 
 #: gui/mainwindow.cpp:555
 #, kde-format
 msgid "Input data %1 does not exist."
-msgstr "La donnée d'entrée %1 n'existe pas."
+msgstr ""
 
 #: gui/mainwindow.cpp:557
 #, kde-format
 msgid "Input data %1 is not a file."
-msgstr "La donné d'entrées %1 n'est pas un fichier."
+msgstr ""
 
 #: gui/mainwindow.cpp:559
 #, kde-format
 msgid "Input data %1 is not readable."
-msgstr "La donné d'entrée %1 est non lisible."
+msgstr ""
 
 #: gui/mainwindow.cpp:597
 #, kde-format
 msgid "Failed to parse suppression file."
-msgstr "Impossible d'analyser le fichier de suppression."
+msgstr ""
 
 #: gui/mainwindow.cpp:612
 #, kde-format
 msgid "Heaptrack"
-msgstr "Heaptrack"
+msgstr ""
 
 #: gui/mainwindow.cpp:640
 #, kde-format
 msgid "Disable Embedded Suppressions"
-msgstr "Désactiver les suppressions intégrées"
+msgstr ""
 
 #: gui/mainwindow.cpp:652
 #, kde-format
 msgid "Disable Builtin Suppressions"
-msgstr "Désactiver les suppressions intégrées"
+msgstr ""
 
 #: gui/mainwindow.cpp:654
 #, kde-format
@@ -874,56 +767,53 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks from common system libraries."
 msgstr ""
-"Ignorer les définitions de suppression intégrées dans Heaptrack. Par défaut, "
-"Heaptrack supprimera certaines fuites connues des bibliothèques communes du "
-"système."
 
 #: gui/mainwindow.cpp:682
 #, kde-format
 msgid "Loading file %1, please wait..."
-msgstr "Chargement du fichier %1, veuillez patienter..."
+msgstr ""
 
 #: gui/mainwindow.cpp:684
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
-msgstr "Heaptrack - %1"
+msgstr ""
 
 #: gui/mainwindow.cpp:687
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
-msgstr "« Heaptrack» - Comparaison de %1 avec %2"
+msgstr ""
 
 #: gui/mainwindow.cpp:703
 #, kde-format
 msgid "Reparsing file, please wait..."
-msgstr "Nouvelle analyse du fichier, veuillez patienter..."
+msgstr ""
 
 #: gui/mainwindow.cpp:746
 #, kde-format
 msgid " / %1"
-msgstr " / %1"
+msgstr ""
 
 #: gui/mainwindow.cpp:786
 #, kde-format
 msgid "Code Navigation"
-msgstr "Navigation dans le code"
+msgstr ""
 
 #: gui/mainwindow.cpp:813
 #, kde-format
 msgid "Custom..."
-msgstr "Personnaliser..."
+msgstr ""
 
 #: gui/mainwindow.cpp:825
 #, kde-format
 msgid "Automatic (No Line numbers)"
-msgstr "Automatique (Aucun numéro de lignes)"
+msgstr ""
 
 #: gui/mainwindow.cpp:845
 #, kde-format
 msgid "Custom Code Navigation"
-msgstr "Navigation personnalisée dans le code"
+msgstr ""
 
 #: gui/mainwindow.cpp:846
 #, kde-format
@@ -931,15 +821,12 @@ msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
 "file name, '%l' by the line number and '%c' by the column number."
 msgstr ""
-"Spécifier la commande à utiliser pour la navigation dans le code. Les "
-"éléments « %f », « %l » et « %c » seront respectivement remplacés par le nom "
-"du fichier, le numéro de ligne et le numéro de colonne."
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
 #, kde-format
 msgid "MainWindow"
-msgstr "Fenêtre principale"
+msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (QMainWindow, MainWindow)
 #. i18n: ectx: property (toolTip), widget (QLabel, suppressionsLabel)
@@ -947,14 +834,12 @@ msgstr "Fenêtre principale"
 #, kde-format
 msgid "Path to a file containing leak suppression rules in the LSAN format."
 msgstr ""
-"Emplacement du fichier contenant les règles de suppression de fuites dans le "
-"format « LSAN »."
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: gui/mainwindow.ui:63
 #, kde-format
 msgid "Open Heaptrack Data"
-msgstr "Ouvrir des fichiers « Heaptrack »"
+msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, openFile)
 #: gui/mainwindow.ui:72
@@ -967,22 +852,13 @@ msgid ""
 "<p>Or, alternatively, you can attach to a running process via</p>\n"
 "<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
 msgstr ""
-"<qt><p>Ce champ spécifie le fichier primaire pour les données des traces "
-"pour le tas local. Ces fichiers sont appelés <tt>heaptrack.$APP.$PID.gz</tt> "
-"ou <tt>heaptrack.$APP.$PID.zst</tt>. Vous pouvez réaliser un tel fichier en "
-"caractérisant votre application, par exemple, grâce à :</p>\n"
-"<pre><code> « heaptrack &lt;votre_application&gt;... » </code></pre>\n"
-"<p>Ou, de façon alternative, vous pouvez l'associer à un processus en "
-"exécution grâce à : </p>\n"
-"<pre><code> « heaptrack --pid $(PID_de &lt;votre_application&gt;)</code></"
-"pre></qt>"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, openFile)
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, compareTo)
 #: gui/mainwindow.ui:75 gui/mainwindow.ui:88
 #, kde-format
 msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
-msgstr "emplacement / vers / heaptrack.$APP.$PID.{gz,zst}"
+msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
 #: gui/mainwindow.ui:85
@@ -992,79 +868,75 @@ msgid ""
 "If set, this file will be used as a base and its cost gets subtracted from "
 "the primary data costs.</qt>"
 msgstr ""
-"<qt> Vous pouvez spécifier de façon optionnelle un second fichier de données "
-"« heaptrack » pour faire des comparaisons. Si cette option est activée, ce "
-"fichier sera utilisé comme une référence. Son coût est soustrait des coûts "
-"des données primaires.</qt>"
 
 #. i18n: ectx: property (text), widget (QLabel, openFileLabel)
 #: gui/mainwindow.ui:98
 #, kde-format
 msgid "Profile &Data:"
-msgstr "&Données du profil :"
+msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, compareToLabel)
 #: gui/mainwindow.ui:108
 #, kde-format
 msgid "Compare to:"
-msgstr "Comparer à :"
+msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, suppressionsLabel)
 #: gui/mainwindow.ui:121
 #, kde-format
 msgid "Suppressions:"
-msgstr "Suppressions :"
+msgstr ""
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
 #: gui/mainwindow.ui:131
 #, kde-format
 msgid "path/to/lsan_suppressions.txt"
-msgstr "emplacement/vers/lsan_suppressions.txt"
+msgstr ""
 
 #. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
 #: gui/mainwindow.ui:244
 #, kde-format
 msgid "Summary"
-msgstr "Résumé"
+msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topPeakLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topPeak)
 #: gui/mainwindow.ui:345 gui/mainwindow.ui:358
 #, kde-format
 msgid "List of functions that allocated the most memory at a given time."
-msgstr "Liste des fonctions allouant le plus de la mémoire à un moment donné."
+msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, topPeakLabel)
 #: gui/mainwindow.ui:348
 #, kde-format
 msgid "Peak Contributions"
-msgstr "Contributions au pic"
+msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topLeakedLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topLeaked)
 #: gui/mainwindow.ui:384 gui/mainwindow.ui:397
 #, kde-format
 msgid "List of functions that leak the most memory."
-msgstr "Liste des fonctions ayant les plus importantes fuites de mémoire."
+msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, topLeakedLabel)
 #: gui/mainwindow.ui:387
 #, kde-format
 msgid "Largest Memory Leaks"
-msgstr "Fuites de mémoire les plus importantes"
+msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topAllocationsLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topAllocations)
 #: gui/mainwindow.ui:423 gui/mainwindow.ui:436
 #, kde-format
 msgid "List of functions that allocate memory most often."
-msgstr "Liste des fonctions allouant le plus souvent de la mémoire."
+msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, topAllocationsLabel)
 #: gui/mainwindow.ui:426
 #, kde-format
 msgid "Most Memory Allocations"
-msgstr "La plupart des allocations de mémoire"
+msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topTemporaryLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topTemporary)
@@ -1072,26 +944,24 @@ msgstr "La plupart des allocations de mémoire"
 #, kde-format
 msgid "List of functions that produced the most temporary memory allocations."
 msgstr ""
-"Liste des fonctions effectuant les allocations de mémoire les plus "
-"temporaires."
 
 #. i18n: ectx: property (text), widget (QLabel, topTemporaryLabel)
 #: gui/mainwindow.ui:468
 #, kde-format
 msgid "Most Temporary Allocations"
-msgstr "Allocations de mémoire les plus temporaires"
+msgstr ""
 
 #. i18n: ectx: property (title), widget (KCollapsibleGroupBox, suppressionBox)
 #: gui/mainwindow.ui:501
 #, kde-format
 msgid "Suppressions"
-msgstr "Suppressions"
+msgstr ""
 
 #. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
 #: gui/mainwindow.ui:533
 #, kde-format
 msgid "Bottom-Up"
-msgstr "De bas en haut"
+msgstr ""
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFunction)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterFunction)
@@ -1099,14 +969,14 @@ msgstr "De bas en haut"
 #: gui/mainwindow.ui:557 gui/mainwindow.ui:625 gui/mainwindow.ui:746
 #, kde-format
 msgid "filter by function..."
-msgstr "Filtrer par fonction..."
+msgstr ""
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
 #: gui/mainwindow.ui:564 gui/mainwindow.ui:753
 #, kde-format
 msgid "filter by file..."
-msgstr "Filtrer par fichier..."
+msgstr ""
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
@@ -1114,145 +984,145 @@ msgstr "Filtrer par fichier..."
 #: gui/mainwindow.ui:571 gui/mainwindow.ui:632 gui/mainwindow.ui:760
 #, kde-format
 msgid "filter by module..."
-msgstr "Filtrer par module..."
+msgstr ""
 
 #. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
 #: gui/mainwindow.ui:601
 #, kde-format
 msgid "Caller / Callee"
-msgstr "Appelant / Appelé"
+msgstr ""
 
 #. i18n: ectx: attribute (title), widget (QWidget, topDownTab)
 #: gui/mainwindow.ui:725
 #, kde-format
 msgid "Top-Down"
-msgstr "De haut en bas"
+msgstr ""
 
 #. i18n: ectx: attribute (title), widget (FlameGraph, flameGraphTab)
 #: gui/mainwindow.ui:790
 #, kde-format
 msgid "Flame Graph"
-msgstr "Graphique en flammes"
+msgstr ""
 
 #. i18n: ectx: property (windowTitle), widget (QDockWidget, stacksDock)
 #: gui/mainwindow.ui:806
 #, kde-format
 msgid "S&tacks"
-msgstr "Pi&les"
+msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, stackSpinnerLabel)
 #: gui/mainwindow.ui:831
 #, kde-format
 msgid "Selected Stack:"
-msgstr "Pile sélectionnée :"
+msgstr ""
 
 #. i18n: ectx: property (title), widget (QMenu, menu_File)
 #: gui/mainwindow.ui:868
 #, kde-format
 msgid "&File"
-msgstr "&Fichier"
+msgstr ""
 
 #. i18n: ectx: property (title), widget (QMenu, menu_Settings)
 #: gui/mainwindow.ui:873
 #, kde-format
 msgid "Setti&ngs"
-msgstr "Para&mètres"
+msgstr ""
 
 #. i18n: ectx: property (title), widget (QMenu, menuFilter)
 #: gui/mainwindow.ui:878
 #, kde-format
 msgid "Filter"
-msgstr "Filtre"
+msgstr ""
 
 #: gui/parser.cpp:387
 #, kde-format
 msgid "merging allocations... %1%"
-msgstr "Fusion des allocations %1 %..."
+msgstr ""
 
 #: gui/parser.cpp:557
 #, kde-format
 msgid "total"
-msgstr "total"
+msgstr ""
 
 #: gui/parser.cpp:559
 #, kde-format
 msgid "0B to 8B"
-msgstr "0B à 8B"
+msgstr ""
 
 #: gui/parser.cpp:560
 #, kde-format
 msgid "9B to 16B"
-msgstr "9B à 16B"
+msgstr ""
 
 #: gui/parser.cpp:561
 #, kde-format
 msgid "17B to 32B"
-msgstr "17B à 32B"
+msgstr ""
 
 #: gui/parser.cpp:562
 #, kde-format
 msgid "33B to 64B"
-msgstr "33B à 64B"
+msgstr ""
 
 #: gui/parser.cpp:563
 #, kde-format
 msgid "65B to 128B"
-msgstr "65B à 128B"
+msgstr ""
 
 #: gui/parser.cpp:564
 #, kde-format
 msgid "129B to 256B"
-msgstr "129B à 256B"
+msgstr ""
 
 #: gui/parser.cpp:565
 #, kde-format
 msgid "257B to 512B"
-msgstr "257B à 512B"
+msgstr ""
 
 #: gui/parser.cpp:566
 #, kde-format
 msgid "512B to 1KB"
-msgstr "512 o à 1Ko"
+msgstr ""
 
 #: gui/parser.cpp:567
 #, kde-format
 msgid "more than 1KB"
-msgstr "plus de 1Ko"
+msgstr ""
 
 #: gui/parser.cpp:645
 #, kde-format
 msgid "reparsing data"
-msgstr "Nouvelle analyse des données"
+msgstr ""
 
 #: gui/parser.cpp:645
 #, kde-format
 msgid "parsing data"
-msgstr "Analyse des données"
+msgstr ""
 
 #: gui/parser.cpp:659
 #, kde-format
 msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
-msgstr "%1 passe : %2 / %3 consommé : %4 restant : %5"
+msgstr ""
 
 #: gui/parser.cpp:715
 #, kde-format
 msgid "merging allocations..."
-msgstr "Fusion des allocations"
+msgstr ""
 
 #: gui/parser.cpp:726
 #, kde-format
 msgid "building size histogram..."
-msgstr "Construction de l'histogramme de taille..."
+msgstr ""
 
 #: gui/parser.cpp:739
 #, kde-format
 msgid "building charts..."
-msgstr "Construction des graphiques..."
+msgstr ""
 
 #: gui/stacksmodel.cpp:99
 #, kde-format
 msgid "Backtrace"
-msgstr "Pile d'appels"
+msgstr ""
 
 #: gui/treemodel.cpp:80
 #, kde-format
@@ -1260,8 +1130,6 @@ msgid ""
 "<qt>The number of times an allocation function was called from this location."
 "</qt>"
 msgstr ""
-"<qt>Le nombre de fois fonction d'allocation a été appelée depuis cet "
-"emplacement.</qt>"
 
 #: gui/treemodel.cpp:83
 #, kde-format
@@ -1269,8 +1137,6 @@ msgid ""
 "<qt>The number of temporary allocations. These allocations are directly "
 "followed by a free without any other allocations in-between.</qt>"
 msgstr ""
-"<qt>Le nombre d'allocations temporaires. Ces allocations sont directement "
-"suivies par leur désallocation, sans aucune autre allocation entre.</qt>"
 
 #: gui/treemodel.cpp:87
 #, kde-format
@@ -1278,9 +1144,6 @@ msgid ""
 "<qt>The contributions from a given location to the maximum heap memory "
 "consumption in bytes. This takes deallocations into account.</qt>"
 msgstr ""
-"<qt>Les contributions à partir d'un emplacement donné à la consommation en "
-"octets de la mémoire maximale du tas local. Ceci prend en compte les "
-"libérations.</qt>"
 
 #: gui/treemodel.cpp:94
 #, kde-format
@@ -1289,10 +1152,6 @@ msgid ""
 "symbol and file information may be unknown when debug information was "
 "missing when heaptrack was run.</qt>"
 msgstr ""
-"<qt>L'emplacement depuis lequel une fonction d'allocation a été annulée. Les "
-"informations de symbole de fonction et de fichier peuvent être inconnues "
-"quand les informations de débogage n'étaient pas disponibles quand Heaptrack "
-"a été exécuté.</qt>"
 
 #: gui/treemodel.cpp:149 gui/treemodel.cpp:173
 #, kde-format
@@ -1301,319 +1160,71 @@ msgid ""
 "%1\n"
 "  in %2 (%3)"
 msgstr ""
-"%1\n"
-" dans %2 (%3)"
 
 #: gui/treemodel.cpp:159
 #, kde-format
 msgid "peak contribution: %1 (%2% of total)\n"
-msgstr "Contribution au pic : %1 (Total de %2 %)\n"
+msgstr ""
 
 #: gui/treemodel.cpp:160
 #, kde-format
 msgid "leaked: %1 (%2% of total)\n"
-msgstr "Fuite : %1 (total de %2%)\n"
+msgstr ""
 
 #: gui/treemodel.cpp:161
 #, kde-format
 msgid "allocations: %1 (%2% of total)\n"
-msgstr "Allocations : %1 (Total de %2%)\n"
+msgstr ""
 
 #: gui/treemodel.cpp:162
 #, kde-format
 msgid "temporary: %1 (%2% of allocations, %3% of total)\n"
-msgstr "Temporaire : %1 (%2 % des allocations, total de %3 %)\n"
+msgstr ""
 
 #: gui/treemodel.cpp:168
 #, kde-format
 msgid "backtrace:"
-msgstr "Pile d'appels :"
+msgstr ""
 
 #: gui/treemodel.cpp:180
 #, kde-format
 msgid "called from one location"
 msgid_plural "called from %1 locations"
-msgstr[0] "appelé depuis un emplacement"
-msgstr[1] "appelé depuis %1 emplacements"
+msgstr[0] ""
+msgstr[1] ""
 
 #: gui/util.cpp:32
 #, kde-format
 msgid "??"
-msgstr "??"
+msgstr ""
 
 #: gui/util.cpp:108
 #, kde-format
 msgid "%1: %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr "%1 : %2<br/>&nbsp;&nbsp;Total de %4% parmi %3"
+msgstr ""
 
 #: gui/util.cpp:134 gui/util.cpp:163
 #, kde-format
 msgid "%1 (self): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr "%1 (automatique) : %2<br/>&nbsp;&nbsp;Total de %4 % parmi %3"
+msgstr ""
 
 #: gui/util.cpp:137 gui/util.cpp:166
 #, kde-format
 msgid "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr "%1 (inclus) : %2<br/>&nbsp;&nbsp;Total de %4% parmi %3"
+msgstr ""
 
 #: gui/util.cpp:183
 #, kde-format
 msgid "symbol: <tt>%1</tt><br/>binary: <tt>%2 (%3)</tt>"
-msgstr "Symbole : <tt>%1</tt><br/>Binaire : <tt>%2 (%3)</tt>"
+msgstr ""
 
 #: gui/util.cpp:187
 #, kde-format
 msgctxt "%1: function name, %2: binary basename"
 msgid "%1 in %2"
-msgstr "%1 dans %2"
+msgstr ""
 
 #: gui/util.cpp:209
 #, kde-format
 msgid "<unresolved function>"
-msgstr "<unresolved function>"
-
-#~ msgid "KDevelop"
-#~ msgstr "KDevelop"
-
-#~ msgid "Kate"
-#~ msgstr "Kate"
-
-#~ msgid "KWrite"
-#~ msgstr "KWrite"
-
-#~ msgid "gedit"
-#~ msgstr "gedit"
-
-#~ msgid "gvim"
-#~ msgstr "gvim"
-
-#~ msgid "Qt Creator"
-#~ msgstr "Qt Creator"
-
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
-#~ msgid "Symbol"
-#~ msgstr "Symbole"
-
-#~ msgid "Binary"
-#~ msgstr "Binaire"
-
-#~ msgid ""
-#~ "<qt>The parent function that called an allocation function. May be "
-#~ "unresolved when debug information is missing.</qt>"
-#~ msgstr ""
-#~ "<qt>La fonction parente appelant une fonction d'allocation. Peut être non "
-#~ "résolue quand les informations de débogage sont manquantes.</qt>"
-
-#~ msgid ""
-#~ "<qt>The module, i.e. executable or shared library, from which an "
-#~ "allocation function was called.</qt>"
-#~ msgstr ""
-#~ "<qt>Le module, c'est-à-dire l'exécutable ou la bibliothèque partagée, "
-#~ "depuis lequel une fonction d'allocation a été appelée.</qt>"
-
-#~ msgid ""
-#~ "The function name of the %1. May be unresolved when debug information is "
-#~ "missing."
-#~ msgstr ""
-#~ "Le nom de la fonction de %1. Peut être non résolu lorsque les "
-#~ "informations de débogage sont absentes."
-
-#~ msgid "The name of the executable the symbol resides in."
-#~ msgstr "Le nom de d'exécutable dans lequel se trouve le symbole."
-
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 (%2)"
-
-#~ msgid "Function"
-#~ msgstr "Fonction"
-
-#~ msgid "Module"
-#~ msgstr "Module"
-
-#~ msgid ""
-#~ "<qt>The parent function that called an allocation function. May be "
-#~ "unknown when debug information is missing.</qt>"
-#~ msgstr ""
-#~ "<qt>La fonction parente qui a appelé une fonction d'allocation. Peut être "
-#~ "inconnue quand les informations de débogage ne sont pas disponibles.</qt>"
-
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 parmi %2 (%3)"
-
-#~ msgid "File"
-#~ msgstr "Fichier"
-
-#~ msgid "Line"
-#~ msgstr "Ligne"
-
-#, fuzzy
-#~| msgid "Allocated"
-#~ msgid "Allocated (Self)"
-#~ msgstr "Alloué"
-
-#, fuzzy
-#~| msgid "Allocated"
-#~ msgid "Allocated (Incl.)"
-#~ msgstr "Alloué"
-
-#, fuzzy
-#~| msgid ""
-#~| "<qt>The file and line number where the allocation function was called "
-#~| "from. May be empty when debug information is missing.</qt>"
-#~ msgid ""
-#~ "<qt>The file where the allocation function was called from. May be empty "
-#~ "when debug information is missing.</qt>"
-#~ msgstr ""
-#~ "<qt>Le fichier et  numéro de ligne d'où la fonction d'allocation a été "
-#~ "appelée. Peut être vide si les information de débogage ne sont pas "
-#~ "disponibles.</qt>"
-
-#, fuzzy
-#~| msgid ""
-#~| "<qt>The file and line number where the allocation function was called "
-#~| "from. May be empty when debug information is missing.</qt>"
-#~ msgid ""
-#~ "<qt>The line number where the allocation function was called from. May be "
-#~ "empty when debug information is missing.</qt>"
-#~ msgstr ""
-#~ "<qt>Le fichier et  numéro de ligne d'où la fonction d'allocation a été "
-#~ "appelée. Peut être vide si les information de débogage ne sont pas "
-#~ "disponibles.</qt>"
-
-#, fuzzy
-#~| msgid ""
-#~| "<qt>The sum of all bytes allocated from this location, ignoring "
-#~| "deallocations.</qt>"
-#~ msgid ""
-#~ "<qt>The sum of all bytes directly allocated from this location, ignoring "
-#~ "deallocations.</qt>"
-#~ msgstr ""
-#~ "<qt>La somme de tous les octets alloués depuis cet emplacement, en "
-#~ "ignorant les libérations.</qt>"
-
-#, fuzzy
-#~| msgid ""
-#~| "<qt>The sum of all bytes allocated from this location, ignoring "
-#~| "deallocations.</qt>"
-#~ msgid ""
-#~ "<qt>The inclusive sum of all bytes allocated from this location or "
-#~ "functions called from here, ignoring deallocations.</qt>"
-#~ msgstr ""
-#~ "<qt>La somme de tous les octets alloués depuis cet emplacement, en "
-#~ "ignorant les libérations.</qt>"
-
-#, fuzzy
-#~| msgctxt "1: function, 2: file, 3: module"
-#~| msgid ""
-#~| "%1\n"
-#~| "  at %2\n"
-#~| "  in %3"
-#~ msgctxt "1: function, 2: file, 3: line, 4: module"
-#~ msgid ""
-#~ "%1\n"
-#~ "  at %2:%3\n"
-#~ "  in %4"
-#~ msgstr ""
-#~ "%1\n"
-#~ "  à %2\n"
-#~ "  de %3"
-
-#, fuzzy
-#~| msgid "allocated %1 over %2 calls, peak at %3, leaked %4"
-#~ msgid ""
-#~ "inclusive: allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at "
-#~ "%5, leaked %6"
-#~ msgstr "%1 alloués sur %2 appels, pic à %3, %4 de fuite"
-
-#, fuzzy
-#~| msgid "allocated %1 over %2 calls, peak at %3, leaked %4"
-#~ msgid ""
-#~ "self: allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, "
-#~ "leaked %6"
-#~ msgstr "%1 alloués sur %2 appels, pic à %3, %4 de fuite"
-
-#~ msgid "Memory Allocated"
-#~ msgstr "Mémoire allouée"
-
-#, fuzzy
-#~| msgid "Memory Allocations"
-#~ msgid "<qt>%1 allocated in total after %2</qt>"
-#~ msgstr "Allocations mémoire"
-
-#, fuzzy
-#~| msgid "Memory Allocations"
-#~ msgctxt "%1: allocated bytes, %2: relative number, %3: function label"
-#~ msgid "%1 (%2%) allocated in %3 and below."
-#~ msgstr "Allocations mémoire"
-
-#, fuzzy
-#~| msgid "Memory Allocations"
-#~ msgid "%1 allocated in total"
-#~ msgstr "Allocations mémoire"
-
-#~ msgid "Allocated"
-#~ msgstr "Alloué"
-
-#, fuzzy
-#~| msgid ""
-#~| "<strong>bytes allocated in total</strong> (ignoring deallocations): %1 "
-#~| "(%2/s)"
-#~ msgid ""
-#~ "<dt><b>bytes allocated in total</b> (ignoring deallocations):</dt><dd>%1 "
-#~ "(%2/s)</dd>"
-#~ msgstr ""
-#~ "<strong>octets alloués au total</strong> (ignorant les libérations): %1 "
-#~ "(%2/s)"
-
-#, fuzzy
-#~| msgid "Memory Allocated"
-#~ msgid "Most Memory Allocated"
-#~ msgstr "Mémoire allouée"
-
-#~ msgid ""
-#~ "<qt>The sum of all bytes allocated from this location, ignoring "
-#~ "deallocations.</qt>"
-#~ msgstr ""
-#~ "<qt>La somme de tous les octets alloués depuis cet emplacement, en "
-#~ "ignorant les libérations.</qt>"
-
-#~ msgid "Open Heaptrack Output File"
-#~ msgstr "Ouvrir un fichier de sortie Heaptrack"
-
-#~ msgid "Heaptrack data files (heaptrack.*)"
-#~ msgstr "Fichiers de données heaptrack (heaptrack.*)"
-
-#, fuzzy
-#~| msgid "allocated %1 over %2 calls, peak at %3, leaked %4"
-#~ msgid ""
-#~ "allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, leaked %6"
-#~ msgstr "%1 alloués sur %2 appels, pic à %3, %4 de fuite"
-
-#~ msgid "<strong>debuggee</strong>: <code>%1</code>"
-#~ msgstr "<strong>debuggee</strong> : <code>%1</code>"
-
-#~ msgid "<strong>total runtime</strong>: %1s"
-#~ msgstr "<strong>temps d'exécution total</strong> : %1s"
-
-#~ msgid "Allocations [-]"
-#~ msgstr "Allocations [-]"
-
-#, fuzzy
-#~| msgid "Memory Allocations"
-#~ msgid "Temporary Allocations [-]"
-#~ msgstr "Allocations mémoire"
-
-#~ msgid "Leaked [B]"
-#~ msgstr "Fuite [B]"
-
-#~ msgid "Allocated [B]"
-#~ msgstr "Alloué [B]"
-
-#~ msgid "time in ms"
-#~ msgstr "temps en ms"
-
-#~ msgid "memory heap size"
-#~ msgstr "taille mémoire du tas"
+msgstr ""

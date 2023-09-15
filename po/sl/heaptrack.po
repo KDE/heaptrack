@@ -1,16 +1,16 @@
+# SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR This file is copyright:
 # This file is distributed under the same license as the heaptrack package.
 #
-#
 # Martin Srebotnjak <miles@filmsi.net>, 2022.
-# Matjaž Jeran <matjaz.jeran@amis.net>, 2022.
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-05 00:47+0000\n"
-"PO-Revision-Date: 2022-10-06 09:04+0200\n"
-"Last-Translator: Matjaž Jeran <matjaz.jeran@amis.net>\n"
+"POT-Creation-Date: 2023-09-15 02:28+0000\n"
+"PO-Revision-Date: 2022-01-09 16:40+0100\n"
+"Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
 "%100==4 ? 3 : 0);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.0.1\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -233,24 +233,27 @@ msgid "Elapsed Time"
 msgstr "Pretečeni čas"
 
 #: gui/chartmodel.cpp:83
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Most Memory Allocations"
 msgid "Total Memory Allocations"
-msgstr "Skupna dodelitev pomnilnika"
+msgstr "Večina dodelitev pomnilnika"
 
 #: gui/chartmodel.cpp:85
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "%1 peak memory consumption"
 msgid "Total Memory Consumption"
-msgstr "Skupna poraba pomnilnika"
+msgstr "%1 vrhuncev porabe pomnilnika"
 
 #: gui/chartmodel.cpp:87
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Most Temporary Allocations"
 msgid "Total Temporary Allocations"
-msgstr "Skupne začasne dodelitve"
+msgstr "Večina začasnih dodelitev"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
-msgstr "%1"
+msgstr ""
 
 #: gui/chartmodel.cpp:166
 #, kde-format
@@ -297,27 +300,27 @@ msgstr "<qt>%2 porabljenega po %3 f iz:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr "Izvozi kot..."
+msgstr ""
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr "Prikaži legendo"
+msgstr ""
 
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr "Prikaži graf skupnih stroškov"
+msgstr ""
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr "Prikaži graf podrobnih stroškov"
+msgstr ""
 
 #: gui/chartwidget.cpp:187
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr "Naloženi diagrami:"
+msgstr ""
 
 #: gui/chartwidget.cpp:234
 #, kde-format
@@ -333,17 +336,18 @@ msgstr "Ponastavi filter"
 #: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
-msgstr "Shrani %1"
+msgstr ""
 
 #: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr "Rastrska slika (*.png *.jpg *.tiff);;Vektorska slika (*.svg)"
+msgstr ""
 
 #: gui/chartwidget.cpp:400
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Failed to parse file %1."
 msgid "Failed to save the image to %1"
-msgstr "Shranjevanje slike na %1 ni uspelo"
+msgstr "Razčlenjevanje datoteke %1 ni uspelo."
 
 #: gui/chartwidget.cpp:420
 #, kde-format
@@ -1330,9 +1334,6 @@ msgstr "%1 v %2"
 msgid "<unresolved function>"
 msgstr "<nerazrešena funkcija>"
 
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
 
@@ -1350,3 +1351,6 @@ msgstr "<nerazrešena funkcija>"
 
 #~ msgid "Qt Creator"
 #~ msgstr "Ustvarjalec Qt"
+
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"

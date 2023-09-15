@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-05 00:47+0000\n"
+"POT-Creation-Date: 2023-09-15 02:28+0000\n"
 "PO-Revision-Date: 2023-06-07 10:42+0200\n"
 "Last-Translator: Adrián Chaves (Gallaecio) <adrian@chaves.io>\n"
 "Language-Team: Galician <proxecto@trasno.gal>\n"
@@ -231,24 +231,27 @@ msgid "Elapsed Time"
 msgstr "Tempo transcorrido"
 
 #: gui/chartmodel.cpp:83
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Most Memory Allocations"
 msgid "Total Memory Allocations"
-msgstr "Asignacións totais de memoria"
+msgstr "Máis asignacións de memoria"
 
 #: gui/chartmodel.cpp:85
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "%1 peak memory consumption"
 msgid "Total Memory Consumption"
-msgstr "Consumo total de memoria"
+msgstr "%1 de pico de consumo de memoria"
 
 #: gui/chartmodel.cpp:87
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Most Temporary Allocations"
 msgid "Total Temporary Allocations"
-msgstr "Asignacións temporais totais"
+msgstr "Máis asignacións temporais"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
-msgstr "%1"
+msgstr ""
 
 #: gui/chartmodel.cpp:166
 #, kde-format
@@ -300,27 +303,27 @@ msgstr ""
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr "Exportar como…"
+msgstr ""
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr "Amosar a lenda"
+msgstr ""
 
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr "Amosar o gráfico de custe total"
+msgstr ""
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr "Amosar o gráfico de custe total"
+msgstr ""
 
 #: gui/chartwidget.cpp:187
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr "Diagramas acumulativos"
+msgstr ""
 
 #: gui/chartwidget.cpp:234
 #, kde-format
@@ -336,17 +339,18 @@ msgstr "Restaurar o filtro"
 #: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
-msgstr "Gardar %1"
+msgstr ""
 
 #: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr "Mapa de bits (*.png *.jpg *.tiff);;Imaxe vectorial (*.svg)"
+msgstr ""
 
 #: gui/chartwidget.cpp:400
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Failed to parse file %1."
 msgid "Failed to save the image to %1"
-msgstr "Non se puido gardar a imaxe en «%1»."
+msgstr "Non se puido analizar o ficheiro %1."
 
 #: gui/chartwidget.cpp:420
 #, kde-format
@@ -1340,9 +1344,6 @@ msgstr "%1 en %2"
 msgid "<unresolved function>"
 msgstr "<función sen resolver>"
 
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
 
@@ -1361,17 +1362,8 @@ msgstr "<función sen resolver>"
 #~ msgid "Qt Creator"
 #~ msgstr "Qt Creator"
 
-#, fuzzy
-#~| msgid "%1 allocations from %2 in %3 (%4)"
-#~ msgid "%1 allocations from %2"
-#~ msgstr "%1 asignacións de %2 en %3 (%4)"
-
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 (%2)"
-
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 en %2 (%3)"
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
 
 #~ msgid "Symbol"
 #~ msgstr "Símbolo"
@@ -1403,6 +1395,10 @@ msgstr "<función sen resolver>"
 #~ msgid "The name of the executable the symbol resides in."
 #~ msgstr "O nome do executábel no que está o símbolo."
 
+#~ msgctxt "%1: function, %2: binary"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1 (%2)"
+
 #~ msgid "Function"
 #~ msgstr "Función"
 
@@ -1416,18 +1412,8 @@ msgstr "<función sen resolver>"
 #~ "<qt>A función suerior que chamou a unha función de asignación. Pode que "
 #~ "se descoñeza se falta a información de depuración.</qt>"
 
-#, fuzzy
-#~| msgctxt "1: function, 2: module"
-#~| msgid ""
-#~| "%1\n"
-#~| "  in %2"
-#~ msgctxt "1: function, 2: module, 3: module path"
-#~ msgid ""
-#~ "%1\n"
-#~ "  in %2"
-#~ msgstr ""
-#~ "%1\n"
-#~ "  en %2"
+#~ msgid "%1 in %2 (%3)"
+#~ msgstr "%1 en %2 (%3)"
 
 #~ msgid "File"
 #~ msgstr "Ficheiro"
@@ -1530,8 +1516,8 @@ msgstr "<función sen resolver>"
 #~ "code. This aggregates all memory allocations and ignores deallocations."
 #~ msgstr ""
 #~ "Mostrar un gráfico de chamas coa memoria total asignada por funcións do "
-#~ "seu código. Isto engloba todas as asignacións de memoria, sen ter en "
-#~ "conta as liberacións."
+#~ "seu código. Isto engloba todas as asignacións de memoria, ignorando as "
+#~ "liberacións."
 
 #~ msgid "%1 allocations from %2 at %3:%4 in %5"
 #~ msgstr "%1 asignacións de %2 en %3:%4 en %5"
@@ -1547,8 +1533,8 @@ msgstr "<función sen resolver>"
 #~ "List of functions that allocated the most memory overall, ignoring "
 #~ "deallocations."
 #~ msgstr ""
-#~ "Lista de funcións que asignaron máis memoria en xeral, sen ter en conta "
-#~ "as liberacións."
+#~ "Lista de funcións que asignaron máis memoria en xeral, ignorando as "
+#~ "liberacións."
 
 #~ msgid "Most Memory Allocated"
 #~ msgstr "Máis memoria asignada"
