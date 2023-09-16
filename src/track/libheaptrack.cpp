@@ -834,7 +834,7 @@ void heaptrack_init(const char* outputFileName, heaptrack_callback_t initBeforeC
 
     debugLog<MinimalOutput>("heaptrack_init(%s)", outputFileName);
 
-    auto ret = HeapTrack::op(guard, [&](HeapTrack& heaptrack) {
+    POTENTIALLY_UNUSED auto ret = HeapTrack::op(guard, [&](HeapTrack& heaptrack) {
         heaptrack.initialize(outputFileName, initBeforeCallback, initAfterCallback, stopCallback);
     });
     assert(ret);
@@ -847,7 +847,7 @@ void heaptrack_stop()
     debugLog<MinimalOutput>("%s", "heaptrack_stop()");
 
     assert(!s_forceCleanup);
-    auto ret = HeapTrack::op(guard, [&](HeapTrack& heaptrack) {
+    POTENTIALLY_UNUSED auto ret = HeapTrack::op(guard, [&](HeapTrack& heaptrack) {
         if (!s_atexit) {
             s_forceCleanup.store(true);
         }
