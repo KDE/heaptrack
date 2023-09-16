@@ -17,7 +17,7 @@ add_executable(heaptrack_interpret
 )
 
 target_link_libraries(heaptrack_interpret
-    PRIVATE ${LIBDW_LIBRARIES}
+    PRIVATE ${LIBDW_LIBRARIES} tsl::robin_map
 )
 
 target_include_directories(heaptrack_interpret

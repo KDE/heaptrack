@@ -171,7 +171,6 @@ if (HEAPTRACK_BUILD_TRACK)
 endif()
 
 add_subdirectory(3rdparty)
-include_directories(3rdparty/robin-map/include)
 add_subdirectory(src)
 add_subdirectory(tests)
 

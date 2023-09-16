@@ -12,8 +12,11 @@ check_cxx_source_compiles(
 if (HAVE_MALLOC_H)
     add_executable(bench_pointermap bench_pointermap.cpp)
     set_target_properties(bench_pointermap PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
+    target_link_libraries(bench_pointermap PRIVATE tsl::robin_map)
+
     add_executable(bench_pointerhash bench_pointerhash.cpp)
     set_target_properties(bench_pointerhash PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
+    target_link_libraries(bench_pointerhash PRIVATE tsl::robin_map)
 
     add_executable(measure_malloc_overhead measure_malloc_overhead.cpp)
     set_target_properties(measure_malloc_overhead PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")

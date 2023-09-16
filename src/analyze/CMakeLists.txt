@@ -18,9 +18,11 @@ add_library(sharedprint STATIC
     suppressions.cpp
 )
 
-target_link_libraries(sharedprint LINK_PUBLIC
-    ${Boost_LIBRARIES}
-    ${ZLIB_LIBRARIES}
+target_link_libraries(sharedprint
+    PUBLIC
+        ${Boost_LIBRARIES}
+        ${ZLIB_LIBRARIES}
+        tsl::robin_map
 )
 
 if (ZSTD_FOUND AND NOT BOOST_IOSTREAMS_HAS_ZSTD)
