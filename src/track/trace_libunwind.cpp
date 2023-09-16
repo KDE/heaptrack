@@ -49,9 +49,12 @@ void Trace::print()
 void Trace::setup()
 {
     // configure libunwind for better speed
+#if LIBUNWIND_HAS_UNW_CACHE_PER_THREAD
     if (unw_set_caching_policy(unw_local_addr_space, UNW_CACHE_PER_THREAD)) {
         fprintf(stderr, "WARNING: Failed to enable per-thread libunwind caching.\n");
     }
+#endif
+
 #if LIBUNWIND_HAS_UNW_SET_CACHE_SIZE
     if (unw_set_cache_size(unw_local_addr_space, 1024, 0)) {
         fprintf(stderr, "WARNING: Failed to set libunwind cache size.\n");
