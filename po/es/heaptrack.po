@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Automatically generated, 2015.
-# Eloy Cuadra <ecuadra@eloihr.net>, 2015, 2016, 2017, 2018, 2019, 2021.
+# SPDX-FileCopyrightText: 2015, 2016, 2017, 2018, 2019, 2021, 2023 Eloy Cuadra <ecuadra@eloihr.net>
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2023-09-15 02:28+0000\n"
-"PO-Revision-Date: 2021-12-09 18:31+0100\n"
+"PO-Revision-Date: 2023-09-15 17:36+0200\n"
 "Last-Translator: Eloy Cuadra <ecuadra@eloihr.net>\n"
 "Language-Team: Spanish <kde-l10n-es@kde.org>\n"
 "Language: es\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 21.11.90\n"
+"X-Generator: Lokalize 23.08.0\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -237,27 +237,24 @@ msgid "Elapsed Time"
 msgstr "Tiempo transcurrido"
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "Mayor cantidad de asignaciones de memoria"
+msgstr "Total de asignaciones de memoria"
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "%1 peak memory consumption"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "%1 de picos consumo de memoria"
+msgstr "Consumo de memoria total"
 
 #: gui/chartmodel.cpp:87
-#, fuzzy, kde-format
-#| msgid "Most Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "Mayor cantidad de asignaciones temporales"
+msgstr "Total de asignaciones temporales"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:166
 #, kde-format
@@ -306,27 +303,27 @@ msgstr "<qt>%2 consumidos tras %3 de:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Exportar como..."
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Mostrar leyenda"
 
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "Mostrar el gráfico de coste total"
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "Mostrar el gráfico de coste detallado"
 
 #: gui/chartwidget.cpp:187
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "Diagramas apilados:"
 
 #: gui/chartwidget.cpp:234
 #, kde-format
@@ -342,18 +339,18 @@ msgstr "Reiniciar el filtro"
 #: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Guardar %1"
 
 #: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
 msgstr ""
+"Imágenes rasterizadas (*.png *.jpg *.tiff);;Imágenes vectoriales (*.svg)"
 
 #: gui/chartwidget.cpp:400
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to save the image to %1"
-msgstr "El análisis del archivo %1 ha fallado."
+msgstr "No se ha podido guardar la imagen en %1"
 
 #: gui/chartwidget.cpp:420
 #, kde-format
