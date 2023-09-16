@@ -30,7 +30,13 @@ endif()
 
 add_executable(tst_trace tst_trace.cpp ../../src/interpret/dwarfdiecache.cpp)
 set_target_properties(tst_trace PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
-target_link_libraries(tst_trace heaptrack_unwind Threads::Threads ${LIBDW_LIBRARIES})
+target_link_libraries(tst_trace
+    PRIVATE
+        heaptrack_unwind
+        Threads::Threads
+        ${LIBDW_LIBRARIES}
+        tsl::robin_map
+)
 target_include_directories(tst_trace PRIVATE ${LIBDW_INCLUDE_DIRS} )
 
 add_test(NAME tst_trace COMMAND tst_trace)

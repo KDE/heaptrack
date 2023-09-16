@@ -63,12 +63,13 @@ add_library(heaptrack_inject MODULE
     libheaptrack.cpp
 )
 
-target_link_libraries(heaptrack_inject LINK_PRIVATE
+target_link_libraries(heaptrack_inject PRIVATE
     ${CMAKE_DL_LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
     ${LIBUTIL_LIBRARY}
     heaptrack_unwind
     rt
+    tsl::robin_map
 )
 
 set_target_properties(heaptrack_inject PROPERTIES
