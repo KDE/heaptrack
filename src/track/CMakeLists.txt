@@ -8,10 +8,9 @@ install(PROGRAMS ${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}/heaptrack
 )
 
 if (HEAPTRACK_USE_LIBUNWIND)
-    include_directories(${LIBUNWIND_INCLUDE_DIR})
-
     add_library(heaptrack_unwind STATIC trace_libunwind.cpp)
-    target_link_libraries(heaptrack_unwind LINK_PRIVATE ${LIBUNWIND_LIBRARY})
+    target_include_directories(heaptrack_unwind PRIVATE ${LIBUNWIND_INCLUDE_DIRS})
+    target_link_libraries(heaptrack_unwind PRIVATE ${LIBUNWIND_LIBRARIES})
 else()
     add_library(heaptrack_unwind STATIC trace_unwind_tables.cpp)
 endif()
