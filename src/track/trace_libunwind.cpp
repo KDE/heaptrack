@@ -15,7 +15,7 @@
 #include <cinttypes>
 #include <cstdio>
 
-#define UNW_LOCAL_ONLY
+#define UNW_LOCAL_ONLY 1
 #include <libunwind.h>
 
 void Trace::print()
