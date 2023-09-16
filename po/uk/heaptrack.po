@@ -3,13 +3,13 @@
 # This file is distributed under the license LGPL version 2.1 or
 # version 3 or later versions approved by the membership of KDE e.V.
 #
-# Yuri Chornoivan <yurchor@ukr.net>, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022.
+# Yuri Chornoivan <yurchor@ukr.net>, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-05 00:47+0000\n"
-"PO-Revision-Date: 2022-10-05 07:04+0300\n"
+"POT-Creation-Date: 2023-09-15 02:28+0000\n"
+"PO-Revision-Date: 2023-09-15 19:31+0300\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <kde-i18n-uk@kde.org>\n"
 "Language: uk\n"
@@ -1351,9 +1351,6 @@ msgstr "%1 у %2"
 msgid "<unresolved function>"
 msgstr "<невизначена функція>"
 
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
 
@@ -1372,15 +1369,8 @@ msgstr "<невизначена функція>"
 #~ msgid "Qt Creator"
 #~ msgstr "Qt Creator"
 
-#~ msgid "%1 allocations from %2"
-#~ msgstr "%1 розміщень з %2"
-
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 (%2)"
-
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 у %2 (%3)"
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
 
 #~ msgid "Symbol"
 #~ msgstr "Символ"
@@ -1412,6 +1402,10 @@ msgstr "<невизначена функція>"
 #~ msgid "The name of the executable the symbol resides in."
 #~ msgstr "Назва виконуваного файла, у якому перебуває символ."
 
+#~ msgctxt "%1: function, %2: binary"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1 (%2)"
+
 #~ msgid "Function"
 #~ msgstr "Функція"
 
@@ -1425,17 +1419,8 @@ msgstr "<невизначена функція>"
 #~ "<qt>Батьківська функція, якою було викликано функцію розподілу. Може бути "
 #~ "невідомою, якщо немає достатніх діагностичних даних.</qt>"
 
-#~| msgctxt "1: function, 2: module"
-#~| msgid ""
-#~| "%1\n"
-#~| "  in %2"
-#~ msgctxt "1: function, 2: module, 3: module path"
-#~ msgid ""
-#~ "%1\n"
-#~ "  in %2"
-#~ msgstr ""
-#~ "%1\n"
-#~ "  у %2"
+#~ msgid "%1 in %2 (%3)"
+#~ msgstr "%1 у %2 (%3)"
 
 #~ msgid "File"
 #~ msgstr "Файл"

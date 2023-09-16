@@ -1,13 +1,13 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Stefan Asserhäll <stefan.asserhall@bredband.net>, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2023.
+# Stefan Asserhäll <stefan.asserhall@bredband.net>, 2015, 2016, 2017, 2018, 2019, 2021, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-05 00:47+0000\n"
-"PO-Revision-Date: 2023-07-30 16:11+0200\n"
+"POT-Creation-Date: 2023-09-15 02:28+0000\n"
+"PO-Revision-Date: 2023-09-15 19:29+0200\n"
 "Last-Translator: Stefan Asserhäll <stefan.asserhall@bredband.net>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
 "Language: sv\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 20.08.1\n"
+"X-Generator: Lokalize 23.04.3\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -80,7 +80,7 @@ msgid ""
 "may be unresolved when debug information is missing.</qt>"
 msgstr ""
 "<qt>Överliggande funktion som anropade en tilldelningsfunktion. "
-"Funktionsnamnet kan vara okänd om avlusningsinformation saknas.</qt>"
+"Funktionsnamnet kan vara olöst när avlusningsinformation saknas.</qt>"
 
 #: gui/callercalleemodel.cpp:66 gui/callercalleemodel.h:359
 #, kde-format
@@ -160,12 +160,12 @@ msgstr "<qt>Byte tilldelade för den här platsen som inte har frigjorts.</qt>"
 #: gui/callercalleemodel.cpp:202
 #, kde-format
 msgid "Caller"
-msgstr "Den som anropar"
+msgstr "Anropare"
 
 #: gui/callercalleemodel.cpp:214
 #, kde-format
 msgid "Callee"
-msgstr "Den som blir anropad"
+msgstr "Anropad"
 
 #: gui/callercalleemodel.h:156 gui/treemodel.cpp:69 gui/util.cpp:112
 #: gui/util.cpp:141 gui/util.cpp:170
@@ -196,8 +196,8 @@ msgid ""
 "The location of the %1. The function name may be unresolved when debug "
 "information is missing."
 msgstr ""
-"Plats för %1. Funktionsnamnet kan sakna upplösning om avlusningsinformation "
-"saknas."
+"Platsen för %1. Funktionsnamnet kan vara olöst när avlusningsinformation "
+"saknas.</qt>"
 
 #: gui/callercalleemodel.h:356
 #, kde-format
@@ -205,7 +205,7 @@ msgid ""
 "<qt>The source code location that called an allocation function. May be "
 "unknown when debug information is missing.</qt>"
 msgstr ""
-"<qt>Källkodsplatsen där en tilldelningsfunktion anropades. Kan vara okänd om "
+"<qt>Källkodsplatsen som anropade en tilldelningsfunktion. Kan vara okänd när "
 "avlusningsinformation saknas.</qt>"
 
 #: gui/chartmodel.cpp:52
@@ -455,7 +455,7 @@ msgstr "Totalt %1 tillfälliga tilldelningar"
 #: gui/flamegraph.cpp:179
 #, kde-format
 msgid "%1 peak memory consumption"
-msgstr "%1 toppanvändning av minne"
+msgstr "%1 maximal minnesanvändningen"
 
 #: gui/flamegraph.cpp:181
 #, kde-format
@@ -655,9 +655,9 @@ msgid ""
 "suppression per line, and start each line with 'leak:', i.e. use the LSAN "
 "suppression file format."
 msgstr ""
-"Läs  in lista över undertryckningar av läckor från den angivna filen. Ange "
-"en undertryckning per rad, och börja varje rad med 'leak:', dvs. använd LSAN-"
-"filformatet för undertryckningar."
+"Läs in lista med läckundertryckningar från angiven fil. Ange en "
+"undertryckning per rad, och börja varje rad med 'leak:', dvs. använd LSAN-"
+"undertryckningsfilformatet."
 
 #: gui/gui.cpp:97 gui/mainwindow.cpp:642
 #, kde-format
@@ -668,11 +668,11 @@ msgid ""
 "application.  These are then always applied when analyzing the data, unless "
 "this feature is explicitly disabled using this command line option."
 msgstr ""
-"Ignorera undertryckningsdefinitioner som är inbäddade i Heaptracks datafil. "
-"Normal kopierar Heaptrack undertryckningar valfritt definierade via symbolen "
-"`const char *__lsan_default_suppressions()` i det avlusade programmet. De "
-"används sedan alltid när data analyseras, om inte funktionen explicit "
-"inaktiveras genom att använda den här kommandoradsväljaren."
+"Ignorera undertryckningsdefinitioner som är inbäddade i heaptrack-datafilen. "
+"Normalt kopierar heaptrack undertryckningar valfritt definierade via "
+"symbolen `const char *__lsan_default_suppressions()` i programmet som "
+"avlusas. De appliceras sedan alltid när data analyseras, om funktionen inte "
+"explicit inaktiveras genom att använda den här kommandoradsväljaren."
 
 #: gui/gui.cpp:105
 #, kde-format
@@ -827,7 +827,7 @@ msgstr "Heaptrack"
 #: gui/mainwindow.cpp:640
 #, kde-format
 msgid "Disable Embedded Suppressions"
-msgstr "Inaktivera inbäddade undertryckningar"
+msgstr "Inaktivera inbyggda undertryckningar"
 
 #: gui/mainwindow.cpp:652
 #, kde-format
@@ -896,8 +896,8 @@ msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
 "file name, '%l' by the line number and '%c' by the column number."
 msgstr ""
-"Ange kommando för att använda för kodnavigering, '%f' ersätts av filnamnet, "
-"'%l' av radnumret och '%c' av kolumnnumret."
+"Ange kommando att använda vid kodnavigering, '%f' ersätts av filnamnet, '%l' "
+"av radnummer och '%c' av kolumnnummer."
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
@@ -911,8 +911,7 @@ msgstr "Huvudfönster"
 #, kde-format
 msgid "Path to a file containing leak suppression rules in the LSAN format."
 msgstr ""
-"Sökväg till en fil som innehåller undertryckningsregler för läckor med LSAN-"
-"format."
+"Sökväg till en fil som innehåller läckundertryckningsregler på LSAN-format."
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: gui/mainwindow.ui:63
@@ -1116,7 +1115,7 @@ msgstr "&Arkiv"
 #: gui/mainwindow.ui:873
 #, kde-format
 msgid "Setti&ngs"
-msgstr "Inställ&ningar"
+msgstr "I&nställningar"
 
 #. i18n: ectx: property (title), widget (QMenu, menuFilter)
 #: gui/mainwindow.ui:878
@@ -1329,9 +1328,6 @@ msgstr "%1 i %2"
 msgid "<unresolved function>"
 msgstr "<oupplöst funktion>"
 
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
 
@@ -1350,28 +1346,21 @@ msgstr "<oupplöst funktion>"
 #~ msgid "Qt Creator"
 #~ msgstr "Qt Creator"
 
-#~ msgid "%1 allocations from %2"
-#~ msgstr "%1 tilldelningar från %2"
-
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 (%2)"
-
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 i %2 (%3)"
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
 
 #~ msgid "Symbol"
 #~ msgstr "Symbol"
 
 #~ msgid "Binary"
-#~ msgstr "Binärprogram"
+#~ msgstr "Binärfil"
 
 #~ msgid ""
 #~ "<qt>The parent function that called an allocation function. May be "
 #~ "unresolved when debug information is missing.</qt>"
 #~ msgstr ""
-#~ "<qt>Överliggande funktion som anropade en tilldelningsfunktion. Kan sakna "
-#~ "upplösning om avlusningsinformation saknas.</qt>"
+#~ "<qt>Överliggande funktion som anropade en tilldelningsfunktion. Kan vara "
+#~ "olöst när avlusningsinformation saknas.</qt>"
 
 #~ msgid ""
 #~ "<qt>The module, i.e. executable or shared library, from which an "
@@ -1384,11 +1373,14 @@ msgstr "<oupplöst funktion>"
 #~ "The function name of the %1. May be unresolved when debug information is "
 #~ "missing."
 #~ msgstr ""
-#~ "Funktionsnamnet för %1. Kan sakna upplösning om avlusningsinformation "
-#~ "saknas."
+#~ "Funktionsnamnet för %1. Kan vara olöst när avlusningsinformation saknas."
 
 #~ msgid "The name of the executable the symbol resides in."
-#~ msgstr "Namnet på den körbara fil som symbolen finns i."
+#~ msgstr "Namnet på det körbara programmet som symbolen finns i."
+
+#~ msgctxt "%1: function, %2: binary"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1 (%2)"
 
 #~ msgid "Function"
 #~ msgstr "Funktion"
@@ -1403,17 +1395,8 @@ msgstr "<oupplöst funktion>"
 #~ "<qt>Överliggande funktion som anropade en tilldelningsfunktion. Kan vara "
 #~ "okänd om avlusningsinformation saknas.</qt>"
 
-#~| msgctxt "1: function, 2: module"
-#~| msgid ""
-#~| "%1\n"
-#~| "  in %2"
-#~ msgctxt "1: function, 2: module, 3: module path"
-#~ msgid ""
-#~ "%1\n"
-#~ "  in %2"
-#~ msgstr ""
-#~ "%1\n"
-#~ "  i %2"
+#~ msgid "%1 in %2 (%3)"
+#~ msgstr "%1 i %2 (%3)"
 
 #~ msgid "File"
 #~ msgstr "Arkiv"

@@ -1,26 +1,26 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Freek de Kruijf <freekdekruijf@kde.nl>, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022.
+# SPDX-FileCopyrightText: 2015, 2016, 2017, 2018, 2019, 2021, 2023 Freek de Kruijf <freekdekruijf@kde.nl>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-05 00:47+0000\n"
-"PO-Revision-Date: 2022-10-05 15:21+0200\n"
+"POT-Creation-Date: 2023-09-15 02:28+0000\n"
+"PO-Revision-Date: 2023-09-15 10:44+0200\n"
 "Last-Translator: Freek de Kruijf <freekdekruijf@kde.nl>\n"
-"Language-Team: \n"
+"Language-Team: Dutch <kde-i18n-nl@kde.org>\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 22.08.1\n"
+"X-Generator: Lokalize 23.08.0\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
 msgid "Your names"
-msgstr "Freek de Kruijf - t/m 2021"
+msgstr "Freek de Kruijf - t/m 2019;2021"
 
 #, kde-format
 msgctxt "EMAIL OF TRANSLATORS"
@@ -1127,7 +1127,7 @@ msgstr "&Bestand"
 #: gui/mainwindow.ui:873
 #, kde-format
 msgid "Setti&ngs"
-msgstr "I&nstellingen"
+msgstr "Instelli&ngen"
 
 #. i18n: ectx: property (title), widget (QMenu, menuFilter)
 #: gui/mainwindow.ui:878
@@ -1341,9 +1341,6 @@ msgstr "%1 in %2"
 msgid "<unresolved function>"
 msgstr "<niet-gevonden functie>"
 
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
 
@@ -1362,15 +1359,8 @@ msgstr "<niet-gevonden functie>"
 #~ msgid "Qt Creator"
 #~ msgstr "Qt Creator"
 
-#~ msgid "%1 allocations from %2"
-#~ msgstr "%1 allocaties van %2"
-
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 (%2)"
-
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 in %2 (%3)"
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
 
 #~ msgid "Symbol"
 #~ msgstr "Symbool"
@@ -1402,6 +1392,10 @@ msgstr "<niet-gevonden functie>"
 #~ msgid "The name of the executable the symbol resides in."
 #~ msgstr "De naam van het programma waarin het symbool zich bevindt."
 
+#~ msgctxt "%1: function, %2: binary"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1 (%2)"
+
 #~ msgid "Function"
 #~ msgstr "Functie"
 
@@ -1415,17 +1409,8 @@ msgstr "<niet-gevonden functie>"
 #~ "<qt>De hogere functie die een allocatiefunctie heeft aangeroepen. Kan "
 #~ "onbekend zijn wanneer debug-informatie ontbreekt.</qt>"
 
-#~| msgctxt "1: function, 2: module"
-#~| msgid ""
-#~| "%1\n"
-#~| "  in %2"
-#~ msgctxt "1: function, 2: module, 3: module path"
-#~ msgid ""
-#~ "%1\n"
-#~ "  in %2"
-#~ msgstr ""
-#~ "%1\n"
-#~ "  in %2"
+#~ msgid "%1 in %2 (%3)"
+#~ msgstr "%1 in %2 (%3)"
 
 #~ msgid "File"
 #~ msgstr "Bestand"

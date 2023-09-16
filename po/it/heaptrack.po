@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-05 00:47+0000\n"
+"POT-Creation-Date: 2023-09-15 02:28+0000\n"
 "PO-Revision-Date: 2022-10-12 02:44+0200\n"
 "Last-Translator: Vincenzo Reale <smart2128vr@gmail.com>\n"
 "Language-Team: Italian <kde-i18n-it@kde.org>\n"
@@ -234,24 +234,27 @@ msgid "Elapsed Time"
 msgstr "Tempo trascorso"
 
 #: gui/chartmodel.cpp:83
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Most Memory Allocations"
 msgid "Total Memory Allocations"
-msgstr "Allocazioni di memoria totali"
+msgstr "Maggior parte delle allocazioni di memoria"
 
 #: gui/chartmodel.cpp:85
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "%1 peak memory consumption"
 msgid "Total Memory Consumption"
-msgstr "Consumo totale di memoria"
+msgstr "%1 consumo di memoria di picco"
 
 #: gui/chartmodel.cpp:87
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Most Temporary Allocations"
 msgid "Total Temporary Allocations"
-msgstr "Allocazioni temporanee totali"
+msgstr "Maggior parte delle allocazioni temporanee"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
-msgstr "%1"
+msgstr ""
 
 #: gui/chartmodel.cpp:166
 #, kde-format
@@ -300,27 +303,27 @@ msgstr "<qt>%2 consumati dopo %3 da: <p style='margin-left: 10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr "Esporta come..."
+msgstr ""
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr "Mostra legenda"
+msgstr ""
 
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr "Mostra il grafico del costo totale"
+msgstr ""
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr "Mostra il grafico dettagliato dei costi"
+msgstr ""
 
 #: gui/chartwidget.cpp:187
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr "Diagrammi a colonne:"
+msgstr ""
 
 #: gui/chartwidget.cpp:234
 #, kde-format
@@ -336,17 +339,18 @@ msgstr "Azzera filtro"
 #: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
-msgstr "Salva %1"
+msgstr ""
 
 #: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr "Immagine raster (*.png *.jpg *.tiff);;Immagine vettoriale (*.svg)"
+msgstr ""
 
 #: gui/chartwidget.cpp:400
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Failed to parse file %1."
 msgid "Failed to save the image to %1"
-msgstr "Impossibile salvare l'immagine in %1."
+msgstr "Impossibile analizzare il file %1."
 
 #: gui/chartwidget.cpp:420
 #, kde-format
@@ -1350,9 +1354,6 @@ msgstr "%1 in %2"
 msgid "<unresolved function>"
 msgstr "<funzione non risolta>"
 
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
 
@@ -1370,3 +1371,6 @@ msgstr "<funzione non risolta>"
 
 #~ msgid "Qt Creator"
 #~ msgstr "Qt Creator"
+
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kdeorg\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-05 00:47+0000\n"
-"PO-Revision-Date: 2023-09-02 02:56\n"
+"POT-Creation-Date: 2023-09-15 02:28+0000\n"
+"PO-Revision-Date: 2023-09-02 02:59\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -14,8 +14,8 @@ msgstr ""
 "X-Crowdin-Project: kdeorg\n"
 "X-Crowdin-Project-ID: 269464\n"
 "X-Crowdin-Language: zh-CN\n"
-"X-Crowdin-File: /kf5-trunk/messages/heaptrack/heaptrack.pot\n"
-"X-Crowdin-File-ID: 5826\n"
+"X-Crowdin-File: /kf5-stable/messages/heaptrack/heaptrack.pot\n"
+"X-Crowdin-File-ID: 4641\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -214,24 +214,27 @@ msgid "Elapsed Time"
 msgstr "已用时间"
 
 #: gui/chartmodel.cpp:83
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Most Memory Allocations"
 msgid "Total Memory Allocations"
-msgstr "合计内存分配"
+msgstr "最多内存分配"
 
 #: gui/chartmodel.cpp:85
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "%1 peak memory consumption"
 msgid "Total Memory Consumption"
-msgstr "合计内存消耗"
+msgstr "%1 内存消耗峰值"
 
 #: gui/chartmodel.cpp:87
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Most Temporary Allocations"
 msgid "Total Temporary Allocations"
-msgstr "合计临时分配"
+msgstr "最临时的分配"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
-msgstr "%1"
+msgstr ""
 
 #: gui/chartmodel.cpp:166
 #, kde-format
@@ -277,12 +280,12 @@ msgstr "<qt>%2 在 %3 之后消费:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr "导出为..."
+msgstr ""
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr "显示图例"
+msgstr ""
 
 #: gui/chartwidget.cpp:172
 #, kde-format
@@ -313,17 +316,18 @@ msgstr "重置过滤器"
 #: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
-msgstr "保存 %1"
+msgstr ""
 
 #: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr "栅格图像（*.png *.jpg *.tiff）；矢量图形 (*.svg)"
+msgstr ""
 
 #: gui/chartwidget.cpp:400
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "Failed to parse file %1."
 msgid "Failed to save the image to %1"
-msgstr "保存图像到 %1 失败"
+msgstr "解析文件 %1 失败。"
 
 #: gui/chartwidget.cpp:420
 #, kde-format
@@ -1253,3 +1257,24 @@ msgstr ""
 #, kde-format
 msgid "<unresolved function>"
 msgstr "<unresolved function>"
+
+#~ msgid "KDevelop"
+#~ msgstr "KDevelop"
+
+#~ msgid "Kate"
+#~ msgstr "Kate"
+
+#~ msgid "KWrite"
+#~ msgstr "KWrite"
+
+#~ msgid "gedit"
+#~ msgstr "gedit"
+
+#~ msgid "gvim"
+#~ msgstr "gvim"
+
+#~ msgid "Qt Creator"
+#~ msgstr "Qt Creator"
+
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"

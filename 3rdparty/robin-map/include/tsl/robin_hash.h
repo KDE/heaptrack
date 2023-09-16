@@ -92,6 +92,7 @@ static T numeric_cast(U value, const char* error_message = "numeric_cast() faile
         TSL_RH_THROW_OR_TERMINATE(std::runtime_error, error_message);
     }
 
+    TSL_RH_UNUSED(error_message);
     return ret;
 }
 

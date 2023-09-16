@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Automatically generated, 2015.
-# Eloy Cuadra <ecuadra@eloihr.net>, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022.
+# SPDX-FileCopyrightText: 2015, 2016, 2017, 2018, 2019, 2021, 2023 Eloy Cuadra <ecuadra@eloihr.net>
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-05 00:47+0000\n"
-"PO-Revision-Date: 2022-10-05 04:58+0200\n"
+"POT-Creation-Date: 2023-09-15 02:28+0000\n"
+"PO-Revision-Date: 2023-09-15 17:36+0200\n"
 "Last-Translator: Eloy Cuadra <ecuadra@eloihr.net>\n"
 "Language-Team: Spanish <kde-l10n-es@kde.org>\n"
 "Language: es\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 22.08.1\n"
+"X-Generator: Lokalize 23.08.0\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -244,7 +244,7 @@ msgstr "Total de asignaciones de memoria"
 #: gui/chartmodel.cpp:85
 #, kde-format
 msgid "Total Memory Consumption"
-msgstr "Total de consumo de memoria"
+msgstr "Consumo de memoria total"
 
 #: gui/chartmodel.cpp:87
 #, kde-format
@@ -1354,9 +1354,6 @@ msgstr "%1 en %2"
 msgid "<unresolved function>"
 msgstr "<función sin resolver>"
 
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
 
@@ -1375,15 +1372,8 @@ msgstr "<función sin resolver>"
 #~ msgid "Qt Creator"
 #~ msgstr "Qt Creator"
 
-#~ msgid "%1 allocations from %2"
-#~ msgstr "%1 asignaciones de %2"
-
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 (%2)"
-
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 en %2 (%3)"
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
 
 #~ msgid "Symbol"
 #~ msgstr "Símbolo"
@@ -1415,6 +1405,10 @@ msgstr "<función sin resolver>"
 #~ msgid "The name of the executable the symbol resides in."
 #~ msgstr "El nombre del ejecutable en el que reside el símbolo."
 
+#~ msgctxt "%1: function, %2: binary"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1 (%2)"
+
 #~ msgid "Function"
 #~ msgstr "Función"
 
@@ -1428,18 +1422,8 @@ msgstr "<función sin resolver>"
 #~ "<qt>La función desde donde se ha llamado a una función de asignación. "
 #~ "Puede ser desconocida cuando falta la información de depuración.</qt>"
 
-#, fuzzy
-#~| msgctxt "1: function, 2: module"
-#~| msgid ""
-#~| "%1\n"
-#~| "  in %2"
-#~ msgctxt "1: function, 2: module, 3: module path"
-#~ msgid ""
-#~ "%1\n"
-#~ "  in %2"
-#~ msgstr ""
-#~ "%1\n"
-#~ "  en %2"
+#~ msgid "%1 in %2 (%3)"
+#~ msgstr "%1 en %2 (%3)"
 
 #~ msgid "File"
 #~ msgstr "Archivo"
