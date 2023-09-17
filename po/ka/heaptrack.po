@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2023-09-15 02:28+0000\n"
-"PO-Revision-Date: 2023-02-08 11:57+0100\n"
+"PO-Revision-Date: 2023-09-16 06:06+0200\n"
 "Last-Translator: Temuri Doghonadze <temuri.doghonadze@gmail.com>\n"
 "Language-Team: Georgian <kde-i18n-doc@kde.org>\n"
 "Language: ka\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.3.2\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -202,7 +202,7 @@ msgstr "დახარჯული მეხსიერება"
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
-msgstr "დროებით გამოყოფები"
+msgstr "დროებითი გამოყოფები"
 
 #: gui/chartmodel.cpp:76 gui/chartwidget.cpp:466
 #, kde-format
@@ -210,27 +210,24 @@ msgid "Elapsed Time"
 msgstr "გასული დრო"
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "მეხსიერების გამყოფების უმრავლესობა"
+msgstr "მეხსიერების გამოყოფები ჯამში"
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "%1 peak memory consumption"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "%1 პიკური მეხსიერების მოხმარება"
+msgstr "დახარჯული მეხსიერება ჯამში"
 
 #: gui/chartmodel.cpp:87
-#, fuzzy, kde-format
-#| msgid "Most Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "დროებით გამოყოფების უმრავლესობა"
+msgstr "დროებითი გამოყოფები ჯამში"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:166
 #, kde-format
@@ -276,27 +273,27 @@ msgstr ""
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "გატანა, როგორც..."
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "ახსნის ჩვენება"
 
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "ჯამური ღირებულების გრაფიკის ჩვენება"
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "დეტალური ღირებულების გრაფიკის ჩვენება"
 
 #: gui/chartwidget.cpp:187
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "მიწყობილი დიაგრამები:"
 
 #: gui/chartwidget.cpp:234
 #, kde-format
@@ -312,18 +309,18 @@ msgstr "ფილტრის გასუფთავება"
 #: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "%1-ის შენახვა"
 
 #: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
 msgstr ""
+"რასტრული გამოსახულება (*.png *.jpg *.tiff);;ვექტორული გამოსახულება (*.svg)"
 
 #: gui/chartwidget.cpp:400
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to save the image to %1"
-msgstr "%1 ფაილის დამუშავების შეცდომა."
+msgstr "გამოსახულების %1-ში შენახვა ჩავარდა"
 
 #: gui/chartwidget.cpp:420
 #, kde-format
@@ -956,19 +953,19 @@ msgstr ""
 #: gui/mainwindow.ui:468
 #, kde-format
 msgid "Most Temporary Allocations"
-msgstr "დროებით გამოყოფების უმრავლესობა"
+msgstr "დროებითი გამოყოფების უმრავლესობა"
 
 #. i18n: ectx: property (title), widget (KCollapsibleGroupBox, suppressionBox)
 #: gui/mainwindow.ui:501
 #, kde-format
 msgid "Suppressions"
-msgstr ""
+msgstr "ჩახშობები"
 
 #. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
 #: gui/mainwindow.ui:533
 #, kde-format
 msgid "Bottom-Up"
-msgstr ""
+msgstr "ბოლოთი მაღლა"
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFunction)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterFunction)
@@ -976,14 +973,14 @@ msgstr ""
 #: gui/mainwindow.ui:557 gui/mainwindow.ui:625 gui/mainwindow.ui:746
 #, kde-format
 msgid "filter by function..."
-msgstr ""
+msgstr "ფუნქციით გაფილტვრა..."
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
 #: gui/mainwindow.ui:564 gui/mainwindow.ui:753
 #, kde-format
 msgid "filter by file..."
-msgstr ""
+msgstr "ფაილით გაფილტვრა..."
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
@@ -991,19 +988,19 @@ msgstr ""
 #: gui/mainwindow.ui:571 gui/mainwindow.ui:632 gui/mainwindow.ui:760
 #, kde-format
 msgid "filter by module..."
-msgstr ""
+msgstr "მოდულით გაფილტვრა..."
 
 #. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
 #: gui/mainwindow.ui:601
 #, kde-format
 msgid "Caller / Callee"
-msgstr ""
+msgstr "გამოძახებული/გამომძახებლი"
 
 #. i18n: ectx: attribute (title), widget (QWidget, topDownTab)
 #: gui/mainwindow.ui:725
 #, kde-format
 msgid "Top-Down"
-msgstr ""
+msgstr "მაღლიდან დაბლა"
 
 #. i18n: ectx: attribute (title), widget (FlameGraph, flameGraphTab)
 #: gui/mainwindow.ui:790
@@ -1193,7 +1190,7 @@ msgstr "დროებითი: %1 (გამოყოფების %2%, ს
 #: gui/treemodel.cpp:168
 #, kde-format
 msgid "backtrace:"
-msgstr ""
+msgstr "უკუტრეისი:"
 
 #: gui/treemodel.cpp:180
 #, kde-format
@@ -1231,7 +1228,7 @@ msgstr "სიმბოლო: <tt>%1</tt><br/>ბინარული: <tt>%2 
 #, kde-format
 msgctxt "%1: function name, %2: binary basename"
 msgid "%1 in %2"
-msgstr ""
+msgstr "%1-ი %2-ში"
 
 #: gui/util.cpp:209
 #, kde-format
