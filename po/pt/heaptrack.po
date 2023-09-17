@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-15 02:28+0000\n"
-"PO-Revision-Date: 2019-12-06 14:04+0000\n"
+"POT-Creation-Date: 2023-09-05 00:47+0000\n"
+"PO-Revision-Date: 2022-10-05 11:15+0100\n"
 "Last-Translator: José Nuno Coelho Pires <zepires@gmail.com>\n"
 "Language-Team: Portuguese <kde-i18n-pt@kde.org>\n"
 "Language: pt\n"
@@ -18,6 +18,9 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-POFile-SpellExtra: Wolff heaptrack ms Milian Heaptrack free Incl pid\n"
 "X-POFile-SpellExtra: pidof KDevelop Creator gvim gedit Kate KWrite\n"
+"X-POFile-SpellExtra: supressões leak LSAN const char\n"
+"X-POFile-SpellExtra: lsandefaultsuppressions Supressões supressoeslsan txt\n"
+"X-POFile-SpellExtra: jpg tiff\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -233,27 +236,24 @@ msgid "Elapsed Time"
 msgstr "Tempo Decorrido"
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "Mais Alocações de Memória"
+msgstr "Total de Alocações de Memória"
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "%1 peak memory consumption"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "%1 de pico de consumo de memória"
+msgstr "Total de Consumo de Memória"
 
 #: gui/chartmodel.cpp:87
-#, fuzzy, kde-format
-#| msgid "Most Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "Mais Alocações Temporárias"
+msgstr "Total de Alocações Temporárias"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:166
 #, kde-format
@@ -301,106 +301,101 @@ msgstr "<qt>%2 consumidos após %3 de:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Exportar Como..."
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Mostrar a legenda"
 
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "Mostrar o gráfico do custo total"
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "Mostrar o gráfico do custo detalhado"
 
 #: gui/chartwidget.cpp:187
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "Diagramas empilhados:"
 
 #: gui/chartwidget.cpp:234
-#, fuzzy, kde-format
-#| msgid "filter by function..."
+#, kde-format
 msgid "Filter In On Selection"
-msgstr "filtrar pela função..."
+msgstr "Filtrar a Selecção"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
 #: gui/chartwidget.cpp:244 gui/mainwindow.ui:891
-#, fuzzy, kde-format
-#| msgid "Reset View"
+#, kde-format
 msgid "Reset Filter"
-msgstr "Repor a Janela"
+msgstr "Reiniciar o Filtro"
 
 #: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Gravar o %1"
 
 #: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr ""
+msgstr "Imagem Rasterizada (*.png *.jpg *.tiff);;Imagem Vectorial (*.svg)"
 
 #: gui/chartwidget.cpp:400
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to save the image to %1"
-msgstr "Não foi possível processar o ficheiro %1."
+msgstr "Não foi possível gravar a imagem em %1"
 
 #: gui/chartwidget.cpp:420
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
-msgstr ""
+msgstr "<tr><th></th><th>Início</th><th>Fim</th><th>Delta</th></tr>"
 
 #: gui/chartwidget.cpp:421
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>Hora</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:425
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>Consumida</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:429
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>Alocações</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:433
-#, fuzzy, kde-format
-#| msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
+#, kde-format
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr "<dt><b>alocações temporárias</b>:</dt><dd>%1 (%2, %3/s)</dd>"
+msgstr ""
+"<tr><th>Alocações Temporárias</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:441
-#, fuzzy, kde-format
-#| msgid "<qt>Shows the heap memory consumption over time.</qt>"
+#, kde-format
 msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
 "a time range for filtering.</qt>"
-msgstr "<qt>Mostra o consumo de memória de dados ao longo do tempo.</qt>"
+msgstr ""
+"<qt>Mostra o consumo de memória de dados ao longo do tempo.<br/>Carregue e "
+"arraste para seleccionar um intervalo de tempo na filtragem.</qt>"
 
 #: gui/chartwidget.cpp:445
-#, fuzzy, kde-format
-#| msgid "<qt>Shows number of memory allocations over time.</qt>"
+#, kde-format
 msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
 "select a time range for filtering.</qt>"
-msgstr "<qt>Mostra o número de alocações de memória ao longo do tempo.</qt>"
+msgstr ""
+"<qt>Mostra o número de alocações de memória ao longo do tempo.<br/>Carregue "
+"e arraste para seleccionar um intervalo de tempo na filtragem.</qt>"
 
 #: gui/chartwidget.cpp:449
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>Shows number of temporary memory allocations over time. A temporary "
-#| "allocation is one that is followed immediately by its corresponding "
-#| "deallocation, without other allocations happening in-between.</qt>"
+#, kde-format
 msgid ""
 "<qt>Shows number of temporary memory allocations over time. A temporary "
 "allocation is one that is followed immediately by its corresponding "
@@ -409,35 +404,39 @@ msgid ""
 msgstr ""
 "<qt>Mostra o número de alocações temporárias ao longo do tempo. Estas "
 "alocações são seguidas directamente de um 'free' (libertação), sem outras "
-"alocações intermédias.</qt>"
+"alocações intermédias.<br/>Carregue e arraste para seleccionar um intervalo "
+"de tempo na filtragem.</qt>"
 
 #: gui/chartwidget.cpp:471
-#, fuzzy, kde-format
-#| msgid "%1 allocations from %2 in %3 (%4)"
+#, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
-msgstr "%1 alocações de %2 em %3 (%4)"
+msgstr "%1 (filtrados de %2 até %3, Δ%4)"
 
 #: gui/chartwidget.cpp:475
 #, kde-format
 msgid "%1 (filtered delta)"
-msgstr ""
+msgstr "%1 (delta filtrado)"
 
 #: gui/chartwidget.cpp:564
 #, kde-format
 msgid "Click and drag to select time range for filtering."
-msgstr ""
+msgstr "Carregue e arraste para seleccionar o intervalo de tempo na filtragem."
 
 #: gui/chartwidget.cpp:570
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
 msgstr ""
+"T = %1, Consumida: %2. Carregue e arraste para seleccionar o intervalo de "
+"tempo na filtragem."
 
 #: gui/chartwidget.cpp:574
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
 msgstr ""
+"T = %1, Alocações: %2. Carregue e arraste para seleccionar o intervalo de "
+"tempo na filtragem."
 
 #: gui/chartwidget.cpp:578
 #, kde-format
@@ -445,6 +444,8 @@ msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
 "filtering."
 msgstr ""
+"T = %1, Alocações Temporárias: %2. Carregue e arraste para seleccionar o "
+"intervalo de tempo na filtragem."
 
 #: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
 #, kde-format
@@ -542,16 +543,12 @@ msgstr ""
 "Seleccione a fonte de dados que deverá ser visualizada no gráfico em chama."
 
 #: gui/flamegraph.cpp:467
-#, fuzzy, kde-format
-#| msgid "Bottom-Down View"
+#, kde-format
 msgid "Bottom-Up View"
 msgstr "Vista de Baixo-para-Cima"
 
 #: gui/flamegraph.cpp:468
-#, fuzzy, kde-format
-#| msgid ""
-#| "Enable the bottom-down flame graph view. When this is unchecked, the top-"
-#| "down view is enabled by default."
+#, kde-format
 msgid ""
 "Enable the bottom-up flame graph view. When this is unchecked, the top-down "
 "view is enabled by default."
@@ -667,6 +664,9 @@ msgid ""
 "suppression per line, and start each line with 'leak:', i.e. use the LSAN "
 "suppression file format."
 msgstr ""
+"Carregar uma lista de supressões de fugas do ficheiro indicado. Indique uma "
+"supressão por linha, começando cada linha por 'leak:', i.e. use o formato de "
+"ficheiro de supressões LSAN."
 
 #: gui/gui.cpp:97 gui/mainwindow.cpp:642
 #, kde-format
@@ -677,6 +677,12 @@ msgid ""
 "application.  These are then always applied when analyzing the data, unless "
 "this feature is explicitly disabled using this command line option."
 msgstr ""
+"Ignorar as definições de supressões que estão incorporadas no ficheiro de "
+"dados do 'heaptrack'. Por omissão, o 'heaptrack' irá copiar as supressões "
+"definidas opcionalmente através de um símbolo `const char "
+"*__lsan_default_suppressions()` na aplicação sob depuração. Estas serão "
+"sempre aplicadas ao analisar os dados, a menos que esta funcionalidade "
+"estejam explicitamente desligada com esta opção da linha de comandos."
 
 #: gui/gui.cpp:105
 #, kde-format
@@ -684,6 +690,9 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks in common system libraries."
 msgstr ""
+"Ignorar as definições de supressão compiladas dentro do 'heaptrack'. Por "
+"omissão, este irá suprimir certo tipo de fugas conhecidas em algumas "
+"bibliotecas comuns do sistema."
 
 #: gui/gui.cpp:108
 #, kde-format
@@ -701,6 +710,7 @@ msgid ""
 "%1 allocations from %2, totalling %3 allocated with an average of %4 per "
 "allocation"
 msgstr ""
+"%1 alocações de %2, totalizando %3 alocados com uma média de %4 por alocação"
 
 #: gui/histogramwidget.cpp:99
 #, kde-format
@@ -732,16 +742,16 @@ msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 msgstr "<dt><b>depurado</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 
 #: gui/mainwindow.cpp:401
-#, fuzzy, kde-format
-#| msgid "<dt><b>total runtime</b>:</dt><dd>%1s</dd>"
+#, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
-msgstr "<dt><b>tempo de execução total</b>:</dt><dd>%1s</dd>"
+msgstr ""
+"<dt><b>tempo de execução total</b>:</dt><dd>%1, filtrado de %2 até %3 (%4)</"
+"dd>"
 
 #: gui/mainwindow.cpp:406
-#, fuzzy, kde-format
-#| msgid "<dt><b>total runtime</b>:</dt><dd>%1s</dd>"
+#, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
-msgstr "<dt><b>tempo de execução total</b>:</dt><dd>%1s</dd>"
+msgstr "<dt><b>tempo de execução total</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:408
 #, kde-format
@@ -759,11 +769,10 @@ msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 msgstr "<dt><b>alocações temporárias</b>:</dt><dd>%1 (%2, %3/s)</dd>"
 
 #: gui/mainwindow.cpp:428
-#, fuzzy, kde-format
-#| msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2s</dd>"
+#, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
 msgstr ""
-"<dt><b>pico do consumo de memória de dados</b>:</dt><dd>%1 ao fim de %2s</dd>"
+"<dt><b>pico do consumo de memória de dados</b>:</dt><dd>%1 ao fim de %2</dd>"
 
 #: gui/mainwindow.cpp:431
 #, kde-format
@@ -773,17 +782,14 @@ msgstr ""
 "dd>"
 
 #: gui/mainwindow.cpp:435
-#, fuzzy, kde-format
-#| msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2s</dd>"
+#, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
-msgstr ""
-"<dt><b>pico do consumo de memória de dados</b>:</dt><dd>%1 ao fim de %2s</dd>"
+msgstr "<dt><b>delta do consumo de memória</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:439
-#, fuzzy, kde-format
-#| msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
+#, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
-msgstr "<dt><b>total da fuga de memória</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>total da fuga de memória</b>:</dt><dd>%1 (%2 suprimidas)</dd>"
 
 #: gui/mainwindow.cpp:442
 #, kde-format
@@ -821,10 +827,9 @@ msgid "Input data %1 is not readable."
 msgstr "Os dados de entrada %1 não são legíveis."
 
 #: gui/mainwindow.cpp:597
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to parse suppression file."
-msgstr "Não foi possível processar o ficheiro %1."
+msgstr "Não foi possível processar o ficheiro de supressões."
 
 #: gui/mainwindow.cpp:612
 #, kde-format
@@ -834,12 +839,12 @@ msgstr "Heaptrack"
 #: gui/mainwindow.cpp:640
 #, kde-format
 msgid "Disable Embedded Suppressions"
-msgstr ""
+msgstr "Desactivar as Supressões Incorporadas"
 
 #: gui/mainwindow.cpp:652
 #, kde-format
 msgid "Disable Builtin Suppressions"
-msgstr ""
+msgstr "Desactivar as Supressões Incorporadas"
 
 #: gui/mainwindow.cpp:654
 #, kde-format
@@ -847,6 +852,9 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks from common system libraries."
 msgstr ""
+"Ignorar as definições de supressão compiladas dentro do 'heaptrack'. Por "
+"omissão, este irá suprimir certo tipo de fugas conhecidas em algumas "
+"bibliotecas comuns do sistema."
 
 #: gui/mainwindow.cpp:682
 #, kde-format
@@ -866,10 +874,9 @@ msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1 comparado com %2"
 
 #: gui/mainwindow.cpp:703
-#, fuzzy, kde-format
-#| msgid "Loading file %1, please wait..."
+#, kde-format
 msgid "Reparsing file, please wait..."
-msgstr "A carregar o ficheiro %1; espere por favor..."
+msgstr "A processar de novo o ficheiro; espere por favor..."
 
 #: gui/mainwindow.cpp:746
 #, kde-format
@@ -918,6 +925,7 @@ msgstr "Janela Principal"
 #, kde-format
 msgid "Path to a file containing leak suppression rules in the LSAN format."
 msgstr ""
+"Localização de um ficheiro com regras de supressão de fugas no formato LSAN."
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: gui/mainwindow.ui:63
@@ -980,13 +988,13 @@ msgstr "Comparar com:"
 #: gui/mainwindow.ui:121
 #, kde-format
 msgid "Suppressions:"
-msgstr ""
+msgstr "Supressões:"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
 #: gui/mainwindow.ui:131
 #, kde-format
 msgid "path/to/lsan_suppressions.txt"
-msgstr ""
+msgstr "localização/das/supressoes_lsan.txt"
 
 #. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
 #: gui/mainwindow.ui:244
@@ -1051,7 +1059,7 @@ msgstr "Mais Alocações Temporárias"
 #: gui/mainwindow.ui:501
 #, kde-format
 msgid "Suppressions"
-msgstr ""
+msgstr "Supressões"
 
 #. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
 #: gui/mainwindow.ui:533
@@ -1128,7 +1136,7 @@ msgstr "Co&nfiguração"
 #: gui/mainwindow.ui:878
 #, kde-format
 msgid "Filter"
-msgstr ""
+msgstr "Filtro"
 
 #: gui/parser.cpp:387
 #, kde-format
@@ -1186,21 +1194,19 @@ msgid "more than 1KB"
 msgstr "mais de 1KB"
 
 #: gui/parser.cpp:645
-#, fuzzy, kde-format
-#| msgid "parsing data..."
+#, kde-format
 msgid "reparsing data"
-msgstr "a processar os dados..."
+msgstr "a processar de novo os dados"
 
 #: gui/parser.cpp:645
-#, fuzzy, kde-format
-#| msgid "parsing data..."
+#, kde-format
 msgid "parsing data"
-msgstr "a processar os dados..."
+msgstr "a analisar os dados"
 
 #: gui/parser.cpp:659
 #, kde-format
 msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
-msgstr ""
+msgstr "%1 passado: %2/%3  gasto: %4  falta: %5"
 
 #: gui/parser.cpp:715
 #, kde-format
@@ -1341,6 +1347,9 @@ msgstr "%1 em %2"
 msgid "<unresolved function>"
 msgstr "<função não resolvida>"
 
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
+
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
 
@@ -1358,56 +1367,3 @@ msgstr "<função não resolvida>"
 
 #~ msgid "Qt Creator"
 #~ msgstr "Qt Creator"
-
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
-#~ msgid "Symbol"
-#~ msgstr "Símbolo"
-
-#~ msgid "Binary"
-#~ msgstr "Binário"
-
-#~ msgid ""
-#~ "<qt>The parent function that called an allocation function. May be "
-#~ "unresolved when debug information is missing.</qt>"
-#~ msgstr ""
-#~ "<qt>A função-mãe que invocou uma função de alocação. Poderá não ser "
-#~ "possível resolvê-lo se não existir a informação de depuração.</qt>"
-
-#~ msgid ""
-#~ "<qt>The module, i.e. executable or shared library, from which an "
-#~ "allocation function was called.</qt>"
-#~ msgstr ""
-#~ "<qt>O módulo, i.e. executável ou biblioteca dinâmica, onde foi invocada a "
-#~ "função de alocação.</qt>"
-
-#~ msgid ""
-#~ "The function name of the %1. May be unresolved when debug information is "
-#~ "missing."
-#~ msgstr ""
-#~ "O nome da função do %1. Pode não ser possível resolvê-lo se não existir a "
-#~ "informação de depuração."
-
-#~ msgid "The name of the executable the symbol resides in."
-#~ msgstr "O nome do executável onde reside o símbolo."
-
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 (%2)"
-
-#~ msgid "Function"
-#~ msgstr "Função"
-
-#~ msgid "Module"
-#~ msgstr "Módulo"
-
-#~ msgid ""
-#~ "<qt>The parent function that called an allocation function. May be "
-#~ "unknown when debug information is missing.</qt>"
-#~ msgstr ""
-#~ "<qt>A função-mãe que invocou uma função de alocação. Poderá estar em "
-#~ "branco se não existir a informação de depuração.</qt>"
-
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 em %2 (%3)"

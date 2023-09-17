@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-15 02:28+0000\n"
+"POT-Creation-Date: 2023-09-05 00:47+0000\n"
 "PO-Revision-Date: 2018-01-26 20:51+0200\n"
 "Last-Translator: scootergrisen\n"
 "Language-Team: Danish\n"
@@ -1367,6 +1367,22 @@ msgstr "<uløst funktion>"
 #~ msgstr "heaptrack.*.*.gz"
 
 #, fuzzy
+#~| msgid "%1 allocations from %2 in %3"
+#~ msgid "%1 allocations from %2"
+#~ msgstr "%1 allokeringer fra %2 i %3"
+
+#, fuzzy
+#~| msgid "%1 in ?? (%2)"
+#~ msgctxt "%1: function, %2: binary"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1 i ?? (%2)"
+
+#, fuzzy
+#~| msgid "%1 in %2:%3 (%4)"
+#~ msgid "%1 in %2 (%3)"
+#~ msgstr "%1 i %2:%3 (%4)"
+
+#, fuzzy
 #~| msgid ""
 #~| "<qt>The parent function that called an allocation function. May be "
 #~| "unknown when debug information is missing.</qt>"
@@ -1395,12 +1411,6 @@ msgstr "<uløst funktion>"
 #~ "<qt>Forælderfunktionen som kaldte en allokeringsfunktion. Kan være ukendt "
 #~ "når der mangler fejlretningsinformation.</qt>"
 
-#, fuzzy
-#~| msgid "%1 in ?? (%2)"
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 i ?? (%2)"
-
 #~ msgid "Function"
 #~ msgstr "Funktion"
 
@@ -1415,9 +1425,17 @@ msgstr "<uløst funktion>"
 #~ "når der mangler fejlretningsinformation.</qt>"
 
 #, fuzzy
-#~| msgid "%1 in %2:%3 (%4)"
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 i %2:%3 (%4)"
+#~| msgctxt "1: function, 2: module"
+#~| msgid ""
+#~| "%1\n"
+#~| "  in %2"
+#~ msgctxt "1: function, 2: module, 3: module path"
+#~ msgid ""
+#~ "%1\n"
+#~ "  in %2"
+#~ msgstr ""
+#~ "%1\n"
+#~ "  i %2"
 
 #~ msgid "File"
 #~ msgstr "Fil"

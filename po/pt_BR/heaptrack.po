@@ -3,21 +3,21 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # André Marcelo Alvarenga <alvarenga@kde.org>, 2015, 2016.
-# Luiz Fernando Ranghetti <elchevive@opensuse.org>, 2017, 2018, 2019, 2021.
+# Luiz Fernando Ranghetti <elchevive@opensuse.org>, 2017, 2018, 2019, 2020, 2021, 2022, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-15 02:28+0000\n"
-"PO-Revision-Date: 2021-12-09 09:13-0300\n"
+"POT-Creation-Date: 2023-09-05 00:47+0000\n"
+"PO-Revision-Date: 2023-05-31 14:33-0300\n"
 "Last-Translator: Luiz Fernando Ranghetti <elchevive@opensuse.org>\n"
-"Language-Team: Portuguese <kde-i18n-pt_BR@kde.org>\n"
+"Language-Team: Brazilian Portuguese <kde-i18n-pt_BR@kde.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 20.04.2\n"
+"X-Generator: Lokalize 21.12.3\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -233,27 +233,24 @@ msgid "Elapsed Time"
 msgstr "Tempo decorrido"
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "Mais alocações de memória"
+msgstr "Total de alocações de memória"
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "%1 peak memory consumption"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "%1 pico de consumo de memória"
+msgstr "Total de consumo de memória"
 
 #: gui/chartmodel.cpp:87
-#, fuzzy, kde-format
-#| msgid "Most Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "Mais alocações temporárias"
+msgstr "Total de alocações temporárias"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:166
 #, kde-format
@@ -301,27 +298,27 @@ msgstr "<qt>%2 consumidos após %3 de:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Exportar como..."
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Mostrar legenda"
 
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "Mostrar gráfico de custo total"
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "Mostrar gráfico de custo detalhado"
 
 #: gui/chartwidget.cpp:187
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "Diagramas empilhados:"
 
 #: gui/chartwidget.cpp:234
 #, kde-format
@@ -337,18 +334,17 @@ msgstr "Redefinir filtro"
 #: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Salvar %1"
 
 #: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr ""
+msgstr "Imagem raster (*.png *.jpg *.tiff);;Imagem vetorial (*.svg)"
 
 #: gui/chartwidget.cpp:400
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to save the image to %1"
-msgstr "Não foi possível processar o arquivo %1."
+msgstr "Falha ao salvar a imagem em %1"
 
 #: gui/chartwidget.cpp:420
 #, kde-format
@@ -1345,6 +1341,9 @@ msgstr "%1 em %2"
 msgid "<unresolved function>"
 msgstr "<função não resolvida>"
 
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
+
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
 
@@ -1363,8 +1362,15 @@ msgstr "<função não resolvida>"
 #~ msgid "Qt Creator"
 #~ msgstr "Qt Creator"
 
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgid "%1 allocations from %2"
+#~ msgstr "%1 alocações de %2"
+
+#~ msgctxt "%1: function, %2: binary"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1 (%2)"
+
+#~ msgid "%1 in %2 (%3)"
+#~ msgstr "%1 em %2 (%3)"
 
 #~ msgid "Symbol"
 #~ msgstr "Símbolo"
@@ -1396,10 +1402,6 @@ msgstr "<função não resolvida>"
 #~ msgid "The name of the executable the symbol resides in."
 #~ msgstr "O nome do executável que contém o símbolo."
 
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 (%2)"
-
 #~ msgid "Function"
 #~ msgstr "Função"
 
@@ -1413,8 +1415,18 @@ msgstr "<função não resolvida>"
 #~ "<qt>A função-mãe que chamou uma função de alocação. Poderá estar em "
 #~ "branco se não existir informações de depuração.</qt>"
 
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 em %2 (%3)"
+#, fuzzy
+#~| msgctxt "1: function, 2: module"
+#~| msgid ""
+#~| "%1\n"
+#~| "  in %2"
+#~ msgctxt "1: function, 2: module, 3: module path"
+#~ msgid ""
+#~ "%1\n"
+#~ "  in %2"
+#~ msgstr ""
+#~ "%1\n"
+#~ "  em %2"
 
 #~ msgid "File"
 #~ msgstr "Arquivo"

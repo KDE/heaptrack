@@ -1,19 +1,19 @@
 # translation of heaptrack.po to Slovak
-# Roman Paholik <wizzardsk@gmail.com>, 2015, 2016, 2017, 2021, 2022.
-# Mthw <jari_45@hotmail.com>, 2018.
+# Roman Paholik <wizzardsk@gmail.com>, 2015, 2016, 2017.
+# Mthw <jari_45@hotmail.com>, 2019.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-09-15 02:28+0000\n"
-"PO-Revision-Date: 2022-04-06 17:40+0200\n"
-"Last-Translator: Roman Paholik <wizzardsk@gmail.com>\n"
-"Language-Team: Slovak <kde-sk@linux.sk>\n"
+"POT-Creation-Date: 2023-09-05 00:47+0000\n"
+"PO-Revision-Date: 2019-01-28 18:52+0100\n"
+"Last-Translator: Mthw <jari_45@hotmail.com>\n"
+"Language-Team: Slovak <kde-i18n-doc@kde.org>\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 21.12.3\n"
+"X-Generator: Lokalize 18.12.1\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #, kde-format
@@ -360,23 +360,24 @@ msgstr ""
 #: gui/chartwidget.cpp:421
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr "<tr><th>Čas</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr ""
 
 #: gui/chartwidget.cpp:425
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr "<tr><th>Použité</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr ""
 
 #: gui/chartwidget.cpp:429
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr "<tr><th>Alokácie</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr ""
 
 #: gui/chartwidget.cpp:433
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr "<tr><th>Dočasné alokácie</th><td>%1</td><td>%2</td><td>%3</td></tr>"
+msgstr "<dt><b>dočasné alokácie</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 
 #: gui/chartwidget.cpp:441
 #, fuzzy, kde-format
@@ -411,9 +412,9 @@ msgstr ""
 
 #: gui/chartwidget.cpp:471
 #, fuzzy, kde-format
-#| msgid "%1 allocations from %2 in %3"
+#| msgid "%1 allocations from %2 in %3 (%4)"
 msgid "%1 (filtered from %2 to %3, Δ%4)"
-msgstr "%1 alokácií od %2 v %3"
+msgstr "%1 alokácií od %2 v %3 (%4)"
 
 #: gui/chartwidget.cpp:475
 #, kde-format
@@ -874,7 +875,7 @@ msgstr ""
 #: gui/mainwindow.cpp:813
 #, kde-format
 msgid "Custom..."
-msgstr "Vlastné..."
+msgstr ""
 
 #: gui/mainwindow.cpp:825
 #, kde-format
@@ -914,7 +915,15 @@ msgstr "Otvoriť údaje Heaptrack"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, openFile)
 #: gui/mainwindow.ui:72
-#, kde-format
+#, fuzzy, kde-format
+#| msgid ""
+#| "<qt><p>This field specifies the primary heaptrack data file. These files "
+#| "are called <tt>heaptrack.$APP.$PID.gz</tt>. You can produce such a file "
+#| "by profiling your application, e.g. via:</p>\n"
+#| "<pre><code>heaptrack &lt;yourapplication&gt; ...</code></pre>\n"
+#| "<p>Or, alternatively, you can attach to a running process via</p>\n"
+#| "<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></"
+#| "qt>"
 msgid ""
 "<qt><p>This field specifies the primary heaptrack data file. These files are "
 "called <tt>heaptrack.$APP.$PID.gz</tt> or <tt>heaptrack.$APP.$PID.zst</tt>. "
@@ -933,7 +942,8 @@ msgstr ""
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, openFile)
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, compareTo)
 #: gui/mainwindow.ui:75 gui/mainwindow.ui:88
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "path/to/heaptrack.$APP.$PID.gz"
 msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
 msgstr "cesta/ku/heaptrack.$APP.$PID.gz"
 
@@ -1113,12 +1123,13 @@ msgstr "Nastavenia"
 #: gui/mainwindow.ui:878
 #, kde-format
 msgid "Filter"
-msgstr "Filter"
+msgstr ""
 
 #: gui/parser.cpp:387
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "merging allocations..."
 msgid "merging allocations... %1%"
-msgstr "zlučujem alokácie... %1%"
+msgstr "zlučujem alokácie..."
 
 #: gui/parser.cpp:557
 #, kde-format
@@ -1177,9 +1188,10 @@ msgid "reparsing data"
 msgstr "spracúvam údaje..."
 
 #: gui/parser.cpp:645
-#, kde-format
+#, fuzzy, kde-format
+#| msgid "parsing data..."
 msgid "parsing data"
-msgstr "spracúvam údaje"
+msgstr "spracúvam údaje..."
 
 #: gui/parser.cpp:659
 #, kde-format
@@ -1314,12 +1326,17 @@ msgstr ""
 #, kde-format
 msgctxt "%1: function name, %2: binary basename"
 msgid "%1 in %2"
-msgstr "%1 v %2"
+msgstr "%1 in %2"
 
 #: gui/util.cpp:209
 #, kde-format
 msgid "<unresolved function>"
 msgstr "<nevyriešená funkcia>"
+
+#, fuzzy
+#~| msgid "heaptrack.*.*.gz"
+#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
+#~ msgstr "heaptrack.*.*.gz"
 
 #~ msgid "KDevelop"
 #~ msgstr "KDevelop"
@@ -1339,14 +1356,23 @@ msgstr "<nevyriešená funkcia>"
 #~ msgid "Qt Creator"
 #~ msgstr "Qt Creator"
 
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
+#, fuzzy
+#~| msgid "%1 allocations from %2 in %3 (%4)"
+#~ msgid "%1 allocations from %2"
+#~ msgstr "%1 alokácií od %2 v %3 (%4)"
+
+#~ msgctxt "%1: function, %2: binary"
+#~ msgid "%1 (%2)"
+#~ msgstr "%1 (%2)"
+
+#~ msgid "%1 in %2 (%3)"
+#~ msgstr "%1 v %2 (%3)"
 
 #~ msgid "Symbol"
 #~ msgstr "Symbol"
 
 #~ msgid "Binary"
-#~ msgstr "Binárny"
+#~ msgstr "Binárne číslo"
 
 #, fuzzy
 #~| msgid ""
@@ -1377,12 +1403,6 @@ msgstr "<nevyriešená funkcia>"
 #~ "<qt>Rodičovská funkcia, ktorá volala alokačnú funkciu. Môže byť neznáma, "
 #~ "ak chýbajú ladiace informácie.</qt>"
 
-#, fuzzy
-#~| msgid "%1 in ?? (%2)"
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 v ?? (%2)"
-
 #~ msgid "Function"
 #~ msgstr "Funkcia"
 
@@ -1396,8 +1416,18 @@ msgstr "<nevyriešená funkcia>"
 #~ "<qt>Rodičovská funkcia, ktorá volala alokačnú funkciu. Môže byť neznáma, "
 #~ "ak chýbajú ladiace informácie.</qt>"
 
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 v %2 (%3)"
+#, fuzzy
+#~| msgctxt "1: function, 2: module"
+#~| msgid ""
+#~| "%1\n"
+#~| "  in %2"
+#~ msgctxt "1: function, 2: module, 3: module path"
+#~ msgid ""
+#~ "%1\n"
+#~ "  in %2"
+#~ msgstr ""
+#~ "%1\n"
+#~ "  v %2"
 
 #~ msgid "File"
 #~ msgstr "Súbor"
