@@ -381,6 +381,7 @@ public:
             return;
         }
         s_data->moduleCacheDirty = true;
+        Trace::invalidateModuleCache();
     }
 
     void writeTimestamp()

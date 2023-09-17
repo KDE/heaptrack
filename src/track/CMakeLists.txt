@@ -7,7 +7,11 @@ install(PROGRAMS ${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}/heaptrack
     DESTINATION ${BIN_INSTALL_DIR}
 )
 
-if (HEAPTRACK_USE_LIBUNWIND)
+if (HEAPTRACK_USE_NWIND_CAPI)
+    add_library(heaptrack_unwind STATIC trace_nwind_capi.cpp)
+    target_include_directories(heaptrack_unwind PRIVATE ${NWIND_CAPI_INCLUDE_DIRS})
+    target_link_libraries(heaptrack_unwind PRIVATE ${NWIND_CAPI_LIBRARIES})
+elseif (HEAPTRACK_USE_LIBUNWIND)
     add_library(heaptrack_unwind STATIC trace_libunwind.cpp)
     target_include_directories(heaptrack_unwind PRIVATE ${LIBUNWIND_INCLUDE_DIRS})
     target_link_libraries(heaptrack_unwind PRIVATE ${LIBUNWIND_LIBRARIES})

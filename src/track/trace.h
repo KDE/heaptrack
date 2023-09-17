@@ -68,6 +68,7 @@ struct Trace
     }
 
     static void setup();
+    static void invalidateModuleCache();
 
     static void print();
 

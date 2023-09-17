@@ -106,6 +106,12 @@ else()
 endif()
 
 option(
+  HEAPTRACK_USE_NWIND_CAPI
+  "Use nwind_capi for unwind, see https://github.com/koute/not-perf"
+  OFF
+)
+
+option(
   HEAPTRACK_USE_LIBUNWIND
   "Define preferred unwind functionality - Libunwind as ON and unwind_tables as OFF."
   ON
@@ -151,7 +157,9 @@ if (ECM_ENABLE_SANITIZERS)
 endif()
 
 if (HEAPTRACK_BUILD_TRACK)
-    if (HEAPTRACK_USE_LIBUNWIND)
+    if (HEAPTRACK_USE_NWIND_CAPI)
+        find_package(nwind_capi REQUIRED)
+    elseif (HEAPTRACK_USE_LIBUNWIND)
         find_package(Libunwind REQUIRED)
     endif()
 

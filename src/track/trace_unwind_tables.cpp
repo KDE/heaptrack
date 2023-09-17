@@ -41,6 +41,10 @@ void Trace::setup()
 {
 }
 
+void Trace::invalidateModuleCache()
+{
+}
+
 void Trace::print()
 {
     Trace trace;

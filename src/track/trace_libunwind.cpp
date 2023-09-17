@@ -62,6 +62,10 @@ void Trace::setup()
 #endif
 }
 
+void Trace::invalidateModuleCache()
+{
+}
+
 int Trace::unwind(void** data)
 {
     return unw_backtrace(data, MAX_SIZE);
