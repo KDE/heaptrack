@@ -234,27 +234,24 @@ msgid "Elapsed Time"
 msgstr "Tempo trascorso"
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "Maggior parte delle allocazioni di memoria"
+msgstr "Allocazioni di memoria totali"
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "%1 peak memory consumption"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "%1 consumo di memoria di picco"
+msgstr "Consumo totale di memoria"
 
 #: gui/chartmodel.cpp:87
-#, fuzzy, kde-format
-#| msgid "Most Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "Maggior parte delle allocazioni temporanee"
+msgstr "Allocazioni temporanee totali"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:166
 #, kde-format
@@ -303,27 +300,27 @@ msgstr "<qt>%2 consumati dopo %3 da: <p style='margin-left: 10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Esporta come..."
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Mostra legenda"
 
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "Mostra il grafico del costo totale"
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "Mostra il grafico dettagliato dei costi"
 
 #: gui/chartwidget.cpp:187
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "Diagrammi a colonne:"
 
 #: gui/chartwidget.cpp:234
 #, kde-format
@@ -339,18 +336,17 @@ msgstr "Azzera filtro"
 #: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Salva %1"
 
 #: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr ""
+msgstr "Immagine raster (*.png *.jpg *.tiff);;Immagine vettoriale (*.svg)"
 
 #: gui/chartwidget.cpp:400
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to save the image to %1"
-msgstr "Impossibile analizzare il file %1."
+msgstr "Impossibile salvare l'immagine in %1."
 
 #: gui/chartwidget.cpp:420
 #, kde-format
