@@ -1,13 +1,13 @@
 # Copyright (C) YEAR This file is copyright:
 # This file is distributed under the same license as the heaptrack package.
 #
-# giovanni <g.sora@tiscali.it>, 2020, 2021, 2022.
+# giovanni <g.sora@tiscali.it>, 2020, 2021, 2022, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2023-09-15 02:28+0000\n"
-"PO-Revision-Date: 2022-05-26 09:21+0200\n"
+"PO-Revision-Date: 2023-09-21 12:18+0200\n"
 "Last-Translator: giovanni <g.sora@tiscali.it>\n"
 "Language-Team: Interlingua <kde-i18n-doc@kde.org>\n"
 "Language: ia\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 20.04.2\n"
+"X-Generator: Lokalize 22.12.3\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -209,22 +209,19 @@ msgid "Elapsed Time"
 msgstr "Tempore perimite"
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "Allocationes de memoria"
+msgstr "Allocationes total de memoria"
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "Memory Consumed"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "Memoria consumite"
+msgstr "Consumo Total de Memoria"
 
 #: gui/chartmodel.cpp:87
-#, fuzzy, kde-format
-#| msgid "Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "Allocationes temporanee"
+msgstr "Allocationes temporanee total"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
@@ -277,12 +274,12 @@ msgstr "<qt>%2 consumite postea %3 ex:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Exporta como..."
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Monstra legenda"
 
 #: gui/chartwidget.cpp:172
 #, kde-format
@@ -313,7 +310,7 @@ msgstr "Reinitialisa filtro"
 #: gui/chartwidget.cpp:383
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Salveguarda %1"
 
 #: gui/chartwidget.cpp:384
 #, kde-format
@@ -720,7 +717,7 @@ msgstr ""
 #: gui/mainwindow.cpp:470
 #, kde-format
 msgid "Failed to parse file %1."
-msgstr ""
+msgstr "Falleva a analysar file: %1."
 
 #: gui/mainwindow.cpp:475
 #, kde-format
