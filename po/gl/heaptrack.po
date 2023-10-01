@@ -346,7 +346,7 @@ msgstr "Mapa de bits (*.png *.jpg *.tiff);;Imaxe vectorial (*.svg)"
 #: gui/chartwidget.cpp:400
 #, kde-format
 msgid "Failed to save the image to %1"
-msgstr "Non se puido gardar a imaxe en «%1»."
+msgstr "Non foi posíbel gardar a imaxe en «%1»."
 
 #: gui/chartwidget.cpp:420
 #, kde-format
@@ -796,7 +796,7 @@ msgstr "<dt><b>memoria total perdida</b>:</dt><dd>%1</dd>"
 #: gui/mainwindow.cpp:470
 #, kde-format
 msgid "Failed to parse file %1."
-msgstr "Non se puido analizar o ficheiro %1."
+msgstr "Non foi posíbel analizar o ficheiro %1."
 
 #: gui/mainwindow.cpp:475
 #, kde-format
@@ -826,7 +826,7 @@ msgstr "O dato de entrada %1 non pode lerse."
 #: gui/mainwindow.cpp:597
 #, kde-format
 msgid "Failed to parse suppression file."
-msgstr "Non se puido analizar o ficheiro de supresión."
+msgstr "Non foi posíbel analizar o ficheiro de supresión."
 
 #: gui/mainwindow.cpp:612
 #, kde-format
