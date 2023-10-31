@@ -39,6 +39,8 @@ usage() {
     echo "  -d, --debug    Run the debuggee in GDB and heaptrack."
     echo " --use-inject    Use the same heaptrack_inject symbol interception mechanism instead of relying on"
     echo "                 the dynamic linker and LD_PRELOAD. This is an experimental flag for now."
+    echo " --asan          Enables running heaptrack on binaries built with gcc's address sanitizer enabled."
+    echo "                 Implies --use-inject."
     echo " --record-only   Only record and interpret the data, do not attempt to analyze it."
     echo "  ARGUMENT       Any number of arguments that will be passed verbatim"
     echo "                 to the debuggee."
@@ -66,6 +68,8 @@ client=
 use_inject_lib=
 write_raw_data=
 record_only=
+asan=
+asan_ld_preload=
 
 # path to current heaptrack.sh executable
 SCRIPT_PATH=$(readlink -f "$0")
@@ -98,6 +102,11 @@ while true; do
             ;;
         "-r" | "--raw")
             write_raw_data=1
+            shift 1
+            ;;
+        "--asan")
+            asan=1
+            use_inject_lib=1
             shift 1
             ;;
         "--record-only")
@@ -239,6 +248,16 @@ if [ ! -f "$LIBHEAPTRACK_INJECT" ]; then
 fi
 LIBHEAPTRACK_INJECT=$(readlink -f "$LIBHEAPTRACK_INJECT")
 
+if [ -n "$asan" ]; then
+  asan_ld_preload=$(ldd $client | grep libasan | sed -e 's/.*=> //;s/ (.*//')
+  if [ -z "$asan_ld_preload" ]; then
+    echo "Unable to detect libasan when running ldd on the executable $client"
+    exit 1
+  fi
+  echo "Found ASAN library: $asan_ld_preload"
+  asan_ld_preload="$asan_ld_preload:"
+fi
+
 # setup named pipe to read data from
 pipe=/tmp/heaptrack_fifo$$
 mkfifo $pipe
@@ -325,7 +344,7 @@ echo "heaptrack output will be written to \"$output\""
 
 if [ -z "$debug" ] && [ -z "$pid" ]; then
   echo "starting application, this might take some time..."
-  LD_PRELOAD="$LIBHEAPTRACK_PRELOAD${LD_PRELOAD:+:$LD_PRELOAD}" DUMP_HEAPTRACK_OUTPUT="$pipe" "$client" "$@"
+  LD_PRELOAD="$asan_ld_preload$LIBHEAPTRACK_PRELOAD${LD_PRELOAD:+:$LD_PRELOAD}" DUMP_HEAPTRACK_OUTPUT="$pipe" "$client" "$@"
   EXIT_CODE=$?
 else
   if [ -z "$pid" ]; then

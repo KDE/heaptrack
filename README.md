@@ -242,3 +242,14 @@ will see garbage backtraces that are completely broken.
 If you encounter such issues, try to relink your application and also libunwind with `ld.bfd` instead of `ld.gold`.
 You can see if you are affected by running the libunwind unit tests via `make check`. But do note that you
 need to relink your application too, not only libunwind.
+
+### Executables built with ASAN (Address Sanitizer)
+
+If you run heaptrack on an application built with ASAN, you'll likely get this fatal error on startup:
+
+    ASan runtime does not come first in initial library list [...]
+
+The solution is to pass the `--asan` flag to heaptrack.
+Note: this only work for binaries built with `gcc` (i.e. those which link to `libasan.so`).
+Binaries built with `clang`'s ASAN enabled are not supported at the moment.
+
