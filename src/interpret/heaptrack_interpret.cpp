@@ -39,7 +39,7 @@ using namespace std;
 namespace {
 bool isArmArch()
 {
-#if __arm__
+#ifdef __arm__
     return true;
 #else
     return false;
