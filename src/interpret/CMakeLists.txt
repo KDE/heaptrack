@@ -3,6 +3,7 @@ if (ECM_FOUND)
 endif()
 
 find_package(Elfutils 0.158 REQUIRED)
+find_package(Boost 1.41.0 REQUIRED COMPONENTS headers)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/3rdparty/
@@ -21,7 +22,7 @@ target_link_libraries(heaptrack_interpret
 )
 
 target_include_directories(heaptrack_interpret
-    PRIVATE ${LIBDW_INCLUDE_DIRS}
+    PRIVATE ${LIBDW_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS}
 )
 
 install(TARGETS heaptrack_interpret
