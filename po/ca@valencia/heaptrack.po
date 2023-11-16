@@ -529,8 +529,8 @@ msgid ""
 "is considered to be leaked when it never got deallocated. "
 msgstr ""
 "Mostra un gràfic de flames sobre la memòria en monticles perduda de "
-"l'aplicació. Es considera que la memòria es perd quan no es desselecciona "
-"mai."
+"l'aplicació. Es considera que la memòria es perd quan no es trau "
+"l'assignació mai."
 
 #: gui/flamegraph.cpp:440
 #, kde-format
@@ -569,8 +569,9 @@ msgid ""
 "Enable the bottom-up flame graph view. When this is unchecked, the top-down "
 "view is enabled by default."
 msgstr ""
-"Activa la vista de baix cap a dalt del gràfic de flames. Quan açò no està "
-"activat, de manera predeterminada està activada la vista de dalt cap a baix."
+"Activa la vista de baix cap a dalt del gràfic de flames. Quan no se "
+"selecciona, de manera predeterminada estarà activada la vista de dalt cap a "
+"baix."
 
 #: gui/flamegraph.cpp:476
 #, kde-format
@@ -584,7 +585,7 @@ msgid ""
 "unchecked, recursive frames will be visualized separately."
 msgstr ""
 "Reduïx els marcs de la pila per a les funcions que es criden a si mateixes. "
-"Quan açò no està activat, els marcs amb recursivitat es visualitzaran per "
+"Quan no se selecciona, els marcs amb recursivitat es visualitzaran per "
 "separat."
 
 #: gui/flamegraph.cpp:490
