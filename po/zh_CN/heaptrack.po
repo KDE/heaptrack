@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: kdeorg\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2023-11-05 12:37+0000\n"
-"PO-Revision-Date: 2023-11-19 03:40\n"
+"PO-Revision-Date: 2023-11-25 02:29\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Language: zh_CN\n"
@@ -366,7 +366,7 @@ msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
 "select a time range for filtering.</qt>"
 msgstr ""
-"<qt>显示随时间变化的内存分配数。<br>点击并拖拽以选择要筛选的时间范围。</qt>"
+"<qt>显示随时间变化的内存分配数。<br>点击并拖拽以选择要过滤的时间范围。</qt>"
 
 #: gui/chartwidget.cpp:449
 #, kde-format
@@ -377,41 +377,41 @@ msgid ""
 "drag to select a time range for filtering.</qt>"
 msgstr ""
 "<qt>显示随时间变化的临时内存分配数。临时分配是指相应内存分配后紧接着被释放，"
-"中间没有发生其他分配。<br>点击并拖拽以选择要筛选的时间范围。</qt>"
+"中间没有发生其他分配。<br>点击并拖拽以选择要过滤的时间范围。</qt>"
 
 #: gui/chartwidget.cpp:471
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
-msgstr "%1（筛选自 %2 到 %3，Δ%4）"
+msgstr "%1 (从 %2 过滤到 %3，Δ%4)"
 
 #: gui/chartwidget.cpp:475
 #, kde-format
 msgid "%1 (filtered delta)"
-msgstr "%1（筛选的差值）"
+msgstr "%1 (过滤的差异)"
 
 #: gui/chartwidget.cpp:564
 #, kde-format
 msgid "Click and drag to select time range for filtering."
-msgstr "点击并拖动以选择要筛选的时间范围。"
+msgstr "点击并拖动以选择要过滤的时间范围。"
 
 #: gui/chartwidget.cpp:570
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
-msgstr "T = %1，已消耗：%2。点击并拖动以选择要筛选的时间范围。"
+msgstr "T = %1，已消耗：%2。点击并拖动以选择要过滤的时间范围。"
 
 #: gui/chartwidget.cpp:574
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
-msgstr "T = %1，已分配：%2。点击并拖动以选择要筛选的时间范围。"
+msgstr "T = %1，已分配：%2。点击并拖动以选择要过滤的时间范围。"
 
 #: gui/chartwidget.cpp:578
 #, kde-format
 msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
 "filtering."
-msgstr "T = %1，临时分配：%2。点击并拖动以选择要筛选的时间范围。"
+msgstr "T = %1，临时分配：%2。点击并拖动以选择要过滤的时间范围。"
 
 #: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
 #, kde-format
@@ -1055,7 +1055,7 @@ msgstr "设置(&N)"
 #: gui/mainwindow.ui:878
 #, kde-format
 msgid "Filter"
-msgstr "筛选"
+msgstr "过滤"
 
 #: gui/parser.cpp:387
 #, kde-format
