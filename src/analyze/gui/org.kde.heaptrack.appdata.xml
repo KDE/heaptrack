@@ -66,6 +66,7 @@
     <p xml:lang="ca-valencia">«heaptrack» rastreja totes les assignacions de memòria i anota estos esdeveniments amb seguiments de pila. Les eines d'anàlisi dedicades que hi ha a continuació, vos permetran interpretar l'anàlisi de rendiment de la memòria en monticles:</p>
     <p xml:lang="da">Heaptrack sporer alle hukommelsesallokeringer og anmærker begivenhederne med stakspor. Dedikerede analyseværktøjer som giver dig mulighed for at fortolke heapens hukommelsesprofil til:</p>
     <p xml:lang="en-GB">Heaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:</p>
+    <p xml:lang="eo">Heaptrack spuras ĉiujn memorajn atribuojn kaj notas ĉi tiujn eventojn per stakspuroj. Dediĉitaj analiziloj tiam permesas vin interpreti la staplomemoran profilon al:</p>
     <p xml:lang="es">Heaptrack rastrea todas las asignaciones de memoria y anota estos eventos con trazas de la pila para poder usar herramientas de dedicadas que le permitan interpretar el análisis de rendimiento de la memoria de almacenamiento libre para:</p>
     <p xml:lang="fr">Le logiciel « Heaptrack » permet le suivi des allocations de mémoire. Il annote les demandes par des traces dans la pile. Des outils dédiés d'analyse vous permettent ensuite d'interpréter le profil de la mémoire dynamique pour :</p>
     <p xml:lang="gl">Heaptrack fai un seguimento de todas as asociacións de memoria e apunta os eventos co historial da rima. Logo pode usar ferramentas de análise para interpretar os datos de uso da memoria dinámica (heap) para:</p>
@@ -90,6 +91,7 @@
       <li xml:lang="ca-valencia">troba els punts crítics que necessiten optimitzar-se per a reduir el consum de memòria de la vostra aplicació</li>
       <li xml:lang="da">find hotspots som behøver optimering for at reducere dit programs hukommelsesfodaftryk</li>
       <li xml:lang="en-GB">find hotspots that need to be optimized to reduce the memory footprint of your application</li>
+      <li xml:lang="eo">trovi retpunktojn, kiuj bezonas esti optimumigitaj por redukti la memorspuron de via aplikaĵo</li>
       <li xml:lang="es">encontrar cuellos de botella que es necesario optimizar para reducir el impacto de su aplicación en la memoria</li>
       <li xml:lang="fr">trouver les zones principales de code à améliorer pour réduire l'empreinte mémoire de votre application</li>
       <li xml:lang="gl">Atopar puntos quentes que cómpre optimizar para reducir o consumo de memoria da aplicación</li>
@@ -113,6 +115,7 @@
       <li xml:lang="ca-valencia">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai es desassignarà</li>
       <li xml:lang="da">find hukommelseslæk, dvs. positioner som allokerer hukommelse som aldrig deallokeres</li>
       <li xml:lang="en-GB">find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
+      <li xml:lang="eo">trovi memorlikojn, t.e. lokojn kiuj asignas memoron kiu neniam estas deasignita</li>
       <li xml:lang="es">encontrar fugas de memoria (es decir, lugares donde se asigna memoria que no se llega a liberar)</li>
       <li xml:lang="fr">trouver les fuites de mémoires, c'est-à-dire, des parties de logiciels, qui s'allouent de la mémoire mais qui ne la libèrent jamais</li>
       <li xml:lang="gl">Atopar perdas de memoria, é dicir, lugares que asignan memoria que nunca se libera.</li>
@@ -136,6 +139,7 @@
       <li xml:lang="ca-valencia">troba els punts crítics d'assignació, és a dir, les ubicacions al codi que desencadenen un munt de crides d'assignació de memòria</li>
       <li xml:lang="da">find allokerede hotspots, dvs. kodepositioner som udløser en masse kald for hukommelsesallokering</li>
       <li xml:lang="en-GB">find allocation hotspots, i.e. code locations that trigger a lot of memory allocation calls</li>
+      <li xml:lang="eo">trovi atribuajn retpunktojn, t.e. kodlokojn, kiuj ekigas multajn memorajn alvokojn</li>
       <li xml:lang="es">encontrar cuellos de botella de asignaciones (es decir, lugares del código fuente que desencadenan numerosas llamadas de asignación de memoria)</li>
       <li xml:lang="fr">trouver les zones principales de code faisant des allocations mémoire, c'est-à-dire celles faisant de nombreuses requêtes d'allocation mémoire</li>
       <li xml:lang="gl">Atopar puntos quentes de asignación, é dicir, lugares do código que causan moitas chamadas de asignación de memoria.</li>
@@ -159,6 +163,7 @@
       <li xml:lang="ca-valencia">troba les assignacions temporals, són les assignacions que són seguides directament per la cancel·lació de la seua assignació</li>
       <li xml:lang="da">find midlertidige allokeringer, som er allokeringer der direkte følges af deres deallokering</li>
       <li xml:lang="en-GB">find temporary allocations, which are allocations that are directly followed by their deallocation</li>
+      <li xml:lang="eo">trovi provizorajn asignojn, kiuj estas asignoj, kiuj estas rekte sekvataj de sia malasignado</li>
       <li xml:lang="es">encontrar asignaciones de memoria temporales, que son asignaciones que son inmediatamente seguidas por sus correspondientes liberaciones</li>
       <li xml:lang="fr">trouver les allocations transitoires, c'est-à-dire enchaînant une allocation suivie directement par une désallocation.</li>
       <li xml:lang="gl">Atopar asignacións temporais, asignacións que se liberan no momento.</li>
