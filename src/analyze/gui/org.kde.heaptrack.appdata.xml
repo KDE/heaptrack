@@ -186,7 +186,7 @@
       <li xml:lang="zh-CN">查找临时分配，即直接在其释放之后进行的分配</li>
     </ul>
   </description>
-  <url type="homepage">https://phabricator.kde.org/dashboard/view/28/</url>
+  <url type="homepage">https://apps.kde.org/heaptrack</url>
   <url type="bugtracker">https://bugs.kde.org/enter_bug.cgi?format=guided&amp;product=heaptrack</url>
   <url type="help">https://mail.kde.org/mailman/listinfo/heaptrack</url>
   <screenshots>
