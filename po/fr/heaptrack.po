@@ -1,8 +1,8 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 # Vincent Pinon <vpinon@kde.org>, 2015.
-# SPDX-FileCopyrightText: 2020, 2021, 2022, 2023 Xavier Besnard <xavier.besnard@neuf.fr>
-# Xavier BESNARD <xavier.besnard@neuf.fr>, 2023.
+# SPDX-FileCopyrightText: 2020, 2021, 2022, 2023 Xavier Besnard <xavier.besnard@kde.org>
+# Xavier Besnard <xavier.besnard@kde.org>, 2023.
 #
 msgid ""
 msgstr ""
@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2023-09-15 02:28+0000\n"
 "PO-Revision-Date: 2023-10-11 21:05+0200\n"
-"Last-Translator: Xavier BESNARD <xavier.besnard@neuf.fr>\n"
+"Last-Translator: Xavier Besnard <xavier.besnard@kde.org>\n"
 "Language-Team: fr\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -30,7 +30,7 @@ msgstr "Vincent Pinon, Xavier Besnard"
 #, kde-format
 msgctxt "EMAIL OF TRANSLATORS"
 msgid "Your emails"
-msgstr "vpinon@kde.org, xavier.besnard@neuf.fr"
+msgstr "vpinon@kde.org, xavier.besnard@kde.org"
 
 #: gui/callercalleemodel.cpp:40 gui/callercalleemodel.h:333
 #: gui/treemodel.cpp:73
