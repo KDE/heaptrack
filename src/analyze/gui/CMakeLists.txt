@@ -92,7 +92,7 @@ if (KChart_FOUND)
         histogrammodel.cpp
     )
     list(APPEND LIBRARIES
-        KChart
+        ${KChartName}
         Qt${QT_VERSION_MAJOR}::Svg
     )
 endif()
