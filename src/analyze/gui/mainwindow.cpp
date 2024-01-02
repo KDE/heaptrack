@@ -57,8 +57,8 @@ const int MAINWINDOW_VERSION = 1;
 
 namespace Config {
 namespace Groups {
-const char MainWindow[] = "MainWindow";
-const char CodeNavigation[] = "CodeNavigation";
+const QString MainWindow() { return QStringLiteral("MainWindow"); }
+const QString CodeNavigation() { return QStringLiteral("CodeNavigation"); }
 }
 namespace Entries {
 const char State[] = "State";
@@ -317,7 +317,7 @@ MainWindow::MainWindow(QWidget* parent)
 {
     m_ui->setupUi(this);
 
-    auto group = m_config->group(Config::Groups::MainWindow);
+    auto group = m_config->group(Config::Groups::MainWindow());
     auto state = group.readEntry(Config::Entries::State, QByteArray());
     restoreState(state, MAINWINDOW_VERSION);
 
@@ -671,7 +671,7 @@ MainWindow::MainWindow(QWidget* parent)
 MainWindow::~MainWindow()
 {
     auto state = saveState(MAINWINDOW_VERSION);
-    auto group = m_config->group(Config::Groups::MainWindow);
+    auto group = m_config->group(Config::Groups::MainWindow());
     group.writeEntry(Config::Entries::State, state);
 }
 
@@ -788,7 +788,7 @@ void MainWindow::setupCodeNavigationMenu()
     auto group = new QActionGroup(this);
     group->setExclusive(true);
 
-    const auto settings = m_config->group(Config::Groups::CodeNavigation);
+    const auto settings = m_config->group(Config::Groups::CodeNavigation());
     const auto currentIdx = settings.readEntry(Config::Entries::IDE, firstAvailableIde());
 
     for (int i = 0; i < LAST_IDE; ++i) {
@@ -838,7 +838,7 @@ void MainWindow::setupCodeNavigationMenu()
 
 void MainWindow::setCodeNavigationIDE(QAction* action)
 {
-    auto settings = m_config->group(Config::Groups::CodeNavigation);
+    auto settings = m_config->group(Config::Groups::CodeNavigation());
 
     if (action->data() == -1) {
         const auto customCmd =
@@ -859,7 +859,7 @@ void MainWindow::setCodeNavigationIDE(QAction* action)
 
 void MainWindow::navigateToCode(const QString& filePath, int lineNumber, int columnNumber)
 {
-    const auto settings = m_config->group(Config::Groups::CodeNavigation);
+    const auto settings = m_config->group(Config::Groups::CodeNavigation());
     const auto ideIdx = settings.readEntry(Config::Entries::IDE, firstAvailableIde());
 
     QString command;
