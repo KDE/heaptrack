@@ -2,3 +2,4 @@ include:
   - project: sysadmin/ci-utilities
     file:
       - /gitlab-templates/linux.yml
+      - /gitlab-templates/linux-qt6.yml
