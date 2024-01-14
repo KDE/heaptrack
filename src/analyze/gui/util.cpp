@@ -27,6 +27,32 @@ QString Util::basename(const QString& path)
     return path.mid(idx + 1);
 }
 
+QString Util::elideTemplateArguments(const QString& s)
+{
+    const auto startBracket = QLatin1Char('<');
+    const auto stopBracket  = QLatin1Char('>');
+
+    int level = 0;
+    QString result;
+    result.reserve(s.size());
+    for (auto currentChar : s) {
+        if (currentChar == startBracket) {
+            if (level == 0) {
+                result += startBracket;
+            }
+            ++level;
+        } else if (currentChar == stopBracket) {
+            if (level == 1) {
+                result += stopBracket;
+            }
+            --level;
+        } else if (level == 0) {
+            result += currentChar;
+        }
+    }
+    return result;
+}
+
 QString Util::formatString(const QString& input)
 {
     return input.isEmpty() ? i18n("??") : input;
