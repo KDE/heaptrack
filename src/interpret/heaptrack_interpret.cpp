@@ -28,13 +28,16 @@
 #include "util/linewriter.h"
 #include "util/pointermap.h"
 
-#include <dwarf.h>
-#include <elfutils/libdwelf.h>
+#include <boost/program_options.hpp>
 
 #include <csignal>
+#include <dwarf.h>
+#include <elfutils/libdwelf.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 using namespace std;
+namespace po = boost::program_options;
 
 namespace {
 bool isArmArch()
@@ -261,19 +264,17 @@ struct Module
 
 struct AccumulatedTraceData
 {
-    AccumulatedTraceData()
+    AccumulatedTraceData(const std::string& sysroot, const std::vector<std::string>& debugPaths,
+                         const std::vector<std::string>& extraPaths)
         : out(fileno(stdout))
+        , m_sysroot(sysroot)
+        , m_debugPaths(debugPaths)
+        , m_extraPaths(extraPaths)
     {
+        initializePaths();
         m_moduleFragments.reserve(256);
         m_internedData.reserve(4096);
         m_encounteredIps.reserve(32768);
-
-        {
-            std::string debugPath(":.debug:/usr/lib/debug");
-            const auto length = debugPath.size() + 1;
-            m_debugPath = new char[length];
-            std::memcpy(m_debugPath, debugPath.data(), length);
-        }
 
         m_callbacks = {
             &dwfl_build_id_find_elf,
@@ -377,6 +378,9 @@ struct AccumulatedTraceData
     void addModule(string fileName, const size_t moduleIndex, const uintptr_t addressStart,
                    const uintptr_t fragmentStart, const uintptr_t fragmentEnd)
     {
+        if (!m_sysroot.empty()) {
+            fileName = m_sysroot + fileName;
+        }
         m_moduleFragments.emplace_back(fileName, addressStart, fragmentStart, fragmentEnd, moduleIndex);
         m_modulesDirty = true;
     }
@@ -446,12 +450,32 @@ private:
         return &ret;
     }
 
+    void initializePaths()
+    {
+        std::string path;
+        for (const auto& p : m_debugPaths) {
+            path += p + ":";
+        }
+        for (const auto& p : m_extraPaths) {
+            path += p + ":";
+        }
+        path += ".debug:" + m_sysroot + "/usr/lib/debug";
+
+        // Allocate memory and copy the string
+        m_debugPath = new char[path.size() + 1];
+        std::strcpy(m_debugPath, path.c_str());
+    }
+
     vector<ModuleFragment> m_moduleFragments;
     Dwfl* m_dwfl = nullptr;
     char* m_debugPath = nullptr;
     Dwfl_Callbacks m_callbacks;
     SymbolCache m_symbolCache;
     bool m_modulesDirty = false;
+
+    std::string m_sysroot;
+    std::vector<std::string> m_debugPaths;
+    std::vector<std::string> m_extraPaths;
 
     tsl::robin_map<string, size_t> m_internedData;
     tsl::robin_map<uintptr_t, size_t> m_encounteredIps;
@@ -477,8 +501,44 @@ void exitHandler()
 }
 }
 
-int main(int /*argc*/, char** /*argv*/)
+int main(int argc, char** argv)
 {
+    po::options_description desc("Options", 120, 60);
+
+    // clang-format off
+    desc.add_options()
+        ("sysroot", po::value<std::string>(),
+            "Path to a system root directory")
+        ("debug-paths", po::value<std::vector<std::string>>()->multitoken(),
+            "Paths to folders containing extra debug symbols\nSee e.g. https://sourceware.org/gdb/current/onlinedocs/gdb.html/Separate-Debug-Files.html")
+        ("extra-paths", po::value<std::vector<std::string>>()->multitoken(),
+            "Paths to folders containing additional executables or libraries with debug symbols, e.g. for side loading");
+    // clang-format on
+
+    po::variables_map vm;
+    try {
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+        po::notify(vm);
+    } catch (const po::error& e) {
+        std::cerr << "ERROR: " << e.what() << std::endl;
+        std::cerr << desc << std::endl;
+        return 1;
+    }
+
+    std::string sysroot;
+    std::vector<std::string> debugPaths;
+    std::vector<std::string> extraPaths;
+
+    if (vm.count("sysroot")) {
+        sysroot = vm["sysroot"].as<std::string>();
+    }
+    if (vm.count("debug-paths")) {
+        debugPaths = vm["debug-paths"].as<std::vector<std::string>>();
+    }
+    if (vm.count("extra-paths")) {
+        extraPaths = vm["extra-paths"].as<std::vector<std::string>>();
+    }
+
     [] {
         // NOTE: we disable debuginfod by default as it can otherwise lead to
         //       nasty delays otherwise which are highly unexpected to users
@@ -509,7 +569,7 @@ int main(int /*argc*/, char** /*argv*/)
     // output data at end, even when we get terminated
     std::atexit(exitHandler);
 
-    AccumulatedTraceData data;
+    AccumulatedTraceData data(sysroot, debugPaths, extraPaths);
 
     LineReader reader;
 
