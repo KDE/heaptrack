@@ -267,7 +267,7 @@ mkfifo $pipe
 if [ ! -z "$pid" ]; then
   case $(uname) in
     Linux*)
-      pid_user=$(stat -c %U "/proc/$pid")
+      pid_user=$(stat -c %u "/proc/$pid")
     ;;
     FreeBSD*)
       pid_user=$(stat -f %Su "/proc/$pid")
