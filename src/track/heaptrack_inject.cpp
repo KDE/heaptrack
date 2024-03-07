@@ -72,6 +72,12 @@ __attribute__((weak)) void* mi_malloc(size_t size) LIBC_FUN_ATTRS;
 __attribute__((weak)) void* mi_calloc(size_t count, size_t size) LIBC_FUN_ATTRS;
 __attribute__((weak)) void* mi_realloc(void* p, size_t newsize) LIBC_FUN_ATTRS;
 __attribute__((weak)) void mi_free(void* p) LIBC_FUN_ATTRS;
+
+// Forward declare bdwgc (https://github.com/ivmai/bdwgc)
+__attribute__((weak)) void* GC_malloc(size_t size) LIBC_FUN_ATTRS;
+__attribute__((weak)) void* GC_realloc(void* p, size_t newsize) LIBC_FUN_ATTRS;
+__attribute__((weak)) void GC_free_profiler_hook(void* p) LIBC_FUN_ATTRS;
+__attribute__((weak)) int GC_posix_memalign(void** memptr, size_t alignment, size_t size) LIBC_FUN_ATTRS;
 }
 
 namespace {
@@ -268,6 +274,60 @@ struct mi_calloc
     }
 };
 
+// bdwgc functions
+struct GC_malloc
+{
+    static constexpr auto name = "GC_malloc";
+    static constexpr auto original = &::GC_malloc;
+
+    static void* hook(size_t size) noexcept
+    {
+        auto ptr = original(size);
+        heaptrack_malloc(ptr, size);
+        return ptr;
+    }
+};
+
+struct GC_free_profiler_hook
+{
+    static constexpr auto name = "GC_free_profiler_hook";
+    static constexpr auto original = &::GC_free_profiler_hook;
+
+    static void hook(void* ptr) noexcept
+    {
+        heaptrack_free(ptr);
+        original(ptr);
+    }
+};
+
+struct GC_realloc
+{
+    static constexpr auto name = "GC_realloc";
+    static constexpr auto original = &::GC_realloc;
+
+    static void* hook(void* ptr, size_t size) noexcept
+    {
+        auto ret = original(ptr, size);
+        heaptrack_realloc(ptr, size, ret);
+        return ret;
+    }
+};
+
+struct GC_posix_memalign
+{
+    static constexpr auto name = "GC_posix_memalign";
+    static constexpr auto original = &::GC_posix_memalign;
+
+    static int hook(void** memptr, size_t alignment, size_t size) noexcept
+    {
+        auto ret = original(memptr, alignment, size);
+        if (!ret) {
+            heaptrack_malloc(*memptr, size);
+        }
+        return ret;
+    }
+};
+
 template <typename Hook>
 bool hook(const char* symname, Elf::Addr addr, bool restore)
 {
@@ -308,7 +368,10 @@ void apply(const char* symname, Elf::Addr addr, bool restore)
         || hook<dlclose>(symname, addr, restore)
         // mimalloc functions
         || hook<mi_malloc>(symname, addr, restore) || hook<mi_free>(symname, addr, restore)
-        || hook<mi_realloc>(symname, addr, restore) || hook<mi_calloc>(symname, addr, restore);
+        || hook<mi_realloc>(symname, addr, restore) || hook<mi_calloc>(symname, addr, restore)
+        // bdwgc functions
+        || hook<GC_malloc>(symname, addr, restore) || hook<GC_free_profiler_hook>(symname, addr, restore)
+        || hook<GC_realloc>(symname, addr, restore) || hook<GC_posix_memalign>(symname, addr, restore);
 }
 }
 
