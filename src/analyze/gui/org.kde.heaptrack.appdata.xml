@@ -156,7 +156,7 @@
       <li xml:lang="sk">nájdenie hotspotov alokácií, teda iest, ktoré spúšťajú veľa volaní alokácie pamäte</li>
       <li xml:lang="sl">poiščite vroče točke dodeljevanja, to so lokacije kod, ki sprožijo veliko klicev po dodeljevanju pomnilnika</li>
       <li xml:lang="sv">Hitta överbelastningsställen för tilldelningar, dvs. ställen i koden som orsakar många anrop till minnestilldelning.</li>
-      <li xml:lang="tr">ayrılan noktaları, demeli bir çok bellek ayırma çağrısını tetikleyen kod yerlerini bulun</li>
+      <li xml:lang="tr">ayrılan noktaları, demeli birçok bellek ayırma çağrısını tetikleyen kod yerlerini bulun</li>
       <li xml:lang="uk">Виявлення проблемних місць розміщення, тобто місць у програмному коді, які призводять до багатьох викликів щодо розміщення у пам'яті.</li>
       <li xml:lang="x-test">xxfind allocation hotspots, i.e. code locations that trigger a lot of memory allocation callsxx</li>
       <li xml:lang="zh-CN">找到分配热点，即触发大量内存分配调用的代码位置</li>
