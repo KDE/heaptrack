@@ -39,6 +39,11 @@ void* mi_malloc(size_t size) LIBC_FUN_ATTRS;
 void* mi_calloc(size_t count, size_t size) LIBC_FUN_ATTRS;
 void* mi_realloc(void* p, size_t newsize) LIBC_FUN_ATTRS;
 void mi_free(void* p) LIBC_FUN_ATTRS;
+
+void* GC_malloc(size_t size) LIBC_FUN_ATTRS;
+void* GC_realloc(void* p, size_t newsize) LIBC_FUN_ATTRS;
+void GC_free_profiler_hook(void* p) LIBC_FUN_ATTRS;
+int GC_posix_memalign(void** memptr, size_t alignment, size_t size) LIBC_FUN_ATTRS;
 }
 
 namespace {
@@ -113,6 +118,10 @@ HOOK(mi_calloc, HookType::Optional);
 HOOK(mi_realloc, HookType::Optional);
 HOOK(mi_free, HookType::Optional);
 
+HOOK(GC_malloc, HookType::Optional);
+HOOK(GC_realloc, HookType::Optional);
+HOOK(GC_free_profiler_hook, HookType::Optional);
+HOOK(GC_posix_memalign, HookType::Optional);
 #pragma GCC diagnostic pop
 #undef HOOK
 
@@ -190,6 +199,12 @@ void init()
             hooks::mi_calloc.init();
             hooks::mi_realloc.init();
             hooks::mi_free.init();
+
+            // bdwgc functions
+            hooks::GC_malloc.init();
+            hooks::GC_realloc.init();
+            hooks::GC_free_profiler_hook.init();
+            hooks::GC_posix_memalign.init();
 
             // cleanup environment to prevent tracing of child apps
             unsetenv("LD_PRELOAD");
@@ -431,4 +446,60 @@ void mi_free(void* ptr) LIBC_FUN_ATTRS
 
     hooks::mi_free(ptr);
 }
+
+void* GC_malloc(size_t size) LIBC_FUN_ATTRS
+{
+    if (!hooks::GC_malloc) {
+        hooks::init();
+    }
+
+    void* ptr = hooks::GC_malloc(size);
+    heaptrack_malloc(ptr, size);
+    return ptr;
+}
+
+void* GC_realloc(void* ptr, size_t size) LIBC_FUN_ATTRS
+{
+    if (!hooks::GC_realloc) {
+        hooks::init();
+    }
+
+    void* ret = hooks::GC_realloc(ptr, size);
+
+    if (ret) {
+        heaptrack_realloc(ptr, size, ret);
+    }
+
+    return ret;
+}
+
+void GC_free_profiler_hook(void* ptr) LIBC_FUN_ATTRS
+{
+    if (!hooks::GC_free_profiler_hook) {
+        hooks::init();
+    }
+
+    if (hooks::dummyPool().isDummyAllocation(ptr)) {
+        return;
+    }
+    heaptrack_free(ptr);
+
+    hooks::GC_free_profiler_hook(ptr);
+}
+
+int GC_posix_memalign(void** memptr, size_t alignment, size_t size) LIBC_FUN_ATTRS
+{
+    if (!hooks::GC_posix_memalign) {
+        hooks::init();
+    }
+
+    int ret = hooks::GC_posix_memalign(memptr, alignment, size);
+
+    if (!ret) {
+        heaptrack_malloc(*memptr, size);
+    }
+
+    return ret;
+}
+
 }
