@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2023-11-05 12:37+0000\n"
-"PO-Revision-Date: 2024-02-26 21:30+0100\n"
+"PO-Revision-Date: 2024-03-24 10:34+0100\n"
 "Last-Translator: Oliver Kellogg <okellogg@users.sourceforge.net>\n"
 "Language-Team: Esperanto <kde-i18n-eo.org>\n"
 "Language: eo\n"
@@ -37,42 +37,42 @@ msgstr "Loko"
 #: gui/callercalleemodel.cpp:42 gui/callercalleemodel.h:335
 #, kde-format
 msgid "Allocations (Self)"
-msgstr ""
+msgstr "Asignoj (Mem)"
 
 #: gui/callercalleemodel.cpp:44 gui/callercalleemodel.h:337
 #, kde-format
 msgid "Temporary (Self)"
-msgstr ""
+msgstr "Provizora (Memo)"
 
 #: gui/callercalleemodel.cpp:46 gui/callercalleemodel.h:339
 #, kde-format
 msgid "Peak (Self)"
-msgstr ""
+msgstr "Pinto (Memo)"
 
 #: gui/callercalleemodel.cpp:48 gui/callercalleemodel.h:341
 #, kde-format
 msgid "Leaked (Self)"
-msgstr ""
+msgstr "Likita (Memo)"
 
 #: gui/callercalleemodel.cpp:50 gui/callercalleemodel.h:343
 #, kde-format
 msgid "Allocations (Incl.)"
-msgstr ""
+msgstr "Asignoj (inkl.)"
 
 #: gui/callercalleemodel.cpp:52 gui/callercalleemodel.h:345
 #, kde-format
 msgid "Temporary (Incl.)"
-msgstr ""
+msgstr "Provizora (Inkl.)"
 
 #: gui/callercalleemodel.cpp:54 gui/callercalleemodel.h:347
 #, kde-format
 msgid "Peak (Incl.)"
-msgstr ""
+msgstr "Pinto (inkl.)"
 
 #: gui/callercalleemodel.cpp:56 gui/callercalleemodel.h:349
 #, kde-format
 msgid "Leaked (Incl.)"
-msgstr ""
+msgstr "Likita (Inkl.)"
 
 #: gui/callercalleemodel.cpp:63
 #, kde-format
@@ -161,7 +161,7 @@ msgstr "Pinto"
 #: gui/util.cpp:113 gui/util.cpp:142 gui/util.cpp:171
 #, kde-format
 msgid "Leaked"
-msgstr ""
+msgstr "Likita"
 
 #: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:477
 #: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
@@ -172,7 +172,7 @@ msgstr "Asignoj"
 #: gui/callercalleemodel.h:162 gui/treemodel.cpp:67
 #, kde-format
 msgid "Temporary"
-msgstr ""
+msgstr "Provizora"
 
 #: gui/callercalleemodel.h:170
 #, kde-format
@@ -191,18 +191,18 @@ msgstr ""
 #: gui/chartmodel.cpp:52
 #, kde-format
 msgid "Memory Allocations"
-msgstr ""
+msgstr "Memoraj Atribuoj"
 
 #: gui/chartmodel.cpp:54
 #, kde-format
 msgid "Memory Consumed"
-msgstr ""
+msgstr "Memoro Konsumita"
 
 #: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:479
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
-msgstr ""
+msgstr "Provizora Asignoj"
 
 #: gui/chartmodel.cpp:76 gui/chartwidget.cpp:466
 #, kde-format
@@ -212,17 +212,17 @@ msgstr "Pasinta tempo"
 #: gui/chartmodel.cpp:83
 #, kde-format
 msgid "Total Memory Allocations"
-msgstr ""
+msgstr "Totalaj Memoraj Atribuoj"
 
 #: gui/chartmodel.cpp:85
 #, kde-format
 msgid "Total Memory Consumption"
-msgstr ""
+msgstr "Totala Memorkonsumo"
 
 #: gui/chartmodel.cpp:87
 #, kde-format
 msgid "Total Temporary Allocations"
-msgstr ""
+msgstr "Tutaj Provizoraj Asignoj"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
@@ -240,17 +240,17 @@ msgstr ""
 #: gui/chartmodel.cpp:174
 #, kde-format
 msgid "<qt>%1 allocations in total after %2</qt>"
-msgstr ""
+msgstr "<qt>%1 asignoj entute post %2</qt>"
 
 #: gui/chartmodel.cpp:176
 #, kde-format
 msgid "<qt>%1 temporary allocations in total after %2</qt>"
-msgstr ""
+msgstr "<qt>%1 provizoraj asignoj entute post %2</qt>"
 
 #: gui/chartmodel.cpp:178
 #, kde-format
 msgid "<qt>%1 consumed in total after %2</qt>"
-msgstr ""
+msgstr "<qt>%1 konsumita entute post %2</qt>"
 
 #: gui/chartmodel.cpp:184
 #, kde-format
@@ -268,43 +268,43 @@ msgstr ""
 #: gui/chartmodel.cpp:192
 #, kde-format
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
-msgstr ""
+msgstr "<qt>%2 konsumita post %3 de:<p style='margin-left:10px'>%1</p></qt>"
 
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Eksporti kiel..."
 
 #: gui/chartwidget.cpp:165
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Montri klarigeton"
 
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "Montri sumkostan grafikon"
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "Montri detalan kostografikon"
 
 #: gui/chartwidget.cpp:187
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "Stakitaj diagramoj:"
 
 #: gui/chartwidget.cpp:234
 #, kde-format
 msgid "Filter In On Selection"
-msgstr ""
+msgstr "Filtrilo En Elekto"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
 #: gui/chartwidget.cpp:244 gui/mainwindow.ui:891
 #, kde-format
 msgid "Reset Filter"
-msgstr ""
+msgstr "Restarigi Filtrilon"
 
 #: gui/chartwidget.cpp:383
 #, kde-format
@@ -314,32 +314,32 @@ msgstr "Konservi %1"
 #: gui/chartwidget.cpp:384
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr ""
+msgstr "Rastrumbildo (*.png *.jpg *.tiff);;Vekktorbildo (*.svg)"
 
 #: gui/chartwidget.cpp:400
 #, kde-format
 msgid "Failed to save the image to %1"
-msgstr ""
+msgstr "Malsukcesis konservi la bildon al %1"
 
 #: gui/chartwidget.cpp:420
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
-msgstr ""
+msgstr "<tr><th></th><th>Komenco</th><th>Fino</th><th>Delta</th></tr>"
 
 #: gui/chartwidget.cpp:421
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>Tempo</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:425
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>Konsumita</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:429
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>Asignoj</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:433
 #, kde-format
@@ -373,17 +373,17 @@ msgstr ""
 #: gui/chartwidget.cpp:471
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
-msgstr ""
+msgstr "%1 (filtrita de %2 al %3, Δ%4)"
 
 #: gui/chartwidget.cpp:475
 #, kde-format
 msgid "%1 (filtered delta)"
-msgstr ""
+msgstr "%1 (filtrita delto)"
 
 #: gui/chartwidget.cpp:564
 #, kde-format
 msgid "Click and drag to select time range for filtering."
-msgstr ""
+msgstr "Klaku kaj trenu por elekti tempoperiodon por filtri."
 
 #: gui/chartwidget.cpp:570
 #, kde-format
@@ -407,28 +407,28 @@ msgstr ""
 #: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
 #, kde-format
 msgid "%1 allocations in total"
-msgstr ""
+msgstr "%1 asignoj entute"
 
 #: gui/flamegraph.cpp:177
 #, kde-format
 msgid "%1 temporary allocations in total"
-msgstr ""
+msgstr "%1 provizoraj asignoj entute"
 
 #: gui/flamegraph.cpp:179
 #, kde-format
 msgid "%1 peak memory consumption"
-msgstr ""
+msgstr "%1 pinta memorkonsumo"
 
 #: gui/flamegraph.cpp:181
 #, kde-format
 msgid "%1 leaked in total"
-msgstr ""
+msgstr "%1 likis entute"
 
 #: gui/flamegraph.cpp:234
 #, kde-format
 msgctxt "%1: number of allocations, %2: relative number, %3: function label"
 msgid "%1 (%2%) allocations in %3 and below."
-msgstr ""
+msgstr "%1 (%2%) asignoj en %3 kaj malsupre."
 
 #: gui/flamegraph.cpp:239
 #, kde-format
@@ -448,12 +448,12 @@ msgstr ""
 #, kde-format
 msgctxt "%1: leaked bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) leaked in %3 and below."
-msgstr ""
+msgstr "%1 (%2%) likis en %3 kaj sube."
 
 #: gui/flamegraph.cpp:428
 #, kde-format
 msgid "Memory Peak"
-msgstr ""
+msgstr "Memorpinto"
 
 #: gui/flamegraph.cpp:430
 #, kde-format
@@ -487,12 +487,12 @@ msgstr ""
 #: gui/flamegraph.cpp:452
 #, kde-format
 msgid "Select the data source that should be visualized in the flame graph."
-msgstr ""
+msgstr "Elektu la datumfonton, kiu devus esti bildigita en la flama grafiko."
 
 #: gui/flamegraph.cpp:467
 #, kde-format
 msgid "Bottom-Up View"
-msgstr ""
+msgstr "Malsupre Supre Vido"
 
 #: gui/flamegraph.cpp:468
 #, kde-format
@@ -504,7 +504,7 @@ msgstr ""
 #: gui/flamegraph.cpp:476
 #, kde-format
 msgid "Collapse Recursion"
-msgstr ""
+msgstr "Malvastigi Rekurso"
 
 #: gui/flamegraph.cpp:478
 #, kde-format
@@ -516,7 +516,7 @@ msgstr ""
 #: gui/flamegraph.cpp:490
 #, kde-format
 msgid "Cost Threshold: "
-msgstr ""
+msgstr "Kosta Sojlo:"
 
 #: gui/flamegraph.cpp:494
 #, kde-format
@@ -536,7 +536,7 @@ msgstr "Serĉi..."
 #: gui/flamegraph.cpp:507
 #, kde-format
 msgid "<qt>Search the flame graph for a symbol.</qt>"
-msgstr ""
+msgstr "<qt>Traserĉi la flamgrafeon por simbolo.</qt>"
 
 #: gui/flamegraph.cpp:545
 #, kde-format
@@ -546,37 +546,37 @@ msgstr "Restarigi la vidaĵon"
 #: gui/flamegraph.cpp:555 gui/mainwindow.cpp:142
 #, kde-format
 msgid "View Caller/Callee"
-msgstr ""
+msgstr "Vidi Alvokanto/Alvokanto"
 
 #: gui/flamegraph.cpp:696
 #, kde-format
 msgid "generating flame graph..."
-msgstr ""
+msgstr "generante flamgrafikon..."
 
 #: gui/flamegraph.cpp:773
 #, kde-format
 msgid "%1 (%2% of total of %3) allocations matched by search."
-msgstr ""
+msgstr "%1 (%2% de totalo de %3) asignoj kongruaj per serĉo."
 
 #: gui/flamegraph.cpp:778
 #, kde-format
 msgid "%1 (%2% of total of %3) matched by search."
-msgstr ""
+msgstr "%1 (%2% de totalo de %3) kongruis per serĉo."
 
 #: gui/gui.cpp:67
 #, kde-format
 msgid "Heaptrack GUI"
-msgstr ""
+msgstr "Heaptrack GUI"
 
 #: gui/gui.cpp:68
 #, kde-format
 msgid "A visualizer for heaptrack data files."
-msgstr ""
+msgstr "Vidilo por heaptrack datumdosieroj."
 
 #: gui/gui.cpp:69
 #, kde-format
 msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
-msgstr ""
+msgstr "Kopirajto 2015, Milian Wolff <mail@milianw.de>"
 
 #: gui/gui.cpp:72
 #, kde-format
@@ -586,12 +586,12 @@ msgstr "Milian Wolff"
 #: gui/gui.cpp:72
 #, kde-format
 msgid "Original author, maintainer"
-msgstr ""
+msgstr "Origina aŭtoro, prizorganto"
 
 #: gui/gui.cpp:86
 #, kde-format
 msgid "Base profile data to compare other files to."
-msgstr ""
+msgstr "Bazaj profilaj datumoj por kompari aliajn dosierojn."
 
 #: gui/gui.cpp:91
 #, kde-format
@@ -621,12 +621,12 @@ msgstr ""
 #: gui/gui.cpp:108
 #, kde-format
 msgid "Files to load"
-msgstr ""
+msgstr "Dosieroj por ŝargi"
 
 #: gui/gui.cpp:108
 #, kde-format
 msgid "[FILE...]"
-msgstr ""
+msgstr "[DOSIERO...]"
 
 #: gui/histogrammodel.cpp:65
 #, kde-format
@@ -638,17 +638,17 @@ msgstr ""
 #: gui/histogramwidget.cpp:99
 #, kde-format
 msgid "Requested Allocation Size"
-msgstr ""
+msgstr "Petita Asigno Grandeco"
 
 #: gui/histogramwidget.cpp:105
 #, kde-format
 msgid "Number of Allocations"
-msgstr ""
+msgstr "Nombro de Asignoj"
 
 #: gui/mainwindow.cpp:171
 #, kde-format
 msgid "Open file in editor"
-msgstr ""
+msgstr "Malfermi dosieron en redaktilo"
 
 #: gui/mainwindow.cpp:394
 #, kde-format
@@ -660,67 +660,67 @@ msgstr ""
 #: gui/mainwindow.cpp:397
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
-msgstr ""
+msgstr "<dt><b>sencimigi</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 
 #: gui/mainwindow.cpp:401
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
-msgstr ""
+msgstr "<dt><b>tuta rultempo</b>:</dt><dd>%1, filtrita de %2 al %3 (%4)</dd>"
 
 #: gui/mainwindow.cpp:406
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>tuta rultempo</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:408
 #, kde-format
 msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>tuta sistemmemoro</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:415
 #, kde-format
 msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
-msgstr ""
+msgstr "<dt><b>vokoj al atribuaj funkcioj</b>:</dt><dd>%1 (%2/s)</dd>"
 
 #: gui/mainwindow.cpp:418
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
-msgstr ""
+msgstr "<dt><b>provizoraj asignoj</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 
 #: gui/mainwindow.cpp:428
 #, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
-msgstr ""
+msgstr "<dt><b>Pinta amasa memorkonsumo</b>:</dt><dd>%1 post %2</dd>"
 
 #: gui/mainwindow.cpp:431
 #, kde-format
 msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>pinta RSS</b> (inkluzive de heaptrack supra):</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:435
 #, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>delta konsumo de memoro</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:439
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
-msgstr ""
+msgstr "<dt><b>totala memoro likita</b>:</dt><dd>%1 (%2 subpremita)</dd>"
 
 #: gui/mainwindow.cpp:442
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>totala memoro likita</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:470
 #, kde-format
 msgid "Failed to parse file %1."
-msgstr ""
+msgstr "Malsukcesis analizi dosieron %1."
 
 #: gui/mainwindow.cpp:475
 #, kde-format
 msgid "Consumed"
-msgstr ""
+msgstr "Konsumita"
 
 #: gui/mainwindow.cpp:491
 #, kde-format
@@ -730,22 +730,22 @@ msgstr "Grandecoj"
 #: gui/mainwindow.cpp:555
 #, kde-format
 msgid "Input data %1 does not exist."
-msgstr ""
+msgstr "Eniga datumoj %1 ne ekzistas."
 
 #: gui/mainwindow.cpp:557
 #, kde-format
 msgid "Input data %1 is not a file."
-msgstr ""
+msgstr "Eniga datumoj %1 ne estas dosiero."
 
 #: gui/mainwindow.cpp:559
 #, kde-format
 msgid "Input data %1 is not readable."
-msgstr ""
+msgstr "Eniga datumoj %1 ne estas legebla."
 
 #: gui/mainwindow.cpp:597
 #, kde-format
 msgid "Failed to parse suppression file."
-msgstr ""
+msgstr "Malsukcesis analizi subpreman dosieron."
 
 #: gui/mainwindow.cpp:612
 #, kde-format
@@ -755,12 +755,12 @@ msgstr "Heaptrack"
 #: gui/mainwindow.cpp:640
 #, kde-format
 msgid "Disable Embedded Suppressions"
-msgstr ""
+msgstr "Malebligi Enigitan Subpremojn"
 
 #: gui/mainwindow.cpp:652
 #, kde-format
 msgid "Disable Builtin Suppressions"
-msgstr ""
+msgstr "Malebligi Enkonstruitajn Subpremojn"
 
 #: gui/mainwindow.cpp:654
 #, kde-format
@@ -772,34 +772,34 @@ msgstr ""
 #: gui/mainwindow.cpp:682
 #, kde-format
 msgid "Loading file %1, please wait..."
-msgstr ""
+msgstr "Ŝargante dosieron %1, bonvolu atendi..."
 
 #: gui/mainwindow.cpp:684
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
-msgstr ""
+msgstr "Heaptrack - %1"
 
 #: gui/mainwindow.cpp:687
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
-msgstr ""
+msgstr "Heaptrack - %1 kompare kun %2"
 
 #: gui/mainwindow.cpp:703
 #, kde-format
 msgid "Reparsing file, please wait..."
-msgstr ""
+msgstr "Reparanta dosieron, bonvolu atendi..."
 
 #: gui/mainwindow.cpp:746
 #, kde-format
 msgid " / %1"
-msgstr ""
+msgstr " / %1"
 
 #: gui/mainwindow.cpp:786
 #, kde-format
 msgid "Code Navigation"
-msgstr ""
+msgstr "Koda Navigado"
 
 #: gui/mainwindow.cpp:813
 #, kde-format
@@ -809,12 +809,12 @@ msgstr "Propra..."
 #: gui/mainwindow.cpp:825
 #, kde-format
 msgid "Automatic (No Line numbers)"
-msgstr ""
+msgstr "Aŭtomata (Neniu Linia nombro)"
 
 #: gui/mainwindow.cpp:845
 #, kde-format
 msgid "Custom Code Navigation"
-msgstr ""
+msgstr "Propra Kodo Navigado"
 
 #: gui/mainwindow.cpp:846
 #, kde-format
@@ -834,13 +834,13 @@ msgstr "Ĉeffenestro"
 #: gui/mainwindow.ui:17 gui/mainwindow.ui:118
 #, kde-format
 msgid "Path to a file containing leak suppression rules in the LSAN format."
-msgstr ""
+msgstr "Vojo al dosiero enhavanta liksubpremadregulojn en la LSAN-formato."
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: gui/mainwindow.ui:63
 #, kde-format
 msgid "Open Heaptrack Data"
-msgstr ""
+msgstr "Malfermi Heaptrack-Datumojn"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, openFile)
 #: gui/mainwindow.ui:72
@@ -859,7 +859,7 @@ msgstr ""
 #: gui/mainwindow.ui:75 gui/mainwindow.ui:88
 #, kde-format
 msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
-msgstr ""
+msgstr "vojo/al/heaptrack.$APP.$PID.{gz,zst}"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
 #: gui/mainwindow.ui:85
@@ -874,25 +874,25 @@ msgstr ""
 #: gui/mainwindow.ui:98
 #, kde-format
 msgid "Profile &Data:"
-msgstr ""
+msgstr "&Datumoj de Profilo:"
 
 #. i18n: ectx: property (text), widget (QLabel, compareToLabel)
 #: gui/mainwindow.ui:108
 #, kde-format
 msgid "Compare to:"
-msgstr ""
+msgstr "Kompari al:"
 
 #. i18n: ectx: property (text), widget (QLabel, suppressionsLabel)
 #: gui/mainwindow.ui:121
 #, kde-format
 msgid "Suppressions:"
-msgstr ""
+msgstr "Subpremoj:"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
 #: gui/mainwindow.ui:131
 #, kde-format
 msgid "path/to/lsan_suppressions.txt"
-msgstr ""
+msgstr "vojo/al/lsan_suppressions.txt"
 
 #. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
 #: gui/mainwindow.ui:244
@@ -906,38 +906,39 @@ msgstr "Resumo"
 #, kde-format
 msgid "List of functions that allocated the most memory at a given time."
 msgstr ""
+"Listo de funkcioj kiuj asignis la plej multe da memoro en difinita tempo."
 
 #. i18n: ectx: property (text), widget (QLabel, topPeakLabel)
 #: gui/mainwindow.ui:348
 #, kde-format
 msgid "Peak Contributions"
-msgstr ""
+msgstr "Pintaj Kontribuoj"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topLeakedLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topLeaked)
 #: gui/mainwindow.ui:384 gui/mainwindow.ui:397
 #, kde-format
 msgid "List of functions that leak the most memory."
-msgstr ""
+msgstr "Listo de funkcioj, kiuj likas la plej multe da memoro."
 
 #. i18n: ectx: property (text), widget (QLabel, topLeakedLabel)
 #: gui/mainwindow.ui:387
 #, kde-format
 msgid "Largest Memory Leaks"
-msgstr ""
+msgstr "Plej Grandaj Memorfluoj"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topAllocationsLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topAllocations)
 #: gui/mainwindow.ui:423 gui/mainwindow.ui:436
 #, kde-format
 msgid "List of functions that allocate memory most often."
-msgstr ""
+msgstr "Listo de funkcioj, kiuj plej ofte asignas memoron."
 
 #. i18n: ectx: property (text), widget (QLabel, topAllocationsLabel)
 #: gui/mainwindow.ui:426
 #, kde-format
 msgid "Most Memory Allocations"
-msgstr ""
+msgstr "Plej Memoraj Atribuoj"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topTemporaryLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topTemporary)
@@ -945,24 +946,25 @@ msgstr ""
 #, kde-format
 msgid "List of functions that produced the most temporary memory allocations."
 msgstr ""
+"Listo de funkcioj kiuj produktis la plej provizorajn memorajn asignojn."
 
 #. i18n: ectx: property (text), widget (QLabel, topTemporaryLabel)
 #: gui/mainwindow.ui:468
 #, kde-format
 msgid "Most Temporary Allocations"
-msgstr ""
+msgstr "Plej Provizora Asignoj"
 
 #. i18n: ectx: property (title), widget (KCollapsibleGroupBox, suppressionBox)
 #: gui/mainwindow.ui:501
 #, kde-format
 msgid "Suppressions"
-msgstr ""
+msgstr "Subpremoj"
 
 #. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
 #: gui/mainwindow.ui:533
 #, kde-format
 msgid "Bottom-Up"
-msgstr ""
+msgstr "Malsupre-Supren"
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFunction)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterFunction)
@@ -970,14 +972,14 @@ msgstr ""
 #: gui/mainwindow.ui:557 gui/mainwindow.ui:625 gui/mainwindow.ui:746
 #, kde-format
 msgid "filter by function..."
-msgstr ""
+msgstr "filtri per funkcio..."
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
 #: gui/mainwindow.ui:564 gui/mainwindow.ui:753
 #, kde-format
 msgid "filter by file..."
-msgstr ""
+msgstr "filtri per dosiero..."
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
@@ -985,37 +987,37 @@ msgstr ""
 #: gui/mainwindow.ui:571 gui/mainwindow.ui:632 gui/mainwindow.ui:760
 #, kde-format
 msgid "filter by module..."
-msgstr ""
+msgstr "filtri laŭ modulo..."
 
 #. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
 #: gui/mainwindow.ui:601
 #, kde-format
 msgid "Caller / Callee"
-msgstr ""
+msgstr "Alvokanto / Callee"
 
 #. i18n: ectx: attribute (title), widget (QWidget, topDownTab)
 #: gui/mainwindow.ui:725
 #, kde-format
 msgid "Top-Down"
-msgstr ""
+msgstr "Desupre"
 
 #. i18n: ectx: attribute (title), widget (FlameGraph, flameGraphTab)
 #: gui/mainwindow.ui:790
 #, kde-format
 msgid "Flame Graph"
-msgstr ""
+msgstr "Flama Grafiko"
 
 #. i18n: ectx: property (windowTitle), widget (QDockWidget, stacksDock)
 #: gui/mainwindow.ui:806
 #, kde-format
 msgid "S&tacks"
-msgstr ""
+msgstr "S&takoj"
 
 #. i18n: ectx: property (text), widget (QLabel, stackSpinnerLabel)
 #: gui/mainwindow.ui:831
 #, kde-format
 msgid "Selected Stack:"
-msgstr ""
+msgstr "Elektita Stako:"
 
 #. i18n: ectx: property (title), widget (QMenu, menu_File)
 #: gui/mainwindow.ui:868
@@ -1038,7 +1040,7 @@ msgstr "Filtri"
 #: gui/parser.cpp:387
 #, kde-format
 msgid "merging allocations... %1%"
-msgstr ""
+msgstr "kunfandante asignojn... %1%"
 
 #: gui/parser.cpp:557
 #, kde-format
@@ -1048,77 +1050,77 @@ msgstr "entute"
 #: gui/parser.cpp:559
 #, kde-format
 msgid "0B to 8B"
-msgstr ""
+msgstr "0B ĝis 8B"
 
 #: gui/parser.cpp:560
 #, kde-format
 msgid "9B to 16B"
-msgstr ""
+msgstr "9B ĝis 16B"
 
 #: gui/parser.cpp:561
 #, kde-format
 msgid "17B to 32B"
-msgstr ""
+msgstr "17B ĝis 32B"
 
 #: gui/parser.cpp:562
 #, kde-format
 msgid "33B to 64B"
-msgstr ""
+msgstr "33B ĝis 64B"
 
 #: gui/parser.cpp:563
 #, kde-format
 msgid "65B to 128B"
-msgstr ""
+msgstr "65B ĝis 128B"
 
 #: gui/parser.cpp:564
 #, kde-format
 msgid "129B to 256B"
-msgstr ""
+msgstr "129B ĝis 256B"
 
 #: gui/parser.cpp:565
 #, kde-format
 msgid "257B to 512B"
-msgstr ""
+msgstr "257B ĝis 512B"
 
 #: gui/parser.cpp:566
 #, kde-format
 msgid "512B to 1KB"
-msgstr ""
+msgstr "512B ĝis 1KB"
 
 #: gui/parser.cpp:567
 #, kde-format
 msgid "more than 1KB"
-msgstr ""
+msgstr "pli ol 1KB"
 
 #: gui/parser.cpp:645
 #, kde-format
 msgid "reparsing data"
-msgstr ""
+msgstr "reparante datumojn"
 
 #: gui/parser.cpp:645
 #, kde-format
 msgid "parsing data"
-msgstr ""
+msgstr "analizado de datumoj"
 
 #: gui/parser.cpp:659
 #, kde-format
 msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
-msgstr ""
+msgstr "%1 preterpaso: %2/%3 elspezita: %4 restanta: %5"
 
 #: gui/parser.cpp:715
 #, kde-format
 msgid "merging allocations..."
-msgstr ""
+msgstr "kunfandante asignojn..."
 
 #: gui/parser.cpp:726
 #, kde-format
 msgid "building size histogram..."
-msgstr ""
+msgstr "konstrugranda histogramo..."
 
 #: gui/parser.cpp:739
 #, kde-format
 msgid "building charts..."
-msgstr ""
+msgstr "konstruante leterojn..."
 
 #: gui/stacksmodel.cpp:99
 #, kde-format
@@ -1165,27 +1167,27 @@ msgstr ""
 #: gui/treemodel.cpp:159
 #, kde-format
 msgid "peak contribution: %1 (%2% of total)\n"
-msgstr ""
+msgstr "pinta kontribuo: %1 (%2% de totalo)\n"
 
 #: gui/treemodel.cpp:160
 #, kde-format
 msgid "leaked: %1 (%2% of total)\n"
-msgstr ""
+msgstr "likita: %1 (%2% de totalo)\n"
 
 #: gui/treemodel.cpp:161
 #, kde-format
 msgid "allocations: %1 (%2% of total)\n"
-msgstr ""
+msgstr "asignoj: %1 (%2% de totalo)\n"
 
 #: gui/treemodel.cpp:162
 #, kde-format
 msgid "temporary: %1 (%2% of allocations, %3% of total)\n"
-msgstr ""
+msgstr "provizora: %1 (%2% de asignoj, %3% de totalo)\n"
 
 #: gui/treemodel.cpp:168
 #, kde-format
 msgid "backtrace:"
-msgstr ""
+msgstr "retrospuro:"
 
 #: gui/treemodel.cpp:180
 #, kde-format
@@ -1202,22 +1204,22 @@ msgstr "??"
 #: gui/util.cpp:108
 #, kde-format
 msgid "%1: %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr ""
+msgstr "%1: %2<br/>&nbsp;&nbsp;%4% el %3 entute"
 
 #: gui/util.cpp:134 gui/util.cpp:163
 #, kde-format
 msgid "%1 (self): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr ""
+msgstr "%1 (mem): %2<br/>&nbsp;&nbsp;%4% el %3 entute"
 
 #: gui/util.cpp:137 gui/util.cpp:166
 #, kde-format
 msgid "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr ""
+msgstr "%1 (inkluzive): %2<br/>&nbsp;&nbsp;%4% el %3 entute"
 
 #: gui/util.cpp:183
 #, kde-format
 msgid "symbol: <tt>%1</tt><br/>binary: <tt>%2 (%3)</tt>"
-msgstr ""
+msgstr "simbolo: <tt>%1</tt><br/>duuma: <tt>%2 (%3)</tt>"
 
 #: gui/util.cpp:187
 #, kde-format
@@ -1228,4 +1230,4 @@ msgstr "%1 en %2"
 #: gui/util.cpp:209
 #, kde-format
 msgid "<unresolved function>"
-msgstr ""
+msgstr "<nesolvita funkcio>"
