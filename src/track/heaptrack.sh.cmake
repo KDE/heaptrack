@@ -46,6 +46,7 @@ usage() {
     echo "                 to the debuggee."
     echo "  -h, --help     Show this help message and exit."
     echo "  -v, --version  Displays version information."
+    echo "  -q, --quiet    Only print error messages."
     echo "  -o, --output   Specifies the data-file for the captured data."
     echo "                 %h in the file name string is replaced with the hostname of the system."
     echo "                 %p in the file name string is replaced with the pid of the application being profiled."
@@ -70,6 +71,7 @@ write_raw_data=
 record_only=
 asan=
 asan_ld_preload=
+quiet=
 
 # path to current heaptrack.sh executable
 SCRIPT_PATH=$(readlink -f "$0")
@@ -166,6 +168,10 @@ while true; do
                 exit 1
             fi
             break
+            ;;
+        "-q" | "--quiet")
+            quiet=1
+            shift
             ;;
         "-v" | "--version")
             echo "heaptrack @HEAPTRACK_VERSION_MAJOR@.@HEAPTRACK_VERSION_MINOR@.@HEAPTRACK_VERSION_PATCH@"
@@ -323,39 +329,51 @@ cleanup() {
     esac
     kill "$debuggee" 2> /dev/null
 
-    echo "Heaptrack finished! Now run the following to investigate the data:"
-    echo
+    if [ -z ${quiet} ]; then
+      echo "Heaptrack finished! Now run the following to investigate the data:"
+        echo
 
-    if [ ! -z "$write_raw_data" ]; then
-        echo "  $UNCOMPRESSOR < \"$output\" | $INTERPRETER | $COMPRESSOR > \"$output_non_raw\""
-    else
-        echo "  heaptrack --analyze \"$output\""
+      if [ ! -z "$write_raw_data" ]; then
+          echo "  $UNCOMPRESSOR < \"$output\" | $INTERPRETER | $COMPRESSOR > \"$output_non_raw\""
+      else
+          echo "  heaptrack --analyze \"$output\""
+      fi
     fi
 
     if [ -z "$record_only" ] && [ -z "$write_raw_data" ] && [ -x "$EXE_PATH/heaptrack_gui" ]; then
-        echo ""
-        echo "heaptrack_gui detected, automatically opening the file..."
+        if [ -z ${quiet} ]; then
+          echo ""
+          echo "heaptrack_gui detected, automatically opening the file..."
+        fi
         "$EXE_PATH/heaptrack_gui" "$output"
     fi
 }
 trap cleanup EXIT
 
-echo "heaptrack output will be written to \"$output\""
+if [ -z ${quiet} ]; then
+  echo "heaptrack output will be written to \"$output\""
+fi
 
 if [ -z "$debug" ] && [ -z "$pid" ]; then
-  echo "starting application, this might take some time..."
+  if [ -z ${quiet} ]; then
+    echo "starting application, this might take some time..."
+  fi
   LD_PRELOAD="$asan_ld_preload$LIBHEAPTRACK_PRELOAD${LD_PRELOAD:+:$LD_PRELOAD}" DUMP_HEAPTRACK_OUTPUT="$pipe" "$client" "$@"
   EXIT_CODE=$?
 else
   if [ -z "$pid" ]; then
-    echo "starting application in GDB, this might take some time..."
+    if [ -z ${quiet} ]; then
+      echo "starting application in GDB, this might take some time..."
+    fi
     gdb --quiet --eval-command="set environment LD_PRELOAD=$LIBHEAPTRACK_PRELOAD" \
         --eval-command="set environment DUMP_HEAPTRACK_OUTPUT=$pipe" \
         --eval-command="set startup-with-shell off" \
         --eval-command="run" --args "$client" "$@"
     EXIT_CODE=$?
   else
-    echo "injecting heaptrack into application via GDB, this might take some time..."
+    if [ -z ${quiet} ]; then
+      echo "injecting heaptrack into application via GDB, this might take some time..."
+    fi
     dlopen=$($ENVCHECKER dlopen "$LIBHEAPTRACK_INJECT")
     if [ -z "$debug" ]; then
         unset DEBUGINFOD_URLS
@@ -375,7 +393,9 @@ else
             --eval-command="call (void) heaptrack_inject(\"$pipe\")"
     fi
     EXIT_CODE=$?
-    echo "injection finished"
+    if [ -z ${quiet} ]; then
+      echo "injection finished"
+    fi
   fi
 fi
 
