@@ -25,3 +25,6 @@ Dependencies:
     'frameworks/kiconthemes': '@latest-kf6'
     'frameworks/threadweaver': '@latest-kf6'
     'graphics/kdiagram': '@latest-kf6'
+
+Options:
+  require-passing-tests-on: ['Linux']
