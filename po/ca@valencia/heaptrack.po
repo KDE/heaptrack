@@ -313,7 +313,7 @@ msgstr ""
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr "Exporta com a..."
+msgstr "Exporta com a…"
 
 #: gui/chartwidget.cpp:165
 #, kde-format
@@ -569,9 +569,8 @@ msgid ""
 "Enable the bottom-up flame graph view. When this is unchecked, the top-down "
 "view is enabled by default."
 msgstr ""
-"Activa la vista de baix cap a dalt del gràfic de flames. Quan no se "
-"selecciona, de manera predeterminada estarà activada la vista de dalt cap a "
-"baix."
+"Activa la vista de baix cap a dalt del gràfic de flames. Quan no es marca, "
+"de manera predeterminada està activada la vista de dalt cap a baix."
 
 #: gui/flamegraph.cpp:476
 #, kde-format
@@ -585,8 +584,7 @@ msgid ""
 "unchecked, recursive frames will be visualized separately."
 msgstr ""
 "Reduïx els marcs de la pila per a les funcions que es criden a si mateixes. "
-"Quan no se selecciona, els marcs amb recursivitat es visualitzaran per "
-"separat."
+"Quan no es marca, els marcs amb recursivitat es visualitzaran per separat."
 
 #: gui/flamegraph.cpp:490
 #, kde-format
@@ -611,7 +609,7 @@ msgstr ""
 #: gui/flamegraph.cpp:506
 #, kde-format
 msgid "Search..."
-msgstr "Busca..."
+msgstr "Busca…"
 
 #: gui/flamegraph.cpp:507
 #, kde-format
@@ -631,7 +629,7 @@ msgstr "Vista del Cridador / Cridat"
 #: gui/flamegraph.cpp:696
 #, kde-format
 msgid "generating flame graph..."
-msgstr "s'està generant el gràfic de flames..."
+msgstr "s'està generant el gràfic de flames…"
 
 #: gui/flamegraph.cpp:773
 #, kde-format
@@ -720,7 +718,7 @@ msgstr "Fitxers que s'han de carregar"
 #: gui/gui.cpp:108
 #, kde-format
 msgid "[FILE...]"
-msgstr "[FITXER...]"
+msgstr "[FITXER…]"
 
 #: gui/histogrammodel.cpp:65
 #, kde-format
@@ -878,7 +876,7 @@ msgstr ""
 #: gui/mainwindow.cpp:682
 #, kde-format
 msgid "Loading file %1, please wait..."
-msgstr "S'està carregant el fitxer %1. Espereu..."
+msgstr "S'està carregant el fitxer %1. Espereu…"
 
 #: gui/mainwindow.cpp:684
 #, kde-format
@@ -895,7 +893,7 @@ msgstr "Heaptrack - %1 comparat amb %2"
 #: gui/mainwindow.cpp:703
 #, kde-format
 msgid "Reparsing file, please wait..."
-msgstr "S'està tornant a analitzar el fitxer. Espereu..."
+msgstr "S'està tornant a analitzar el fitxer. Espereu…"
 
 #: gui/mainwindow.cpp:746
 #, kde-format
@@ -905,12 +903,12 @@ msgstr " / %1"
 #: gui/mainwindow.cpp:786
 #, kde-format
 msgid "Code Navigation"
-msgstr "Navegació pel codi"
+msgstr "Navegueu pel codi"
 
 #: gui/mainwindow.cpp:813
 #, kde-format
 msgid "Custom..."
-msgstr "Personalitzada..."
+msgstr "Personalitzada…"
 
 #: gui/mainwindow.cpp:825
 #, kde-format
@@ -968,7 +966,7 @@ msgstr ""
 "Estos fitxers s'anomenen <tt>heaptrack.$APP.$PID.gz</tt> o <tt>heaptrack."
 "$APP.$PID.zst</tt>. Podeu crear estos fitxers amb l'anàlisi del rendiment de "
 "l'aplicació, p. ex., via:</p>\n"
-"<pre><code>heaptrack &lt;aplicació&gt; ...</code></pre>\n"
+"<pre><code>heaptrack &lt;aplicació&gt; …</code></pre>\n"
 "<p>O, de manera alternativa, podeu annexar un procés en execució via</p>\n"
 "<pre><code>heaptrack --pid $(pidof &lt;aplicació&gt;)</code></pre></qt>"
 
@@ -1094,14 +1092,14 @@ msgstr "De baix a dalt"
 #: gui/mainwindow.ui:557 gui/mainwindow.ui:625 gui/mainwindow.ui:746
 #, kde-format
 msgid "filter by function..."
-msgstr "filtra per funció..."
+msgstr "filtra per funció…"
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
 #: gui/mainwindow.ui:564 gui/mainwindow.ui:753
 #, kde-format
 msgid "filter by file..."
-msgstr "filtra per fitxer..."
+msgstr "filtra per fitxer…"
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
@@ -1109,7 +1107,7 @@ msgstr "filtra per fitxer..."
 #: gui/mainwindow.ui:571 gui/mainwindow.ui:632 gui/mainwindow.ui:760
 #, kde-format
 msgid "filter by module..."
-msgstr "filtra per mòdul..."
+msgstr "filtra per mòdul…"
 
 #. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
 #: gui/mainwindow.ui:601
@@ -1162,7 +1160,7 @@ msgstr "Filtre"
 #: gui/parser.cpp:387
 #, kde-format
 msgid "merging allocations... %1%"
-msgstr "s'estan fusionant les assignacions... %1%"
+msgstr "s'estan fusionant les assignacions… %1%"
 
 #: gui/parser.cpp:557
 #, kde-format
@@ -1232,17 +1230,17 @@ msgstr "%1 aprovat: %2/%3 gastat: %4 resta: %5"
 #: gui/parser.cpp:715
 #, kde-format
 msgid "merging allocations..."
-msgstr "s'estan fusionant les assignacions..."
+msgstr "s'estan fusionant les assignacions…"
 
 #: gui/parser.cpp:726
 #, kde-format
 msgid "building size histogram..."
-msgstr "s'està construint l'histograma..."
+msgstr "s'està construint l'histograma…"
 
 #: gui/parser.cpp:739
 #, kde-format
 msgid "building charts..."
-msgstr "s'estan construint les taules..."
+msgstr "s'estan construint les taules…"
 
 #: gui/stacksmodel.cpp:99
 #, kde-format
