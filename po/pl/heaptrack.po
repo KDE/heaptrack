@@ -16,7 +16,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
 "|| n%100>=20) ? 1 : 2);\n"
-"X-Generator: Lokalize 22.12.3\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -80,8 +79,8 @@ msgid ""
 "<qt>The parent symbol that called an allocation function. The function name "
 "may be unresolved when debug information is missing.</qt>"
 msgstr ""
-"<qt>Symbol nadrzędny, która wywołała funkcję przydzielania. Nazwa funkcji "
-"będzie nierozwiązana, gdy będzie brakować danych diagnostycznych.</qt>"
+"<qt>Symbol nadrzędny, który wywołał funkcję przydzielenia. Nazwa funkcji "
+"może być nieodgadnięta, gdy brakuje pakietów diagnostycznych.</qt>"
 
 #: gui/callercalleemodel.cpp:66 gui/callercalleemodel.h:359
 #, kde-format
@@ -201,8 +200,8 @@ msgid ""
 "The location of the %1. The function name may be unresolved when debug "
 "information is missing."
 msgstr ""
-"Położenie %1. Nazwa funkcji może być nierozwiązana, gdy będzie brakować "
-"danych diagnostycznych."
+"Położenie %1. Nazwa funkcji może być nieodgadnięta, gdy brakuje pakietów "
+"diagnostycznych."
 
 #: gui/callercalleemodel.h:356
 #, kde-format
@@ -210,8 +209,8 @@ msgid ""
 "<qt>The source code location that called an allocation function. May be "
 "unknown when debug information is missing.</qt>"
 msgstr ""
-"<qt>Miejsce w kodzie źródłowym, w którym wywołano funkcję przydzielania. "
-"Będzie nieznana, gdy brakuje danych diagnostycznych.</qt>"
+"<qt>Miejsce w kodzie źródłowym, które wywołało funkcję przydzielenia. Może "
+"być nieznana, gdy brakuje pakietów diagnostycznych.</qt>"
 
 #: gui/chartmodel.cpp:52
 #, kde-format
@@ -607,7 +606,7 @@ msgstr "Wyzeruj widok"
 #: gui/flamegraph.cpp:555 gui/mainwindow.cpp:142
 #, kde-format
 msgid "View Caller/Callee"
-msgstr "Zobacz wywołującego / wywołanego"
+msgstr "Zobacz wywołującego/wywoływanego"
 
 #: gui/flamegraph.cpp:696
 #, kde-format
@@ -887,7 +886,7 @@ msgstr "Poruszanie się po kodzie"
 #: gui/mainwindow.cpp:813
 #, kde-format
 msgid "Custom..."
-msgstr "Własne..."
+msgstr "Własny..."
 
 #: gui/mainwindow.cpp:825
 #, kde-format
@@ -906,8 +905,7 @@ msgid ""
 "file name, '%l' by the line number and '%c' by the column number."
 msgstr ""
 "Podaj polecenie używane do poruszania się po kodzie, '%f' zostanie "
-"zastąpione nazwą pliku, '%l' zostanie zastąpione numerem wiersza, a '%c' "
-"numerem kolumny."
+"zastąpione nazwą pliku, '%l' numerem wiersza, a '%c' numerem kolumny."
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
@@ -1130,12 +1128,12 @@ msgstr "Ustawie&nia"
 #: gui/mainwindow.ui:878
 #, kde-format
 msgid "Filter"
-msgstr "Odfiltruj"
+msgstr "Filtr"
 
 #: gui/parser.cpp:387
 #, kde-format
 msgid "merging allocations... %1%"
-msgstr "scalanie przydziałów... %1%"
+msgstr "scalanie przydzieleń... %1%"
 
 #: gui/parser.cpp:557
 #, kde-format
@@ -1310,17 +1308,17 @@ msgstr "??"
 #: gui/util.cpp:108
 #, kde-format
 msgid "%1: %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr "%1: %2<br/>&nbsp;&nbsp;%4% z całkowitej %3"
+msgstr "%1: %2<br/>&nbsp;&nbsp;%4% z sumy %3"
 
 #: gui/util.cpp:134 gui/util.cpp:163
 #, kde-format
 msgid "%1 (self): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr "%1 (własne): %2<br/>&nbsp;&nbsp;%4% z całkowitej %3"
+msgstr "%1 (własnych): %2<br/>&nbsp;&nbsp;%4% z sumy %3"
 
 #: gui/util.cpp:137 gui/util.cpp:166
 #, kde-format
 msgid "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr "%1 (inkluzywne): %2<br/>&nbsp;&nbsp;%4% z całkowitej %3"
+msgstr "%1 (włącznie): %2<br/>&nbsp;&nbsp;%4% z sumy %3"
 
 #: gui/util.cpp:183
 #, kde-format
