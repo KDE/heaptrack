@@ -217,6 +217,41 @@ needed for a simple heap profiler.
 
   This is inherently impossible to implement efficiently in heaptrack as far as I know.
 
+## Heaptrack with Rust
+
+In general, Heaptrack mostly works with Rust binaries out of the box, as Rust programs include the corresponding debug symbols.
+Demangling is not yet supported, however most symbol names are still decipherable.
+
+There are also a few other details to keep in mind.
+
+### Enable debug symbols
+If building in release mode, make sure [debug symbols](https://doc.rust-lang.org/cargo/reference/profiles.html#debug) are enabled.
+
+Add this to your Cargo.toml:
+```
+[profile.release]
+debug = true
+```
+⚠️ Note that if your project is part of a Workspace, this must be added to the Workspace Cargo.toml, not to the individual crate.
+
+### Running Heaptrack on a Rust binary
+
+Running `heaptrack cargo run` will not work as intended, as this will profile Cargo's memory usage, not that of your application.
+
+Instead either:
+1. Compile your binary as normal with `cargo build --release` and run heaptrack on the resulting binary in the `target/release/` directory.
+    * e.g.: `heaptrack ./target/release/my-rust-app`
+2. Install [cargo-heaptrack](https://crates.io/crates/cargo-heaptrack) (unofficial) and run `cargo heaptrack`.
+    * ⚠️ Make sure to run the analysis command as prompted by the command-line output before opening the GUI
+
+### Opening Rust source files via Heaptrack
+
+In Heaptracks GUI under the Callee/Caller graph, you can double-click a location to open an editor there.
+
+The file paths are relative, so make sure to open the heaptrack GUI at the root of your project, in order for this to work correctly.
+
+⚠️ If your crate is part of a workspace, you need to open heaptrack at the root of the workspace for the paths to be correct.
+
 ## Contributing to heaptrack
 
 As a FOSS project, we welcome contributions of any form. You can help improve the project by:
