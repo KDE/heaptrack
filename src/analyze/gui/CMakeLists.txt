@@ -74,7 +74,6 @@ ecm_add_app_icon(SRCFILES ICONS
 
 set(LIBRARIES
     Qt${QT_VERSION_MAJOR}::Widgets
-    KF${QT_VERSION_MAJOR}::ItemModels
     KF${QT_VERSION_MAJOR}::ConfigWidgets
     KF${QT_VERSION_MAJOR}::I18n
     KF${QT_VERSION_MAJOR}::KIOWidgets
