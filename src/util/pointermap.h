@@ -58,7 +58,7 @@ struct AllocationInfoSet
 
     bool add(uint64_t size, TraceIndex traceIndex, AllocationInfoIndex* allocationIndex)
     {
-        allocationIndex->index = set.size();
+        allocationIndex->index = static_cast<uint>(set.size());
         IndexedAllocationInfo info = {size, traceIndex, *allocationIndex};
         auto it = set.find(info);
         if (it != set.end()) {
@@ -96,7 +96,7 @@ class PointerMap
         };
         SplitPointer(uint64_t ptr)
             : big(ptr / PageSize)
-            , small(ptr % PageSize)
+            , small(static_cast<uint16_t>(ptr % PageSize))
         {
         }
         uint64_t big;

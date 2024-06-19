@@ -84,7 +84,7 @@ chrono::milliseconds elapsedTime()
 pid_t gettid()
 {
 #ifdef __linux__
-    return syscall(SYS_gettid);
+    return static_cast<pid_t>(syscall(SYS_gettid));
 #elif defined(__FreeBSD__)
     return pthread_getthreadid_np();
 #endif
@@ -477,7 +477,7 @@ public:
 
 #ifdef __linux__
         auto fd = open("/proc/self/cmdline", O_RDONLY);
-        int bytesRead = read(fd, buf, BUF_SIZE);
+        auto bytesRead = read(fd, buf, BUF_SIZE);
         close(fd);
 #elif defined(__FreeBSD__)
         int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_ARGS, getpid()};

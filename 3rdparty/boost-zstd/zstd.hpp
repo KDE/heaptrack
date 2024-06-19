@@ -91,7 +91,7 @@ struct zstd_params {
 class BOOST_IOSTREAMS_DECL zstd_error : public BOOST_IOSTREAMS_FAILURE {
 public:
     explicit zstd_error(size_t error);
-    int error() const { return error_; }
+    size_t error() const { return error_; }
     static void check BOOST_PREVENT_MACRO_SUBSTITUTION(size_t error);
 private:
     size_t error_;

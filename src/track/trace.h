@@ -63,7 +63,7 @@ struct Trace
             m_data[i] = reinterpret_cast<ip_t>(i);
         }
 
-        m_size = n + 1;
+        m_size = static_cast<int>(n + 1);
         m_skip = 0;
     }
 

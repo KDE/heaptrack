@@ -114,7 +114,7 @@ public:
             auto end = writeHexNumber(start, length);
             *end = ' ';
             ++end;
-            bufferSize += (end - start);
+            bufferSize += end - start;
         }
 
         if (availableSpace() < length) {
@@ -122,7 +122,7 @@ public:
                 return false;
             }
             if (availableSpace() < length) {
-                int ret = 0;
+                ssize_t ret = 0;
                 do {
                     ret = ::write(fd, line.data(), length);
                 } while (ret < 0 && errno == EINTR);
@@ -252,7 +252,7 @@ public:
             return true;
         }
 
-        int ret = 0;
+        ssize_t ret = 0;
         do {
             ret = ::write(fd, buffer.get(), bufferSize);
         } while (ret < 0 && errno == EINTR);
@@ -291,7 +291,7 @@ private:
     }
 
     int fd = -1;
-    unsigned bufferSize = 0;
+    size_t bufferSize = 0;
     std::unique_ptr<char[]> buffer;
 };
 
