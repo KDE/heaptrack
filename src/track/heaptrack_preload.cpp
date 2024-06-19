@@ -366,7 +366,7 @@ void* dlopen(const char* filename, int flag) LIBC_FUN_ATTRS
     void* ret = hooks::dlopen(filename, flag);
 
     if (ret) {
-        heaptrack_invalidate_module_cache();
+        heaptrack_invalidate_module_cache(nullptr);
     }
 
     return ret;
@@ -381,7 +381,7 @@ int dlclose(void* handle) LIBC_FUN_ATTRS
     int ret = hooks::dlclose(handle);
 
     if (!ret) {
-        heaptrack_invalidate_module_cache();
+        heaptrack_invalidate_module_cache(nullptr);
     }
 
     return ret;

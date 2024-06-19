@@ -902,13 +902,17 @@ void heaptrack_realloc2(uintptr_t ptr_in, size_t size, uintptr_t ptr_out)
     heaptrack_realloc_impl(reinterpret_cast<void*>(ptr_in), size, reinterpret_cast<void*>(ptr_out));
 }
 
-void heaptrack_invalidate_module_cache()
+void heaptrack_invalidate_module_cache(heaptrack_invalidate_module_cache_callback callback)
 {
     RecursionGuard guard;
 
     debugLog<VerboseOutput>("%s", "heaptrack_invalidate_module_cache()");
 
-    HeapTrack::op(guard, [&](HeapTrack& heaptrack) { heaptrack.invalidateModuleCache(); });
+    HeapTrack::op(guard, [&](HeapTrack& heaptrack) {
+        heaptrack.invalidateModuleCache();
+        if (callback)
+            callback();
+    });
 }
 
 void heaptrack_warning(heaptrack_warning_callback_t callback)

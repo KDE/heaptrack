@@ -185,8 +185,7 @@ struct dlopen
     {
         auto ret = original(filename, flag);
         if (ret) {
-            heaptrack_invalidate_module_cache();
-            overwrite_symbols();
+            heaptrack_invalidate_module_cache(&overwrite_symbols);
         }
         return ret;
     }
@@ -201,7 +200,7 @@ struct dlclose
     {
         auto ret = original(handle);
         if (!ret) {
-            heaptrack_invalidate_module_cache();
+            heaptrack_invalidate_module_cache(nullptr);
         }
         return ret;
     }

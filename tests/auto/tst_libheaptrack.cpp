@@ -87,7 +87,11 @@ TEST_CASE ("api") {
 
         SUBCASE("invalidate-cache")
         {
-            heaptrack_invalidate_module_cache();
+            heaptrack_invalidate_module_cache(nullptr);
+
+            static bool wasCalled = false;
+            heaptrack_invalidate_module_cache([]() { wasCalled = true; });
+            REQUIRE(wasCalled);
         }
 
         SUBCASE("multi-threaded")
@@ -104,7 +108,7 @@ TEST_CASE ("api") {
                             heaptrack_realloc(&i, i + 1, &i);
                             heaptrack_free(&i);
                             if (i % 100 == 0) {
-                                heaptrack_invalidate_module_cache();
+                                heaptrack_invalidate_module_cache(nullptr);
                             }
                         }
                     }));
