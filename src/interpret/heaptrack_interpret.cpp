@@ -24,6 +24,7 @@
 #include "dwarfdiecache.h"
 #include "symbolcache.h"
 
+#include "util/config.h"
 #include "util/linereader.h"
 #include "util/linewriter.h"
 #include "util/pointermap.h"
@@ -546,12 +547,30 @@ int main(int argc, char** argv)
         ("debug-paths", po::value<std::vector<std::string>>()->multitoken(),
             "Paths to folders containing extra debug symbols\nSee e.g. https://sourceware.org/gdb/current/onlinedocs/gdb.html/Separate-Debug-Files.html")
         ("extra-paths", po::value<std::vector<std::string>>()->multitoken(),
-            "Paths to folders containing additional executables or libraries with debug symbols, e.g. for side loading");
+            "Paths to folders containing additional executables or libraries with debug symbols, e.g. for side loading")
+        ("help,h", "Show this help message.")
+        ("version,v", "Displays version information.");
     // clang-format on
 
     po::variables_map vm;
     try {
         po::store(po::parse_command_line(argc, argv, desc), vm);
+
+        if (vm.count("help")) {
+            cout << "heaptrack_interpret - interpret raw heaptrack data files.\n"
+                 << "\n"
+                 << "heaptrack is a heap memory profiler which records information\n"
+                 << "about calls to heap allocation functions such as malloc, "
+                    "operator new etc. pp.\n"
+                 << "This interpreter utility resolves debug symbols and inline frames.\n"
+                    "The resulting output can then be analyzed with heaptrack_gui or heaptrack_print.\n\n"
+                 << desc << endl;
+            return 0;
+        } else if (vm.count("version")) {
+            cout << "heaptrack_interpret " << HEAPTRACK_VERSION_STRING << endl;
+            return 0;
+        }
+
         po::notify(vm);
     } catch (const po::error& e) {
         std::cerr << "ERROR: " << e.what() << std::endl;
