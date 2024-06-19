@@ -18,5 +18,5 @@ int main()
             sum -= foo.doFoo();
         }
     }
-    return sum;
+    return static_cast<int>(sum);
 }

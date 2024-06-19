@@ -51,8 +51,8 @@ void benchPointers()
             }
 
             const auto added = mallinfo2().uordblks - baseline;
-            std::cerr << "pointers added:          \t" << added << " (" << (float(added) * 100.f / allocated)
-                      << "% overhead)" << std::endl;
+            std::cerr << "pointers added:          \t" << added << " ("
+                      << (float(added) * 100.f / static_cast<float>(allocated)) << "% overhead)" << std::endl;
 
             std::shuffle(pointers.begin(), pointers.end(), randGenerator);
             for (auto ptr : pointers) {

@@ -4,9 +4,9 @@
     SPDX-License-Identifier: LGPL-2.1-or-later
 */
 
-#include <unistd.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include "../benchutil.h"
 
@@ -17,7 +17,7 @@ int main()
     srand(0);
     void* p = malloc(1);
     for (i = 0; i < 10000; ++i) {
-        void* l = malloc(rand() % 1000);
+        void* l = malloc((size_t)(rand() % 1000));
         escape(l);
         usleep(100);
     }

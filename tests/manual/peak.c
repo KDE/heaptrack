@@ -8,7 +8,7 @@
 
 char* allocate_something(int size)
 {
-    return malloc(size);
+    return malloc((size_t)size);
 }
 
 char* foo()

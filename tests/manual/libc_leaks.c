@@ -4,10 +4,10 @@
     SPDX-License-Identifier: LGPL-2.1-or-later
 */
 
-#include <time.h>
 #include <stdlib.h>
+#include <time.h>
 
-int main(int argc, char **argv)
+int main()
 {
     time_t t = time(0);
     struct tm tmbuf;
