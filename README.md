@@ -28,7 +28,7 @@ The recommended way is to launch your application and start tracing from the beg
 
     Heaptrack finished! Now run the following to investigate the data:
 
-        heaptrack_gui "/tmp/heaptrack.APP.PID.gz"
+        heaptrack --analyze "/tmp/heaptrack.APP.PID.gz"
 
 Alternatively, you can attach to an already running process:
 
@@ -42,7 +42,25 @@ Alternatively, you can attach to an already running process:
 
     Heaptrack finished! Now run the following to investigate the data:
 
-        heaptrack_gui "/tmp/heaptrack.APP.PID.gz"
+        heaptrack --analyze "/tmp/heaptrack.APP.PID.gz"
+
+### Profiling on embedded machines
+
+When you are trying to profile a system where you do not have direct access to debug symbols, which is commonly the case
+on embedded systems, the above steps won't give you useful data. There, you instead first need to record a raw trace
+file and then later interpret it on a system where you have access to an SDK or sysroot with the required debug symbols.
+
+Record a raw trace file on the embedded system:
+
+    heaptrack --raw <your application and its parameters>
+
+Then download the raw trace file to your development machine and interpret the data:
+
+    heaptrack --interpret "/path/heaptrack.test_c.8911.raw.zst" --sysroot "/path/to/sysroot"
+
+Then, you can analyze it:
+
+    heaptrack --analyze "/tmp/heaptrack.test_c.8911.zst"
 
 ## Building heaptrack
 

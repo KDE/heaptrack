@@ -55,6 +55,10 @@ usage() {
     echo "                   ./%h/%p/outdat will be translated into ./<hostname>/<pid>/outdat."
     echo "                   The directory ./<hostname>/<pid> will be created if it doesn't exist."
     echo
+    echo "Alternatively, to interpret a raw recorded heaptrack data file:"
+    echo "  -i, --interpret FILE  Convert a raw heaptrack data file with heaptrack_interpret."
+    echo "                        Any options passed after --analyze will be passed along."
+    echo
     echo "Alternatively, to analyze a recorded heaptrack data file:"
     echo "  -a, --analyze FILE    Open the heaptrack data file in heaptrack_gui, if available,"
     echo "                        or fallback to heaptrack_print otherwise."
@@ -72,11 +76,69 @@ record_only=
 asan=
 asan_ld_preload=
 quiet=
+output=
 
 # path to current heaptrack.sh executable
 SCRIPT_PATH=$(readlink -f "$0")
 SCRIPT_DIR=$(dirname "$SCRIPT_PATH")
 EXE_PATH=$(readlink -f "$SCRIPT_DIR")
+
+# find preload library and interpreter executable using relative paths
+LIB_REL_PATH="@LIB_REL_PATH@"
+LIBEXEC_REL_PATH="@LIBEXEC_REL_PATH@"
+
+INTERPRETER="$EXE_PATH/$LIBEXEC_REL_PATH/heaptrack_interpret"
+if [ -z "$write_raw_data" ] && [ ! -f "$INTERPRETER" ]; then
+    echo "Could not find heaptrack interpreter executable: $INTERPRETER"
+    exit 1
+fi
+INTERPRETER=$(readlink -f "$INTERPRETER")
+
+GZ_COMPRESSOR="gzip -c"
+GZ_UNCOMPRESSOR="gzip -dc"
+
+ZSTD_COMPRESSOR="zstd -c"
+ZSTD_UNCOMPRESSOR="zstd -dc"
+
+COMPRESSOR="$GZ_COMPRESSOR"
+UNCOMPRESSOR="$GZ_UNCOMPRESSOR"
+output_suffix="gz"
+if [ "@ZSTD_FOUND@" = "TRUE" ] && [ ! -z "$(command -v zstd 2> /dev/null)" ]; then
+    output_suffix="zst"
+    COMPRESSOR="$ZSTD_COMPRESSOR"
+    UNCOMPRESSOR="$ZSTD_UNCOMPRESSOR"
+fi
+
+interpretRawHeaptrackDataFile() {
+    input="$1"
+    shift 1
+
+    if [ ! -f "$input" ]; then
+        echo "raw file "$input" does not exist"
+        exit 1
+    fi
+
+    output=$(echo $input | sed -e 's/.zst$//' -e 's/.gz$//' -e 's/.raw$//')
+    output="$output.$output_suffix"
+    echo "writing interpreted data to $output..."
+
+    case "$input" in
+        *.gz)
+            $GZ_UNCOMPRESSOR < "$input" | "$INTERPRETER" "$@" | $COMPRESSOR > "$output"
+            ;;
+        *.zst)
+            $ZSTD_UNCOMPRESSOR < "$input" | "$INTERPRETER" "$@" | $COMPRESSOR > "$output"
+            ;;
+        *)
+            "$INTERPRETER" "$@" | $COMPRESSOR > "$output"
+            ;;
+    esac
+
+    echo
+    echo "Interpretation finished, you can now analyze the data:"
+    echo
+    echo "  heaptrack --analyze \"$output\""
+}
 
 openHeaptrackDataFiles() {
     if [ -x "$EXE_PATH/heaptrack_gui" ]; then
@@ -177,6 +239,11 @@ while true; do
             echo "heaptrack @HEAPTRACK_VERSION_MAJOR@.@HEAPTRACK_VERSION_MINOR@.@HEAPTRACK_VERSION_PATCH@"
             exit 0
             ;;
+        "-i" | "--interpret")
+            shift 1
+            interpretRawHeaptrackDataFile "$@"
+            exit
+            ;;
         "-a" | "--analyze")
             shift 1
             openHeaptrackDataFiles "$@"
@@ -218,23 +285,12 @@ if [ -z "$output" ]; then
     output=$(pwd)/heaptrack.$(basename "$client").$$
 fi
 
-# find preload library and interpreter executable using relative paths
-LIB_REL_PATH="@LIB_REL_PATH@"
-LIBEXEC_REL_PATH="@LIBEXEC_REL_PATH@"
-
 ENVCHECKER="$EXE_PATH/$LIBEXEC_REL_PATH/heaptrack_env"
 if [ ! -f "$ENVCHECKER" ]; then
     echo "Could not find heaptrack_env: $ENVCHECKER"
     exit 1
 fi
 ENVCHECKER=$(readlink -f "$ENVCHECKER")
-
-INTERPRETER="$EXE_PATH/$LIBEXEC_REL_PATH/heaptrack_interpret"
-if [ -z "$write_raw_data" ] && [ ! -f "$INTERPRETER" ]; then
-    echo "Could not find heaptrack interpreter executable: $INTERPRETER"
-    exit 1
-fi
-INTERPRETER=$(readlink -f "$INTERPRETER")
 
 if [ -z "$use_inject_lib" ]; then
     LIBHEAPTRACK_PRELOAD="$EXE_PATH/$LIB_REL_PATH/libheaptrack_preload.so"
@@ -297,6 +353,7 @@ if [ "@ZSTD_FOUND@" = "TRUE" ] && [ ! -z "$(command -v zstd 2> /dev/null)" ]; th
     UNCOMPRESSOR="zstd -dc"
 fi
 
+output_no_suffix="$output"
 output_non_raw="$output.$output_suffix"
 
 if [ ! -z "$write_raw_data" ]; then
@@ -336,10 +393,15 @@ cleanup() {
         echo
 
       if [ ! -z "$write_raw_data" ]; then
-          echo "  $UNCOMPRESSOR < \"$output\" | $INTERPRETER | $COMPRESSOR > \"$output_non_raw\""
-      else
-          echo "  heaptrack --analyze \"$output\""
+          echo "First, interpret the raw data (possibly specifying the sysroot etc):"
+          echo
+          echo "  heaptrack --interpret \"$output\""
+          echo
+          echo "Then, you can analyze it:"
+          echo
       fi
+
+      echo "  heaptrack --analyze \"$output\""
     fi
 
     if [ -z "$record_only" ] && [ -z "$write_raw_data" ] && [ -x "$EXE_PATH/heaptrack_gui" ]; then
