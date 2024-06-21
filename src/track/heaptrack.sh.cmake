@@ -255,7 +255,9 @@ fi
 LIBHEAPTRACK_INJECT=$(readlink -f "$LIBHEAPTRACK_INJECT")
 
 if [ -n "$asan" ]; then
-  asan_ld_preload=$(ldd $client | grep libasan | sed -e 's/.*=> //;s/ (.*//')
+  # We need to check the actual path to the binary
+  bin_path=$(readlink -f /proc/$pid/exe)
+  asan_ld_preload=$(ldd $bin_path | grep libasan | sed -e 's/.*=> //;s/ (.*//')
   if [ -z "$asan_ld_preload" ]; then
     echo "Unable to detect libasan when running ldd on the executable $client"
     exit 1
