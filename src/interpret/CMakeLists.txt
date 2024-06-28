@@ -3,7 +3,7 @@ if (ECM_FOUND)
 endif()
 
 find_package(Elfutils 0.158 REQUIRED)
-find_package(Boost 1.41.0 REQUIRED COMPONENTS headers)
+find_package(Boost 1.41.0 REQUIRED)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/3rdparty/
