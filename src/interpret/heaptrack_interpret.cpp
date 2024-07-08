@@ -31,6 +31,7 @@
 #include <boost/program_options.hpp>
 
 #include <csignal>
+#include <cstring>
 #include <dwarf.h>
 #include <elfutils/libdwelf.h>
 #include <sys/stat.h>
@@ -54,6 +55,12 @@ bool isArmArch()
 bool startsWith(const std::string& haystack, const char* needle)
 {
     return haystack.compare(0, strlen(needle), needle) == 0;
+}
+
+bool fileExists(const std::string& file)
+{
+    struct stat buffer;
+    return stat(file.c_str(), &buffer) == 0;
 }
 
 static uint64_t alignedAddress(uint64_t addr, bool isArmArch)
@@ -295,6 +302,35 @@ struct AccumulatedTraceData
         dwfl_end(m_dwfl);
     }
 
+    /// find a file in the sysroot or extra path
+    const std::string& resolveFile(const std::string& fileName)
+    {
+        if (m_sysroot.empty() && m_extraPaths.empty()) {
+            // no caching required
+            return fileName;
+        }
+
+        auto it = m_resolvedFiles.find(fileName);
+        if (it != m_resolvedFiles.end()) {
+            // already cached
+            return it->second;
+        }
+
+        if (!m_extraPaths.empty()) {
+            // look for the filename, ignoring any directory structure, in the extra path
+            const auto baseName = basename(fileName.c_str());
+            for (const auto& extraPath : m_extraPaths) {
+                auto fileInExtraPath = extraPath + '/' + baseName;
+                if (fileExists(fileInExtraPath))
+                    return m_resolvedFiles.insert(it, {fileName, std::move(fileInExtraPath)})->second;
+            }
+        }
+
+        // as a last resort always look into the sysroot, even if that doesn't exist, and cache the result even if
+        // negative
+        return m_resolvedFiles.insert(it, {fileName, m_sysroot + fileName})->second;
+    }
+
     ResolvedIP resolve(const uintptr_t ip)
     {
         if (m_modulesDirty) {
@@ -375,12 +411,9 @@ struct AccumulatedTraceData
         return id;
     }
 
-    void addModule(string fileName, const size_t moduleIndex, const uintptr_t addressStart,
+    void addModule(const string& fileName, const size_t moduleIndex, const uintptr_t addressStart,
                    const uintptr_t fragmentStart, const uintptr_t fragmentEnd)
     {
-        if (!m_sysroot.empty()) {
-            fileName = m_sysroot + fileName;
-        }
         m_moduleFragments.emplace_back(fileName, addressStart, fragmentStart, fragmentEnd, moduleIndex);
         m_modulesDirty = true;
     }
@@ -480,6 +513,7 @@ private:
     tsl::robin_map<string, size_t> m_internedData;
     tsl::robin_map<uintptr_t, size_t> m_encounteredIps;
     tsl::robin_map<string, Module> m_modules;
+    tsl::robin_map<string, string> m_resolvedFiles;
 };
 
 struct Stats
@@ -613,8 +647,9 @@ int main(int argc, char** argv)
                 }
                 uintptr_t vAddr = 0;
                 uintptr_t memSize = 0;
+                const auto& resolvedFileName = data.resolveFile(fileName);
                 while ((reader >> vAddr) && (reader >> memSize)) {
-                    data.addModule(fileName, moduleIndex, addressStart, addressStart + vAddr,
+                    data.addModule(resolvedFileName, moduleIndex, addressStart, addressStart + vAddr,
                                    addressStart + vAddr + memSize);
                 }
             }
