@@ -1,0 +1,64 @@
+v 10550 3
+X ./tests/manual/test_lib
+I 1000 7d09db
+s 3b /home/milian/projects/build/heaptrack/tests/manual/test_lib
+s f linux-vdso.so.1
+s 40 /home/milian/projects/build/heaptrack/tests/manual/libtestlib.so
+s 12 /usr/lib/libc.so.6
+i 7bf3f6a3579f 0
+t 1 0
+i 7bf3f6a1e3dc 0
+t 2 1
+i 7bf3f6a1e2e6 0
+t 3 2
+i 7bf3f66aa0ff 0
+t 4 3
+a 12000 4
++ 0
+s 6 _start
+i 5d7ea53fa924 1 5
+t 5 0
+s 16 __libc_start_main_impl
+s 13 ../csu/libc-start.c
+i 7bf3f6439d4b 4 6 7 168
+t 6 5
+s 16 __libc_start_call_main
+s 26 ../sysdeps/nptl/libc_start_call_main.h
+i 7bf3f6439c87 4 8 9 3a
+t 7 6
+s 4 main
+s 3d /home/milian/projects/src/heaptrack/tests/manual/test_lib.cpp
+i 5d7ea53faa4f 1 a b d
+t 8 7
+s a Foo::Foo()
+s 38 /home/milian/projects/src/heaptrack/tests/manual/lib.cpp
+i 7bf3f6a00aad 3 c d 17
+t 9 8
+i 7bf3f66ae6e4 0
+t a 9
+a 18 a
++ 1
+i 5d7ea53faa57 1 a b f
+t b 7
+s 6d void std::vector<unsigned long, std::allocator<unsigned long> >::emplace_back<unsigned long>(unsigned long&&)
+s 27 /usr/include/c++/14.1.1/bits/vector.tcc
+s 56 std::vector<unsigned long, std::allocator<unsigned long> >::push_back(unsigned long&&)
+s 29 /usr/include/c++/14.1.1/bits/stl_vector.h
+s 14 Foo::Private::push()
+s c Foo::doBar()
+i 7bf3f6a00b97 3 e f 7b 10 11 515 12 d 12 13 d 22
+t c b
+s 49 std::__new_allocator<unsigned long>::allocate(unsigned long, void const*)
+s 2c /usr/include/c++/14.1.1/bits/new_allocator.h
+s 6e std::allocator_traits<std::allocator<unsigned long> >::allocate(std::allocator<unsigned long>&, unsigned long)
+s 2b /usr/include/c++/14.1.1/bits/alloc_traits.h
+s 5c std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_allocate(unsigned long)
+s 72 void std::vector<unsigned long, std::allocator<unsigned long> >::_M_realloc_append<unsigned long>(unsigned long&&)
+i 7bf3f6a00c1d 3 14 15 97 16 17 1de 18 11 17c 19 f 254
+t d c
+t a d
+a 8 e
++ 2
+
+# strings: 25
+# ips: 13

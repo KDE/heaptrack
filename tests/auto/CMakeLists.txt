@@ -41,6 +41,9 @@ target_include_directories(tst_trace PRIVATE ${LIBDW_INCLUDE_DIRS} )
 
 add_test(NAME tst_trace COMMAND tst_trace)
 
+configure_file(tst_heaptrack_interpret.cmake.sh ${CMAKE_CURRENT_BINARY_DIR}/tst_heaptrack_interpret.sh @ONLY)
+add_test(NAME tst_heaptrack_interpret COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tst_heaptrack_interpret.sh)
+
 if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
     add_executable(tst_libheaptrack
         tst_libheaptrack.cpp

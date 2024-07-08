@@ -1,0 +1,26 @@
+v 10550 3
+x 3b /home/milian/projects/build/heaptrack/tests/manual/test_lib
+X ./tests/manual/test_lib
+I 1000 7d09db
+m 1 -
+m 1 x 5d7ea53f9000 0 848 1848 268 2ab0 550 3d28 61
+m f linux-vdso.so.1 7bf3f6a17000 0 fef
+m 40 /home/milian/projects/build/heaptrack/tests/manual/libtestlib.so 7bf3f69ff000 0 922 1924 37e 2ca8 358 3ee0 51
+m 12 /usr/lib/libc.so.6 7bf3f6414000 0 23220 24000 16b0b9 190000 4dabb 1debe0 cf90
+t 7bf3f6a3579f 0
+t 7bf3f6a1e3dc 1
+t 7bf3f6a1e2e6 2
+t 7bf3f66aa0ff 3
++ 12000 4 5d7ec4ddc570
+t 5d7ea53fa924 0
+t 7bf3f6439d4b 5
+t 7bf3f6439c87 6
+t 5d7ea53faa4f 7
+t 7bf3f6a00aad 8
+t 7bf3f66ae6e4 9
++ 18 a 5d7ec4dee610
+t 5d7ea53faa57 7
+t 7bf3f6a00b97 b
+t 7bf3f6a00c1d c
+t 7bf3f66ae6e4 d
++ 8 e 5d7ec4dee750
