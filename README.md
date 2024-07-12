@@ -62,6 +62,14 @@ Then, you can analyze it:
 
     heaptrack --analyze "/tmp/heaptrack.test_c.8911.zst"
 
+If you have other folders outside of the sysroot that contain debug information, you can pass them via `--debug-paths`
+to `heaptrack --interpret`, see also: https://sourceware.org/gdb/current/onlinedocs/gdb.html/Separate-Debug-Files.html
+
+Furthermore, if you have custom code side loaded and want to load the debug information from the respective build
+folders, use `--extra-paths`, e.g.:
+
+    heaptrack --interpret "/path/heaptrack.test_c.8911.raw.zst" --sysroot "/path/to/sysroot"
+
 ## Building heaptrack
 
 Heaptrack is split into two parts: The data collector, i.e. `heaptrack` itself, and the

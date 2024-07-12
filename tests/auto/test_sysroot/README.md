@@ -3,10 +3,10 @@ The files in here are used for the sysroot-resolve auto test
 - libtestlib.so is copied over directly to the path from my system
   this allows us to test resolving via `--sysroot`
 - test_lib is put into another folder
-  this allows us to test the `--extraLibPaths` feature
+  this allows us to test the `--extra-paths` feature
 - then the debug info for a system lib referenced by the
   executable is copied to various places to test that finding
-  them with the default path as well as the `--debugPaths` feature.
+  them with the default path as well as the `--debug-paths` feature.
   These files get the `.debug` suffix too.
 
 All files are stripped for safety purposes and since we don't
