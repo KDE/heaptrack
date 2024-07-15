@@ -32,6 +32,7 @@ struct TestParser
         , spyBottomUp(&parser, &Parser::bottomUpDataAvailable)
         , spyTopDown(&parser, &Parser::topDownDataAvailable)
         , spyFinished(&parser, &Parser::finished)
+        , spyFailedToOpen(&parser, &Parser::failedToOpen)
     {
         QObject::connect(&parser, &Parser::bottomUpDataAvailable, &parser,
                          [this](const auto& data) { resultData = data.resultData; });
@@ -39,7 +40,7 @@ struct TestParser
 
     ~TestParser()
     {
-        if (spyFinished.isEmpty())
+        if (spyFinished.isEmpty() && spyFailedToOpen.isEmpty())
             REQUIRE(spyFinished.wait(20000));
     }
 
@@ -100,6 +101,14 @@ struct TestParser
         return spySummary.at(0).at(0).value<SummaryData>();
     }
 
+    QString awaitError()
+    {
+        if (spyFailedToOpen.isEmpty())
+            REQUIRE(spyFailedToOpen.wait(20000));
+
+        return spyFailedToOpen.at(0).at(0).toString();
+    }
+
     Parser parser;
     std::shared_ptr<const ResultData> resultData;
 
@@ -136,6 +145,7 @@ private:
     QSignalSpy spyBottomUp;
     QSignalSpy spyTopDown;
     QSignalSpy spyFinished;
+    QSignalSpy spyFailedToOpen;
 };
 
 TEST_CASE ("heaptrack.david.18594.gz") {
@@ -322,6 +332,15 @@ TEST_CASE ("heaptrack.heaptrack_gui.{99454,99529}.zst diff") {
     CHECK(cost.selfCost.temporary == 0);
     CHECK(cost.selfCost.leaked == 0);
     CHECK(cost.selfCost.peak == ((68952 - 56152)));
+}
+
+TEST_CASE ("heaptrack.test_sysroot.raw") {
+    TestParser parser;
+
+    parser.parser.parse(SRC_DIR "/test_sysroot/heaptrack.test_sysroot.raw", {}, {});
+
+    const auto error = parser.awaitError();
+    REQUIRE(error.contains("heaptrack.test_sysroot.raw"));
 }
 
 int main(int argc, char** argv)

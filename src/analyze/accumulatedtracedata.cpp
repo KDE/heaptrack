@@ -478,6 +478,10 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
             if (!suppression.empty()) {
                 suppressions.push_back({std::move(suppression), 0, 0});
             }
+        } else if (reader.mode() == 'x' || reader.mode() == 'm') {
+            cerr << "failed to parse line: " << reader.line() << '\n'
+                 << "this looks like a raw file that needs to be interpreted first via `heaptrack -i`\n";
+            return false;
         } else {
             cerr << "failed to parse line: " << reader.line() << endl;
         }
