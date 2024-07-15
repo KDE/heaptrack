@@ -47,6 +47,15 @@ LD_LIBRARY_PATH="\$d/../lib:\$LD_LIBRARY_PATH" "\$d/heaptrack_gui_bin" "\$@"
 WRAPPER_SCRIPT
 chmod +x ./appdir/usr/bin/heaptrack_gui
 
+mv "./appdir/usr/lib/heaptrack/libexec/heaptrack_interpret" "./appdir/usr/lib/heaptrack/libexec/heaptrack_interpret_bin"
+cat << WRAPPER_SCRIPT > ./appdir/usr/lib/heaptrack/libexec/heaptrack_interpret
+#!/bin/bash
+f="\$(readlink -f "\${0}")"
+d="\$(dirname "\$f")"
+LD_LIBRARY_PATH="\$d/../../:\$LD_LIBRARY_PATH" "\$d/heaptrack_interpret_bin" "\$@"
+WRAPPER_SCRIPT
+chmod +x ./appdir/usr/lib/heaptrack/libexec/heaptrack_interpret
+
 # include breeze icons
 mkdir -p "appdir/usr/share/icons/breeze"
 cp -v "/usr/share/icons/breeze/breeze-icons.rcc" "appdir/usr/share/icons/breeze/"
@@ -69,7 +78,7 @@ mkdir -p appdir/usr/plugins/wayland-shell-integration/
 cp /usr/plugins/wayland-shell-integration/libxdg-shell.so appdir/usr/plugins/wayland-shell-integration/
 
 linuxdeploy --appdir appdir --plugin qt \
-    -e "./appdir/usr/lib/heaptrack/libexec/heaptrack_interpret" \
+    -e "./appdir/usr/lib/heaptrack/libexec/heaptrack_interpret_bin" \
     -e "./appdir/usr/lib/heaptrack/libheaptrack_preload.so" \
     -e "./appdir/usr/lib/heaptrack/libheaptrack_inject.so" \
     -e "./appdir/usr/bin/heaptrack_gui_bin" \
