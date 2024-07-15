@@ -1,18 +1,16 @@
 #!/bin/sh
 
-cd $(dirname $0)/../
+set -e
 
-OUTDIR=$PWD
+srcdir=$(readlink -f "$1")
+buildir=$(readlink -f "$2")
 
-PREFIX=/opt
-
-if [ ! -z "$1" ]; then
-    PREFIX=$1
+if [ -z "$srcdir" ] || [ -z "$buildir" ]; then
+    echo "usage: $0 <srcdir> <builddir>"
+    exit 1
 fi
 
-if [ ! -z "$2" ]; then
-    OUTDIR="$2"
-fi
+gitversion=$(git -C "$srcdir" describe)
 
 ZSTD=$(which zstd)
 
@@ -21,62 +19,68 @@ if [ -z "$ZSTD" ]; then
     exit 1
 fi
 
-if [ -z "$(which linuxdeployqt)" ]; then
-    echo "ERROR: cannot find linuxdeployqt in PATH"
+if [ -z "$(which linuxdeploy)" ]; then
+    echo "ERROR: cannot find linuxdeploy in PATH"
     exit 1
 fi
 
-if [ -z "$(which appimagetool)" ]; then
-    echo "ERROR: cannot find appimagetool in PATH"
-    exit 1
-fi
+. /opt/rh/gcc-toolset-13/enable
 
-if [ ! -d build-appimage ]; then
-    mkdir build-appimage
-fi
-
-cd build-appimage
-
-cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_BUILD_TYPE=Release  -DAPPIMAGE_BUILD=ON ..
+mkdir -p "$buildir" && cd "$buildir"
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/opt/rh/gcc-toolset-13/root/ \
+    -DCMAKE_BUILD_TYPE=Release  -DAPPIMAGE_BUILD=ON "$srcdir"
 make -j$(nproc)
+rm -Rf appdir
 make DESTDIR=appdir install
 
 # copy the zstd binary into the app image
-cp $ZSTD ./appdir/$PREFIX/bin/zstd
-
-linuxdeployqt "./appdir/$PREFIX/share/applications/org.kde.heaptrack.desktop" \
-    -executable="./appdir/$PREFIX/lib/heaptrack/libexec/heaptrack_interpret" \
-    -executable="./appdir/$PREFIX/lib/heaptrack/libheaptrack_preload.so" \
-    -executable="./appdir/$PREFIX/lib/heaptrack/libheaptrack_inject.so" \
-    -executable="./appdir/$PREFIX/bin/zstd" \
-    -bundle-non-qt-libs
+cp $ZSTD ./appdir/usr/bin/zstd
 
 # Ensure we prefer the bundled libs also when calling dlopen, cf.: https://github.com/KDAB/hotspot/issues/89
-mv "./appdir/$PREFIX/bin/heaptrack_gui" "./appdir/$PREFIX/bin/heaptrack_gui_bin"
-cat << WRAPPER_SCRIPT > ./appdir/$PREFIX/bin/heaptrack_gui
+mv "./appdir/usr/bin/heaptrack_gui" "./appdir/usr/bin/heaptrack_gui_bin"
+cat << WRAPPER_SCRIPT > ./appdir/usr/bin/heaptrack_gui
 #!/bin/bash
 f="\$(readlink -f "\${0}")"
 d="\$(dirname "\$f")"
+unset QT_PLUGIN_PATH
 LD_LIBRARY_PATH="\$d/../lib:\$LD_LIBRARY_PATH" "\$d/heaptrack_gui_bin" "\$@"
 WRAPPER_SCRIPT
-chmod +x ./appdir/$PREFIX/bin/heaptrack_gui
+chmod +x ./appdir/usr/bin/heaptrack_gui
 
 # include breeze icons
-if [ -d /opt/share/icons/breeze ]; then
-    cp -va /opt/share/icons/breeze ./appdir/$PREFIX/share/icons/
-fi
+mkdir -p "appdir/usr/share/icons/breeze"
+cp -v "/usr/share/icons/breeze/breeze-icons.rcc" "appdir/usr/share/icons/breeze/"
 
 # use the shell script as AppRun entry point
 # also make sure we find the bundled zstd
-rm ./appdir/AppRun
 cat << WRAPPER_SCRIPT > ./appdir/AppRun
 #!/bin/bash
 f="\$(readlink -f "\${0}")"
 d="\$(dirname "\$f")"
-bin="\$d/$PREFIX/bin"
+bin="\$d/usr/bin"
 PATH="\$PATH:\$bin" "\$bin/heaptrack" "\$@"
 WRAPPER_SCRIPT
 chmod +x ./appdir/AppRun
 
-# Actually create the final image
-appimagetool ./appdir $OUTDIR/heaptrack-x86_64.AppImage
+# tell the linuxdeploy qt plugin to include these platform plugins
+export EXTRA_PLATFORM_PLUGINS="libqoffscreen.so;libqwayland-generic.so"
+
+mkdir -p appdir/usr/plugins/wayland-shell-integration/
+cp /usr/plugins/wayland-shell-integration/libxdg-shell.so appdir/usr/plugins/wayland-shell-integration/
+
+linuxdeploy --appdir appdir --plugin qt \
+    -e "./appdir/usr/lib/heaptrack/libexec/heaptrack_interpret" \
+    -e "./appdir/usr/lib/heaptrack/libheaptrack_preload.so" \
+    -e "./appdir/usr/lib/heaptrack/libheaptrack_inject.so" \
+    -e "./appdir/usr/bin/heaptrack_gui_bin" \
+    -e "./appdir/usr/bin/zstd" \
+    -l "/usr/lib64/libz.so.1" \
+    -l /usr/lib64/libharfbuzz.so.0 \
+    -l /usr/lib64/libfreetype.so.6 \
+    -l /usr/lib64/libfontconfig.so.1 \
+    -l /usr/lib64/libwayland-egl.so \
+    -i "$srcdir/src/analyze/gui/128-apps-heaptrack.png" --icon-filename=heaptrack \
+    -d "./appdir/usr/share/applications/org.kde.heaptrack.desktop" \
+    --output appimage
+
+mv Heaptrack*x86_64.AppImage "/github/workspace/heaptrack-$gitversion-x86_64.AppImage"
