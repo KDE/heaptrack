@@ -9,6 +9,8 @@
 
 #include "dwarfdiecache.h"
 
+#include "demangler.h"
+
 #include <dwarf.h>
 
 #include <cxxabi.h>
@@ -214,21 +216,8 @@ std::string qualifiedDieName(Dwarf_Die* die, tsl::robin_map<Dwarf_Off, std::stri
 
 std::string demangle(const std::string& mangledName)
 {
-    if (mangledName.length() < 3) {
-        return mangledName;
-    } else {
-        static size_t demangleBufferLength = 1024;
-        static char* demangleBuffer = reinterpret_cast<char*>(malloc(demangleBufferLength));
-
-        // Require GNU v3 ABI by the "_Z" prefix.
-        if (mangledName[0] == '_' && mangledName[1] == 'Z') {
-            int status = -1;
-            char* dsymname = abi::__cxa_demangle(mangledName.data(), demangleBuffer, &demangleBufferLength, &status);
-            if (status == 0 && dsymname)
-                return demangleBuffer = dsymname;
-        }
-    }
-    return mangledName;
+    static Demangler demangler;
+    return demangler.demangle(mangledName);
 }
 
 std::string absoluteSourcePath(const char* path, Dwarf_Die* cuDie)

@@ -107,6 +107,10 @@ following libraries:
 
 For runtime-attaching, you will need `gdb` installed.
 
+At runtime, heaptrack will try to load these optional dependencies to demangle Rust & D symbols:
+- [rustc_demangle](https://github.com/rust-lang/rustc-demangle)
+- [d_demangler](https://github.com/lievenhey/d_demangler)
+
 ### `heaptrack_gui` dependencies
 
 The graphical user interface to interpret and analyze the data collected by heaptrack

@@ -28,7 +28,7 @@ if (ECM_FOUND)
     include(ECMEnableSanitizers)
 endif()
 
-add_executable(tst_trace tst_trace.cpp ../../src/interpret/dwarfdiecache.cpp)
+add_executable(tst_trace tst_trace.cpp ../../src/interpret/dwarfdiecache.cpp ../../src/interpret/demangler.cpp)
 set_target_properties(tst_trace PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
 target_link_libraries(tst_trace
     PRIVATE
