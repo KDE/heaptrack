@@ -206,8 +206,9 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
             suppressions = builtinSuppressions();
         }
 
-        suppressions.resize(suppressions.size() + filterParameters.suppressions.size());
-        std::transform(filterParameters.suppressions.begin(), filterParameters.suppressions.end(), suppressions.begin(),
+        const auto builtins = suppressions.size();
+        suppressions.resize(builtins + filterParameters.suppressions.size());
+        std::transform(filterParameters.suppressions.begin(), filterParameters.suppressions.end(), suppressions.begin() + builtins,
                        [](const std::string& pattern) {
                            return Suppression {pattern, 0, 0};
                        });
