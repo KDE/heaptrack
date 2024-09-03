@@ -17,6 +17,8 @@
 
 #include <boost/functional/hash.hpp>
 
+#include <sys/types.h>
+
 #include "indices.h"
 
 /**

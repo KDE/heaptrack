@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+#include <sys/types.h>
+
 std::string parseSuppression(std::string line);
 std::vector<std::string> parseSuppressions(const std::string& suppressionFile, bool* ok);
 bool matchesSuppression(const std::string& suppression, const std::string& haystack);
