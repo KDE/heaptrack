@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <cinttypes>
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 #ifdef __linux__
@@ -319,7 +320,7 @@ struct AccumulatedTraceData
 
         if (!m_extraPaths.empty()) {
             // look for the filename, ignoring any directory structure, in the extra path
-            const auto baseName = basename(fileName.c_str());
+            const auto baseName = std::filesystem::path(fileName).filename().string();
             for (const auto& extraPath : m_extraPaths) {
                 auto fileInExtraPath = extraPath + '/' + baseName;
                 if (fileExists(fileInExtraPath))
