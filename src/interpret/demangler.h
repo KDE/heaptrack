@@ -28,16 +28,16 @@ private:
     struct DemangleLib
     {
         DemangleFn demangle;
-        std::string prefix;
+        std::string_view prefix;
     };
 
     struct DemangleLibSpec
     {
-        const char* libName = nullptr;
-        const char* functionName = nullptr;
-        const std::string prefix;
-        const char* languageName = nullptr;
-        const char* repository = nullptr;
+        std::string_view libName;
+        std::string_view functionName;
+        std::string_view prefix;
+        std::string_view languageName;
+        std::string_view repository;
     };
 
     void loadDemanglers(std::vector<DemangleLibSpec> specifiers);

@@ -44,8 +44,8 @@ std::string Demangler::demangle(const std::string& mangledName)
 void Demangler::loadDemanglers(std::vector<Demangler::DemangleLibSpec> specifiers)
 {
     for (auto specifier : specifiers) {
-        if (auto demanglerLib = dlopen(specifier.libName, RTLD_LAZY)) {
-            if (auto demangleFnVoid = dlsym(demanglerLib, specifier.functionName)) {
+        if (auto demanglerLib = dlopen(specifier.libName.data(), RTLD_LAZY)) {
+            if (auto demangleFnVoid = dlsym(demanglerLib, specifier.functionName.data())) {
                 auto demangle = reinterpret_cast<DemangleFn>(demangleFnVoid);
                 m_demanglers.push_back({demangle, specifier.prefix});
             } else {
