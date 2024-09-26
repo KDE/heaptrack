@@ -41,7 +41,7 @@ std::string Demangler::demangle(const std::string& mangledName)
     return mangledName;
 }
 
-void Demangler::loadDemanglers(std::vector<Demangler::DemangleLibSpec> specifiers)
+void Demangler::loadDemanglers(std::initializer_list<Demangler::DemangleLibSpec> specifiers)
 {
     for (auto specifier : specifiers) {
         if (auto demanglerLib = dlopen(specifier.libName.data(), RTLD_LAZY)) {

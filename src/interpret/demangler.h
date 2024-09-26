@@ -40,7 +40,7 @@ private:
         std::string_view repository;
     };
 
-    void loadDemanglers(std::vector<DemangleLibSpec> specifiers);
+    void loadDemanglers(std::initializer_list<DemangleLibSpec> specifiers);
 
     bool tryExternalDemanglers(const std::string& mangledName);
 
