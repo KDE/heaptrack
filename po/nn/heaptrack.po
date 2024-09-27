@@ -1,12 +1,11 @@
 # Translation of heaptrack to Norwegian Nynorsk
 #
-# Karl Ove Hufthammer <karl@huftis.org>, 2018, 2020, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2023-11-05 12:37+0000\n"
-"PO-Revision-Date: 2023-08-24 21:38+0200\n"
+"PO-Revision-Date: 2024-09-26 18:41+0200\n"
 "Last-Translator: Karl Ove Hufthammer <karl@huftis.org>\n"
 "Language-Team: Norwegian Nynorsk <l10n-no@lister.huftis.org>\n"
 "Language: nn\n"
@@ -14,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 23.04.3\n"
+"X-Generator: Lokalize 24.11.70\n"
 "X-Environment: kde\n"
 "X-Accelerator-Marker: &\n"
 "X-Text-Markup: kde4\n"
@@ -662,6 +661,9 @@ msgid ""
 "suppression per line, and start each line with 'leak:', i.e. use the LSAN "
 "suppression file format."
 msgstr ""
+"Last in liste over lekkasje­undertrykkingar frå valt fil. Oppgje éi "
+"undertrykking per linje, og start kvar linje med «leak:», dvs. bruk "
+"filformatet LSAN."
 
 #: gui/gui.cpp:97 gui/mainwindow.cpp:642
 #, kde-format
@@ -810,7 +812,7 @@ msgstr "Inndataa %1 er ikkje lesbare."
 #: gui/mainwindow.cpp:597
 #, kde-format
 msgid "Failed to parse suppression file."
-msgstr ""
+msgstr "Klarte ikkje tolka undertrykkingsfil."
 
 #: gui/mainwindow.cpp:612
 #, kde-format
@@ -901,7 +903,7 @@ msgstr "Hovudvindauge"
 #: gui/mainwindow.ui:17 gui/mainwindow.ui:118
 #, kde-format
 msgid "Path to a file containing leak suppression rules in the LSAN format."
-msgstr ""
+msgstr "Adresse til fil med lekkasjeundertrykkingsreglar i LSAN-format."
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: gui/mainwindow.ui:63
@@ -963,7 +965,7 @@ msgstr "Samanlikna med:"
 #: gui/mainwindow.ui:121
 #, kde-format
 msgid "Suppressions:"
-msgstr "Undertrykking:"
+msgstr "Undertrykkingar:"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
 #: gui/mainwindow.ui:131
