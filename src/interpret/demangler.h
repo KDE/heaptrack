@@ -1,5 +1,5 @@
 /*
-    dwarfdiecache.h
+    demangler.h
 
     SPDX-FileCopyrightText: 2024 Klarälvdalens Datakonsult AB a KDAB Group company <info@kdab.com>
     SPDX-FileContributor: Leon Matthes <leon.matthes@kdab.com>
