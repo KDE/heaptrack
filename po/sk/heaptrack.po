@@ -1,19 +1,19 @@
 # translation of heaptrack.po to Slovak
-# Roman Paholik <wizzardsk@gmail.com>, 2015, 2016, 2017, 2021, 2022.
+# SPDX-FileCopyrightText: 2015, 2016, 2017, 2021, 2022, 2024 Roman Paholik <wizzardsk@gmail.com>
 # Mthw <jari_45@hotmail.com>, 2018.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2023-09-15 02:28+0000\n"
-"PO-Revision-Date: 2022-04-06 17:40+0200\n"
-"Last-Translator: Roman Paholik <wizzardsk@gmail.com>\n"
+"PO-Revision-Date: 2024-11-10 18:18+0100\n"
+"Last-Translator: Roman Paholík <wizzardsk@gmail.com>\n"
 "Language-Team: Slovak <kde-sk@linux.sk>\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 21.12.3\n"
+"X-Generator: Lokalize 24.08.3\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 
 #, kde-format
@@ -301,12 +301,12 @@ msgstr "<qt>%2 spotrebované po %3 od:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Exportovať ako..."
 
 #: gui/chartwidget.cpp:165
-#, kde-format
+#, fuzzy, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Ukázať legendu"
 
 #: gui/chartwidget.cpp:172
 #, kde-format
@@ -319,9 +319,9 @@ msgid "Show detailed cost graph"
 msgstr ""
 
 #: gui/chartwidget.cpp:187
-#, kde-format
+#, fuzzy, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "Skladané diagramy"
 
 #: gui/chartwidget.cpp:234
 #, fuzzy, kde-format
@@ -337,9 +337,9 @@ msgid "Reset Filter"
 msgstr "Znovunastaviť pohľad"
 
 #: gui/chartwidget.cpp:383
-#, kde-format
+#, fuzzy, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Uložiť"
 
 #: gui/chartwidget.cpp:384
 #, kde-format
