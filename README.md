@@ -289,7 +289,6 @@ As a FOSS project, we welcome contributions of any form. You can help improve th
 - submitting bug reports at https://bugs.kde.org/enter_bug.cgi?product=Heaptrack
 - contributing patches via https://invent.kde.org/sdk/heaptrack
 - translating the GUI with the help of https://l10n.kde.org/
-- writing documentation on https://userbase.kde.org/Heaptrack
 
 When submitting bug reports, you can anonymize your data with the `tools/anonymize` script:
 
