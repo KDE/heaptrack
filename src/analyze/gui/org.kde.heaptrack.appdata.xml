@@ -71,7 +71,7 @@
     <p xml:lang="eo">Heaptrack spuras ĉiujn memorajn atribuojn kaj notas ĉi tiujn eventojn per stakspuroj. Dediĉitaj analiziloj tiam permesas vin interpreti la staplomemoran profilon al:</p>
     <p xml:lang="es">Heaptrack rastrea todas las asignaciones de memoria y anota estos eventos con trazas de la pila para poder usar herramientas de dedicadas que le permitan interpretar el análisis de rendimiento de la memoria de almacenamiento libre para:</p>
     <p xml:lang="fr">Le logiciel « Heaptrack » permet le suivi des allocations de mémoire. Il annote les demandes par des traces dans la pile. Des outils dédiés d'analyse vous permettent ensuite d'interpréter le profil de la mémoire dynamique pour :</p>
-    <p xml:lang="gl">Heaptrack fai un seguimento de todas as asociacións de memoria e apunta os eventos co historial da rima. Logo pode usar ferramentas de análise para interpretar os datos de uso da memoria dinámica (heap) para:</p>
+    <p xml:lang="gl">Heaptrack fai un seguimento de todas as asociacións de memoria e apunta os eventos coa traza da rima. Logo pode usar ferramentas de análise para interpretar os datos de uso da memoria dinámica (heap) para:</p>
     <p xml:lang="id">Heaptrack melacak semua alokasi memori dan membubuhi keterangan peristiwa ini dengan jejak tumpukan. Alat analisis khusus kemudian memungkinkan kamu untuk menginterpretasikan profil memori tumpukan untuk:</p>
     <p xml:lang="it">Heaptrack traccia tutte le allocazioni di memoria e le annota con tracciati dello stack. Degli strumenti dedicati di analisi ti permettono quindi di interpretare il profilo della memoria heap in modo da:</p>
     <p xml:lang="ko">힙 추적은 모든 메모리 할당을 추적하고 스택 추적과 메모리 할당을 연결합니다. 분석 도구를 사용하여 힙 메모리 프로필을 해석할 수 있습니다:</p>
