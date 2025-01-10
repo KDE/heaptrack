@@ -419,6 +419,11 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
                 cerr << "Failed to read time stamp: " << reader.line() << endl;
                 continue;
             }
+            if (newStamp < timeStamp) {
+                cerr << "Damaged timestamp detected: " << newStamp
+                     << " is less than the previous timestamp " << timeStamp << endl;
+                continue;
+            }
             inFilteredTime = newStamp >= filterParameters.minTime && newStamp <= filterParameters.maxTime;
             if (inFilteredTime) {
                 handleTimeStamp(timeStamp, newStamp, false, pass);
