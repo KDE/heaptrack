@@ -91,7 +91,7 @@ AccumulatedTraceData::~AccumulatedTraceData() = default;
 
 const string& AccumulatedTraceData::stringify(const StringIndex stringId) const
 {
-    if (!stringId || stringId.index > strings.size()) {
+    if (!stringId || stringId.index > strings.size() || stringId.index <= 0) {
         static const string empty;
         return empty;
     } else {
