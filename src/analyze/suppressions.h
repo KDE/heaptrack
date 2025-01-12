@@ -9,6 +9,7 @@
 
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include <sys/types.h>
 
