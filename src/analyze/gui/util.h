@@ -18,6 +18,7 @@ class ResultData;
 
 namespace Util {
 QString basename(const QString& path);
+QString elideTemplateArguments(const QString& s);
 QString formatString(const QString& input);
 QString formatTime(qint64 ms);
 QString formatBytes(qint64 bytes);
