@@ -317,3 +317,13 @@ The solution is to pass the `--asan` flag to heaptrack.
 Note: this only work for binaries built with `gcc` (i.e. those which link to `libasan.so`).
 Binaries built with `clang`'s ASAN enabled are not supported at the moment.
 
+### Management of large profiles
+
+Heaptrack produces profile data that cannot be seeked efficiently. This means
+that large profiles from hour-long process runs take a long time to load in the
+GUI, and zooming in- and out on the timeline will reload the profile.
+
+This issue can be mitigated by restarting heaptrack profiling every N minutes
+to create a new fresh profile. If you already have a large profile, you can try
+[heaptrack-trim](https://github.com/untitaker/heaptrack-trim) (unofficial) to
+extract a subset of the profile before loading it into the GUI.
