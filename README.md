@@ -249,8 +249,9 @@ needed for a simple heap profiler.
 
 ## Heaptrack with Rust
 
-In general, Heaptrack mostly works with Rust binaries out of the box, as Rust programs include the corresponding debug symbols.
-Demangling is not yet supported, however most symbol names are still decipherable.
+In general, heaptrack works with Rust binaries out of the box, as long as the Rust programs include the corresponding debug symbols.
+Demangling of Rust symbols is supported. This feature depends on the [rustc_demangle](https://github.com/rust-lang/rustc-demangle)
+library, which must be provided externally.
 
 There are also a few other details to keep in mind.
 
