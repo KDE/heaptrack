@@ -275,7 +275,6 @@ int main() {
 }  
 ```
 
-
 #### Serialization
 
 The library provides an efficient way to serialize and deserialize a map or a set so that it can be saved to a file or send through the network.
@@ -477,6 +476,45 @@ int main() {
     }
 }
 ```
+
+#### Performance pitfalls
+
+Two potential performance pitfalls involving `tsl::robin_map` and
+`tsl::robin_set` are noteworthy:
+
+1. *Bad hashes*. Hash functions that produce many collisions can lead to the
+   following surprising behavior: when the number of collisions exceeds a
+   certain threshold, the hash table will automatically expand to fix the
+   problem. However, in degenerate cases, this expansion might have _no effect_
+   on the collision count, causing a failure mode where a linear sequence of
+   insertion leads to exponential storage growth.
+
+   This case has mainly been observed when using the default power-of-two
+   growth strategy with the default STL `std::hash<T>` for arithmetic types
+   `T`, which is often an identity! See issue
+   [#39](https://github.com/Tessil/robin-map/issues/39) for an example. The
+   solution is simple: use a better hash function and/or `tsl::robin_pg_set` /
+   `tsl::robin_pg_map`.
+
+2. *Element erasure and low load factors*. `tsl::robin_map` and
+   `tsl::robin_set` mirror the STL map/set API, which exposes an `iterator
+   erase(iterator)` method that removes an element at a certain position,
+   returning a valid iterator that points to the next element.
+
+   Constructing this new iterator object requires walking to the next nonempty
+   bucket in the table, which can be a expensive operation when the hash table
+   has a low *load factor* (i.e., when `capacity()` is much larger then
+   `size()`).
+
+   The `erase()` method furthermore never shrinks & re-hashes the table as
+   this is not permitted by the specification of this function. A linear
+   sequence of random removals without intermediate insertions can then lead to
+   a degenerate case with quadratic runtime cost.
+
+   In such cases, an iterator return value is often not even needed, so the
+   cost is entirely unnecessary. Both `tsl::robin_set` and `tsl::robin_map`
+   therefore provide an alternative erasure method `void erase_fast(iterator)`
+   that does not return an iterator to avoid having to find the next element.
 
 ### License
 

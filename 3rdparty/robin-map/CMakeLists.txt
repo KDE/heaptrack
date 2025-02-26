@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)
 
-project(tsl-robin-map VERSION 1.2.1 LANGUAGES CXX)
+project(tsl-robin-map VERSION 1.3.0 LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
@@ -33,8 +33,8 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
   set(IS_SUBPROJECT FALSE)
 endif()
 
-# Installation (only compatible with CMake version >= 3.3)
-if(NOT IS_SUBPROJECT AND ${CMAKE_VERSION} VERSION_GREATER "3.2")
+# Installation
+if(NOT IS_SUBPROJECT)
     include(CMakePackageConfigHelpers)
 
     ## Install include directory and potential natvis file
