@@ -64,31 +64,25 @@
           </property>
           <layout class="QFormLayout" name="formLayout">
            <item row="1" column="1">
-            <widget class="KUrlRequester" name="openFile">
+            <widget class="KUrlRequester" name="openFile" native="true">
              <property name="toolTip">
               <string>&lt;qt&gt;&lt;p&gt;This field specifies the primary heaptrack data file. These files are called &lt;tt&gt;heaptrack.$APP.$PID.gz&lt;/tt&gt; or &lt;tt&gt;heaptrack.$APP.$PID.zst&lt;/tt&gt;. You can produce such a file by profiling your application, e.g. via:&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;heaptrack &amp;lt;yourapplication&amp;gt; ...&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Or, alternatively, you can attach to a running process via&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;heaptrack --pid $(pidof &amp;lt;yourapplication&amp;gt;)&lt;/code&gt;&lt;/pre&gt;&lt;/qt&gt;</string>
              </property>
-             <property name="placeholderText">
+             <property name="placeholderText" stdset="0">
               <string>path/to/heaptrack.$APP.$PID.{gz,zst}</string>
-             </property>
-             <property name="fileDialogModality">
-              <enum>Qt::WindowModal</enum>
              </property>
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="KUrlRequester" name="compareTo">
+            <widget class="KUrlRequester" name="compareTo" native="true">
              <property name="toolTip">
               <string>&lt;qt&gt;You can optionally specify a second heaptrack data file to compare to. If set, this file will be used as a base and its cost gets subtracted from the primary data costs.&lt;/qt&gt;</string>
              </property>
-             <property name="placeholderText">
+             <property name="placeholderText" stdset="0">
               <string>path/to/heaptrack.$APP.$PID.{gz,zst}</string>
-             </property>
-             <property name="fileDialogModality">
-              <enum>Qt::WindowModal</enum>
              </property>
             </widget>
            </item>
@@ -126,8 +120,8 @@
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="KUrlRequester" name="suppressions">
-             <property name="placeholderText">
+            <widget class="KUrlRequester" name="suppressions" native="true">
+             <property name="placeholderText" stdset="0">
               <string>path/to/lsan_suppressions.txt</string>
              </property>
             </widget>
@@ -237,7 +231,7 @@
         <item>
          <widget class="QTabWidget" name="tabWidget">
           <property name="currentIndex">
-           <number>0</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="summaryTab">
            <attribute name="title">
@@ -672,43 +666,50 @@
                  </widget>
                  <widget class="QWidget" name="widget_9" native="true">
                   <layout class="QHBoxLayout" name="horizontalLayout_3">
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
                    <item>
-                    <widget class="QTreeView" name="callerView">
-                     <property name="alternatingRowColors">
-                      <bool>true</bool>
+                    <widget class="QSplitter" name="splitter_3">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
                      </property>
-                     <property name="rootIsDecorated">
-                      <bool>false</bool>
-                     </property>
-                     <property name="sortingEnabled">
-                      <bool>true</bool>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QTreeView" name="calleeView">
-                     <property name="alternatingRowColors">
-                      <bool>true</bool>
-                     </property>
-                     <property name="rootIsDecorated">
-                      <bool>false</bool>
-                     </property>
-                     <property name="sortingEnabled">
-                      <bool>true</bool>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QTreeView" name="locationView">
-                     <property name="alternatingRowColors">
-                      <bool>true</bool>
-                     </property>
-                     <property name="rootIsDecorated">
-                      <bool>false</bool>
-                     </property>
-                     <property name="sortingEnabled">
-                      <bool>true</bool>
-                     </property>
+                     <widget class="QTreeView" name="callerView">
+                      <property name="alternatingRowColors">
+                       <bool>true</bool>
+                      </property>
+                      <property name="rootIsDecorated">
+                       <bool>false</bool>
+                      </property>
+                      <property name="sortingEnabled">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                     <widget class="QTreeView" name="calleeView">
+                      <property name="alternatingRowColors">
+                       <bool>true</bool>
+                      </property>
+                      <property name="rootIsDecorated">
+                       <bool>false</bool>
+                      </property>
+                      <property name="sortingEnabled">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                     <widget class="QTreeView" name="locationView">
+                      <property name="alternatingRowColors">
+                       <bool>true</bool>
+                      </property>
+                      <property name="rootIsDecorated">
+                       <bool>false</bool>
+                      </property>
+                      <property name="sortingEnabled">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
                     </widget>
                    </item>
                   </layout>
@@ -860,7 +861,7 @@
      <x>0</x>
      <y>0</y>
      <width>1332</width>
-     <height>29</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -894,11 +895,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>KUrlRequester</class>
-   <extends>QWidget</extends>
-   <header>kurlrequester.h</header>
-  </customwidget>
-  <customwidget>
    <class>KCollapsibleGroupBox</class>
    <extends>QWidget</extends>
    <header>kcollapsiblegroupbox.h</header>
@@ -908,6 +904,11 @@
    <class>KMessageWidget</class>
    <extends>QFrame</extends>
    <header>kmessagewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>KUrlRequester</class>
+   <extends>QWidget</extends>
+   <header>kurlrequester.h</header>
   </customwidget>
   <customwidget>
    <class>FlameGraph</class>
