@@ -233,6 +233,9 @@
           <property name="currentIndex">
            <number>2</number>
           </property>
+          <property name="documentMode">
+           <bool>true</bool>
+          </property>
           <widget class="QWidget" name="summaryTab">
            <attribute name="title">
             <string>Summary</string>
