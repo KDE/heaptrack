@@ -94,7 +94,7 @@ option(
 option(
   HEAPTRACK_USE_QT6
   "Use Qt6/KF6 when building the Qt / KDE Frameworks based GUI for heaptrack."
-  OFF
+  ON
 )
 if(HEAPTRACK_USE_QT6)
     set(QT_VERSION_MAJOR 6)
