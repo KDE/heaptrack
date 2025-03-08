@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: trunk-kf 5\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2023-11-05 12:37+0000\n"
+"POT-Creation-Date: 2025-03-08 02:05+0000\n"
 "PO-Revision-Date: 2015-08-11 11:40+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: lt\n"
@@ -301,7 +301,7 @@ msgid "Filter In On Selection"
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
-#: gui/chartwidget.cpp:244 gui/mainwindow.ui:891
+#: gui/chartwidget.cpp:244 gui/mainwindow.ui:895
 #, kde-format
 msgid "Reset Filter"
 msgstr ""
@@ -831,7 +831,7 @@ msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (QMainWindow, MainWindow)
 #. i18n: ectx: property (toolTip), widget (QLabel, suppressionsLabel)
-#: gui/mainwindow.ui:17 gui/mainwindow.ui:118
+#: gui/mainwindow.ui:17 gui/mainwindow.ui:112
 #, kde-format
 msgid "Path to a file containing leak suppression rules in the LSAN format."
 msgstr ""
@@ -856,13 +856,13 @@ msgstr ""
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, openFile)
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, compareTo)
-#: gui/mainwindow.ui:75 gui/mainwindow.ui:88
+#: gui/mainwindow.ui:75 gui/mainwindow.ui:85
 #, kde-format
 msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
 msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
-#: gui/mainwindow.ui:85
+#: gui/mainwindow.ui:82
 #, kde-format
 msgid ""
 "<qt>You can optionally specify a second heaptrack data file to compare to. "
@@ -871,95 +871,95 @@ msgid ""
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, openFileLabel)
-#: gui/mainwindow.ui:98
+#: gui/mainwindow.ui:92
 #, kde-format
 msgid "Profile &Data:"
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, compareToLabel)
-#: gui/mainwindow.ui:108
+#: gui/mainwindow.ui:102
 #, kde-format
 msgid "Compare to:"
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, suppressionsLabel)
-#: gui/mainwindow.ui:121
+#: gui/mainwindow.ui:115
 #, kde-format
 msgid "Suppressions:"
 msgstr ""
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
-#: gui/mainwindow.ui:131
+#: gui/mainwindow.ui:125
 #, kde-format
 msgid "path/to/lsan_suppressions.txt"
 msgstr ""
 
 #. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
-#: gui/mainwindow.ui:244
+#: gui/mainwindow.ui:241
 #, kde-format
 msgid "Summary"
 msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topPeakLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topPeak)
-#: gui/mainwindow.ui:345 gui/mainwindow.ui:358
+#: gui/mainwindow.ui:342 gui/mainwindow.ui:355
 #, kde-format
 msgid "List of functions that allocated the most memory at a given time."
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, topPeakLabel)
-#: gui/mainwindow.ui:348
+#: gui/mainwindow.ui:345
 #, kde-format
 msgid "Peak Contributions"
 msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topLeakedLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topLeaked)
-#: gui/mainwindow.ui:384 gui/mainwindow.ui:397
+#: gui/mainwindow.ui:381 gui/mainwindow.ui:394
 #, kde-format
 msgid "List of functions that leak the most memory."
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, topLeakedLabel)
-#: gui/mainwindow.ui:387
+#: gui/mainwindow.ui:384
 #, kde-format
 msgid "Largest Memory Leaks"
 msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topAllocationsLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topAllocations)
-#: gui/mainwindow.ui:423 gui/mainwindow.ui:436
+#: gui/mainwindow.ui:420 gui/mainwindow.ui:433
 #, kde-format
 msgid "List of functions that allocate memory most often."
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, topAllocationsLabel)
-#: gui/mainwindow.ui:426
+#: gui/mainwindow.ui:423
 #, kde-format
 msgid "Most Memory Allocations"
 msgstr ""
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topTemporaryLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topTemporary)
-#: gui/mainwindow.ui:465 gui/mainwindow.ui:478
+#: gui/mainwindow.ui:462 gui/mainwindow.ui:475
 #, kde-format
 msgid "List of functions that produced the most temporary memory allocations."
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, topTemporaryLabel)
-#: gui/mainwindow.ui:468
+#: gui/mainwindow.ui:465
 #, kde-format
 msgid "Most Temporary Allocations"
 msgstr ""
 
 #. i18n: ectx: property (title), widget (KCollapsibleGroupBox, suppressionBox)
-#: gui/mainwindow.ui:501
+#: gui/mainwindow.ui:498
 #, kde-format
 msgid "Suppressions"
 msgstr ""
 
 #. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
-#: gui/mainwindow.ui:533
+#: gui/mainwindow.ui:530
 #, kde-format
 msgid "Bottom-Up"
 msgstr ""
@@ -967,14 +967,14 @@ msgstr ""
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFunction)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterFunction)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFunction)
-#: gui/mainwindow.ui:557 gui/mainwindow.ui:625 gui/mainwindow.ui:746
+#: gui/mainwindow.ui:554 gui/mainwindow.ui:622 gui/mainwindow.ui:750
 #, kde-format
 msgid "filter by function..."
 msgstr ""
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
-#: gui/mainwindow.ui:564 gui/mainwindow.ui:753
+#: gui/mainwindow.ui:561 gui/mainwindow.ui:757
 #, kde-format
 msgid "filter by file..."
 msgstr ""
@@ -982,55 +982,55 @@ msgstr ""
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterModule)
-#: gui/mainwindow.ui:571 gui/mainwindow.ui:632 gui/mainwindow.ui:760
+#: gui/mainwindow.ui:568 gui/mainwindow.ui:629 gui/mainwindow.ui:764
 #, kde-format
 msgid "filter by module..."
 msgstr ""
 
 #. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
-#: gui/mainwindow.ui:601
+#: gui/mainwindow.ui:598
 #, kde-format
 msgid "Caller / Callee"
 msgstr ""
 
 #. i18n: ectx: attribute (title), widget (QWidget, topDownTab)
-#: gui/mainwindow.ui:725
+#: gui/mainwindow.ui:729
 #, kde-format
 msgid "Top-Down"
 msgstr ""
 
 #. i18n: ectx: attribute (title), widget (FlameGraph, flameGraphTab)
-#: gui/mainwindow.ui:790
+#: gui/mainwindow.ui:794
 #, kde-format
 msgid "Flame Graph"
 msgstr ""
 
 #. i18n: ectx: property (windowTitle), widget (QDockWidget, stacksDock)
-#: gui/mainwindow.ui:806
+#: gui/mainwindow.ui:810
 #, kde-format
 msgid "S&tacks"
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QLabel, stackSpinnerLabel)
-#: gui/mainwindow.ui:831
+#: gui/mainwindow.ui:835
 #, kde-format
 msgid "Selected Stack:"
 msgstr ""
 
 #. i18n: ectx: property (title), widget (QMenu, menu_File)
-#: gui/mainwindow.ui:868
+#: gui/mainwindow.ui:872
 #, kde-format
 msgid "&File"
 msgstr ""
 
 #. i18n: ectx: property (title), widget (QMenu, menu_Settings)
-#: gui/mainwindow.ui:873
+#: gui/mainwindow.ui:877
 #, kde-format
 msgid "Setti&ngs"
 msgstr ""
 
 #. i18n: ectx: property (title), widget (QMenu, menuFilter)
-#: gui/mainwindow.ui:878
+#: gui/mainwindow.ui:882
 #, kde-format
 msgid "Filter"
 msgstr ""
