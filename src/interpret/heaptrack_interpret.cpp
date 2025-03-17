@@ -311,26 +311,45 @@ struct AccumulatedTraceData
             // no caching required
             return fileName;
         }
-
         auto it = m_resolvedFiles.find(fileName);
         if (it != m_resolvedFiles.end()) {
             // already cached
             return it->second;
         }
 
+        auto insertIntoCache = [&](std::string resolved) {
+            return m_resolvedFiles.insert(m_resolvedFiles.end(), {fileName, std::move(resolved)});
+        };
+
         if (!m_extraPaths.empty()) {
-            // look for the filename, ignoring any directory structure, in the extra path
+            auto resolve = [&](const std::string& subPath) {
+                for (const auto& extraPath : m_extraPaths) {
+                    auto fileInExtraPath = extraPath + '/' + subPath;
+                    if (fileExists(fileInExtraPath)) {
+                        return insertIntoCache(std::move(fileInExtraPath));
+                    }
+                }
+                return m_resolvedFiles.end();
+            };
+
+            // Try to resolve the basename of the target against each extra path,
+            // i.e. look for the filename, ignoring any directory structure, in the extra path
             const auto baseName = std::filesystem::path(fileName).filename().string();
-            for (const auto& extraPath : m_extraPaths) {
-                auto fileInExtraPath = extraPath + '/' + baseName;
-                if (fileExists(fileInExtraPath))
-                    return m_resolvedFiles.insert(it, {fileName, std::move(fileInExtraPath)})->second;
+            it = resolve(baseName);
+            if (it != m_resolvedFiles.end()) {
+                return it->second;
+            }
+
+            // if that fails, try to treat each extra path like the --sysroot
+            it = resolve(fileName);
+            if (it != m_resolvedFiles.end()) {
+                return it->second;
             }
         }
 
         // as a last resort always look into the sysroot, even if that doesn't exist, and cache the result even if
         // negative
-        return m_resolvedFiles.insert(it, {fileName, m_sysroot + fileName})->second;
+        return insertIntoCache(m_sysroot + fileName)->second;
     }
 
     ResolvedIP resolve(const uintptr_t ip)
