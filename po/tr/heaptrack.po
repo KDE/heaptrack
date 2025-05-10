@@ -1,21 +1,21 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Emir SARI <emir_sari@icloud.com>, 2022.
+# SPDX-FileCopyrightText: 2022, 2025 Emir SARI <emir_sari@icloud.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-03-08 02:05+0000\n"
-"PO-Revision-Date: 2022-10-05 10:30+0300\n"
-"Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
+"PO-Revision-Date: 2025-05-10 00:02+0300\n"
+"Last-Translator: Emir SARI <emir_sari@îcloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 22.08.1\n"
+"X-Generator: Lokalize 25.04.0\n"
 "X-POOTLE-MTIME: 1502202299.000000\n"
 
 #, kde-format
@@ -402,7 +402,7 @@ msgstr ""
 #: gui/chartwidget.cpp:471
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
-msgstr "%1 (%2-%3 konumundan süzüldü, Δ%4)"
+msgstr "%1 (%2–%3 konumundan süzüldü, Δ%4)"
 
 #: gui/chartwidget.cpp:475
 #, kde-format
@@ -652,7 +652,7 @@ msgid ""
 "suppression per line, and start each line with 'leak:', i.e. use the LSAN "
 "suppression file format."
 msgstr ""
-"Belirtilen dosyadan sızma bastırmaları listesini yükle. Satır başına bir "
+"Belirtilen dosyadan sızma bastırmaları listesini yükleyin. Satır başına bir "
 "bastırma belirtin ve her bir satıra 'leak' ile başlayın; örneğin LSAN "
 "bastırma dosya biçimini kullanın."
 
@@ -845,18 +845,18 @@ msgstr "%1 dosyası yükleniyor, lütfen bekleyin..."
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
-msgstr "Heaptrack - %1"
+msgstr "Heaptrack — %1"
 
 #: gui/mainwindow.cpp:687
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
-msgstr "Heaptrack - %1, %2 ile karşılaştırılıyor"
+msgstr "Heaptrack — %1, %2 ile karşılaştırılıyor"
 
 #: gui/mainwindow.cpp:703
 #, kde-format
 msgid "Reparsing file, please wait..."
-msgstr "Dosya yeniden ayrıştırılıyor, lütfen bekleyin..."
+msgstr "Dosya yeniden ayrıştırılıyor, lütfen bekleyin…"
 
 #: gui/mainwindow.cpp:746
 #, kde-format
@@ -871,7 +871,7 @@ msgstr "Kod Dolaşımı"
 #: gui/mainwindow.cpp:813
 #, kde-format
 msgid "Custom..."
-msgstr "Özel..."
+msgstr "Özel…"
 
 #: gui/mainwindow.cpp:825
 #, kde-format
@@ -889,8 +889,8 @@ msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
 "file name, '%l' by the line number and '%c' by the column number."
 msgstr ""
-"Kod dolaşımı için kullanılacak komutu belirtin; '%f', dosya adı ile; '%l', "
-"satır numarası ile ve '%c', sütun numarası ile değiştirilir."
+"Kod dolaşımı için kullanılacak komutu belirtin; “%f”, dosya adı ile; “%l”, "
+"csatır numarası ile ve “%c”, sütun numarası ile değiştirilir."
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
@@ -926,7 +926,7 @@ msgstr ""
 "<tt>heaptrack.$APP.$PID.gz</tt> veya <tt>heaptrack.$APP.$PID.zst</tt> olarak "
 "adlandırılırlar. Böyle bir dosyayı, örneğin uygulamanızı şunun yardımıyla "
 "profilleyerek oluşturabilirsiniz:</p>\n"
-"<pre><code>heaptrack &lt;uygulamanız&gt; ...</code></pre>\n"
+"<pre><code>heaptrack &lt;uygulamanız&gt; …</code></pre>\n"
 "<p>Alternatif olarak, çalışan bir süreci şununla iliştirebilirsiniz:</p>\n"
 "<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
 
@@ -953,7 +953,7 @@ msgstr ""
 #: gui/mainwindow.ui:92
 #, kde-format
 msgid "Profile &Data:"
-msgstr "Profil &Verisi:"
+msgstr "Profil &verisi:"
 
 #. i18n: ectx: property (text), widget (QLabel, compareToLabel)
 #: gui/mainwindow.ui:102
@@ -1049,14 +1049,14 @@ msgstr "Yukarıdan Aşağıya"
 #: gui/mainwindow.ui:554 gui/mainwindow.ui:622 gui/mainwindow.ui:750
 #, kde-format
 msgid "filter by function..."
-msgstr "işlev ile süz..."
+msgstr "işleve göre süz…"
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
 #: gui/mainwindow.ui:561 gui/mainwindow.ui:757
 #, kde-format
 msgid "filter by file..."
-msgstr "dosya ile süz..."
+msgstr "dosyaya göre süz…"
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
@@ -1064,7 +1064,7 @@ msgstr "dosya ile süz..."
 #: gui/mainwindow.ui:568 gui/mainwindow.ui:629 gui/mainwindow.ui:764
 #, kde-format
 msgid "filter by module..."
-msgstr "modül ile süz..."
+msgstr "modüle göre süz…"
 
 #. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
 #: gui/mainwindow.ui:598
@@ -1094,7 +1094,7 @@ msgstr "Yığı&nlar"
 #: gui/mainwindow.ui:835
 #, kde-format
 msgid "Selected Stack:"
-msgstr "Seçili Yığın:"
+msgstr "Seçili yığın:"
 
 #. i18n: ectx: property (title), widget (QMenu, menu_File)
 #: gui/mainwindow.ui:872
@@ -1117,7 +1117,7 @@ msgstr "Süzgeç"
 #: gui/parser.cpp:387
 #, kde-format
 msgid "merging allocations... %1%"
-msgstr "ayırmalar birleştiriliyor... %​%1"
+msgstr "ayırmalar birleştiriliyor… %​%1"
 
 #: gui/parser.cpp:557
 #, kde-format
@@ -1127,47 +1127,47 @@ msgstr "toplam"
 #: gui/parser.cpp:559
 #, kde-format
 msgid "0B to 8B"
-msgstr "0B'den 8B'ye"
+msgstr "0 B’den 8 B’ye"
 
 #: gui/parser.cpp:560
 #, kde-format
 msgid "9B to 16B"
-msgstr "9B'den 16B'ye"
+msgstr "9 B’den 16 B’ye"
 
 #: gui/parser.cpp:561
 #, kde-format
 msgid "17B to 32B"
-msgstr "17B'den 32B'ye"
+msgstr "17 B’den 32 B’ye"
 
 #: gui/parser.cpp:562
 #, kde-format
 msgid "33B to 64B"
-msgstr "33B&den 64B'ye"
+msgstr "33 B’den 64 B’ye"
 
 #: gui/parser.cpp:563
 #, kde-format
 msgid "65B to 128B"
-msgstr "65B'den 128B'ye"
+msgstr "65 B’den 128 B’ye"
 
 #: gui/parser.cpp:564
 #, kde-format
 msgid "129B to 256B"
-msgstr "129B'den 256B'ye"
+msgstr "129 B’den 256 B’ye"
 
 #: gui/parser.cpp:565
 #, kde-format
 msgid "257B to 512B"
-msgstr "257B'den 512B'ye"
+msgstr "257 B’den 512 B’ye"
 
 #: gui/parser.cpp:566
 #, kde-format
 msgid "512B to 1KB"
-msgstr "512B'den 1KB'ye"
+msgstr "512 B’den 1 KB’ye"
 
 #: gui/parser.cpp:567
 #, kde-format
 msgid "more than 1KB"
-msgstr "1KB'den çok"
+msgstr "1 KB’den çok"
 
 #: gui/parser.cpp:645
 #, kde-format
@@ -1187,17 +1187,17 @@ msgstr "%1 geçen: %2/%3 harcanan: %4 kalan: %5"
 #: gui/parser.cpp:715
 #, kde-format
 msgid "merging allocations..."
-msgstr "ayırmalar birleştiriliyor..."
+msgstr "ayırmalar birleştiriliyor…"
 
 #: gui/parser.cpp:726
 #, kde-format
 msgid "building size histogram..."
-msgstr "boyut histogramı yapılıyor..."
+msgstr "boyut histogramı yapılıyor…"
 
 #: gui/parser.cpp:739
 #, kde-format
 msgid "building charts..."
-msgstr "çizelgeler yapılıyor..."
+msgstr "çizelgeler yapılıyor…"
 
 #: gui/stacksmodel.cpp:99
 #, kde-format
