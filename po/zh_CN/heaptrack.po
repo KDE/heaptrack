@@ -14,8 +14,8 @@ msgstr ""
 "X-Crowdin-Project: kdeorg\n"
 "X-Crowdin-Project-ID: 269464\n"
 "X-Crowdin-Language: zh-CN\n"
-"X-Crowdin-File: /kf5-trunk/messages/heaptrack/heaptrack.pot\n"
-"X-Crowdin-File-ID: 5826\n"
+"X-Crowdin-File: /kf6-stable/messages/heaptrack/heaptrack.pot\n"
+"X-Crowdin-File-ID: 57438\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
