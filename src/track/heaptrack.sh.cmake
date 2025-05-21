@@ -88,10 +88,6 @@ LIB_REL_PATH="@LIB_REL_PATH@"
 LIBEXEC_REL_PATH="@LIBEXEC_REL_PATH@"
 
 INTERPRETER="$EXE_PATH/$LIBEXEC_REL_PATH/heaptrack_interpret"
-if [ -z "$write_raw_data" ] && [ ! -f "$INTERPRETER" ]; then
-    echo "Could not find heaptrack interpreter executable: $INTERPRETER"
-    exit 1
-fi
 INTERPRETER=$(readlink -f "$INTERPRETER")
 
 GZ_COMPRESSOR="gzip -c"
@@ -112,6 +108,11 @@ fi
 interpretRawHeaptrackDataFile() {
     input="$1"
     shift 1
+
+    if  [ ! -f "$INTERPRETER" ]; then
+        echo "Could not find heaptrack interpreter executable: $INTERPRETER"
+        exit 1
+    fi
 
     if [ ! -f "$input" ]; then
         echo "raw file "$input" does not exist"
@@ -363,6 +364,10 @@ fi
 # interpret the data and compress the output on the fly
 output="$output.$output_suffix"
 if [ -z "$write_raw_data" ]; then
+    if  [ ! -f "$INTERPRETER" ]; then
+        echo "Could not find heaptrack interpreter executable: $INTERPRETER"
+        exit 1
+    fi
     "$INTERPRETER" < $pipe | $COMPRESSOR > "$output" &
 else
     $COMPRESSOR < $pipe > "$output" &
