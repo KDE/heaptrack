@@ -394,7 +394,7 @@ msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
 "a time range for filtering.</qt>"
 msgstr ""
-"<qt>Mostra el consum de memòria en monticles al llarg del temps.<br>Feu clic "
+"<qt>Mostra el consum de memòria en monticles al llarg del temps.<br>Cliqueu "
 "i arrossegueu per a seleccionar un interval de temps per al filtratge.</qt>"
 
 #: gui/chartwidget.cpp:445
@@ -403,9 +403,9 @@ msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
 "select a time range for filtering.</qt>"
 msgstr ""
-"<qt>Mostra el nombre d'assignacions de memòria al llarg del temps.<br>Feu "
-"clic i arrossegueu per a seleccionar un interval de temps per al filtratge.</"
-"qt>"
+"<qt>Mostra el nombre d'assignacions de memòria al llarg del temps."
+"<br>Cliqueu i arrossegueu per a seleccionar un interval de temps per al "
+"filtratge.</qt>"
 
 #: gui/chartwidget.cpp:449
 #, kde-format
@@ -417,7 +417,7 @@ msgid ""
 msgstr ""
 "<qt>Mostra el nombre d'assignacions temporals de memòria al llarg del temps. "
 "Una assignació temporal és aquella que seguix immediatament la seua "
-"desassignació corresponent, sense cap altra assignació entremig.<br>Feu clic "
+"desassignació corresponent, sense cap altra assignació entremig.<br>Cliqueu "
 "i arrossegueu per a seleccionar un interval de temps per al filtratge.</qt>"
 
 #: gui/chartwidget.cpp:471
@@ -434,7 +434,7 @@ msgstr "%1 (delta filtrada)"
 #, kde-format
 msgid "Click and drag to select time range for filtering."
 msgstr ""
-"Feu clic i arrossegueu per a seleccionar un interval de temps per al "
+"Cliqueu i arrossegueu per a seleccionar un interval de temps per al "
 "filtratge."
 
 #: gui/chartwidget.cpp:570
@@ -442,7 +442,7 @@ msgstr ""
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
 msgstr ""
-"T = %1, Consum: %2. Feu clic i arrossegueu per a seleccionar un interval de "
+"T = %1, Consum: %2. Cliqueu i arrossegueu per a seleccionar un interval de "
 "temps per al filtratge."
 
 #: gui/chartwidget.cpp:574
@@ -450,7 +450,7 @@ msgstr ""
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
 msgstr ""
-"T = %1, Assignacions: %2. Feu clic i arrossegueu per a seleccionar un "
+"T = %1, Assignacions: %2. Cliqueu i arrossegueu per a seleccionar un "
 "interval de temps per al filtratge."
 
 #: gui/chartwidget.cpp:578
@@ -459,7 +459,7 @@ msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
 "filtering."
 msgstr ""
-"T = %1, Assignacions temporals: %2. Feu clic i arrossegueu per a seleccionar "
+"T = %1, Assignacions temporals: %2. Cliqueu i arrossegueu per a seleccionar "
 "un interval de temps per al filtratge."
 
 #: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
