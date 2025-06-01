@@ -7,15 +7,15 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-03-08 02:05+0000\n"
-"PO-Revision-Date: 2025-05-30 12:26+0300\n"
+"PO-Revision-Date: 2025-05-31 19:05+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : n==2 ? 1 : n>10 && n%10==0 ? "
-"2 : 3);\n"
+"Plural-Forms: nplurals=4; plural=(n == 1) ? 0 : ((n == 2) ? 1 : ((n > 10 && "
+"n % 10 == 0) ? 2 : 3));\n"
 "X-Generator: Lokalize 25.04.1\n"
 
 #, kde-format
@@ -448,18 +448,18 @@ msgstr ""
 msgctxt ""
 "%1: peak consumption in bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) contribution to peak consumption in %3 and below."
-msgstr ""
+msgstr "%1 (%2%) תרומה לצריכת שיא ב־%3 ומטה."
 
 #: gui/flamegraph.cpp:248
 #, kde-format
 msgctxt "%1: leaked bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) leaked in %3 and below."
-msgstr ""
+msgstr "%1 (%2%) זלג ב־%3 ומטה."
 
 #: gui/flamegraph.cpp:428
 #, kde-format
 msgid "Memory Peak"
-msgstr ""
+msgstr "שיא צריכת זיכרון"
 
 #: gui/flamegraph.cpp:430
 #, kde-format
@@ -467,6 +467,7 @@ msgid ""
 "Show a flame graph over the contributions to the peak heap memory "
 "consumption of your application."
 msgstr ""
+"הצגת תרשים להבות על פני תרומות לצריכת שיא של זיכרון המצבור של היישום שלך."
 
 #: gui/flamegraph.cpp:435
 #, kde-format
@@ -474,13 +475,15 @@ msgid ""
 "Show a flame graph over the leaked heap memory of your application. Memory "
 "is considered to be leaked when it never got deallocated. "
 msgstr ""
+"הצגת תרשים להבות על פני זיכרון המצבור שזלג ביישום שלך. הזיכרון נחשב שזלג "
+"כשמעולם לא שוחררה ההקצאה שלו."
 
 #: gui/flamegraph.cpp:440
 #, kde-format
 msgid ""
 "Show a flame graph over the number of allocations triggered by functions in "
 "your code."
-msgstr ""
+msgstr "הצגת תרשים להבות על פני מספר ההקצאות שהוזנקו על ידי פונקציות בקוד שלך."
 
 #: gui/flamegraph.cpp:445
 #, kde-format
@@ -489,16 +492,18 @@ msgid ""
 "functions in your code. Allocations are marked as temporary when they are "
 "immediately followed by their deallocation."
 msgstr ""
+"הצגת תרשים להבות על פני מספר ההקצאות הזמניות שהוזנקו על ידי פונקציות בקוד "
+"שלך. הקצאות מסומנות זמניות אם מיד לאחריהן ההקצאה משוחררת."
 
 #: gui/flamegraph.cpp:452
 #, kde-format
 msgid "Select the data source that should be visualized in the flame graph."
-msgstr ""
+msgstr "נא לבחור את מקור הנתונים שיומחש בתרשים הלהבות."
 
 #: gui/flamegraph.cpp:467
 #, kde-format
 msgid "Bottom-Up View"
-msgstr ""
+msgstr "תצוגה מלמטה למעלה"
 
 #: gui/flamegraph.cpp:468
 #, kde-format
@@ -510,7 +515,7 @@ msgstr ""
 #: gui/flamegraph.cpp:476
 #, kde-format
 msgid "Collapse Recursion"
-msgstr ""
+msgstr "צמצום נסיגות"
 
 #: gui/flamegraph.cpp:478
 #, kde-format
@@ -552,12 +557,12 @@ msgstr "איפוס תצוגה"
 #: gui/flamegraph.cpp:555 gui/mainwindow.cpp:142
 #, kde-format
 msgid "View Caller/Callee"
-msgstr ""
+msgstr "הצגת קורא/נקרא"
 
 #: gui/flamegraph.cpp:696
 #, kde-format
 msgid "generating flame graph..."
-msgstr ""
+msgstr "נוצר תרשים להבות…"
 
 #: gui/flamegraph.cpp:773
 #, kde-format
@@ -582,7 +587,7 @@ msgstr ""
 #: gui/gui.cpp:69
 #, kde-format
 msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
-msgstr ""
+msgstr "כל הזכויות שמורות 2015, למיליאן וולף <mail@milianw.de>"
 
 #: gui/gui.cpp:72
 #, kde-format
@@ -592,7 +597,7 @@ msgstr ""
 #: gui/gui.cpp:72
 #, kde-format
 msgid "Original author, maintainer"
-msgstr ""
+msgstr "יוצר מקורי, מתחזק"
 
 #: gui/gui.cpp:86
 #, kde-format
@@ -627,7 +632,7 @@ msgstr ""
 #: gui/gui.cpp:108
 #, kde-format
 msgid "Files to load"
-msgstr ""
+msgstr "קבצים לטעינה"
 
 #: gui/gui.cpp:108
 #, kde-format
@@ -639,22 +644,22 @@ msgstr ""
 msgid ""
 "%1 allocations from %2, totalling %3 allocated with an average of %4 per "
 "allocation"
-msgstr ""
+msgstr "%1 הקצאות מצד %2, שמסתכמים בכדי %3 מוקצים עם ממוצע של %4 להקצאה"
 
 #: gui/histogramwidget.cpp:99
 #, kde-format
 msgid "Requested Allocation Size"
-msgstr ""
+msgstr "גודל ההקצאה המבוקש"
 
 #: gui/histogramwidget.cpp:105
 #, kde-format
 msgid "Number of Allocations"
-msgstr ""
+msgstr "מספר ההקצאות"
 
 #: gui/mainwindow.cpp:171
 #, kde-format
 msgid "Open file in editor"
-msgstr ""
+msgstr "פתיחת הקובץ בעורך"
 
 #: gui/mainwindow.cpp:394
 #, kde-format

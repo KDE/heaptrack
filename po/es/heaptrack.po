@@ -1,15 +1,15 @@
 # Spanish translations for heaptrack.po package.
-# Copyright (C) 2015 This_file_is_part_of_KDE
-# This file is distributed under the same license as the PACKAGE package.
-#
+# Copyright (C) 2015-2025 This file is copyright:
+# This file is distributed under the same license as the heaptrack package.
 # Automatically generated, 2015.
-# Eloy Cuadra <ecuadra@eloihr.net>, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022.
+#
+# SPDX-FileCopyrightText: 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2025 Eloy Cuadra <ecuadra@eloihr.net>
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-03-08 02:05+0000\n"
-"PO-Revision-Date: 2022-10-05 04:58+0200\n"
+"PO-Revision-Date: 2025-05-31 16:43+0100\n"
 "Last-Translator: Eloy Cuadra <ecuadra@eloihr.net>\n"
 "Language-Team: Spanish <kde-l10n-es@kde.org>\n"
 "Language: es\n"
@@ -303,7 +303,7 @@ msgstr "<qt>%2 consumidos tras %3 de:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr "Exportar como..."
+msgstr "Exportar como…"
 
 #: gui/chartwidget.cpp:165
 #, kde-format
@@ -598,7 +598,7 @@ msgstr ""
 #: gui/flamegraph.cpp:506
 #, kde-format
 msgid "Search..."
-msgstr "Buscar..."
+msgstr "Buscar…"
 
 #: gui/flamegraph.cpp:507
 #, kde-format
@@ -618,7 +618,7 @@ msgstr "Vista llamador/llamado"
 #: gui/flamegraph.cpp:696
 #, kde-format
 msgid "generating flame graph..."
-msgstr "generando gráfico de llamas..."
+msgstr "generando gráfico de llamas…"
 
 #: gui/flamegraph.cpp:773
 #, kde-format
@@ -707,7 +707,7 @@ msgstr "Archivos a cargar"
 #: gui/gui.cpp:108
 #, kde-format
 msgid "[FILE...]"
-msgstr "[ARCHIVO...]"
+msgstr "[ARCHIVO…]"
 
 #: gui/histogrammodel.cpp:65
 #, kde-format
@@ -864,7 +864,7 @@ msgstr ""
 #: gui/mainwindow.cpp:682
 #, kde-format
 msgid "Loading file %1, please wait..."
-msgstr "Cargando el archivo %1. Por favor, espere..."
+msgstr "Cargando el archivo %1. Por favor, espere…"
 
 #: gui/mainwindow.cpp:684
 #, kde-format
@@ -881,7 +881,7 @@ msgstr "Heaptrack - %1 comparado con %2"
 #: gui/mainwindow.cpp:703
 #, kde-format
 msgid "Reparsing file, please wait..."
-msgstr "Volviendo a analizar el archivo. Por favor, espere..."
+msgstr "Volviendo a analizar el archivo. Por favor, espere…"
 
 #: gui/mainwindow.cpp:746
 #, kde-format
@@ -896,7 +896,7 @@ msgstr "Navegación de código"
 #: gui/mainwindow.cpp:813
 #, kde-format
 msgid "Custom..."
-msgstr "Personalizar..."
+msgstr "Personalizar…"
 
 #: gui/mainwindow.cpp:825
 #, kde-format
@@ -953,7 +953,7 @@ msgstr ""
 "archivos se llaman <tt>heaptrack.$APP.$PID.gz</tt> o <tt>heaptrack.$APP.$PID."
 "zst</tt>. Puede generar estos archivos analizando el rendimiento de la "
 "aplicación, por ejemplo, con:</p>\n"
-"<pre><code>heaptrack &lt;aplicación&gt; ...</code></pre>\n"
+"<pre><code>heaptrack &lt;aplicación&gt; …</code></pre>\n"
 "<p>O, de forma alternativa, puede adjuntar un proceso en ejecución usando:</"
 "p>\n"
 "<pre><code>heaptrack --pid $(pidof &lt;aplicación&gt;)</code></pre></qt>"
@@ -1081,14 +1081,14 @@ msgstr "De abajo arriba"
 #: gui/mainwindow.ui:554 gui/mainwindow.ui:622 gui/mainwindow.ui:750
 #, kde-format
 msgid "filter by function..."
-msgstr "filtrar por función..."
+msgstr "filtrar por función…"
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
 #: gui/mainwindow.ui:561 gui/mainwindow.ui:757
 #, kde-format
 msgid "filter by file..."
-msgstr "filtrar por archivo..."
+msgstr "filtrar por archivo…"
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
@@ -1096,7 +1096,7 @@ msgstr "filtrar por archivo..."
 #: gui/mainwindow.ui:568 gui/mainwindow.ui:629 gui/mainwindow.ui:764
 #, kde-format
 msgid "filter by module..."
-msgstr "filtrar por módulo..."
+msgstr "filtrar por módulo…"
 
 #. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
 #: gui/mainwindow.ui:598
@@ -1149,7 +1149,7 @@ msgstr "Filtro"
 #: gui/parser.cpp:387
 #, kde-format
 msgid "merging allocations... %1%"
-msgstr "fusionando asignaciones... %1%"
+msgstr "fusionando asignaciones… %1%"
 
 #: gui/parser.cpp:557
 #, kde-format
@@ -1219,17 +1219,17 @@ msgstr "Paso de %1: %2/%3  transcurrido: %4  restante: %5"
 #: gui/parser.cpp:715
 #, kde-format
 msgid "merging allocations..."
-msgstr "fusionando asignaciones..."
+msgstr "fusionando asignaciones…"
 
 #: gui/parser.cpp:726
 #, kde-format
 msgid "building size histogram..."
-msgstr "generando histograma de tamaños..."
+msgstr "generando histograma de tamaños…"
 
 #: gui/parser.cpp:739
 #, kde-format
 msgid "building charts..."
-msgstr "generando gráficas..."
+msgstr "generando gráficas…"
 
 #: gui/stacksmodel.cpp:99
 #, kde-format
@@ -1353,266 +1353,3 @@ msgstr "%1 en %2"
 #, kde-format
 msgid "<unresolved function>"
 msgstr "<función sin resolver>"
-
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
-
-#~ msgid "KDevelop"
-#~ msgstr "KDevelop"
-
-#~ msgid "Kate"
-#~ msgstr "Kate"
-
-#~ msgid "KWrite"
-#~ msgstr "KWrite"
-
-#~ msgid "gedit"
-#~ msgstr "gedit"
-
-#~ msgid "gvim"
-#~ msgstr "gvim"
-
-#~ msgid "Qt Creator"
-#~ msgstr "Qt Creator"
-
-#~ msgid "%1 allocations from %2"
-#~ msgstr "%1 asignaciones de %2"
-
-#~ msgctxt "%1: function, %2: binary"
-#~ msgid "%1 (%2)"
-#~ msgstr "%1 (%2)"
-
-#~ msgid "%1 in %2 (%3)"
-#~ msgstr "%1 en %2 (%3)"
-
-#~ msgid "Symbol"
-#~ msgstr "Símbolo"
-
-#~ msgid "Binary"
-#~ msgstr "Binario"
-
-#~ msgid ""
-#~ "<qt>The parent function that called an allocation function. May be "
-#~ "unresolved when debug information is missing.</qt>"
-#~ msgstr ""
-#~ "<qt>La función desde donde se ha llamado a una función de asignación. "
-#~ "Puede estar sin resolver cuando falta la información de depuración.</qt>"
-
-#~ msgid ""
-#~ "<qt>The module, i.e. executable or shared library, from which an "
-#~ "allocation function was called.</qt>"
-#~ msgstr ""
-#~ "<qt>El módulo (es decir, el ejecutable o la biblioteca compartida) desde "
-#~ "donde se ha llamado a una función de asignación.</qt>"
-
-#~ msgid ""
-#~ "The function name of the %1. May be unresolved when debug information is "
-#~ "missing."
-#~ msgstr ""
-#~ "El nombre de la función del %1. Puede estar sin resolver cuando falta la "
-#~ "información de depuración."
-
-#~ msgid "The name of the executable the symbol resides in."
-#~ msgstr "El nombre del ejecutable en el que reside el símbolo."
-
-#~ msgid "Function"
-#~ msgstr "Función"
-
-#~ msgid "Module"
-#~ msgstr "Módulo"
-
-#~ msgid ""
-#~ "<qt>The parent function that called an allocation function. May be "
-#~ "unknown when debug information is missing.</qt>"
-#~ msgstr ""
-#~ "<qt>La función desde donde se ha llamado a una función de asignación. "
-#~ "Puede ser desconocida cuando falta la información de depuración.</qt>"
-
-#, fuzzy
-#~| msgctxt "1: function, 2: module"
-#~| msgid ""
-#~| "%1\n"
-#~| "  in %2"
-#~ msgctxt "1: function, 2: module, 3: module path"
-#~ msgid ""
-#~ "%1\n"
-#~ "  in %2"
-#~ msgstr ""
-#~ "%1\n"
-#~ "  en %2"
-
-#~ msgid "File"
-#~ msgstr "Archivo"
-
-#~ msgid "Line"
-#~ msgstr "Línea"
-
-#~ msgid "Allocated (Self)"
-#~ msgstr "Asignada (propia)"
-
-#~ msgid "Allocated (Incl.)"
-#~ msgstr "Asignada (incl.)"
-
-#~ msgid ""
-#~ "<qt>The file where the allocation function was called from. May be empty "
-#~ "when debug information is missing.</qt>"
-#~ msgstr ""
-#~ "<qt>El archivo desde donde se ha llamado a la función de asignación. "
-#~ "Puede estar vacío cuando falta la información de depuración.</qt>"
-
-#~ msgid ""
-#~ "<qt>The line number where the allocation function was called from. May be "
-#~ "empty when debug information is missing.</qt>"
-#~ msgstr ""
-#~ "<qt>El número de línea desde donde se ha llamado a la función de "
-#~ "asignación. Puede estar vacío cuando falta la información de depuración.</"
-#~ "qt>"
-
-#~ msgid ""
-#~ "<qt>The sum of all bytes directly allocated from this location, ignoring "
-#~ "deallocations.</qt>"
-#~ msgstr ""
-#~ "<qt>La suma de todos los bytes asignados directamente desde esta "
-#~ "ubicación, sin tener en cuenta las liberaciones.</qt>"
-
-#~ msgid ""
-#~ "<qt>The inclusive sum of all bytes allocated from this location or "
-#~ "functions called from here, ignoring deallocations.</qt>"
-#~ msgstr ""
-#~ "<qt>La suma de todos los bytes asignados incluidos desde esta ubicación, "
-#~ "sin tener en cuenta las liberaciones.</qt>"
-
-#~ msgctxt "1: function, 2: file, 3: line, 4: module"
-#~ msgid ""
-#~ "%1\n"
-#~ "  at %2:%3\n"
-#~ "  in %4"
-#~ msgstr ""
-#~ "%1\n"
-#~ "  en %2:%3\n"
-#~ "  en %4"
-
-#~ msgid ""
-#~ "inclusive: allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at "
-#~ "%5, leaked %6"
-#~ msgstr ""
-#~ "incluidas: asignada %1 sobre %2 llamadas (%3 temporales, es decir, %4%), "
-#~ "pico en %5, fugada %6"
-
-#~ msgid ""
-#~ "self: allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, "
-#~ "leaked %6"
-#~ msgstr ""
-#~ "propia: asignada %1 sobre %2 llamadas (%3 temporales, es decir, %4%), "
-#~ "pico en %5, fugada %6"
-
-#~ msgid "Memory Allocated"
-#~ msgstr "Memoria asignada"
-
-#~ msgid "<qt>%1 allocated in total after %2</qt>"
-#~ msgstr "<qt>%1 asignaciones en total tras %2</qt>"
-
-#~ msgid ""
-#~ "<qt>%2 allocated after %3 from:<p style='margin-left:10px'>%1</p></qt>"
-#~ msgstr "<qt>%2 asignados tras %3 de:<p style='margin-left:10px'>%1</p></qt>"
-
-#~ msgid ""
-#~ "<qt>Displays total memory allocated over time. This value ignores "
-#~ "deallocations and just measures heap allocation throughput.</qt>"
-#~ msgstr ""
-#~ "<qt>Muestra la memoria total asignada a lo largo del tiempo. Este valor "
-#~ "ignora las liberaciones y solo mide el rendimiento de la asignación de "
-#~ "memoria dinámica.</qt>"
-
-#~ msgctxt "%1: allocated bytes, %2: relative number, %3: function label"
-#~ msgid "%1 (%2%) allocated in %3 and below."
-#~ msgstr "%1 (%2%) asignaciones en %3 y por debajo."
-
-#~ msgid "%1 contribution to peak consumption"
-#~ msgstr "%1 contribución al consumo pico"
-
-#~ msgid "%1 allocated in total"
-#~ msgstr "%1 asignaciones en total"
-
-#~ msgid "Allocated"
-#~ msgstr "Asignada"
-
-#~ msgid ""
-#~ "Show a flame graph over the total memory allocated by functions in your "
-#~ "code. This aggregates all memory allocations and ignores deallocations."
-#~ msgstr ""
-#~ "Mostrar un gráfico de llamas sobre la memoria total asignada por las "
-#~ "funciones de su código. Aquí se suman todas las asignaciones de memoria "
-#~ "sin tener en cuenta las liberaciones."
-
-#~ msgid "%1 allocations from %2 at %3:%4 in %5"
-#~ msgstr "%1 asignaciones de %2  en %3:%4 en %5"
-
-#~ msgid ""
-#~ "<dt><b>bytes allocated in total</b> (ignoring deallocations):</dt><dd>%1 "
-#~ "(%2/s)</dd>"
-#~ msgstr ""
-#~ "<dt><b>total de bytes asignados</b> (sin tener en cuenta liberaciones):</"
-#~ "dt><dd>%1 (%2/s)</dd>"
-
-#~ msgid ""
-#~ "List of functions that allocated the most memory overall, ignoring "
-#~ "deallocations."
-#~ msgstr ""
-#~ "Lista de funciones que asignan la mayor cantidad de memoria ignorando las "
-#~ "liberaciones."
-
-#~ msgid "Most Memory Allocated"
-#~ msgstr "Mayor cantidad de memoria asignada"
-
-#~ msgid ""
-#~ "<qt>The sum of all bytes allocated from this location, ignoring "
-#~ "deallocations.</qt>"
-#~ msgstr ""
-#~ "<qt>La suma de todos los bytes asignados desde esta ubicación, sin tener "
-#~ "en cuenta las liberaciones.</qt>"
-
-#~ msgid "allocated: %1 (%2% of total)\n"
-#~ msgstr "asignada: %1 (%2% del total)\n"
-
-#~ msgid "Open Heaptrack Output File"
-#~ msgstr "Abrir archivo de salida de Heaptrack"
-
-#~ msgid "Heaptrack data files (heaptrack.*)"
-#~ msgstr "Archivos de datos de Heaptrack (heaptrack.*)"
-
-#~ msgid "&Graphs"
-#~ msgstr "&Gráficos"
-
-#~ msgid ""
-#~ "allocated %1 over %2 calls (%3 temporary, i.e. %4%), peak at %5, leaked %6"
-#~ msgstr ""
-#~ "asignada %1 sobre %2 llamadas (%3 temporales, es decir, %4%), pico en %5, "
-#~ "fugada %6"
-
-#~ msgid "<strong>debuggee</strong>: <code>%1</code>"
-#~ msgstr "<strong>depurado</strong>: <code>%1</code>"
-
-#~ msgid "<strong>total runtime</strong>: %1s"
-#~ msgstr "<strong>tiempo de ejecución total</strong>: %1s"
-
-#~ msgid "%1: %2 at %3"
-#~ msgstr "%1: %2 en %3"
-
-#~ msgid "Allocations [-]"
-#~ msgstr "Asignaciones [-]"
-
-#~ msgid "Temporary Allocations [-]"
-#~ msgstr "Asignaciones temporales [-]"
-
-#~ msgid "Leaked [B]"
-#~ msgstr "Fugada [B]"
-
-#~ msgid "Allocated [B]"
-#~ msgstr "Asignada [B]"
-
-#~ msgid "time in ms"
-#~ msgstr "tiempo en ms"
-
-#~ msgid "memory heap size"
-#~ msgstr "tamaño de la memoria dinámica"
