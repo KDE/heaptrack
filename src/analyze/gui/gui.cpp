@@ -51,10 +51,6 @@ void Q_DECL_UNUSED initRCCIconTheme()
 
 int main(int argc, char** argv)
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
-
     QApplication app(argc, argv);
     app.setStyle(new ProxyStyle);
 
@@ -73,9 +69,7 @@ int main(int argc, char** argv)
                         QStringLiteral("http://milianw.de"));
 
     aboutData.setOrganizationDomain("kde.org");
-#if KCOREADDONS_VERSION >= QT_VERSION_CHECK(5, 16, 0)
     aboutData.setDesktopFileName(QStringLiteral("org.kde.heaptrack"));
-#endif
     KAboutData::setApplicationData(aboutData);
     app.setWindowIcon(QIcon(QStringLiteral(":/512-heaptrack_app_icon.png")));
 

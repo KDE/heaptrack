@@ -564,14 +564,9 @@ MainWindow::MainWindow(QWidget* parent)
     };
 
     const QString heaptrackFileFilter = QStringLiteral("heaptrack.*.*.gz heaptrack.*.*.zst");
-#if KIO_VERSION >= QT_VERSION_CHECK(5, 108, 0)
     const QStringList heaptrackFileFilters = {heaptrackFileFilter};
     m_ui->openFile->setNameFilters(heaptrackFileFilters);
     m_ui->compareTo->setNameFilters(heaptrackFileFilters);
-#else
-    m_ui->openFile->setFilter(heaptrackFileFilter);
-    m_ui->compareTo->setFilter(heaptrackFileFilter);
-#endif
 
     auto validateInput = [this, validateInputFile]() {
         m_ui->messages->hide();
