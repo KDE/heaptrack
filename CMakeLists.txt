@@ -1,11 +1,4 @@
-if (CMAKE_VERSION VERSION_LESS "2.8.12")
-    cmake_minimum_required(VERSION 2.8.9)
-    set(HEAPTRACK_BUILD_GUI OFF)
-elseif (CMAKE_VERSION VERSION_LESS "3.16.0")
-    cmake_minimum_required(VERSION 2.8.12)
-else()
-    cmake_minimum_required(VERSION 3.16.0)
-endif()
+cmake_minimum_required(VERSION 3.16.0)
 
 project(heaptrack)
 enable_testing()
@@ -91,19 +84,8 @@ option(
   ${HEAPTRACK_BUILD_ANALYZE_DEFAULT}
 )
 
-option(
-  HEAPTRACK_USE_QT6
-  "Use Qt6/KF6 when building the Qt / KDE Frameworks based GUI for heaptrack."
-  ON
-)
-if(HEAPTRACK_USE_QT6)
-    set(QT_VERSION_MAJOR 6)
-    # possibly works with older Qt6, but I didn't test that yet
-    set(QT_MIN_VERSION 6.5.0)
-else()
-    set(QT_VERSION_MAJOR 5)
-    set(QT_MIN_VERSION 5.10.0)
-endif()
+# possibly works with older Qt6, but I didn't test that yet
+set(QT_MIN_VERSION 6.5.0)
 
 option(
   HEAPTRACK_USE_LIBUNWIND

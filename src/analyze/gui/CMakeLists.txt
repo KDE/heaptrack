@@ -30,10 +30,10 @@ add_library(heaptrack_gui_private STATIC
     parser.cpp
 )
 target_link_libraries(heaptrack_gui_private PUBLIC
-    KF${QT_VERSION_MAJOR}::I18n
-    KF${QT_VERSION_MAJOR}::CoreAddons # KFormat
-    KF${QT_VERSION_MAJOR}::ThreadWeaver
-    Qt${QT_VERSION_MAJOR}::Core
+    KF6::I18n
+    KF6::CoreAddons # KFormat
+    KF6::ThreadWeaver
+    Qt6::Core
     sharedprint
     pthread
     ${CMAKE_THREAD_LIBS_INIT}
@@ -73,11 +73,11 @@ ecm_add_app_icon(SRCFILES ICONS
 )
 
 set(LIBRARIES
-    Qt${QT_VERSION_MAJOR}::Widgets
-    KF${QT_VERSION_MAJOR}::ConfigWidgets
-    KF${QT_VERSION_MAJOR}::I18n
-    KF${QT_VERSION_MAJOR}::KIOWidgets
-    KF${QT_VERSION_MAJOR}::IconThemes
+    Qt6::Widgets
+    KF6::ConfigWidgets
+    KF6::I18n
+    KF6::KIOWidgets
+    KF6::IconThemes
     sharedprint
     heaptrack_gui_private
 )
@@ -91,8 +91,8 @@ if (KChart_FOUND)
         histogrammodel.cpp
     )
     list(APPEND LIBRARIES
-        ${KChartName}
-        Qt${QT_VERSION_MAJOR}::Svg
+        KChart6
+        Qt6::Svg
     )
 endif()
 

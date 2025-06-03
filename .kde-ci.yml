@@ -2,18 +2,7 @@
 # SPDX-License-Identifier: CC0-1.0
 
 Dependencies:
-- 'on': ['Linux/Qt5']
-  'require':
-    'frameworks/extra-cmake-modules': '@stable'
-    'frameworks/kcoreaddons': '@stable'
-    'frameworks/ki18n': '@stable'
-    'frameworks/kconfigwidgets': '@stable'
-    'frameworks/kio': '@stable'
-    'frameworks/kiconthemes': '@stable'
-    'frameworks/threadweaver': '@stable'
-    'graphics/kdiagram': '@stable'
-
-- 'on': ['Linux/Qt6']
+- 'on': ['Linux']
   'require':
     'frameworks/extra-cmake-modules': '@latest-kf6'
     'frameworks/kcoreaddons': '@latest-kf6'

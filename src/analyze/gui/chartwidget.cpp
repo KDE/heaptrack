@@ -57,20 +57,12 @@ KChart::TextAttributes fixupTextAttributes(KChart::TextAttributes attributes, co
 
 QPointF localPos(QMouseEvent* event)
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    return event->localPos();
-#else
     return event->position();
-#endif
 }
 
 QPoint globalPos(QMouseEvent* event)
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    return event->globalPos();
-#else
     return event->globalPosition().toPoint();
-#endif
 }
 
 class TimeAxis : public CartesianAxis
