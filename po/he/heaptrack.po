@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-03-08 02:05+0000\n"
-"PO-Revision-Date: 2025-05-31 19:05+0300\n"
+"PO-Revision-Date: 2025-06-03 14:47+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
@@ -130,6 +130,8 @@ msgid ""
 "<qt>The number of inclusive temporary allocations. These allocations are "
 "directly followed by a free without any other allocations in-between.</qt>"
 msgstr ""
+"<qt>מספר ההקצאות הכוללניות הזמניות. מיד לאחר ההקצאות האלו מתבצע שחרור בלי "
+"שום הקצאות בין לבין.</qt>"
 
 #: gui/callercalleemodel.cpp:89 gui/callercalleemodel.h:173
 #: gui/callercalleemodel.h:382
@@ -193,6 +195,8 @@ msgid ""
 "<qt>The source code location that called an allocation function. May be "
 "unknown when debug information is missing.</qt>"
 msgstr ""
+"<qt>המקור בקוד המקור שקרא לפונקציית הקצאה. יכול להיות לא ידוע כשפרטי ניפוי "
+"השגיאות חסרים.</qt>"
 
 #: gui/chartmodel.cpp:52
 #, kde-format
@@ -289,12 +293,12 @@ msgstr "הצגת מקרא"
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "הצגת תרשים עלות כוללת"
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "הצגת תרשים עלות מפורט"
 
 #: gui/chartwidget.cpp:187
 #, kde-format
@@ -379,12 +383,12 @@ msgstr ""
 #: gui/chartwidget.cpp:471
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
-msgstr ""
+msgstr "%1 (מסונן מ־%2 עד %3, Δ%4)"
 
 #: gui/chartwidget.cpp:475
 #, kde-format
 msgid "%1 (filtered delta)"
-msgstr ""
+msgstr "%1 (הפרש מסונן)"
 
 #: gui/chartwidget.cpp:564
 #, kde-format
@@ -413,22 +417,22 @@ msgstr ""
 #: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
 #, kde-format
 msgid "%1 allocations in total"
-msgstr ""
+msgstr "%1 הקצאות בסך הכול"
 
 #: gui/flamegraph.cpp:177
 #, kde-format
 msgid "%1 temporary allocations in total"
-msgstr ""
+msgstr "%1 הקצאות זמניות בסך הכול"
 
 #: gui/flamegraph.cpp:179
 #, kde-format
 msgid "%1 peak memory consumption"
-msgstr ""
+msgstr "%1 צריכת שיא בזיכרון"
 
 #: gui/flamegraph.cpp:181
 #, kde-format
 msgid "%1 leaked in total"
-msgstr ""
+msgstr "%1 זלגו בסך הכול"
 
 #: gui/flamegraph.cpp:234
 #, kde-format
@@ -547,7 +551,7 @@ msgstr "חיפוש…"
 #: gui/flamegraph.cpp:507
 #, kde-format
 msgid "<qt>Search the flame graph for a symbol.</qt>"
-msgstr ""
+msgstr "<qt>חיפוש סמל בתרשים הלהבות.</qt>"
 
 #: gui/flamegraph.cpp:545
 #, kde-format
@@ -577,12 +581,12 @@ msgstr ""
 #: gui/gui.cpp:67
 #, kde-format
 msgid "Heaptrack GUI"
-msgstr ""
+msgstr "ממשק גרפי ל־Heaptrack"
 
 #: gui/gui.cpp:68
 #, kde-format
 msgid "A visualizer for heaptrack data files."
-msgstr ""
+msgstr "ממחיש לקובצי נתוני heaptrack."
 
 #: gui/gui.cpp:69
 #, kde-format
@@ -592,7 +596,7 @@ msgstr "כל הזכויות שמורות 2015, למיליאן וולף <mail@mil
 #: gui/gui.cpp:72
 #, kde-format
 msgid "Milian Wolff"
-msgstr ""
+msgstr "מיליאן וולף"
 
 #: gui/gui.cpp:72
 #, kde-format
@@ -628,6 +632,8 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks in common system libraries."
 msgstr ""
+"התעלמות מהגדרות הדחקה שמובנות ב־heaptrack. כברירת מחדל, heaptrack ידחיק "
+"זליגות ידועות בספריות מערכת נפוצות."
 
 #: gui/gui.cpp:108
 #, kde-format
@@ -667,36 +673,38 @@ msgid ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
 "<i>(attached)</i></dd>"
 msgstr ""
+"<dt><b>נבדק</b>:</dt><dd style='font-family:monospace;'>%1 <i>(מוצמד)</i></"
+"dd>"
 
 #: gui/mainwindow.cpp:397
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
-msgstr ""
+msgstr "<dt><b>נבדק</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 
 #: gui/mainwindow.cpp:401
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
-msgstr ""
+msgstr "<dt><b>זמן ריצה כולל</b>:</dt><dd>%1, מסונן מ־%2 עד %3 (%4)</dd>"
 
 #: gui/mainwindow.cpp:406
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>זמן ריצה כולל</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:408
 #, kde-format
 msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>סך כל זיכרון המערכת</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:415
 #, kde-format
 msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
-msgstr ""
+msgstr "<dt><b>קריאות לפונקציות הקצאה</b>:</dt><dd>%1 (%2 לשנ׳)</dd>"
 
 #: gui/mainwindow.cpp:418
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
-msgstr ""
+msgstr "<dt><b>הקצאות זמניות</b>:</dt><dd>%1 (%2%, %3 לשנ׳)</dd>"
 
 #: gui/mainwindow.cpp:428
 #, kde-format
@@ -711,67 +719,67 @@ msgstr ""
 #: gui/mainwindow.cpp:435
 #, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>הפרש צריכת זיכרון</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:439
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
-msgstr ""
+msgstr "<dt><b>סך כל הזיכרון שזלג</b>:</dt><dd>%1 (%2 הודחק)</dd>"
 
 #: gui/mainwindow.cpp:442
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>סך כל הזיכרון שזלג</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:470
 #, kde-format
 msgid "Failed to parse file %1."
-msgstr ""
+msgstr "פענוח הקובץ %1 נכשל."
 
 #: gui/mainwindow.cpp:475
 #, kde-format
 msgid "Consumed"
-msgstr ""
+msgstr "נצרכו"
 
 #: gui/mainwindow.cpp:491
 #, kde-format
 msgid "Sizes"
-msgstr ""
+msgstr "גדלים"
 
 #: gui/mainwindow.cpp:555
 #, kde-format
 msgid "Input data %1 does not exist."
-msgstr ""
+msgstr "נתוני הקלט %1 לא קיימים."
 
 #: gui/mainwindow.cpp:557
 #, kde-format
 msgid "Input data %1 is not a file."
-msgstr ""
+msgstr "נתוני הקלט %1 אינם קובץ."
 
 #: gui/mainwindow.cpp:559
 #, kde-format
 msgid "Input data %1 is not readable."
-msgstr ""
+msgstr "נתוני הקלט %1 אינם קריאים."
 
 #: gui/mainwindow.cpp:597
 #, kde-format
 msgid "Failed to parse suppression file."
-msgstr ""
+msgstr "פענוח קובץ ההדחקות נכשל."
 
 #: gui/mainwindow.cpp:612
 #, kde-format
 msgid "Heaptrack"
-msgstr ""
+msgstr "Heaptrack"
 
 #: gui/mainwindow.cpp:640
 #, kde-format
 msgid "Disable Embedded Suppressions"
-msgstr ""
+msgstr "השבתת הדחות מוטמעות"
 
 #: gui/mainwindow.cpp:652
 #, kde-format
 msgid "Disable Builtin Suppressions"
-msgstr ""
+msgstr "השבתת הדחקות מובנות"
 
 #: gui/mainwindow.cpp:654
 #, kde-format
@@ -783,44 +791,44 @@ msgstr ""
 #: gui/mainwindow.cpp:682
 #, kde-format
 msgid "Loading file %1, please wait..."
-msgstr ""
+msgstr "הקובץ %1 נטען, נא להמתין…"
 
 #: gui/mainwindow.cpp:684
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
-msgstr ""
+msgstr "Heaptrack - %1"
 
 #: gui/mainwindow.cpp:687
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
-msgstr ""
+msgstr "Heaptrack - %1 בהשוואה ל־%2"
 
 #: gui/mainwindow.cpp:703
 #, kde-format
 msgid "Reparsing file, please wait..."
-msgstr ""
+msgstr "הקובץ מפוענח מחדש, נא להמתין…"
 
 #: gui/mainwindow.cpp:746
 #, kde-format
 msgid " / %1"
-msgstr ""
+msgstr " / %1"
 
 #: gui/mainwindow.cpp:786
 #, kde-format
 msgid "Code Navigation"
-msgstr ""
+msgstr "ניווט בקוד"
 
 #: gui/mainwindow.cpp:813
 #, kde-format
 msgid "Custom..."
-msgstr ""
+msgstr "התאמה אישית…"
 
 #: gui/mainwindow.cpp:825
 #, kde-format
 msgid "Automatic (No Line numbers)"
-msgstr ""
+msgstr "אוטומטי (ללא מספרי שורות)"
 
 #: gui/mainwindow.cpp:845
 #, kde-format
@@ -851,7 +859,7 @@ msgstr ""
 #: gui/mainwindow.ui:63
 #, kde-format
 msgid "Open Heaptrack Data"
-msgstr ""
+msgstr "פתיחת נתוני Heaptrack"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, openFile)
 #: gui/mainwindow.ui:72
@@ -891,13 +899,13 @@ msgstr ""
 #: gui/mainwindow.ui:102
 #, kde-format
 msgid "Compare to:"
-msgstr ""
+msgstr "השוואה ל־:"
 
 #. i18n: ectx: property (text), widget (QLabel, suppressionsLabel)
 #: gui/mainwindow.ui:115
 #, kde-format
 msgid "Suppressions:"
-msgstr ""
+msgstr "הדחקות:"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
 #: gui/mainwindow.ui:125
@@ -909,71 +917,71 @@ msgstr ""
 #: gui/mainwindow.ui:241
 #, kde-format
 msgid "Summary"
-msgstr ""
+msgstr "תקציר"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topPeakLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topPeak)
 #: gui/mainwindow.ui:342 gui/mainwindow.ui:355
 #, kde-format
 msgid "List of functions that allocated the most memory at a given time."
-msgstr ""
+msgstr "רשימת הפונקציות שהקצו הכי הרבה זיכרון בזמן נתון."
 
 #. i18n: ectx: property (text), widget (QLabel, topPeakLabel)
 #: gui/mainwindow.ui:345
 #, kde-format
 msgid "Peak Contributions"
-msgstr ""
+msgstr "תרומות שיא"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topLeakedLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topLeaked)
 #: gui/mainwindow.ui:381 gui/mainwindow.ui:394
 #, kde-format
 msgid "List of functions that leak the most memory."
-msgstr ""
+msgstr "רשימת הפונקציות שזולג מהן הכי הרבה זיכרון."
 
 #. i18n: ectx: property (text), widget (QLabel, topLeakedLabel)
 #: gui/mainwindow.ui:384
 #, kde-format
 msgid "Largest Memory Leaks"
-msgstr ""
+msgstr "זליגות הזיכרון הגדולות ביותר"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topAllocationsLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topAllocations)
 #: gui/mainwindow.ui:420 gui/mainwindow.ui:433
 #, kde-format
 msgid "List of functions that allocate memory most often."
-msgstr ""
+msgstr "רשימת הפונקציות שמקצות זיכרון בתדירות הגבוהה ביותר."
 
 #. i18n: ectx: property (text), widget (QLabel, topAllocationsLabel)
 #: gui/mainwindow.ui:423
 #, kde-format
 msgid "Most Memory Allocations"
-msgstr ""
+msgstr "הכי הרבה הקצאות"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topTemporaryLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topTemporary)
 #: gui/mainwindow.ui:462 gui/mainwindow.ui:475
 #, kde-format
 msgid "List of functions that produced the most temporary memory allocations."
-msgstr ""
+msgstr "רשימת הפונקציות שייצרו הכי הרבה הקצאות זיכרון זמניות."
 
 #. i18n: ectx: property (text), widget (QLabel, topTemporaryLabel)
 #: gui/mainwindow.ui:465
 #, kde-format
 msgid "Most Temporary Allocations"
-msgstr ""
+msgstr "ההקצאות האחרונות"
 
 #. i18n: ectx: property (title), widget (KCollapsibleGroupBox, suppressionBox)
 #: gui/mainwindow.ui:498
 #, kde-format
 msgid "Suppressions"
-msgstr ""
+msgstr "הדחקות"
 
 #. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
 #: gui/mainwindow.ui:530
 #, kde-format
 msgid "Bottom-Up"
-msgstr ""
+msgstr "מלמטה למעלה"
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFunction)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterFunction)
@@ -981,14 +989,14 @@ msgstr ""
 #: gui/mainwindow.ui:554 gui/mainwindow.ui:622 gui/mainwindow.ui:750
 #, kde-format
 msgid "filter by function..."
-msgstr ""
+msgstr "סינון לפי פונקציה…"
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
 #: gui/mainwindow.ui:561 gui/mainwindow.ui:757
 #, kde-format
 msgid "filter by file..."
-msgstr ""
+msgstr "סינון לפי קובץ…"
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
@@ -996,60 +1004,60 @@ msgstr ""
 #: gui/mainwindow.ui:568 gui/mainwindow.ui:629 gui/mainwindow.ui:764
 #, kde-format
 msgid "filter by module..."
-msgstr ""
+msgstr "סינון לפי מודול…"
 
 #. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
 #: gui/mainwindow.ui:598
 #, kde-format
 msgid "Caller / Callee"
-msgstr ""
+msgstr "קורא / נקרא"
 
 #. i18n: ectx: attribute (title), widget (QWidget, topDownTab)
 #: gui/mainwindow.ui:729
 #, kde-format
 msgid "Top-Down"
-msgstr ""
+msgstr "מלמעלה למטה"
 
 #. i18n: ectx: attribute (title), widget (FlameGraph, flameGraphTab)
 #: gui/mainwindow.ui:794
 #, kde-format
 msgid "Flame Graph"
-msgstr ""
+msgstr "תרשים להבות"
 
 #. i18n: ectx: property (windowTitle), widget (QDockWidget, stacksDock)
 #: gui/mainwindow.ui:810
 #, kde-format
 msgid "S&tacks"
-msgstr ""
+msgstr "ע&רמות"
 
 #. i18n: ectx: property (text), widget (QLabel, stackSpinnerLabel)
 #: gui/mainwindow.ui:835
 #, kde-format
 msgid "Selected Stack:"
-msgstr ""
+msgstr "ערמה נבחרת:"
 
 #. i18n: ectx: property (title), widget (QMenu, menu_File)
 #: gui/mainwindow.ui:872
 #, kde-format
 msgid "&File"
-msgstr ""
+msgstr "&קובץ"
 
 #. i18n: ectx: property (title), widget (QMenu, menu_Settings)
 #: gui/mainwindow.ui:877
 #, kde-format
 msgid "Setti&ngs"
-msgstr ""
+msgstr "ה&גדרות"
 
 #. i18n: ectx: property (title), widget (QMenu, menuFilter)
 #: gui/mainwindow.ui:882
 #, kde-format
 msgid "Filter"
-msgstr ""
+msgstr "סינון"
 
 #: gui/parser.cpp:387
 #, kde-format
 msgid "merging allocations... %1%"
-msgstr ""
+msgstr "הקצאות ממוזגות… %1%"
 
 #: gui/parser.cpp:557
 #, kde-format
@@ -1104,12 +1112,12 @@ msgstr "יותר מקילובית"
 #: gui/parser.cpp:645
 #, kde-format
 msgid "reparsing data"
-msgstr ""
+msgstr "הנתונים מפוענחים מחדש"
 
 #: gui/parser.cpp:645
 #, kde-format
 msgid "parsing data"
-msgstr ""
+msgstr "הנתונים מפוענחים"
 
 #: gui/parser.cpp:659
 #, kde-format
@@ -1119,12 +1127,12 @@ msgstr ""
 #: gui/parser.cpp:715
 #, kde-format
 msgid "merging allocations..."
-msgstr ""
+msgstr "ההקצאות ממוזגות…"
 
 #: gui/parser.cpp:726
 #, kde-format
 msgid "building size histogram..."
-msgstr ""
+msgstr "היסטוגרמת גודל נבנית…"
 
 #: gui/parser.cpp:739
 #, kde-format
@@ -1141,7 +1149,7 @@ msgstr "מעקב קריאות"
 msgid ""
 "<qt>The number of times an allocation function was called from this location."
 "</qt>"
-msgstr ""
+msgstr "<qt>מספר הפעמים שפונקציית הקצאה נקראה מהמקום הזה.</qt>"
 
 #: gui/treemodel.cpp:83
 #, kde-format
@@ -1149,6 +1157,8 @@ msgid ""
 "<qt>The number of temporary allocations. These allocations are directly "
 "followed by a free without any other allocations in-between.</qt>"
 msgstr ""
+"<qt>מספר ההקצאות הזמניות. מיד לאחר ההקצאות האלו מתבצע שחרור בלי שום הקצאות "
+"בין לבין.</qt>"
 
 #: gui/treemodel.cpp:87
 #, kde-format
@@ -1172,21 +1182,23 @@ msgid ""
 "%1\n"
 "  in %2 (%3)"
 msgstr ""
+"%1\n"
+"  ב־%2 (%3)"
 
 #: gui/treemodel.cpp:159
 #, kde-format
 msgid "peak contribution: %1 (%2% of total)\n"
-msgstr ""
+msgstr "תרומות שיא: %1 (%2% מתוך סך הכול)\n"
 
 #: gui/treemodel.cpp:160
 #, kde-format
 msgid "leaked: %1 (%2% of total)\n"
-msgstr ""
+msgstr "זלגו: %1 (%2% מתוך סך הכול)\n"
 
 #: gui/treemodel.cpp:161
 #, kde-format
 msgid "allocations: %1 (%2% of total)\n"
-msgstr ""
+msgstr "הקצאות: %1 (%2% מתוך סך הכול)\n"
 
 #: gui/treemodel.cpp:162
 #, kde-format
