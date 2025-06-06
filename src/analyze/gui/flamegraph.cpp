@@ -59,9 +59,9 @@ enum SearchMatchType
 class FrameGraphicsItem : public QGraphicsRectItem
 {
 public:
-    FrameGraphicsItem(const qint64 cost, CostType costType, const Symbol& symbol,
+    FrameGraphicsItem(const qint64 cost, bool templateElision, CostType costType, const Symbol& symbol,
                       std::shared_ptr<const ResultData> resultData, FrameGraphicsItem* parent = nullptr);
-    FrameGraphicsItem(const qint64 cost, const Symbol& symbol, std::shared_ptr<const ResultData> resultData,
+    FrameGraphicsItem(const qint64 cost, bool templateElision, const Symbol& symbol, std::shared_ptr<const ResultData> resultData,
                       FrameGraphicsItem* parent);
 
     qint64 cost() const;
@@ -85,12 +85,13 @@ private:
     Symbol m_symbol;
     CostType m_costType;
     bool m_isHovered;
+    bool m_templateElision;
     SearchMatchType m_searchMatch = NoSearch;
 };
 
 Q_DECLARE_METATYPE(FrameGraphicsItem*)
 
-FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, CostType costType, const Symbol& symbol,
+FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, bool templateElision, CostType costType, const Symbol& symbol,
                                      std::shared_ptr<const ResultData> resultData, FrameGraphicsItem* parent)
     : QGraphicsRectItem(parent)
     , m_resultData(std::move(resultData))
@@ -98,14 +99,15 @@ FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, CostType costType, const
     , m_symbol(symbol)
     , m_costType(costType)
     , m_isHovered(false)
+    , m_templateElision(templateElision)
 {
     setFlag(QGraphicsItem::ItemIsSelectable);
     setAcceptHoverEvents(true);
 }
 
-FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, const Symbol& symbol,
+FrameGraphicsItem::FrameGraphicsItem(const qint64 cost, bool templateElision, const Symbol& symbol,
                                      std::shared_ptr<const ResultData> resultData, FrameGraphicsItem* parent)
-    : FrameGraphicsItem(cost, parent->m_costType, symbol, std::move(resultData), parent)
+    : FrameGraphicsItem(cost, templateElision, parent->m_costType, symbol, std::move(resultData), parent)
 {
 }
 
@@ -183,10 +185,11 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
         Q_UNREACHABLE();
     }();
 
+    const QString elidedLabel = m_templateElision ? Util::elideTemplateArguments(label) : label;
     const int height = rect().height();
     painter->drawText(margin + rect().x(), rect().y(), width, height,
                       Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
-                      option->fontMetrics.elidedText(label, Qt::ElideRight, width));
+                      option->fontMetrics.elidedText(elidedLabel, Qt::ElideRight, width));
 
     if (m_searchMatch == NoMatch) {
         painter->setPen(oldPen);
@@ -331,23 +334,23 @@ FrameGraphicsItem* findItemBySymbol(const QList<QGraphicsItem*>& items, const Sy
  */
 void toGraphicsItems(const std::shared_ptr<const ResultData>& resultData, const QVector<RowData>& data,
                      FrameGraphicsItem* parent, int64_t AllocationData::*member, const double costThreshold,
-                     bool collapseRecursion)
+                     bool collapseRecursion, bool templateElision)
 {
     for (const auto& row : data) {
         if (collapseRecursion && row.symbol.functionId && row.symbol == parent->symbol()) {
-            toGraphicsItems(resultData, row.children, parent, member, costThreshold, collapseRecursion);
+            toGraphicsItems(resultData, row.children, parent, member, costThreshold, collapseRecursion, templateElision);
             continue;
         }
         auto item = findItemBySymbol(parent->childItems(), row.symbol);
         if (!item) {
-            item = new FrameGraphicsItem(row.cost.*member, row.symbol, resultData, parent);
+            item = new FrameGraphicsItem(row.cost.*member, templateElision, row.symbol, resultData, parent);
             item->setPen(parent->pen());
             item->setBrush(brush());
         } else {
             item->setCost(item->cost() + row.cost.*member);
         }
         if (item->cost() > costThreshold) {
-            toGraphicsItems(resultData, row.children, item, member, costThreshold, collapseRecursion);
+            toGraphicsItems(resultData, row.children, item, member, costThreshold, collapseRecursion, templateElision);
         }
     }
 }
@@ -367,7 +370,7 @@ int64_t AllocationData::*memberForType(CostType type)
     Q_UNREACHABLE();
 }
 
-FrameGraphicsItem* parseData(const TreeData& data, CostType type, double costThreshold, bool collapseRecursion)
+FrameGraphicsItem* parseData(const TreeData& data, CostType type, double costThreshold, bool collapseRecursion, bool templateElision)
 {
     auto member = memberForType(type);
 
@@ -376,10 +379,10 @@ FrameGraphicsItem* parseData(const TreeData& data, CostType type, double costThr
     KColorScheme scheme(QPalette::Active);
     const QPen pen(scheme.foreground().color());
 
-    auto rootItem = new FrameGraphicsItem(totalCost, type, {}, data.resultData);
+    auto rootItem = new FrameGraphicsItem(totalCost, templateElision, type, {}, data.resultData);
     rootItem->setBrush(scheme.background());
     rootItem->setPen(pen);
-    toGraphicsItems(data.resultData, data.rows, rootItem, member, totalCost * costThreshold / 100., collapseRecursion);
+    toGraphicsItems(data.resultData, data.rows, rootItem, member, totalCost * costThreshold / 100., collapseRecursion, templateElision);
     return rootItem;
 }
 
@@ -483,6 +486,15 @@ FlameGraph::FlameGraph(QWidget* parent)
         showData();
     });
 
+    auto templateElisionCheckbox = new QCheckBox(i18n("Collapse Template"), this);
+    templateElisionCheckbox->setChecked(m_templateElision);
+    templateElisionCheckbox->setToolTip(i18n("Collapse template arguments for readability. "
+                                               "When this is checked, templates will be replaced with <>"));
+    connect(templateElisionCheckbox, &QCheckBox::toggled, this, [this, templateElisionCheckbox] {
+        m_templateElision = templateElisionCheckbox->isChecked();
+        showData();
+    });
+
     auto costThreshold = new QDoubleSpinBox(this);
     costThreshold->setDecimals(2);
     costThreshold->setMinimum(0);
@@ -515,6 +527,7 @@ FlameGraph::FlameGraph(QWidget* parent)
     controls->layout()->addWidget(m_costSource);
     controls->layout()->addWidget(bottomUpCheckbox);
     controls->layout()->addWidget(collapseRecursionCheckbox);
+    controls->layout()->addWidget(templateElisionCheckbox);
     controls->layout()->addWidget(costThreshold);
     controls->layout()->addWidget(m_searchInput);
 
@@ -654,10 +667,11 @@ void FlameGraph::showData()
 
     m_buildingScene = true;
     bool collapseRecursion = m_collapseRecursion;
+    bool templateElision = m_templateElision;
     auto source = m_costSource->currentData().value<CostType>();
     auto threshold = m_costThreshold;
-    stream() << make_job([data, source, threshold, collapseRecursion, this]() {
-        auto parsedData = parseData(data, source, threshold, collapseRecursion);
+    stream() << make_job([data, source, threshold, collapseRecursion, templateElision, this]() {
+        auto parsedData = parseData(data, source, threshold, collapseRecursion, templateElision);
         QMetaObject::invokeMethod(this, "setData", Qt::QueuedConnection, Q_ARG(FrameGraphicsItem*, parsedData));
     });
 }
