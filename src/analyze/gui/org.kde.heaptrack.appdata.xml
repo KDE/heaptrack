@@ -77,6 +77,7 @@
     <p xml:lang="he">Heaptrack עוקב אחרי כל הקצאות הזיכרון ומסמן את האירועים האלה עם ניתוח מהלכים. כלי ניתוח ייעודיים יאפשרו לך לאחר מכן לפענח את פרופיל זכרון המצבור כדי:</p>
     <p xml:lang="id">Heaptrack melacak semua alokasi memori dan membubuhi keterangan peristiwa ini dengan jejak tumpukan. Alat analisis khusus kemudian memungkinkan kamu untuk menginterpretasikan profil memori tumpukan untuk:</p>
     <p xml:lang="it">Heaptrack traccia tutte le allocazioni di memoria e le annota con tracciati dello stack. Degli strumenti dedicati di analisi ti permettono quindi di interpretare il profilo della memoria heap in modo da:</p>
+    <p xml:lang="ka">Heaptrack ახდენს ყველა მეხსიერების გამოყოფის თვალყურის დევნებას და ამ მოვლენების ანოტაციას სტეკის ტრეისებით. შემდეგ გამოყოფილი ანალიზის ხელსაწყოები საშუალებას გაძლევენ მოახდინოთ დროებითი მეხსიერების პროფილის ინტერპრეტაცია:</p>
     <p xml:lang="ko">힙 추적은 모든 메모리 할당을 추적하고 스택 추적과 메모리 할당을 연결합니다. 분석 도구를 사용하여 힙 메모리 프로필을 해석할 수 있습니다:</p>
     <p xml:lang="nl">Heaptrack traceert alle toewijzingen van geheugen en annoteert deze gebeurtenissen met stacktraces. Specifieke hulpmiddelen voor analyse bieden u de mogelijkheid om het geheugenprofiel van de heap te interpreteren:</p>
     <p xml:lang="nn">Heaptrack sporar alle minnereserveringar og merkjer dei med tilhøyrande stabelspor. Analyseverktøyet lèt deg så tolka minneprofilen for å:</p>
@@ -103,6 +104,7 @@
       <li xml:lang="he">לאתר נקודות חמות שצריך למטב כדי להפחית את טביעת האצבע של היישום שלך בזיכרון</li>
       <li xml:lang="id">menemukan hotspot yang perlu dioptimalkan untuk mengurangi jejak memori aplikasimu</li>
       <li xml:lang="it">trovare gli «hotspot» che devono essere ottimizzati per ridurre il consumo di memoria della tua applicazione</li>
+      <li xml:lang="ka">იპოვეთ ცხელი წერტილები, რომლებსაც ოპტიმიზაცია სჭირდებათ თქვენი პროგრამის მიერ მეტისმეტი მეხსიერების გამოყენების გამო</li>
       <li xml:lang="ko">앱의 메모리 사용량을 줄일 때 필요한 핫스팟(최적화해야 할 지점) 확인</li>
       <li xml:lang="nl">zoek hotspots die het nodig hebben om geoptimaliseerd te worden om de voetafdruk van het geheugen van uw toepassing te verminderen</li>
       <li xml:lang="nn">Finna problemområde som må optimerast for å redusera minnebruken til programmet.</li>
@@ -128,6 +130,7 @@
       <li xml:lang="he">איתור דליפות זיכרון, כלומר </li>
       <li xml:lang="id">menemukan kebocoran memori, misal lokasi yang mengalokasikan memori yang tidak pernah dialokasikan</li>
       <li xml:lang="it">trovare i buchi di memoria, cioè le posizioni dove è allocata memoria che non viene mai rilasciata</li>
+      <li xml:lang="ka">იპოვეთ მეხსიერების გაჟონვები, ანუ მდებარეობები, საიდანაც ხდება მეხსიერების გამოყოფა, მაგრამ არასდროს მათი გათავისუფლება</li>
       <li xml:lang="ko">할당하고 해제하지 않는 등 메모리 누수 확인</li>
       <li xml:lang="nl">zoek naar lekken in het geheugen, d.w.z. locaties die geheugen toewijzen die nooit wordt vrijgegeven</li>
       <li xml:lang="nn">Finna minnelekkasjar – område der minne vert reservert men aldri frigjort.</li>
@@ -153,6 +156,7 @@
       <li xml:lang="he">לאתר נקודות הקצאה חמות, כלומר מקומות של קוד שמזניק הרבה קריאות להקצאות זיכרון</li>
       <li xml:lang="id">menemukan hotspot alokasi, misal lokasi kode yang memicu banyak panggilan alokasi memori</li>
       <li xml:lang="it">trovare gli «hotspot» delle allocazioni, cioè posizioni nel codice che producono molte chiamate di allocazione della memoria</li>
+      <li xml:lang="ka">იპოვეთ გამოყოფის ცხელი წერტილები, ანუ კოდის მდებარეობა, რომელიც ძალიან ბევრი მეხსიერების გამოყოფას ახდენს</li>
       <li xml:lang="ko">메모리 할당을 많이 호출하는 코드 위치(할당 핫스팟) 확인</li>
       <li xml:lang="nl">zoek naar hotspots voor toewijzingen, d.w.z. locaties in de code die veel aanroepen van geheugen toewijzen doen</li>
       <li xml:lang="nn">Finna område i programkoden som utløyser veldig mange minnereserveringskall.</li>
@@ -178,6 +182,7 @@
       <li xml:lang="he">לאתר הקצאות זמניות, שאלו הקצאות שמיד לאחריהן מגיע שחרור הקצאה</li>
       <li xml:lang="id">menemukan alokasi sementara, yaitu alokasi yang langsung diikuti oleh alokasi mereka</li>
       <li xml:lang="it">trovare allocazioni temporanee, cioè allocazioni che sono seguite direttamente dalle rispettive de-allocazioni</li>
+      <li xml:lang="ka">იპოვეთ დროებითი გამოყოფები, რომლებიც გამოყოფებია, რომლების გათავისუფლებაც მაშინვე ხდება</li>
       <li xml:lang="ko">메모리 할당 다음에 바로 해제가 나오는 임시 할당 확인</li>
       <li xml:lang="nl">zoek naar tijdelijke toewijzingen, die toewijzingen zijn die direct gevolgd worden door hun vrijgave</li>
       <li xml:lang="nn">Finna «mellombelse» reserveringar – reserveringar som umiddelbart vert etterfølgde av avreserveringar.</li>
@@ -210,6 +215,7 @@
       <caption xml:lang="he">תקציר של נתוני הקצאת זיכרון מצבור במעקב</caption>
       <caption xml:lang="id">Ringkasan data alokasi memori tumpukan yang terlacak</caption>
       <caption xml:lang="it">Riepilogo dei dati delle allocazioni di memoria heap tracciati</caption>
+      <caption xml:lang="ka">დატრეკილი დროებითი მეხსიერების გამოყოფის მონაცემების შეჯამება</caption>
       <caption xml:lang="ko">추적된 힙 메모리 할당 데이터 요약</caption>
       <caption xml:lang="nl">Samenvatting van gevolgde gegevens voor heap-geheugen toewijzen</caption>
       <caption xml:lang="nn">Samandrag av minnereserveringsdata</caption>
@@ -236,6 +242,7 @@
       <caption xml:lang="he">תרשים להבות של מספר הקצאות זיכרון המצבור</caption>
       <caption xml:lang="id">Visualisasi Flamegraph dari jumlah alokasi memori tumpukan</caption>
       <caption xml:lang="it">Visualizzazione di tipo Flamegraph del totale di allocazioni di memoria heap</caption>
+      <caption xml:lang="ka">დროებითი მეხსიერების გამოყოფების გრაფიკული ვიზუალიზაცია</caption>
       <caption xml:lang="ko">힙 메모리 할당 횟수를 플레임 그래프로 보기</caption>
       <caption xml:lang="nl">Flamegraph visualisatie van het aantal toewijzingen van heap-geheugen</caption>
       <caption xml:lang="nn">Flammegraf-visualisering av talet på minnereserveringar</caption>
@@ -263,6 +270,7 @@
       <caption xml:lang="he">תרשים של הקצאות זיכרון מצבור לאורך זמן</caption>
       <caption xml:lang="id">Bagan alokasi memori tumpukan dari waktu ke waktu</caption>
       <caption xml:lang="it">Grafico delle allocazioni della memoria heap nel tempo</caption>
+      <caption xml:lang="ka">დროთა განმავლობაში დროებითი მეხსიერების გამოყოფების გრაფიკი</caption>
       <caption xml:lang="ko">시간별 힙 메모리 할당 횟수를 그래프로 보기</caption>
       <caption xml:lang="nl">Grafiek van toewijzingen van heap-geheugen in de tijd</caption>
       <caption xml:lang="nn">Diagram over minnereserveringar over tid</caption>
