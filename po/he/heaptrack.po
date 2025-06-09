@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-03-08 02:05+0000\n"
-"PO-Revision-Date: 2025-06-04 09:54+0300\n"
+"PO-Revision-Date: 2025-06-08 22:19+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
@@ -855,7 +855,7 @@ msgstr ""
 #: gui/mainwindow.ui:17 gui/mainwindow.ui:112
 #, kde-format
 msgid "Path to a file containing leak suppression rules in the LSAN format."
-msgstr ""
+msgstr "נתיב לקובץ שמכיל כללי הדחקת זליגות בתסדיר LSAN."
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: gui/mainwindow.ui:63
