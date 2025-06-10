@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-03-08 02:05+0000\n"
-"PO-Revision-Date: 2025-06-08 22:19+0300\n"
+"PO-Revision-Date: 2025-06-09 15:12+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
@@ -122,6 +122,8 @@ msgid ""
 "<qt>The inclusive number of times an allocation function was called from "
 "this location or any functions called from here.</qt>"
 msgstr ""
+"<qt>המספר הכולל של הפעמים שפונקציית הקצאה נקראה מהמקום הזה או כל פונקציות "
+"שהן שנקראו מכאן.</qt>"
 
 #: gui/callercalleemodel.cpp:85 gui/callercalleemodel.h:185
 #: gui/callercalleemodel.h:378
@@ -141,6 +143,8 @@ msgid ""
 "originating at this location or from functions called from here. This takes "
 "deallocations into account.</qt>"
 msgstr ""
+"<qt>זיכרון המצבור המרבי הכוללני שנצרך בבתים מהקצאות שמקורן במקום הזה או "
+"מפונקציות שנקראו מכאן. לוקח בחשבון פינוי הקצאות.</qt>"
 
 #: gui/callercalleemodel.cpp:94 gui/callercalleemodel.h:178
 #: gui/callercalleemodel.h:387 gui/treemodel.cpp:91
@@ -274,11 +278,12 @@ msgid ""
 "<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
 "p></qt>"
 msgstr ""
+"<qt>%2 הקצאות זמניות אחרי %3 מ־:<p style='margin-left:10px'>%1</p></qt>"
 
 #: gui/chartmodel.cpp:192
 #, kde-format
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
-msgstr ""
+msgstr "<qt>%2 נצרכו אחרי %3 מ־:<p style='margin-left:10px'>%1</p></qt>"
 
 #: gui/chartwidget.cpp:162
 #, kde-format
@@ -372,6 +377,8 @@ msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
 "select a time range for filtering.</qt>"
 msgstr ""
+"<qt>הצגת מספר הקצאות הזיכרון על פני הזמן.<br>יש ללחוץ ולגרור כדי לבחור טווח "
+"זמן לסינון.</qt>"
 
 #: gui/chartwidget.cpp:449
 #, kde-format
@@ -381,6 +388,9 @@ msgid ""
 "deallocation, without other allocations happening in-between.<br>Click and "
 "drag to select a time range for filtering.</qt>"
 msgstr ""
+"<qt>הצגת מספר הקצאות הזיכרון הזמניות על פני הזמן. הקצאה זמניתהיא כזאת שמיד "
+"לאחריה יש פינוי הקצאה תואם, מבלי שאין אף הקצאות בין לבין.<br>יש ללחוץ ולגרור "
+"כדי לבחור טווח זמן לסינון.</qt>"
 
 #: gui/chartwidget.cpp:471
 #, kde-format
@@ -395,26 +405,26 @@ msgstr "%1 (הפרש מסונן)"
 #: gui/chartwidget.cpp:564
 #, kde-format
 msgid "Click and drag to select time range for filtering."
-msgstr ""
+msgstr "יש ללחוץ ולדרוג כדי לבחור טווח זמן לסינון."
 
 #: gui/chartwidget.cpp:570
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
-msgstr ""
+msgstr "ז = %1, נצרכו: %2. יש ללחוץ ולדרוג כדי לבחור טווח זמן לסינון."
 
 #: gui/chartwidget.cpp:574
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
-msgstr ""
+msgstr "ז = %1, הוקצו: %2. יש ללחוץ ולדרוג כדי לבחור טווח זמן לסינון."
 
 #: gui/chartwidget.cpp:578
 #, kde-format
 msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
 "filtering."
-msgstr ""
+msgstr "ז = %1, הקצאות זמניות: %2. יש ללחוץ ולדרוג כדי לבחור טווח זמן לסינון."
 
 #: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
 #, kde-format
@@ -440,14 +450,14 @@ msgstr "%1 זלגו בסך הכול"
 #, kde-format
 msgctxt "%1: number of allocations, %2: relative number, %3: function label"
 msgid "%1 (%2%) allocations in %3 and below."
-msgstr ""
+msgstr "%1 (%2%) הקצאות ב־%3 ומטה."
 
 #: gui/flamegraph.cpp:239
 #, kde-format
 msgctxt ""
 "%1: number of temporary allocations, %2: relative number, %3 function label"
 msgid "%1 (%2%) temporary allocations in %3 and below."
-msgstr ""
+msgstr "%1 (%2%) הקצאות זמניות ב־%3 ומטה."
 
 #: gui/flamegraph.cpp:244
 #, kde-format
@@ -517,6 +527,8 @@ msgid ""
 "Enable the bottom-up flame graph view. When this is unchecked, the top-down "
 "view is enabled by default."
 msgstr ""
+"הפעלת תצוגת תרשים להבות מלמטה למעלה. כשהתיבה לא מסומנת, תצוגה מלמעלה למטה "
+"מופעלת כברירת מחדל."
 
 #: gui/flamegraph.cpp:476
 #, kde-format
@@ -573,12 +585,12 @@ msgstr "נוצר תרשים להבות…"
 #: gui/flamegraph.cpp:773
 #, kde-format
 msgid "%1 (%2% of total of %3) allocations matched by search."
-msgstr ""
+msgstr "%1 (%2% מתוך סך הכול של %3) הקצאות ענו לחיפוש."
 
 #: gui/flamegraph.cpp:778
 #, kde-format
 msgid "%1 (%2% of total of %3) matched by search."
-msgstr ""
+msgstr "%1 (%2% מתוך סך הכול של %3) ענו לחיפוש."
 
 #: gui/gui.cpp:67
 #, kde-format
@@ -608,7 +620,7 @@ msgstr "יוצר מקורי, מתחזק"
 #: gui/gui.cpp:86
 #, kde-format
 msgid "Base profile data to compare other files to."
-msgstr ""
+msgstr "נתוני פרופיל בסיסיים להשוואה לקבצים אחרים."
 
 #: gui/gui.cpp:91
 #, kde-format
@@ -617,6 +629,8 @@ msgid ""
 "suppression per line, and start each line with 'leak:', i.e. use the LSAN "
 "suppression file format."
 msgstr ""
+"לטעון רשימה של הדחקות זליגה מהקובץ שצוין. יש לציין הדחקה אחת בכל שורהולהתחיל "
+"כל שורה ב־‚leak:‎’, כלומר להשתמש בתסדיר קובץ ההדחקות LSAN."
 
 #: gui/gui.cpp:97 gui/mainwindow.cpp:642
 #, kde-format
@@ -711,7 +725,7 @@ msgstr "<dt><b>הקצאות זמניות</b>:</dt><dd>%1 (%2%, %3 לשנ׳)</dd>
 #: gui/mainwindow.cpp:428
 #, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
-msgstr ""
+msgstr "<dt><b>שיא צריכת זיכרון מצבור</b>:</dt><dd>%1 אחרי %2</dd>"
 
 #: gui/mainwindow.cpp:431
 #, kde-format
@@ -835,7 +849,7 @@ msgstr "אוטומטי (ללא מספרי שורות)"
 #: gui/mainwindow.cpp:845
 #, kde-format
 msgid "Custom Code Navigation"
-msgstr ""
+msgstr "ניווט בקוד בהתאמה"
 
 #: gui/mainwindow.cpp:846
 #, kde-format
@@ -843,6 +857,8 @@ msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
 "file name, '%l' by the line number and '%c' by the column number."
 msgstr ""
+"יש לציין פקודה לשימוש לניווט בקוד, ‚‎%f’ יוחלף בשם הקובץ, ‚‎%l’ במספר השורה ו־"
+"‚‎%c’ במספר העמודה."
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
@@ -880,7 +896,7 @@ msgstr ""
 #: gui/mainwindow.ui:75 gui/mainwindow.ui:85
 #, kde-format
 msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
-msgstr ""
+msgstr "path/to/heaptrack.$APP.$PID.{gz,zst}"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
 #: gui/mainwindow.ui:82
@@ -890,6 +906,8 @@ msgid ""
 "If set, this file will be used as a base and its cost gets subtracted from "
 "the primary data costs.</qt>"
 msgstr ""
+"<qt>אפשר לבחור קובץ נתוני heaptrack נוסף להשוואה אליו כרשות. אם הוגדר, הקובץ "
+"הזה ישמש כבסיס והעלות שלו תופחת מעלויות הנתונים העיקריות.</qt>"
 
 #. i18n: ectx: property (text), widget (QLabel, openFileLabel)
 #: gui/mainwindow.ui:92
@@ -913,7 +931,7 @@ msgstr "הדחקות:"
 #: gui/mainwindow.ui:125
 #, kde-format
 msgid "path/to/lsan_suppressions.txt"
-msgstr ""
+msgstr "path/to/lsan_suppressions.txt"
 
 #. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
 #: gui/mainwindow.ui:241
@@ -1168,6 +1186,8 @@ msgid ""
 "<qt>The contributions from a given location to the maximum heap memory "
 "consumption in bytes. This takes deallocations into account.</qt>"
 msgstr ""
+"<qt>התרומות מהמקום שצוין לצריכת זיכרון המצבור המרבי בבתים. לוקח בחשבון פינוי "
+"הקצאות.</qt>"
 
 #: gui/treemodel.cpp:94
 #, kde-format
@@ -1176,6 +1196,8 @@ msgid ""
 "symbol and file information may be unknown when debug information was "
 "missing when heaptrack was run.</qt>"
 msgstr ""
+"<qt>המקום ממנו נקראה פונקציית ההקצאה. סמל הפונקציה ופרטי הקובץ עלולים שלא "
+"להיות ידועים כשפרטי ניפוי השגיאות היו חסרים כאשר heaptrack הופעל.</qt>"
 
 #: gui/treemodel.cpp:149 gui/treemodel.cpp:173
 #, kde-format
@@ -1205,7 +1227,7 @@ msgstr "הקצאות: %1 (%2% מתוך סך הכול)\n"
 #: gui/treemodel.cpp:162
 #, kde-format
 msgid "temporary: %1 (%2% of allocations, %3% of total)\n"
-msgstr ""
+msgstr "זמני: %1 (%2% מההקצאות, %3% מתוך הסך הכולל)\n"
 
 #: gui/treemodel.cpp:168
 #, kde-format
@@ -1216,10 +1238,10 @@ msgstr "מעקב קריאות:"
 #, kde-format
 msgid "called from one location"
 msgid_plural "called from %1 locations"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "נקראה ממקום אחד"
+msgstr[1] "נקראה משני מקומות"
+msgstr[2] "נקראה מ־%1 מקומות"
+msgstr[3] "נקראה מ־%1 מקומות"
 
 #: gui/util.cpp:32
 #, kde-format
@@ -1229,17 +1251,17 @@ msgstr "??"
 #: gui/util.cpp:108
 #, kde-format
 msgid "%1: %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr ""
+msgstr "%1: %2<br/>&nbsp;&nbsp;%4% מתוך %3 בסך הכול"
 
 #: gui/util.cpp:134 gui/util.cpp:163
 #, kde-format
 msgid "%1 (self): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr ""
+msgstr "%1 (עצמי): %2<br/>&nbsp;&nbsp;%4% מתוך %3 בסך הכול"
 
 #: gui/util.cpp:137 gui/util.cpp:166
 #, kde-format
 msgid "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr ""
+msgstr "%1 (כוללני): %2<br/>&nbsp;&nbsp;%4% מתוך %3 בסך הכול"
 
 #: gui/util.cpp:183
 #, kde-format
