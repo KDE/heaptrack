@@ -7,15 +7,15 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-03-08 02:05+0000\n"
-"PO-Revision-Date: 2025-06-09 15:12+0300\n"
+"PO-Revision-Date: 2025-06-10 06:03+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=4; plural=(n == 1) ? 0 : ((n == 2) ? 1 : ((n > 10 && n "
-"% 10 == 0) ? 2 : 3));\n"
+"Plural-Forms: nplurals=4; plural=(n == 1) ? 0 : ((n == 2) ? 1 : ((n > 10 && "
+"n % 10 == 0) ? 2 : 3));\n"
 "X-Generator: Lokalize 25.04.1\n"
 
 #, kde-format
@@ -122,8 +122,8 @@ msgid ""
 "<qt>The inclusive number of times an allocation function was called from "
 "this location or any functions called from here.</qt>"
 msgstr ""
-"<qt>המספר הכולל של הפעמים שפונקציית הקצאה נקראה מהמקום הזה או "
-"כל פונקציות שהן שנקראו מכאן.</qt>"
+"<qt>המספר הכולל של הפעמים שפונקציית הקצאה נקראה מהמקום הזה או כל פונקציות "
+"שהן שנקראו מכאן.</qt>"
 
 #: gui/callercalleemodel.cpp:85 gui/callercalleemodel.h:185
 #: gui/callercalleemodel.h:378
@@ -278,8 +278,7 @@ msgid ""
 "<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
 "p></qt>"
 msgstr ""
-"<qt>%2 הקצאות זמניות אחרי %3 מ־:<p style='margin-left:10px'>%1</"
-"p></qt>"
+"<qt>%2 הקצאות זמניות אחרי %3 מ־:<p style='margin-left:10px'>%1</p></qt>"
 
 #: gui/chartmodel.cpp:192
 #, kde-format
@@ -314,7 +313,7 @@ msgstr "תרשימים מוערמים:"
 #: gui/chartwidget.cpp:234
 #, kde-format
 msgid "Filter In On Selection"
-msgstr ""
+msgstr "סינון פנימי לפי הבחירה"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
 #: gui/chartwidget.cpp:244 gui/mainwindow.ui:895
@@ -378,8 +377,8 @@ msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
 "select a time range for filtering.</qt>"
 msgstr ""
-"<qt>הצגת מספר הקצאות הזיכרון על פני הזמן.<br>יש ללחוץ ולגרור "
-"כדי לבחור טווח זמן לסינון.</qt>"
+"<qt>הצגת מספר הקצאות הזיכרון על פני הזמן.<br>יש ללחוץ ולגרור כדי לבחור טווח "
+"זמן לסינון.</qt>"
 
 #: gui/chartwidget.cpp:449
 #, kde-format
@@ -389,9 +388,9 @@ msgid ""
 "deallocation, without other allocations happening in-between.<br>Click and "
 "drag to select a time range for filtering.</qt>"
 msgstr ""
-"<qt>הצגת מספר הקצאות הזיכרון הזמניות על פני הזמן. הקצאה זמנית"
-"היא כזאת שמיד לאחריה יש פינוי הקצאה תואם, מבלי שאין אף הקצאות "
-"בין לבין.<br>יש ללחוץ ולגרור כדי לבחור טווח זמן לסינון.</qt>"
+"<qt>הצגת מספר הקצאות הזיכרון הזמניות על פני הזמן. הקצאה זמניתהיא כזאת שמיד "
+"לאחריה יש פינוי הקצאה תואם, מבלי שאין אף הקצאות בין לבין.<br>יש ללחוץ ולגרור "
+"כדי לבחור טווח זמן לסינון.</qt>"
 
 #: gui/chartwidget.cpp:471
 #, kde-format
@@ -528,8 +527,8 @@ msgid ""
 "Enable the bottom-up flame graph view. When this is unchecked, the top-down "
 "view is enabled by default."
 msgstr ""
-"הפעלת תצוגת תרשים להבות מלמטה למעלה. כשהתיבה לא מסומנת, תצוגה מלמעלה "
-"למטה מופעלת כברירת מחדל."
+"הפעלת תצוגת תרשים להבות מלמטה למעלה. כשהתיבה לא מסומנת, תצוגה מלמעלה למטה "
+"מופעלת כברירת מחדל."
 
 #: gui/flamegraph.cpp:476
 #, kde-format
@@ -542,6 +541,8 @@ msgid ""
 "Collapse stack frames for functions calling themselves. When this is "
 "unchecked, recursive frames will be visualized separately."
 msgstr ""
+"צמצום מסגרות מחסנית לפונקציות שקוראות לעצמן. כשהאפשרות לא מסומנת, מסגרות "
+"רקורסיביות תומחשנה בנפרד."
 
 #: gui/flamegraph.cpp:490
 #, kde-format
@@ -630,8 +631,8 @@ msgid ""
 "suppression per line, and start each line with 'leak:', i.e. use the LSAN "
 "suppression file format."
 msgstr ""
-"לטעון רשימה של הדחקות זליגה מהקובץ שצוין. יש לציין הדחקה אחת בכל שורה"
-"ולהתחיל כל שורה ב־‚leak:‎’, כלומר להשתמש בתסדיר קובץ ההדחקות LSAN."
+"לטעון רשימה של הדחקות זליגה מהקובץ שצוין. יש לציין הדחקה אחת בכל שורהולהתחיל "
+"כל שורה ב־‚leak:‎’, כלומר להשתמש בתסדיר קובץ ההדחקות LSAN."
 
 #: gui/gui.cpp:97 gui/mainwindow.cpp:642
 #, kde-format
@@ -804,6 +805,8 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks from common system libraries."
 msgstr ""
+"התעלמות מהגדרות הדחקה שמובנות ב־heaptrack. כברירת מחדל, heaptrack ידחיק "
+"זליגות ידועות מספריות מערכת נפוצות."
 
 #: gui/mainwindow.cpp:682
 #, kde-format
@@ -858,14 +861,14 @@ msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
 "file name, '%l' by the line number and '%c' by the column number."
 msgstr ""
-"יש לציין פקודה לשימוש לניווט בקוד, ‚‎%f’ יוחלף בשם הקובץ, ‚‎%l’ במספר "
-"השורה ו־‚‎%c’ במספר העמודה."
+"יש לציין פקודה לשימוש לניווט בקוד, ‚‎%f’ יוחלף בשם הקובץ, ‚‎%l’ במספר השורה ו־"
+"‚‎%c’ במספר העמודה."
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
 #, kde-format
 msgid "MainWindow"
-msgstr ""
+msgstr "חלון ראשי"
 
 #. i18n: ectx: property (toolTip), widget (QMainWindow, MainWindow)
 #. i18n: ectx: property (toolTip), widget (QLabel, suppressionsLabel)
@@ -891,6 +894,12 @@ msgid ""
 "<p>Or, alternatively, you can attach to a running process via</p>\n"
 "<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
 msgstr ""
+"<qt><p>השדה הזה מציין את קובץ הנתונים העיקרי של heaptrack. הקבצים האלו "
+"נקראים <tt>heaptrack.$APP.$PID.gz</tt> או <tt>heaptrack.$APP.$PID.zst</tt>. "
+"אפשר לייצר קבצים כאלה על ידי הפקת פרופיל של היישום שלך, למשל דרך:</p>\n"
+"<pre><code>heaptrack &lt;yourapplication&gt; …</code></pre>\n"
+"<p>או, לחלופין, אפשר להיצמד לתהליך פעיל באמצעות</p>\n"
+"<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, openFile)
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, compareTo)
@@ -907,15 +916,14 @@ msgid ""
 "If set, this file will be used as a base and its cost gets subtracted from "
 "the primary data costs.</qt>"
 msgstr ""
-"<qt>אפשר לבחור קובץ נתוני heaptrack נוסף להשוואה אליו כרשות. "
-"אם הוגדר, הקובץ הזה ישמש כבסיס והעלות שלו תופחת מעלויות הנתונים "
-"העיקריות.</qt>"
+"<qt>אפשר לבחור קובץ נתוני heaptrack נוסף להשוואה אליו כרשות. אם הוגדר, הקובץ "
+"הזה ישמש כבסיס והעלות שלו תופחת מעלויות הנתונים העיקריות.</qt>"
 
 #. i18n: ectx: property (text), widget (QLabel, openFileLabel)
 #: gui/mainwindow.ui:92
 #, kde-format
 msgid "Profile &Data:"
-msgstr ""
+msgstr "&נתוני פרופיל:"
 
 #. i18n: ectx: property (text), widget (QLabel, compareToLabel)
 #: gui/mainwindow.ui:102
@@ -1188,8 +1196,8 @@ msgid ""
 "<qt>The contributions from a given location to the maximum heap memory "
 "consumption in bytes. This takes deallocations into account.</qt>"
 msgstr ""
-"<qt>התרומות מהמקום שצוין לצריכת זיכרון המצבור המרבי בבתים. לוקח "
-"בחשבון פינוי הקצאות.</qt>"
+"<qt>התרומות מהמקום שצוין לצריכת זיכרון המצבור המרבי בבתים. לוקח בחשבון פינוי "
+"הקצאות.</qt>"
 
 #: gui/treemodel.cpp:94
 #, kde-format
@@ -1198,9 +1206,8 @@ msgid ""
 "symbol and file information may be unknown when debug information was "
 "missing when heaptrack was run.</qt>"
 msgstr ""
-"<qt>המקום ממנו נקראה פונקציית ההקצאה. סמל הפונקציה ופרטי הקובץ "
-"עלולים שלא להיות ידועים כשפרטי ניפוי השגיאות היו חסרים כאשר heaptrack "
-"הופעל.</qt>"
+"<qt>המקום ממנו נקראה פונקציית ההקצאה. סמל הפונקציה ופרטי הקובץ עלולים שלא "
+"להיות ידועים כשפרטי ניפוי השגיאות היו חסרים כאשר heaptrack הופעל.</qt>"
 
 #: gui/treemodel.cpp:149 gui/treemodel.cpp:173
 #, kde-format
