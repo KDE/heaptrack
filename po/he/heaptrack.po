@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-03-08 02:05+0000\n"
-"PO-Revision-Date: 2025-06-09 15:12+0300\n"
+"PO-Revision-Date: 2025-06-10 06:03+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
@@ -313,7 +313,7 @@ msgstr "תרשימים מוערמים:"
 #: gui/chartwidget.cpp:234
 #, kde-format
 msgid "Filter In On Selection"
-msgstr ""
+msgstr "סינון פנימי לפי הבחירה"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
 #: gui/chartwidget.cpp:244 gui/mainwindow.ui:895
@@ -541,6 +541,8 @@ msgid ""
 "Collapse stack frames for functions calling themselves. When this is "
 "unchecked, recursive frames will be visualized separately."
 msgstr ""
+"צמצום מסגרות מחסנית לפונקציות שקוראות לעצמן. כשהאפשרות לא מסומנת, מסגרות "
+"רקורסיביות תומחשנה בנפרד."
 
 #: gui/flamegraph.cpp:490
 #, kde-format
@@ -803,6 +805,8 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks from common system libraries."
 msgstr ""
+"התעלמות מהגדרות הדחקה שמובנות ב־heaptrack. כברירת מחדל, heaptrack ידחיק "
+"זליגות ידועות מספריות מערכת נפוצות."
 
 #: gui/mainwindow.cpp:682
 #, kde-format
@@ -864,7 +868,7 @@ msgstr ""
 #: gui/mainwindow.ui:14
 #, kde-format
 msgid "MainWindow"
-msgstr ""
+msgstr "חלון ראשי"
 
 #. i18n: ectx: property (toolTip), widget (QMainWindow, MainWindow)
 #. i18n: ectx: property (toolTip), widget (QLabel, suppressionsLabel)
@@ -890,6 +894,12 @@ msgid ""
 "<p>Or, alternatively, you can attach to a running process via</p>\n"
 "<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
 msgstr ""
+"<qt><p>השדה הזה מציין את קובץ הנתונים העיקרי של heaptrack. הקבצים האלו "
+"נקראים <tt>heaptrack.$APP.$PID.gz</tt> או <tt>heaptrack.$APP.$PID.zst</tt>. "
+"אפשר לייצר קבצים כאלה על ידי הפקת פרופיל של היישום שלך, למשל דרך:</p>\n"
+"<pre><code>heaptrack &lt;yourapplication&gt; …</code></pre>\n"
+"<p>או, לחלופין, אפשר להיצמד לתהליך פעיל באמצעות</p>\n"
+"<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, openFile)
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, compareTo)
@@ -913,7 +923,7 @@ msgstr ""
 #: gui/mainwindow.ui:92
 #, kde-format
 msgid "Profile &Data:"
-msgstr ""
+msgstr "&נתוני פרופיל:"
 
 #. i18n: ectx: property (text), widget (QLabel, compareToLabel)
 #: gui/mainwindow.ui:102
