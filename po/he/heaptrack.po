@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-03-08 02:05+0000\n"
-"PO-Revision-Date: 2025-06-10 06:03+0300\n"
+"PO-Revision-Date: 2025-06-11 11:07+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
@@ -558,6 +558,10 @@ msgid ""
 "low memory overhead. If you need more details, decrease the threshold value, "
 "or set it to zero.</qt>"
 msgstr ""
+"<qt>סף העלות מגדיר ערך חיתוך כשבר. פריטים עם עלות יחסית מתחת לערך הזה לא "
+"יופיעו בתרשים הלהבות. זה נעשה למטרות מיטוב כדי לייצר תרשימים לסדרות נתונים "
+"גדולות במהירות עם תוספת זיכרון נמוכה. לפרטים נוספים, יש להקטין את ערך הסף או "
+"להגדיר אותו לאפס.</qt>"
 
 #: gui/flamegraph.cpp:506
 #, kde-format
@@ -643,6 +647,10 @@ msgid ""
 "application.  These are then always applied when analyzing the data, unless "
 "this feature is explicitly disabled using this command line option."
 msgstr ""
+"התעלמות מהגדרות הדחקה שמוטמעות בקובץ הנתונים של heaptrack. כברירת מחדל, "
+"heaptrack יעתיק את ההדחקות שמוגדרות כרשות דרך הסמל `const char "
+"*__lsan_default_suppressions()‎` ביישום המאובחן. אלו חלים תמיד בעת ניתוח "
+"הנתונים, אלא אם כן האפשרות הזאת מושבתת במפורש דרך האפשרות בשורת הפקודות."
 
 #: gui/gui.cpp:105
 #, kde-format
@@ -661,7 +669,7 @@ msgstr "קבצים לטעינה"
 #: gui/gui.cpp:108
 #, kde-format
 msgid "[FILE...]"
-msgstr ""
+msgstr "[קובץ…]"
 
 #: gui/histogrammodel.cpp:65
 #, kde-format
@@ -733,6 +741,8 @@ msgstr "<dt><b>שיא צריכת זיכרון מצבור</b>:</dt><dd>%1 אחר�
 #, kde-format
 msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
 msgstr ""
+"<dt><b>RSS (דפים מגובים בזיכרון) שיא</b> (כולל התוספת על heaptrack):</dt><dd>"
+"%1</dd>"
 
 #: gui/mainwindow.cpp:435
 #, kde-format
@@ -1152,7 +1162,7 @@ msgstr "הנתונים מפוענחים"
 #: gui/parser.cpp:659
 #, kde-format
 msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
-msgstr ""
+msgstr "מעבר %1: %2/%3  עבר: %4  נותר: %5"
 
 #: gui/parser.cpp:715
 #, kde-format
