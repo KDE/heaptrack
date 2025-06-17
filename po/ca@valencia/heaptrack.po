@@ -1170,47 +1170,47 @@ msgstr "total"
 #: gui/parser.cpp:559
 #, kde-format
 msgid "0B to 8B"
-msgstr "0B a 8B"
+msgstr "0 B a 8 B"
 
 #: gui/parser.cpp:560
 #, kde-format
 msgid "9B to 16B"
-msgstr "9B a 16B"
+msgstr "9 B a 16 B"
 
 #: gui/parser.cpp:561
 #, kde-format
 msgid "17B to 32B"
-msgstr "17B a 32B"
+msgstr "17 B a 32 B"
 
 #: gui/parser.cpp:562
 #, kde-format
 msgid "33B to 64B"
-msgstr "33B a 64B"
+msgstr "33 B a 64 B"
 
 #: gui/parser.cpp:563
 #, kde-format
 msgid "65B to 128B"
-msgstr "65B a 128B"
+msgstr "65 B a 128 B"
 
 #: gui/parser.cpp:564
 #, kde-format
 msgid "129B to 256B"
-msgstr "129B a 256B"
+msgstr "129 B a 256 B"
 
 #: gui/parser.cpp:565
 #, kde-format
 msgid "257B to 512B"
-msgstr "257B a 512B"
+msgstr "257 B a 512 B"
 
 #: gui/parser.cpp:566
 #, kde-format
 msgid "512B to 1KB"
-msgstr "512B a 1KB"
+msgstr "512 B a 1 KB"
 
 #: gui/parser.cpp:567
 #, kde-format
 msgid "more than 1KB"
-msgstr "més que 1KB"
+msgstr "més que 1 KB"
 
 #: gui/parser.cpp:645
 #, kde-format
