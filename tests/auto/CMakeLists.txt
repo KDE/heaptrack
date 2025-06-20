@@ -72,6 +72,14 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
     if (TARGET heaptrack_gui_private)
         find_package(Qt${QT_VERSION_MAJOR} ${QT_MIN_VERSION} CONFIG OPTIONAL_COMPONENTS Test)
         if (Qt${QT_VERSION_MAJOR}Test_FOUND)
+            set(CMAKE_AUTOMOC ON)
+            add_executable(test_template_elision tst_template_elision.cpp)
+            target_link_libraries(test_template_elision
+                    heaptrack_gui_private
+                    Qt${QT_VERSION_MAJOR}::Test
+            )
+            add_test(NAME test_template_elision COMMAND test_template_elision)
+
             add_executable(tst_parser tst_parser.cpp)
             set_target_properties(tst_parser PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
             target_link_libraries(tst_parser
