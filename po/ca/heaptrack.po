@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2025-03-08 02:05+0000\n"
+"POT-Creation-Date: 2025-06-20 00:44+0000\n"
 "PO-Revision-Date: 2023-05-30 11:03+0200\n"
 "Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
@@ -238,7 +238,7 @@ msgstr "Memòria consumida"
 msgid "Temporary Allocations"
 msgstr "Assignacions temporals"
 
-#: gui/chartmodel.cpp:76 gui/chartwidget.cpp:466
+#: gui/chartmodel.cpp:76 gui/chartwidget.cpp:458
 #, kde-format
 msgid "Elapsed Time"
 msgstr "Temps transcorregut"
@@ -310,85 +310,85 @@ msgstr ""
 "<qt>%2 consumits després de %3 des de:<p style='margin-left:10px;'>%1</p></"
 "qt>"
 
-#: gui/chartwidget.cpp:162
+#: gui/chartwidget.cpp:154
 #, kde-format
 msgid "Export As..."
 msgstr "Exporta com a..."
 
-#: gui/chartwidget.cpp:165
+#: gui/chartwidget.cpp:157
 #, kde-format
 msgid "Show legend"
 msgstr "Mostra la llegenda"
 
-#: gui/chartwidget.cpp:172
+#: gui/chartwidget.cpp:164
 #, kde-format
 msgid "Show total cost graph"
 msgstr "Mostra la gràfica del cost total"
 
-#: gui/chartwidget.cpp:180
+#: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show detailed cost graph"
 msgstr "Mostra la gràfica del cost detallat"
 
-#: gui/chartwidget.cpp:187
+#: gui/chartwidget.cpp:179
 #, kde-format
 msgid "Stacked diagrams:"
 msgstr "Diagrames apilats:"
 
-#: gui/chartwidget.cpp:234
+#: gui/chartwidget.cpp:226
 #, kde-format
 msgid "Filter In On Selection"
 msgstr "Filtre en la selecció"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
-#: gui/chartwidget.cpp:244 gui/mainwindow.ui:895
+#: gui/chartwidget.cpp:236 gui/mainwindow.ui:895
 #, kde-format
 msgid "Reset Filter"
 msgstr "Reinicia el filtratge"
 
-#: gui/chartwidget.cpp:383
+#: gui/chartwidget.cpp:375
 #, kde-format
 msgid "Save %1"
 msgstr "Desa %1"
 
-#: gui/chartwidget.cpp:384
+#: gui/chartwidget.cpp:376
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
 msgstr "Imatge ràster (*.png *.jpg *.tiff);;Imatge vectorial (*.svg)"
 
-#: gui/chartwidget.cpp:400
+#: gui/chartwidget.cpp:392
 #, kde-format
 msgid "Failed to save the image to %1"
 msgstr "Ha fallat en desar la imatge a %1"
 
-#: gui/chartwidget.cpp:420
+#: gui/chartwidget.cpp:412
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
 msgstr "<tr><th></th><th>Inici</th><th>Final</th><th>Delta</th></tr>"
 
-#: gui/chartwidget.cpp:421
+#: gui/chartwidget.cpp:413
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Hora</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:425
+#: gui/chartwidget.cpp:417
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Consum</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:429
+#: gui/chartwidget.cpp:421
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Assignacions</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:433
+#: gui/chartwidget.cpp:425
 #, kde-format
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr ""
 "<tr><th>Assignacions temporals</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:441
+#: gui/chartwidget.cpp:433
 #, kde-format
 msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
@@ -397,7 +397,7 @@ msgstr ""
 "<qt>Mostra el consum de memòria en monticles al llarg del temps.<br>Feu clic "
 "i arrossegueu per a seleccionar un interval de temps per al filtratge.</qt>"
 
-#: gui/chartwidget.cpp:445
+#: gui/chartwidget.cpp:437
 #, kde-format
 msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
@@ -407,7 +407,7 @@ msgstr ""
 "clic i arrossegueu per a seleccionar un interval de temps per al filtratge.</"
 "qt>"
 
-#: gui/chartwidget.cpp:449
+#: gui/chartwidget.cpp:441
 #, kde-format
 msgid ""
 "<qt>Shows number of temporary memory allocations over time. A temporary "
@@ -420,24 +420,24 @@ msgstr ""
 "desassignació corresponent, sense cap altra assignació entremig.<br>Feu clic "
 "i arrossegueu per a seleccionar un interval de temps per al filtratge.</qt>"
 
-#: gui/chartwidget.cpp:471
+#: gui/chartwidget.cpp:463
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
 msgstr "%1 (filtrat des de %2 a %3, Δ%4)"
 
-#: gui/chartwidget.cpp:475
+#: gui/chartwidget.cpp:467
 #, kde-format
 msgid "%1 (filtered delta)"
 msgstr "%1 (delta filtrada)"
 
-#: gui/chartwidget.cpp:564
+#: gui/chartwidget.cpp:556
 #, kde-format
 msgid "Click and drag to select time range for filtering."
 msgstr ""
 "Feu clic i arrossegueu per a seleccionar un interval de temps per al "
 "filtratge."
 
-#: gui/chartwidget.cpp:570
+#: gui/chartwidget.cpp:562
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
@@ -445,7 +445,7 @@ msgstr ""
 "T = %1, Consum: %2. Feu clic i arrossegueu per a seleccionar un interval de "
 "temps per al filtratge."
 
-#: gui/chartwidget.cpp:574
+#: gui/chartwidget.cpp:566
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
@@ -453,7 +453,7 @@ msgstr ""
 "T = %1, Assignacions: %2. Feu clic i arrossegueu per a seleccionar un "
 "interval de temps per al filtratge."
 
-#: gui/chartwidget.cpp:578
+#: gui/chartwidget.cpp:570
 #, kde-format
 msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
@@ -641,37 +641,37 @@ msgstr "%1 (%2% d'un total de %3) assignacions coincideixen a la cerca."
 msgid "%1 (%2% of total of %3) matched by search."
 msgstr "%1 (%2% d'un total de %3) coincideixen a la cerca."
 
-#: gui/gui.cpp:67
+#: gui/gui.cpp:63
 #, kde-format
 msgid "Heaptrack GUI"
 msgstr "IGU del Heaptrack"
 
-#: gui/gui.cpp:68
+#: gui/gui.cpp:64
 #, kde-format
 msgid "A visualizer for heaptrack data files."
 msgstr "Un visualitzador pels fitxers de dades del «heaptrack»."
 
-#: gui/gui.cpp:69
+#: gui/gui.cpp:65
 #, kde-format
 msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
 msgstr "Copyright 2015, Milian Wolff <mail@milianw.de>"
 
-#: gui/gui.cpp:72
+#: gui/gui.cpp:68
 #, kde-format
 msgid "Milian Wolff"
 msgstr "Milian Wolff"
 
-#: gui/gui.cpp:72
+#: gui/gui.cpp:68
 #, kde-format
 msgid "Original author, maintainer"
 msgstr "Autor original, mantenidor"
 
-#: gui/gui.cpp:86
+#: gui/gui.cpp:80
 #, kde-format
 msgid "Base profile data to compare other files to."
 msgstr "Dades d'anàlisi de rendiment base a comparar amb altres fitxers."
 
-#: gui/gui.cpp:91
+#: gui/gui.cpp:85
 #, kde-format
 msgid ""
 "Load list of leak suppressions from the specified file. Specify one "
@@ -683,7 +683,7 @@ msgstr ""
 "dir, useu el format de fitxer per a la supressió LSAN."
 
 # skip-rule: t-apo1,rst-link0italic,rst-italic2
-#: gui/gui.cpp:97 gui/mainwindow.cpp:642
+#: gui/gui.cpp:91 gui/mainwindow.cpp:637
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -700,7 +700,7 @@ msgstr ""
 "explícitament aquesta característica mitjançant aquesta opció de la línia "
 "d'ordres."
 
-#: gui/gui.cpp:105
+#: gui/gui.cpp:99
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -710,12 +710,12 @@ msgstr ""
 "manera predeterminada, el Heaptrack suprimirà certes pèrdues conegudes en "
 "les biblioteques habituals del de sistema."
 
-#: gui/gui.cpp:108
+#: gui/gui.cpp:102
 #, kde-format
 msgid "Files to load"
 msgstr "Fitxers a carregar"
 
-#: gui/gui.cpp:108
+#: gui/gui.cpp:102
 #, kde-format
 msgid "[FILE...]"
 msgstr "[FITXER...]"
@@ -843,27 +843,27 @@ msgstr "La dada d'entrada %1 no és cap fitxer."
 msgid "Input data %1 is not readable."
 msgstr "La dada d'entrada %1 no es pot llegir."
 
-#: gui/mainwindow.cpp:597
+#: gui/mainwindow.cpp:592
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr "Ha fallat en analitzar la supressió del fitxer."
 
-#: gui/mainwindow.cpp:612
+#: gui/mainwindow.cpp:607
 #, kde-format
 msgid "Heaptrack"
 msgstr "Heaptrack"
 
-#: gui/mainwindow.cpp:640
+#: gui/mainwindow.cpp:635
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr "Inhabilita les supressions incrustades"
 
-#: gui/mainwindow.cpp:652
+#: gui/mainwindow.cpp:647
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr "Inhabilita les supressions integrades"
 
-#: gui/mainwindow.cpp:654
+#: gui/mainwindow.cpp:649
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -873,54 +873,54 @@ msgstr ""
 "manera predeterminada, el Heaptrack suprimirà certes pèrdues conegudes de "
 "les biblioteques habituals del de sistema."
 
-#: gui/mainwindow.cpp:682
+#: gui/mainwindow.cpp:677
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "S'està carregant el fitxer %1. Si us plau, espereu..."
 
-#: gui/mainwindow.cpp:684
+#: gui/mainwindow.cpp:679
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "Heaptrack - %1"
 
-#: gui/mainwindow.cpp:687
+#: gui/mainwindow.cpp:682
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1 comparat amb %2"
 
-#: gui/mainwindow.cpp:703
+#: gui/mainwindow.cpp:698
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "S'està tornant a analitzar el fitxer. Espereu..."
 
-#: gui/mainwindow.cpp:746
+#: gui/mainwindow.cpp:741
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:786
+#: gui/mainwindow.cpp:781
 #, kde-format
 msgid "Code Navigation"
 msgstr "Navegació pel codi"
 
-#: gui/mainwindow.cpp:813
+#: gui/mainwindow.cpp:808
 #, kde-format
 msgid "Custom..."
 msgstr "Personalitzada..."
 
-#: gui/mainwindow.cpp:825
+#: gui/mainwindow.cpp:820
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "Automàtic (Sense nombre de línies)"
 
-#: gui/mainwindow.cpp:845
+#: gui/mainwindow.cpp:840
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "Navegació personalitzada pel codi"
 
-#: gui/mainwindow.cpp:846
+#: gui/mainwindow.cpp:841
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "

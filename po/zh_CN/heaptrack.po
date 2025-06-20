@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kdeorg\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2025-03-08 02:05+0000\n"
+"POT-Creation-Date: 2025-06-20 00:44+0000\n"
 "PO-Revision-Date: 2024-04-23 19:30\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
@@ -208,7 +208,7 @@ msgstr "内存已使用"
 msgid "Temporary Allocations"
 msgstr "临时分配"
 
-#: gui/chartmodel.cpp:76 gui/chartwidget.cpp:466
+#: gui/chartmodel.cpp:76 gui/chartwidget.cpp:458
 #, kde-format
 msgid "Elapsed Time"
 msgstr "已用时间"
@@ -274,84 +274,84 @@ msgstr "<qt>%2 临时分配后 %3 来自：<p style='margin-left:10px'>%1</p></q
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
 msgstr "<qt>%2 在 %3 之后消费:<p style='margin-left:10px'>%1</p></qt>"
 
-#: gui/chartwidget.cpp:162
+#: gui/chartwidget.cpp:154
 #, kde-format
 msgid "Export As..."
 msgstr "导出为..."
 
-#: gui/chartwidget.cpp:165
+#: gui/chartwidget.cpp:157
 #, kde-format
 msgid "Show legend"
 msgstr "显示图例"
 
-#: gui/chartwidget.cpp:172
+#: gui/chartwidget.cpp:164
 #, kde-format
 msgid "Show total cost graph"
 msgstr ""
 
-#: gui/chartwidget.cpp:180
+#: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show detailed cost graph"
 msgstr ""
 
-#: gui/chartwidget.cpp:187
+#: gui/chartwidget.cpp:179
 #, kde-format
 msgid "Stacked diagrams:"
 msgstr ""
 
-#: gui/chartwidget.cpp:234
+#: gui/chartwidget.cpp:226
 #, kde-format
 msgid "Filter In On Selection"
 msgstr ""
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
-#: gui/chartwidget.cpp:244 gui/mainwindow.ui:895
+#: gui/chartwidget.cpp:236 gui/mainwindow.ui:895
 #, kde-format
 msgid "Reset Filter"
 msgstr "重置过滤器"
 
-#: gui/chartwidget.cpp:383
+#: gui/chartwidget.cpp:375
 #, kde-format
 msgid "Save %1"
 msgstr "保存 %1"
 
-#: gui/chartwidget.cpp:384
+#: gui/chartwidget.cpp:376
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
 msgstr "栅格图像（*.png *.jpg *.tiff）；矢量图形 (*.svg)"
 
-#: gui/chartwidget.cpp:400
+#: gui/chartwidget.cpp:392
 #, kde-format
 msgid "Failed to save the image to %1"
 msgstr "保存图像到 %1 失败"
 
-#: gui/chartwidget.cpp:420
+#: gui/chartwidget.cpp:412
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
 msgstr "<tr><th></th><th>开始</th><th>结束</th><th>差值</th></tr>"
 
-#: gui/chartwidget.cpp:421
+#: gui/chartwidget.cpp:413
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>时间</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:425
+#: gui/chartwidget.cpp:417
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>消耗</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:429
+#: gui/chartwidget.cpp:421
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>分配</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:433
+#: gui/chartwidget.cpp:425
 #, kde-format
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>临时分配</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:441
+#: gui/chartwidget.cpp:433
 #, kde-format
 msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
@@ -360,7 +360,7 @@ msgstr ""
 "<qt>显示一段时间内的堆内存消耗。<br>点击并拖动以选择一个时间范围进行过滤。</"
 "qt>"
 
-#: gui/chartwidget.cpp:445
+#: gui/chartwidget.cpp:437
 #, kde-format
 msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
@@ -368,7 +368,7 @@ msgid ""
 msgstr ""
 "<qt>显示随时间变化的内存分配数。<br>点击并拖拽以选择要过滤的时间范围。</qt>"
 
-#: gui/chartwidget.cpp:449
+#: gui/chartwidget.cpp:441
 #, kde-format
 msgid ""
 "<qt>Shows number of temporary memory allocations over time. A temporary "
@@ -379,34 +379,34 @@ msgstr ""
 "<qt>显示随时间变化的临时内存分配数。临时分配是指相应内存分配后紧接着被释放，"
 "中间没有发生其他分配。<br>点击并拖拽以选择要过滤的时间范围。</qt>"
 
-#: gui/chartwidget.cpp:471
+#: gui/chartwidget.cpp:463
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
 msgstr "%1 (从 %2 过滤到 %3，Δ%4)"
 
-#: gui/chartwidget.cpp:475
+#: gui/chartwidget.cpp:467
 #, kde-format
 msgid "%1 (filtered delta)"
 msgstr "%1 (过滤的差异)"
 
-#: gui/chartwidget.cpp:564
+#: gui/chartwidget.cpp:556
 #, kde-format
 msgid "Click and drag to select time range for filtering."
 msgstr "点击并拖动以选择要过滤的时间范围。"
 
-#: gui/chartwidget.cpp:570
+#: gui/chartwidget.cpp:562
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
 msgstr "T = %1，已消耗：%2。点击并拖动以选择要过滤的时间范围。"
 
-#: gui/chartwidget.cpp:574
+#: gui/chartwidget.cpp:566
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
 msgstr "T = %1，已分配：%2。点击并拖动以选择要过滤的时间范围。"
 
-#: gui/chartwidget.cpp:578
+#: gui/chartwidget.cpp:570
 #, kde-format
 msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
@@ -578,37 +578,37 @@ msgstr "搜索共匹配了 %1 个 (共 %3 个中的 %2% 个) 分配。"
 msgid "%1 (%2% of total of %3) matched by search."
 msgstr "搜索匹配了 %1 (共 %3 中的 %2%)。"
 
-#: gui/gui.cpp:67
+#: gui/gui.cpp:63
 #, kde-format
 msgid "Heaptrack GUI"
 msgstr "Heaptrack 图形界面"
 
-#: gui/gui.cpp:68
+#: gui/gui.cpp:64
 #, kde-format
 msgid "A visualizer for heaptrack data files."
 msgstr "Heaptrack 数据文件的可视化工具。"
 
-#: gui/gui.cpp:69
+#: gui/gui.cpp:65
 #, kde-format
 msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
 msgstr "Copyright 2015, Milian Wolff <mail@milianw.de>"
 
-#: gui/gui.cpp:72
+#: gui/gui.cpp:68
 #, kde-format
 msgid "Milian Wolff"
 msgstr "Milian Wolff"
 
-#: gui/gui.cpp:72
+#: gui/gui.cpp:68
 #, kde-format
 msgid "Original author, maintainer"
 msgstr "原作者，维护者"
 
-#: gui/gui.cpp:86
+#: gui/gui.cpp:80
 #, kde-format
 msgid "Base profile data to compare other files to."
 msgstr "比较其他文件的基本配置数据。"
 
-#: gui/gui.cpp:91
+#: gui/gui.cpp:85
 #, kde-format
 msgid ""
 "Load list of leak suppressions from the specified file. Specify one "
@@ -616,7 +616,7 @@ msgid ""
 "suppression file format."
 msgstr ""
 
-#: gui/gui.cpp:97 gui/mainwindow.cpp:642
+#: gui/gui.cpp:91 gui/mainwindow.cpp:637
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -626,19 +626,19 @@ msgid ""
 "this feature is explicitly disabled using this command line option."
 msgstr ""
 
-#: gui/gui.cpp:105
+#: gui/gui.cpp:99
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks in common system libraries."
 msgstr ""
 
-#: gui/gui.cpp:108
+#: gui/gui.cpp:102
 #, kde-format
 msgid "Files to load"
 msgstr "要加载的文件"
 
-#: gui/gui.cpp:108
+#: gui/gui.cpp:102
 #, kde-format
 msgid "[FILE...]"
 msgstr "[文件...]"
@@ -760,81 +760,81 @@ msgstr "输入数据 %1 不是一个文件。"
 msgid "Input data %1 is not readable."
 msgstr "输入数据 %1 不可读。"
 
-#: gui/mainwindow.cpp:597
+#: gui/mainwindow.cpp:592
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr ""
 
-#: gui/mainwindow.cpp:612
+#: gui/mainwindow.cpp:607
 #, kde-format
 msgid "Heaptrack"
 msgstr "Heaptrack"
 
-#: gui/mainwindow.cpp:640
+#: gui/mainwindow.cpp:635
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr ""
 
-#: gui/mainwindow.cpp:652
+#: gui/mainwindow.cpp:647
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr ""
 
-#: gui/mainwindow.cpp:654
+#: gui/mainwindow.cpp:649
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks from common system libraries."
 msgstr ""
 
-#: gui/mainwindow.cpp:682
+#: gui/mainwindow.cpp:677
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "加载文件 %1，请稍候..."
 
-#: gui/mainwindow.cpp:684
+#: gui/mainwindow.cpp:679
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "Heaptrack - %1"
 
-#: gui/mainwindow.cpp:687
+#: gui/mainwindow.cpp:682
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1 与 %2 比较"
 
-#: gui/mainwindow.cpp:703
+#: gui/mainwindow.cpp:698
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "正在重新解析文件，请稍候…"
 
-#: gui/mainwindow.cpp:746
+#: gui/mainwindow.cpp:741
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:786
+#: gui/mainwindow.cpp:781
 #, kde-format
 msgid "Code Navigation"
 msgstr "代码导航"
 
-#: gui/mainwindow.cpp:813
+#: gui/mainwindow.cpp:808
 #, kde-format
 msgid "Custom..."
 msgstr "自定义..."
 
-#: gui/mainwindow.cpp:825
+#: gui/mainwindow.cpp:820
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "自动（无行号）"
 
-#: gui/mainwindow.cpp:845
+#: gui/mainwindow.cpp:840
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "自定义代码导航"
 
-#: gui/mainwindow.cpp:846
+#: gui/mainwindow.cpp:841
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "

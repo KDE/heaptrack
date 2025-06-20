@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2025-03-08 02:05+0000\n"
+"POT-Creation-Date: 2025-06-20 00:44+0000\n"
 "PO-Revision-Date: 2022-10-06 09:04+0200\n"
 "Last-Translator: Matjaž Jeran <matjaz.jeran@amis.net>\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
@@ -227,7 +227,7 @@ msgstr "Porabljen pomnilnik"
 msgid "Temporary Allocations"
 msgstr "Začasne dodelitve"
 
-#: gui/chartmodel.cpp:76 gui/chartwidget.cpp:466
+#: gui/chartmodel.cpp:76 gui/chartwidget.cpp:458
 #, kde-format
 msgid "Elapsed Time"
 msgstr "Pretečeni čas"
@@ -294,84 +294,84 @@ msgstr ""
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
 msgstr "<qt>%2 porabljenega po %3 f iz:<p style='margin-left:10px'>%1</p></qt>"
 
-#: gui/chartwidget.cpp:162
+#: gui/chartwidget.cpp:154
 #, kde-format
 msgid "Export As..."
 msgstr "Izvozi kot..."
 
-#: gui/chartwidget.cpp:165
+#: gui/chartwidget.cpp:157
 #, kde-format
 msgid "Show legend"
 msgstr "Prikaži legendo"
 
-#: gui/chartwidget.cpp:172
+#: gui/chartwidget.cpp:164
 #, kde-format
 msgid "Show total cost graph"
 msgstr "Prikaži graf skupnih stroškov"
 
-#: gui/chartwidget.cpp:180
+#: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show detailed cost graph"
 msgstr "Prikaži graf podrobnih stroškov"
 
-#: gui/chartwidget.cpp:187
+#: gui/chartwidget.cpp:179
 #, kde-format
 msgid "Stacked diagrams:"
 msgstr "Naloženi diagrami:"
 
-#: gui/chartwidget.cpp:234
+#: gui/chartwidget.cpp:226
 #, kde-format
 msgid "Filter In On Selection"
 msgstr "Filtriraj v izboru"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
-#: gui/chartwidget.cpp:244 gui/mainwindow.ui:895
+#: gui/chartwidget.cpp:236 gui/mainwindow.ui:895
 #, kde-format
 msgid "Reset Filter"
 msgstr "Ponastavi filter"
 
-#: gui/chartwidget.cpp:383
+#: gui/chartwidget.cpp:375
 #, kde-format
 msgid "Save %1"
 msgstr "Shrani %1"
 
-#: gui/chartwidget.cpp:384
+#: gui/chartwidget.cpp:376
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
 msgstr "Rastrska slika (*.png *.jpg *.tiff);;Vektorska slika (*.svg)"
 
-#: gui/chartwidget.cpp:400
+#: gui/chartwidget.cpp:392
 #, kde-format
 msgid "Failed to save the image to %1"
 msgstr "Shranjevanje slike na %1 ni uspelo"
 
-#: gui/chartwidget.cpp:420
+#: gui/chartwidget.cpp:412
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
 msgstr "<tr><th> Začetek </th><th>Konec</th><th>Delta</th></tr>"
 
-#: gui/chartwidget.cpp:421
+#: gui/chartwidget.cpp:413
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Čas</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:425
+#: gui/chartwidget.cpp:417
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Porabljeno</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:429
+#: gui/chartwidget.cpp:421
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Dodelitve</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:433
+#: gui/chartwidget.cpp:425
 #, kde-format
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>Začasne dodelitve</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:441
+#: gui/chartwidget.cpp:433
 #, kde-format
 msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
@@ -380,7 +380,7 @@ msgstr ""
 "<qt>Prikazuje porabo pomnilnika kopice skozi čas.<br>Kliknite in povlecite, "
 "da izberete časovni obseg za filtriranje.</qt>"
 
-#: gui/chartwidget.cpp:445
+#: gui/chartwidget.cpp:437
 #, kde-format
 msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
@@ -389,7 +389,7 @@ msgstr ""
 "<qt>Prikaže število dodelitev pomnilnika skozi čas.<br>Kliknite in "
 "povlecite, da izberete časovni obseg za filtriranje.</qt>"
 
-#: gui/chartwidget.cpp:449
+#: gui/chartwidget.cpp:441
 #, kde-format
 msgid ""
 "<qt>Shows number of temporary memory allocations over time. A temporary "
@@ -402,22 +402,22 @@ msgstr ""
 "dodelitve, ne da bi se druga dodelitev zgodila vmes.<br>Kliknite in "
 "povlecite, da izberete časovni obseg za filtriranje.</qt>"
 
-#: gui/chartwidget.cpp:471
+#: gui/chartwidget.cpp:463
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
 msgstr "%1 (filtrirano od %2 do %3, Δ%4)"
 
-#: gui/chartwidget.cpp:475
+#: gui/chartwidget.cpp:467
 #, kde-format
 msgid "%1 (filtered delta)"
 msgstr "%1 (filtrirana delta)"
 
-#: gui/chartwidget.cpp:564
+#: gui/chartwidget.cpp:556
 #, kde-format
 msgid "Click and drag to select time range for filtering."
 msgstr "Kliknite in povlecite, da izberete časovni obseg za filtriranje."
 
-#: gui/chartwidget.cpp:570
+#: gui/chartwidget.cpp:562
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
@@ -425,7 +425,7 @@ msgstr ""
 "T = %1, Porabljeno: %2. Kliknite in povlecite, da izberete časovni obseg za "
 "filtriranje."
 
-#: gui/chartwidget.cpp:574
+#: gui/chartwidget.cpp:566
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
@@ -433,7 +433,7 @@ msgstr ""
 "T = %1, Dodelitve: %2. Kliknite in povlecite, da izberete časovni obseg za "
 "filtriranje."
 
-#: gui/chartwidget.cpp:578
+#: gui/chartwidget.cpp:570
 #, kde-format
 msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
@@ -620,37 +620,37 @@ msgstr "%1 (%2% od skupaj %3) dodelitev, ki se ujemajo z iskanjem."
 msgid "%1 (%2% of total of %3) matched by search."
 msgstr "%1 (%2% od skupaj %3), ki se ujemajo z iskanjem."
 
-#: gui/gui.cpp:67
+#: gui/gui.cpp:63
 #, kde-format
 msgid "Heaptrack GUI"
 msgstr "Grafični uporabniški vmesnik Heaptrack"
 
-#: gui/gui.cpp:68
+#: gui/gui.cpp:64
 #, kde-format
 msgid "A visualizer for heaptrack data files."
 msgstr "Vizualizator za podatkovne datoteke heaptrack."
 
-#: gui/gui.cpp:69
+#: gui/gui.cpp:65
 #, kde-format
 msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
 msgstr "Copyright 2015, Milian Wolff <mail@milianw.de>"
 
-#: gui/gui.cpp:72
+#: gui/gui.cpp:68
 #, kde-format
 msgid "Milian Wolff"
 msgstr "Milian Wolff"
 
-#: gui/gui.cpp:72
+#: gui/gui.cpp:68
 #, kde-format
 msgid "Original author, maintainer"
 msgstr "Izvirni avtor, vzdrževalec"
 
-#: gui/gui.cpp:86
+#: gui/gui.cpp:80
 #, kde-format
 msgid "Base profile data to compare other files to."
 msgstr "Osnovni podatki profila za primerjavo z drugimi datotekami."
 
-#: gui/gui.cpp:91
+#: gui/gui.cpp:85
 #, kde-format
 msgid ""
 "Load list of leak suppressions from the specified file. Specify one "
@@ -661,7 +661,7 @@ msgstr ""
 "zatiranje na vrstico in začnite vsako vrstico z »leak:«, t.j. uporabite "
 "obliko datoteke za zatiranje LSAN."
 
-#: gui/gui.cpp:97 gui/mainwindow.cpp:642
+#: gui/gui.cpp:91 gui/mainwindow.cpp:637
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -677,7 +677,7 @@ msgstr ""
 "podatkov, razen če je ta funkcija izrecno onemogočena z uporabo te možnosti "
 "ukazne vrstice."
 
-#: gui/gui.cpp:105
+#: gui/gui.cpp:99
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -686,12 +686,12 @@ msgstr ""
 "Prezri definicije zatiranj, ki so vgrajene v heaptrack. Privzeto bo "
 "heaptrack zatrl nekatera znana uhajanja v skupnih sistemskih knjižnicah."
 
-#: gui/gui.cpp:108
+#: gui/gui.cpp:102
 #, kde-format
 msgid "Files to load"
 msgstr "Datoteke za nalaganje"
 
-#: gui/gui.cpp:108
+#: gui/gui.cpp:102
 #, kde-format
 msgid "[FILE...]"
 msgstr "[DATOTEKA…]"
@@ -815,27 +815,27 @@ msgstr "Vhodni podatki %1 niso datoteka."
 msgid "Input data %1 is not readable."
 msgstr "Vhodni podatki %1 niso berljivi."
 
-#: gui/mainwindow.cpp:597
+#: gui/mainwindow.cpp:592
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr "Datoteke za zatiranje ni bilo mogoče razčleniti."
 
-#: gui/mainwindow.cpp:612
+#: gui/mainwindow.cpp:607
 #, kde-format
 msgid "Heaptrack"
 msgstr "Heaptrack"
 
-#: gui/mainwindow.cpp:640
+#: gui/mainwindow.cpp:635
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr "Onemogoči vdelana zatiranja"
 
-#: gui/mainwindow.cpp:652
+#: gui/mainwindow.cpp:647
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr "Onemogoči vgrajena zatiranja"
 
-#: gui/mainwindow.cpp:654
+#: gui/mainwindow.cpp:649
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -844,54 +844,54 @@ msgstr ""
 "Prezri definicije zatiranja, ki so vgrajene v heaptrack. Privzeto bo "
 "heaptrack zatiral nekatera znana uhajanja iz skupnih sistemskih knjižnic."
 
-#: gui/mainwindow.cpp:682
+#: gui/mainwindow.cpp:677
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "Nalaganje datoteke %1, počakajte ..."
 
-#: gui/mainwindow.cpp:684
+#: gui/mainwindow.cpp:679
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "Heaptrack - %1"
 
-#: gui/mainwindow.cpp:687
+#: gui/mainwindow.cpp:682
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1, primerjano z %2"
 
-#: gui/mainwindow.cpp:703
+#: gui/mainwindow.cpp:698
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "Ponovno razčlenjevanje datoteke, počakajte ..."
 
-#: gui/mainwindow.cpp:746
+#: gui/mainwindow.cpp:741
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:786
+#: gui/mainwindow.cpp:781
 #, kde-format
 msgid "Code Navigation"
 msgstr "Krmarjenje po kodi"
 
-#: gui/mainwindow.cpp:813
+#: gui/mainwindow.cpp:808
 #, kde-format
 msgid "Custom..."
 msgstr "Po meri …"
 
-#: gui/mainwindow.cpp:825
+#: gui/mainwindow.cpp:820
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "Samodejno (brez številk vrstic)"
 
-#: gui/mainwindow.cpp:845
+#: gui/mainwindow.cpp:840
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "Krmarjenje po kodi po meri"
 
-#: gui/mainwindow.cpp:846
+#: gui/mainwindow.cpp:841
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
