@@ -171,13 +171,10 @@ struct ParserData final : public AccumulatedTraceData
         }
     }
 
-    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp, bool isFinalTimeStamp, ParsePass pass) override
+    void handleTimeStamp(int64_t /*oldStamp*/, int64_t newStamp, bool isFinalTimeStamp, ParsePass /*pass*/) override
     {
         if (timestampCallback) {
             timestampCallback(*this);
-        }
-        if (pass == ParsePass::FirstPass) {
-            return;
         }
         if (!buildCharts || diffMode) {
             return;
@@ -657,7 +654,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             }
 
             lastPassCompletion = passCompletion;
-            const auto numPasses = data.diffMode ? 2 : 3;
+            const auto numPasses = data.diffMode ? 1 : 2;
             auto totalCompletion = (data.parsingState.pass + passCompletion) / numPasses;
             auto spentTime_ms = data.parseTimer.elapsed();
             auto totalRemainingTime_ms = (spentTime_ms / totalCompletion) * (1.0 - totalCompletion);
@@ -760,7 +757,7 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
                 // this mutates data, and thus anything running in parallel must
                 // not access data
                 data->prepareBuildCharts(resultData);
-                data->read(stdPath, AccumulatedTraceData::ThirdPass, isReparsing);
+                data->read(stdPath, AccumulatedTraceData::SecondPass, isReparsing);
                 emit consumedChartDataAvailable(data->consumedChartData);
                 emit allocationsChartDataAvailable(data->allocationsChartData);
                 emit temporaryChartDataAvailable(data->temporaryChartData);

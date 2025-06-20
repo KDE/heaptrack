@@ -6,6 +6,7 @@
 
 #include "accumulatedtracedata.h"
 #include "analyze_config.h"
+#include "peaktracker.h"
 
 #include <algorithm>
 #include <cassert>
@@ -143,7 +144,7 @@ string AccumulatedTraceData::prettyFunction(const string& function) const
 
 bool AccumulatedTraceData::read(const string& inputFile, bool isReparsing)
 {
-    return read(inputFile, FirstPass, isReparsing) && read(inputFile, SecondPass, isReparsing);
+    return read(inputFile, FirstPass, isReparsing);
 }
 
 bool AccumulatedTraceData::read(const string& inputFile, const ParsePass pass, bool isReparsing)
@@ -196,11 +197,10 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
 
     vector<string> stopStrings = {"main", "__libc_start_main", "__static_initialization_and_destruction_0"};
 
-    const auto lastPeakCost = pass != FirstPass ? totalCost.peak : 0;
-    const auto lastPeakTime = pass != FirstPass ? peakTime : 0;
-
     totalCost = {};
     peakTime = 0;
+    auto peakTracker = PeakTracker(*this);
+
     if (pass == FirstPass) {
         if (!filterParameters.disableBuiltinSuppressions) {
             suppressions = builtinSuppressions();
@@ -208,8 +208,8 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
 
         const auto builtins = suppressions.size();
         suppressions.resize(builtins + filterParameters.suppressions.size());
-        std::transform(filterParameters.suppressions.begin(), filterParameters.suppressions.end(), suppressions.begin() + builtins,
-                       [](const std::string& pattern) {
+        std::transform(filterParameters.suppressions.begin(), filterParameters.suppressions.end(),
+                       suppressions.begin() + builtins, [](const std::string& pattern) {
                            return Suppression {pattern, 0, 0};
                        });
     }
@@ -336,25 +336,20 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
                 lastAllocationPtr = ptr;
             }
 
-            if (pass != FirstPass) {
-                auto& allocation = allocations[info.allocationIndex.index];
-                allocation.leaked += info.size;
-                ++allocation.allocations;
+            auto& allocation = allocations[info.allocationIndex.index];
+            allocation.leaked += info.size;
+            ++allocation.allocations;
 
-                handleAllocation(info, allocationIndex);
-            }
+            handleAllocation(info, allocationIndex);
 
             ++totalCost.allocations;
             totalCost.leaked += info.size;
             if (totalCost.leaked > totalCost.peak) {
                 totalCost.peak = totalCost.leaked;
-                peakTime = timeStamp;
+            }
 
-                if (pass == SecondPass && totalCost.peak == lastPeakCost && peakTime == lastPeakTime) {
-                    for (auto& allocation : allocations) {
-                        allocation.peak = allocation.leaked;
-                    }
-                }
+            if (pass == FirstPass) {
+                peakTracker.recordEvent(allocationIndex, true);
             }
         } else if (reader.mode() == '-') {
             if (!inFilteredTime) {
@@ -386,16 +381,16 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
 
             const auto& info = allocationInfos[allocationInfoIndex.index];
             totalCost.leaked -= info.size;
+
+            auto& allocation = allocations[info.allocationIndex.index];
+            allocation.leaked -= info.size;
             if (temporary) {
                 ++totalCost.temporary;
+                ++allocation.temporary;
             }
 
-            if (pass != FirstPass) {
-                auto& allocation = allocations[info.allocationIndex.index];
-                allocation.leaked -= info.size;
-                if (temporary) {
-                    ++allocation.temporary;
-                }
+            if (pass == FirstPass) {
+                peakTracker.recordEvent(allocationInfoIndex, false);
             }
         } else if (reader.mode() == 'a') {
             if (pass != FirstPass || isReparsing) {
@@ -420,8 +415,8 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
                 continue;
             }
             if (newStamp < timeStamp) {
-                cerr << "Damaged timestamp detected: " << newStamp
-                     << " is less than the previous timestamp " << timeStamp << endl;
+                cerr << "Damaged timestamp detected: " << newStamp << " is less than the previous timestamp "
+                     << timeStamp << endl;
                 continue;
             }
             inFilteredTime = newStamp >= filterParameters.minTime && newStamp <= filterParameters.maxTime;
@@ -444,7 +439,7 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
                 return false;
             }
             debuggeeEncountered = true;
-            if (pass != FirstPass && !isReparsing) {
+            if (!isReparsing) {
                 handleDebuggee(reader.line().c_str() + 2);
             }
         } else if (reader.mode() == 'A') {
@@ -490,6 +485,18 @@ bool AccumulatedTraceData::read(boost::iostreams::filtering_istream& in, const P
             return false;
         } else {
             cerr << "failed to parse line: " << reader.line() << endl;
+        }
+    }
+
+    if (pass == FirstPass) {
+        // Retrieve peak memory information
+        peakTracker.finalize();
+        peakTime = peakTracker.peakTime();
+
+        std::size_t allocIdx = 0;
+        for (const auto& peakMem : peakTracker.peakAllocations()) {
+            allocations[allocIdx].peak = peakMem;
+            ++allocIdx;
         }
     }
 

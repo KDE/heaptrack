@@ -74,6 +74,7 @@ struct AllocationInfo
     uint64_t size = 0;
     // index into AccumulatedTraceData::allocations
     AllocationIndex allocationIndex;
+
     bool operator==(const AllocationInfo& rhs) const
     {
         return rhs.allocationIndex == allocationIndex && rhs.size == size;
@@ -89,12 +90,10 @@ struct AccumulatedTraceData
 
     enum ParsePass
     {
-        // find time of total peak cost
-        FirstPass,
         // parse individual allocations
-        SecondPass,
+        FirstPass,
         // GUI only: graph-building
-        ThirdPass
+        SecondPass
     };
 
     virtual void handleTimeStamp(int64_t oldStamp, int64_t newStamp, bool isFinalTimeStamp, const ParsePass pass) = 0;
