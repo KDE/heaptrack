@@ -31,10 +31,10 @@ if (TARGET heaptrack_gui_private)
     target_link_libraries(bench_parser sharedprint heaptrack_gui_private)
 endif()
 
-if (TARGET Qt${QT_VERSION_MAJOR}::Core AND Boost_CONTAINER_FOUND)
+if (TARGET Qt6::Core AND Boost_CONTAINER_FOUND)
     add_executable(bench_tree bench_tree.cpp)
     set_target_properties(bench_tree PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
     target_include_directories(bench_tree PRIVATE ${Boost_INCLUDE_DIRS})
-    target_link_libraries(bench_tree Qt${QT_VERSION_MAJOR}::Core
+    target_link_libraries(bench_tree Qt6::Core
     ${Boost_CONTAINER_LIBRARY})
 endif()

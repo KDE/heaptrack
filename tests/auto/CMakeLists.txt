@@ -70,15 +70,15 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
     add_test(NAME tst_io COMMAND tst_io)
 
     if (TARGET heaptrack_gui_private)
-        find_package(Qt${QT_VERSION_MAJOR} ${QT_MIN_VERSION} CONFIG OPTIONAL_COMPONENTS Test)
-        if (Qt${QT_VERSION_MAJOR}Test_FOUND)
+        find_package(Qt6 ${QT_MIN_VERSION} CONFIG OPTIONAL_COMPONENTS Test)
+        if (Qt6Test_FOUND)
             add_executable(tst_parser tst_parser.cpp)
             set_target_properties(tst_parser PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
             target_link_libraries(tst_parser
                     ${Boost_SYSTEM_LIBRARY}
                     ${Boost_FILESYSTEM_LIBRARY}
                     heaptrack_gui_private
-                    Qt${QT_VERSION_MAJOR}::Test
+                    Qt6::Test
             )
             add_test(NAME tst_parser COMMAND tst_parser)
         endif()
