@@ -227,10 +227,12 @@ struct ParserData final : public AccumulatedTraceData
     {
         maxConsumedSinceLastTimeStamp = max(maxConsumedSinceLastTimeStamp, totalCost.leaked);
 
-        if (index.index == allocationInfoCounter.size()) {
-            allocationInfoCounter.push_back({info, 1});
-        } else {
-            ++allocationInfoCounter[index.index].allocations;
+        if (!diffMode) {
+            if (index.index == allocationInfoCounter.size()) {
+                allocationInfoCounter.push_back({info, 1});
+            } else {
+                ++allocationInfoCounter[index.index].allocations;
+            }
         }
     }
 
@@ -242,7 +244,7 @@ struct ParserData final : public AccumulatedTraceData
     void clearForReparse()
     {
         // data moved to size histogram
-        {
+        if (!diffMode) {
             // we have to reset the allocation count
             for (auto& info : allocationInfoCounter)
                 info.allocations = 0;
@@ -252,6 +254,7 @@ struct ParserData final : public AccumulatedTraceData
                           return lhs.info.allocationIndex < rhs.info.allocationIndex;
                       });
         }
+
         // data moved to chart models
         consumedChartData = {};
         allocationsChartData = {};
@@ -275,6 +278,7 @@ struct ParserData final : public AccumulatedTraceData
     };
     /// counts how often a given allocation info is encountered based on its index
     /// used to build the size histogram
+    /// this is disabled when we are diffing two files
     vector<CountedAllocationInfo> allocationInfoCounter;
 
     ChartData consumedChartData;
@@ -550,6 +554,7 @@ struct MergedHistogramColumnData
 HistogramData buildSizeHistogram(ParserData& data, std::shared_ptr<const ResultData> resultData)
 {
     HistogramData ret;
+    Q_ASSERT(!data.diffMode || data.allocationInfoCounter.empty());
     if (data.allocationInfoCounter.empty()) {
         return ret;
     }
@@ -670,8 +675,11 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
         emit progressMessageAvailable(parsingMsg);
         data->parseTimer.start();
 
-        if (!diffBase.isEmpty()) {
+        data->diffMode = !diffBase.isEmpty();
+
+        if (data->diffMode) {
             ParserData diffData(nullptr); // currently we don't track the progress of diff parsing
+            diffData.diffMode = true;
             auto readBase = async(launch::async, [&diffData, diffBase, isReparsing]() {
                 return diffData.read(diffBase.toStdString(), isReparsing);
             });
@@ -684,7 +692,6 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
                 return;
             }
             data->diff(diffData);
-            data->diffMode = true;
         } else {
             if (!data->read(stdPath, isReparsing)) {
                 emit failedToOpen(path);
@@ -722,26 +729,28 @@ void Parser::parseImpl(const QString& path, const QString& diffBase, const Filte
             return;
         }
 
-        // also calculate the size histogram
-        emit progressMessageAvailable(i18n("building size histogram..."));
-        const auto sizeHistogram = buildSizeHistogram(*data, resultData);
-        emit sizeHistogramDataAvailable(sizeHistogram);
-        // now data can be modified again for the chart data evaluation
+        // calculate the size histogram when we are not diffing
+        if (!data->diffMode) {
+            emit progressMessageAvailable(i18n("building size histogram..."));
+            const auto sizeHistogram = buildSizeHistogram(*data, resultData);
+            emit sizeHistogramDataAvailable(sizeHistogram);
 
-        if (stopAfter == StopAfter::SizeHistogram) {
-            emit finished();
-            return;
+            if (stopAfter == StopAfter::SizeHistogram) {
+                emit finished();
+                return;
+            }
         }
+
+        // now data can be modified again for the chart data evaluation
 
         emit progress(0);
 
-        const auto diffMode = data->diffMode;
         emit progressMessageAvailable(i18n("building charts..."));
         auto parallel = new Collection;
         *parallel << make_job([this, mergedAllocations, resultData]() {
             const auto topDownData = toTopDownData(mergedAllocations.first);
             emit topDownDataAvailable(topDownData);
-        }) << make_job([this, mergedAllocations, diffMode]() {
+        }) << make_job([this, mergedAllocations, diffMode = data->diffMode]() {
             emit callerCalleeDataAvailable(
                 toCallerCalleeData(mergedAllocations.first, mergedAllocations.second, diffMode));
         });
