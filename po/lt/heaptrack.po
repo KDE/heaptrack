@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: trunk-kf 5\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2025-06-20 00:44+0000\n"
+"POT-Creation-Date: 2025-06-26 00:45+0000\n"
 "PO-Revision-Date: 2015-08-11 11:40+0000\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: lt\n"
@@ -1035,87 +1035,87 @@ msgstr ""
 msgid "Filter"
 msgstr ""
 
-#: gui/parser.cpp:387
+#: gui/parser.cpp:388
 #, kde-format
 msgid "merging allocations... %1%"
 msgstr ""
 
-#: gui/parser.cpp:557
+#: gui/parser.cpp:559
 #, kde-format
 msgid "total"
 msgstr ""
 
-#: gui/parser.cpp:559
+#: gui/parser.cpp:561
 #, kde-format
 msgid "0B to 8B"
 msgstr ""
 
-#: gui/parser.cpp:560
+#: gui/parser.cpp:562
 #, kde-format
 msgid "9B to 16B"
 msgstr ""
 
-#: gui/parser.cpp:561
+#: gui/parser.cpp:563
 #, kde-format
 msgid "17B to 32B"
 msgstr ""
 
-#: gui/parser.cpp:562
+#: gui/parser.cpp:564
 #, kde-format
 msgid "33B to 64B"
 msgstr ""
 
-#: gui/parser.cpp:563
+#: gui/parser.cpp:565
 #, kde-format
 msgid "65B to 128B"
 msgstr ""
 
-#: gui/parser.cpp:564
+#: gui/parser.cpp:566
 #, kde-format
 msgid "129B to 256B"
 msgstr ""
 
-#: gui/parser.cpp:565
+#: gui/parser.cpp:567
 #, kde-format
 msgid "257B to 512B"
 msgstr ""
 
-#: gui/parser.cpp:566
+#: gui/parser.cpp:568
 #, kde-format
 msgid "512B to 1KB"
 msgstr ""
 
-#: gui/parser.cpp:567
+#: gui/parser.cpp:569
 #, kde-format
 msgid "more than 1KB"
 msgstr ""
 
-#: gui/parser.cpp:645
+#: gui/parser.cpp:647
 #, kde-format
 msgid "reparsing data"
 msgstr ""
 
-#: gui/parser.cpp:645
+#: gui/parser.cpp:647
 #, kde-format
 msgid "parsing data"
 msgstr ""
 
-#: gui/parser.cpp:659
+#: gui/parser.cpp:661
 #, kde-format
 msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
 msgstr ""
 
-#: gui/parser.cpp:715
+#: gui/parser.cpp:719
 #, kde-format
 msgid "merging allocations..."
 msgstr ""
 
-#: gui/parser.cpp:726
+#: gui/parser.cpp:731
 #, kde-format
 msgid "building size histogram..."
 msgstr ""
 
-#: gui/parser.cpp:739
+#: gui/parser.cpp:745
 #, kde-format
 msgid "building charts..."
 msgstr ""

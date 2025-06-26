@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2025-06-20 00:44+0000\n"
+"POT-Creation-Date: 2025-06-26 00:45+0000\n"
 "PO-Revision-Date: 2023-02-04 20:17+0100\n"
 "Last-Translator: Iñigo Salvador Azurmendi <xalba@ni.eus>\n"
 "Language-Team: Basque <kde-i18n-eu@kde.org>\n"
@@ -1057,87 +1057,87 @@ msgstr "Ezarpe&nak"
 msgid "Filter"
 msgstr "Iragazkia"
 
-#: gui/parser.cpp:387
+#: gui/parser.cpp:388
 #, kde-format
 msgid "merging allocations... %1%"
 msgstr "esleipenak bateratzen... %%1"
 
-#: gui/parser.cpp:557
+#: gui/parser.cpp:559
 #, kde-format
 msgid "total"
 msgstr "guztira"
 
-#: gui/parser.cpp:559
+#: gui/parser.cpp:561
 #, kde-format
 msgid "0B to 8B"
 msgstr "0B -> 8B"
 
-#: gui/parser.cpp:560
+#: gui/parser.cpp:562
 #, kde-format
 msgid "9B to 16B"
 msgstr "9B -> 16B"
 
-#: gui/parser.cpp:561
+#: gui/parser.cpp:563
 #, kde-format
 msgid "17B to 32B"
 msgstr "17B -> 32B"
 
-#: gui/parser.cpp:562
+#: gui/parser.cpp:564
 #, kde-format
 msgid "33B to 64B"
 msgstr "33B -> 64B"
 
-#: gui/parser.cpp:563
+#: gui/parser.cpp:565
 #, kde-format
 msgid "65B to 128B"
 msgstr "65B -> 128B"
 
-#: gui/parser.cpp:564
+#: gui/parser.cpp:566
 #, kde-format
 msgid "129B to 256B"
 msgstr "129B -> 256B"
 
-#: gui/parser.cpp:565
+#: gui/parser.cpp:567
 #, kde-format
 msgid "257B to 512B"
 msgstr "257B -> 512KB"
 
-#: gui/parser.cpp:566
+#: gui/parser.cpp:568
 #, kde-format
 msgid "512B to 1KB"
 msgstr "512B -> 1KB"
 
-#: gui/parser.cpp:567
+#: gui/parser.cpp:569
 #, kde-format
 msgid "more than 1KB"
 msgstr "1KB baino gehiago"
 
-#: gui/parser.cpp:645
+#: gui/parser.cpp:647
 #, kde-format
 msgid "reparsing data"
 msgstr ""
 
-#: gui/parser.cpp:645
+#: gui/parser.cpp:647
 #, kde-format
 msgid "parsing data"
 msgstr "datuak sintaktikoki aztertzen"
 
-#: gui/parser.cpp:659
+#: gui/parser.cpp:661
 #, kde-format
 msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
 msgstr ""
 
-#: gui/parser.cpp:715
+#: gui/parser.cpp:719
 #, kde-format
 msgid "merging allocations..."
 msgstr "esleipenak bateratzen..."
 
-#: gui/parser.cpp:726
+#: gui/parser.cpp:731
 #, kde-format
 msgid "building size histogram..."
 msgstr "neurrien histograma eraikitzen..."
 
-#: gui/parser.cpp:739
+#: gui/parser.cpp:745
 #, kde-format
 msgid "building charts..."
 msgstr "diagramak sortzen..."

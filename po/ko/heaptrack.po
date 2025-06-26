@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2025-06-20 00:44+0000\n"
+"POT-Creation-Date: 2025-06-26 00:45+0000\n"
 "PO-Revision-Date: 2023-04-21 23:40+0200\n"
 "Last-Translator: Shinjo Park <kde@peremen.name>\n"
 "Language-Team: Korean <kde-kr@kde.org>\n"
@@ -1105,87 +1105,87 @@ msgstr "설정(&N)"
 msgid "Filter"
 msgstr "필터"
 
-#: gui/parser.cpp:387
+#: gui/parser.cpp:388
 #, kde-format
 msgid "merging allocations... %1%"
 msgstr "할당 합치는 중... %1%"
 
-#: gui/parser.cpp:557
+#: gui/parser.cpp:559
 #, kde-format
 msgid "total"
 msgstr "합계"
 
-#: gui/parser.cpp:559
+#: gui/parser.cpp:561
 #, kde-format
 msgid "0B to 8B"
 msgstr "0 B-8 B"
 
-#: gui/parser.cpp:560
+#: gui/parser.cpp:562
 #, kde-format
 msgid "9B to 16B"
 msgstr "9 B-16 B"
 
-#: gui/parser.cpp:561
+#: gui/parser.cpp:563
 #, kde-format
 msgid "17B to 32B"
 msgstr "17 B-32 B"
 
-#: gui/parser.cpp:562
+#: gui/parser.cpp:564
 #, kde-format
 msgid "33B to 64B"
 msgstr "33 B-64 B"
 
-#: gui/parser.cpp:563
+#: gui/parser.cpp:565
 #, kde-format
 msgid "65B to 128B"
 msgstr "65 B-128 B"
 
-#: gui/parser.cpp:564
+#: gui/parser.cpp:566
 #, kde-format
 msgid "129B to 256B"
 msgstr "129 B-256 B"
 
-#: gui/parser.cpp:565
+#: gui/parser.cpp:567
 #, kde-format
 msgid "257B to 512B"
 msgstr "257 B-512 B"
 
-#: gui/parser.cpp:566
+#: gui/parser.cpp:568
 #, kde-format
 msgid "512B to 1KB"
 msgstr "512 B-1 KB"
 
-#: gui/parser.cpp:567
+#: gui/parser.cpp:569
 #, kde-format
 msgid "more than 1KB"
 msgstr "1 KB 초과"
 
-#: gui/parser.cpp:645
+#: gui/parser.cpp:647
 #, kde-format
 msgid "reparsing data"
 msgstr "데이터 다시 분석 중"
 
-#: gui/parser.cpp:645
+#: gui/parser.cpp:647
 #, kde-format
 msgid "parsing data"
 msgstr "데이터 처리 중"
 
-#: gui/parser.cpp:659
+#: gui/parser.cpp:661
 #, kde-format
 msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
 msgstr "%1 합격: %2/%3  소모: %4  남음: %5"
 
-#: gui/parser.cpp:715
+#: gui/parser.cpp:719
 #, kde-format
 msgid "merging allocations..."
 msgstr "할당 합치는 중..."
 
-#: gui/parser.cpp:726
+#: gui/parser.cpp:731
 #, kde-format
 msgid "building size histogram..."
 msgstr "크기 히스토그램 생성 중..."
 
-#: gui/parser.cpp:739
+#: gui/parser.cpp:745
 #, kde-format
 msgid "building charts..."
 msgstr "차트 생성 중..."
