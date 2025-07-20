@@ -41,7 +41,7 @@
   <summary xml:lang="en-GB">A heap memory profiler for Linux</summary>
   <summary xml:lang="eo">Staplomemora profililo por Linukso</summary>
   <summary xml:lang="es">Un analizador de rendimiento de la memoria de almacenamiento libre para Linux</summary>
-  <summary xml:lang="eu">Linux-erako memoria dinamikoaren («heap») profilatzaile bat</summary>
+  <summary xml:lang="eu">Linuxerako memoria dinamikoaren profilatzaile bat</summary>
   <summary xml:lang="fr">Un analyseur de mémoire dynamique pour Linux</summary>
   <summary xml:lang="gl">Un analizador de uso de memoria dinámica (heap) para Linux</summary>
   <summary xml:lang="he">מסווג זכרון מצבור ללינוקס</summary>
@@ -72,6 +72,7 @@
     <p xml:lang="en-GB">Heaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:</p>
     <p xml:lang="eo">Heaptrack spuras ĉiujn memorajn atribuojn kaj notas ĉi tiujn eventojn per stakspuroj. Dediĉitaj analiziloj tiam permesas vin interpreti la staplomemoran profilon al:</p>
     <p xml:lang="es">Heaptrack rastrea todas las asignaciones de memoria y anota estos eventos con trazas de la pila para poder usar herramientas de dedicadas que le permitan interpretar el análisis de rendimiento de la memoria de almacenamiento libre para:</p>
+    <p xml:lang="eu">Heaptrack-ek memoria-esleipen guztien aztarna jarraitzen du eta gertaera horiek pila-aztarnekin anotatzen ditu. Analisi tresna espezializatuek, ondoren, memoria-dinamikoaren profila interpretatzen laguntzen dute, honako helburuetarako:</p>
     <p xml:lang="fr">Le logiciel « Heaptrack » permet le suivi des allocations de mémoire. Il annote les demandes par des traces dans la pile. Des outils dédiés d'analyse vous permettent ensuite d'interpréter le profil de la mémoire dynamique pour :</p>
     <p xml:lang="gl">Heaptrack fai un seguimento de todas as asociacións de memoria e apunta os eventos coa traza da rima. Logo pode usar ferramentas de análise para interpretar os datos de uso da memoria dinámica (heap) para:</p>
     <p xml:lang="he">Heaptrack עוקב אחרי כל הקצאות הזיכרון ומסמן את האירועים האלה עם ניתוח מהלכים. כלי ניתוח ייעודיים יאפשרו לך לאחר מכן לפענח את פרופיל זכרון המצבור כדי:</p>
@@ -99,6 +100,7 @@
       <li xml:lang="en-GB">find hotspots that need to be optimized to reduce the memory footprint of your application</li>
       <li xml:lang="eo">trovi retpunktojn, kiuj bezonas esti optimumigitaj por redukti la memorspuron de via aplikaĵo</li>
       <li xml:lang="es">encontrar cuellos de botella que es necesario optimizar para reducir el impacto de su aplicación en la memoria</li>
+      <li xml:lang="eu">zure aplikazioaren memoria-aztarna murrizteko optimizatu beharreko puntu-beroak aurkitzea</li>
       <li xml:lang="fr">trouver les zones principales de code à améliorer pour réduire l'empreinte mémoire de votre application</li>
       <li xml:lang="gl">Atopar puntos quentes que cómpre optimizar para reducir o consumo de memoria da aplicación</li>
       <li xml:lang="he">לאתר נקודות חמות שצריך למטב כדי להפחית את טביעת האצבע של היישום שלך בזיכרון</li>
@@ -125,6 +127,7 @@
       <li xml:lang="en-GB">find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
       <li xml:lang="eo">trovi memorlikojn, t.e. lokojn kiuj asignas memoron kiu neniam estas deasignita</li>
       <li xml:lang="es">encontrar fugas de memoria (es decir, lugares donde se asigna memoria que no se llega a liberar)</li>
+      <li xml:lang="eu">memoria-ihesak aurkitzea, hau da, inoiz askatzen ez den memoria esleitzen duten kokalekuak</li>
       <li xml:lang="fr">trouver les fuites de mémoires, c'est-à-dire, des parties de logiciels, qui s'allouent de la mémoire mais qui ne la libèrent jamais</li>
       <li xml:lang="gl">Atopar perdas de memoria, é dicir, lugares que asignan memoria que nunca se libera.</li>
       <li xml:lang="he">איתור דליפות זיכרון, כלומר </li>
@@ -151,6 +154,7 @@
       <li xml:lang="en-GB">find allocation hotspots, i.e. code locations that trigger a lot of memory allocation calls</li>
       <li xml:lang="eo">trovi atribuajn retpunktojn, t.e. kodlokojn, kiuj ekigas multajn memorajn alvokojn</li>
       <li xml:lang="es">encontrar cuellos de botella de asignaciones (es decir, lugares del código fuente que desencadenan numerosas llamadas de asignación de memoria)</li>
+      <li xml:lang="eu">esleipen puntu-beroak aurkitzea, hau da, memoria esleipen handia eragiten duten kode-zatiak</li>
       <li xml:lang="fr">trouver les zones principales de code faisant des allocations mémoire, c'est-à-dire celles faisant de nombreuses requêtes d'allocation mémoire</li>
       <li xml:lang="gl">Atopar puntos quentes de asignación, é dicir, lugares do código que causan moitas chamadas de asignación de memoria.</li>
       <li xml:lang="he">לאתר נקודות הקצאה חמות, כלומר מקומות של קוד שמזניק הרבה קריאות להקצאות זיכרון</li>
@@ -177,6 +181,7 @@
       <li xml:lang="en-GB">find temporary allocations, which are allocations that are directly followed by their deallocation</li>
       <li xml:lang="eo">trovi provizorajn asignojn, kiuj estas asignoj, kiuj estas rekte sekvataj de sia malasignado</li>
       <li xml:lang="es">encontrar asignaciones de memoria temporales, que son asignaciones que son inmediatamente seguidas por sus correspondientes liberaciones</li>
+      <li xml:lang="eu">aldi baterako esleipenak aurkitzea, esleipena egin eta jarraian askatzen duten kasuak</li>
       <li xml:lang="fr">trouver les allocations transitoires, c'est-à-dire enchaînant une allocation suivie directement par une désallocation.</li>
       <li xml:lang="gl">Atopar asignacións temporais, asignacións que se liberan no momento.</li>
       <li xml:lang="he">לאתר הקצאות זמניות, שאלו הקצאות שמיד לאחריהן מגיע שחרור הקצאה</li>
@@ -210,6 +215,7 @@
       <caption xml:lang="en-GB">Summary of tracked heap memory allocation data</caption>
       <caption xml:lang="eo">Resumo de spuritaj amasomemoraj asignodatenoj</caption>
       <caption xml:lang="es">Sumario de datos de asignación de memoria de almacenamiento libre rastreada</caption>
+      <caption xml:lang="eu">Aztarna jarraitutako memoria-dinamikoaren esleipen datuen laburpena</caption>
       <caption xml:lang="fr">Résumé des données d'allocation pour la mémoire dynamique surveillée.</caption>
       <caption xml:lang="gl">Resumo dos datos de asignación de memoria dinámica (heap) da que se fai seguimento.</caption>
       <caption xml:lang="he">תקציר של נתוני הקצאת זיכרון מצבור במעקב</caption>
@@ -237,6 +243,7 @@
       <caption xml:lang="en-GB">Flamegraph visualisation of number of heap memory allocations</caption>
       <caption xml:lang="eo">Flamgrafea bildigo de nombro da amasmemor-asignoj</caption>
       <caption xml:lang="es">Visualización de gráfico de llamas del número de asignaciones de memoria de almacenamiento libre</caption>
+      <caption xml:lang="eu">memoria-dinamikoaren esleipen kopuruaren sugar-grafiko irudikapena</caption>
       <caption xml:lang="fr">Affichage graphe en chandelles du nombre d'allocations de mémoire dynamique.</caption>
       <caption xml:lang="gl">Visualización mediante un gráfico de chamas do número de asignacións de memoria dinámica (heap).</caption>
       <caption xml:lang="he">תרשים להבות של מספר הקצאות זיכרון המצבור</caption>
@@ -264,7 +271,7 @@
       <caption xml:lang="en-GB">Chart of heap memory allocations over time</caption>
       <caption xml:lang="eo">Diagramo de amasmemor-asignoj laŭlonge de la tempo</caption>
       <caption xml:lang="es">Gráfico de asignaciones de memoria del almacenamiento libre a lo largo del tiempo</caption>
-      <caption xml:lang="eu">Denboran zehar, memoria dinamikoaren esleipenaren diagrama</caption>
+      <caption xml:lang="eu">Denboran zehar memoria dinamikoaren esleipenaren diagrama</caption>
       <caption xml:lang="fr">Graphique des allocations de mémoire dynamique en temps réel</caption>
       <caption xml:lang="gl">Gráfica das asignacións de memoria dinámica (heap) co paso do tempo.</caption>
       <caption xml:lang="he">תרשים של הקצאות זיכרון מצבור לאורך זמן</caption>
