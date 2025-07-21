@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-06-26 00:45+0000\n"
-"PO-Revision-Date: 2025-07-19 00:23+0200\n"
+"PO-Revision-Date: 2025-07-20 21:00+0200\n"
 "Last-Translator: Iñigo Salvador Azurmendi <xalba@ni.eus>\n"
 "Language-Team: Basque <kde-i18n-eu@kde.org>\n"
 "Language: eu\n"
@@ -293,7 +293,8 @@ msgstr ""
 #, kde-format
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
 msgstr ""
-"<qt>%2 kontsumitu %3 ondoren honetatik:<p style='margin-left:10px'>%1</p>"
+"<qt>%2 kontsumitu %3 ondoren honetatik:<p style='margin-left:10px'>%1</p></"
+"qt>"
 
 #: gui/chartwidget.cpp:154
 #, kde-format
