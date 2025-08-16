@@ -24,10 +24,10 @@ if [ -z "$(which linuxdeploy)" ]; then
     exit 1
 fi
 
-. /opt/rh/gcc-toolset-13/enable
+. /opt/rh/gcc-toolset-14/enable
 
 mkdir -p "$buildir" && cd "$buildir"
-cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/opt/rh/gcc-toolset-13/root/ \
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=/opt/rh/gcc-toolset-14/root/ \
     -DCMAKE_BUILD_TYPE=Release  -DAPPIMAGE_BUILD=ON "$srcdir"
 make -j$(nproc)
 rm -Rf appdir
