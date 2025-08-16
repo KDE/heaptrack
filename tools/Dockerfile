@@ -12,4 +12,3 @@
 FROM ghcr.io/kdab/kdesrc-build:latest
 
 RUN dnf update -y && dnf install -y epel-release && dnf update -y && dnf install -y libunwind-devel zstd
-RUN
