@@ -556,7 +556,7 @@ msgstr ""
 #, kde-format
 msgid "Select the data source that should be visualized in the flame graph."
 msgstr ""
-"Seleccioneu l'origen de dades que s'ha de visualitzar en el gràfic de flames."
+"Trieu l'origen de dades que s'ha de visualitzar en el gràfic de flames."
 
 #: gui/flamegraph.cpp:467
 #, kde-format
