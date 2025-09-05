@@ -68,7 +68,8 @@ to `heaptrack --interpret`, see also: https://sourceware.org/gdb/current/onlined
 Furthermore, if you have custom code side loaded and want to load the debug information from the respective build
 folders, use `--extra-paths`, e.g.:
 
-    heaptrack --interpret "/path/heaptrack.test_c.8911.raw.zst" --sysroot "/path/to/sysroot"
+    heaptrack --interpret "/path/heaptrack.test_c.8911.raw.zst" --sysroot "/path/to/sysroot" \
+        --extra-paths "/path/to/sideloaded/binaries"
 
 ## Building heaptrack
 
