@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-06-26 00:45+0000\n"
-"PO-Revision-Date: 2025-05-31 16:43+0100\n"
+"PO-Revision-Date: 2025-09-16 00:27+0200\n"
 "Last-Translator: Eloy Cuadra <ecuadra@eloihr.net>\n"
 "Language-Team: Spanish <kde-l10n-es@kde.org>\n"
 "Language: es\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 22.08.1\n"
+"X-Generator: Lokalize 25.08.1\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -474,27 +474,27 @@ msgstr "%1 de fugas en total"
 #, kde-format
 msgctxt "%1: number of allocations, %2: relative number, %3: function label"
 msgid "%1 (%2%) allocations in %3 and below."
-msgstr "%1 (%2%) asignaciones en %3 y por debajo."
+msgstr "%1 (%2 %) asignaciones en %3 y por debajo."
 
 #: gui/flamegraph.cpp:239
 #, kde-format
 msgctxt ""
 "%1: number of temporary allocations, %2: relative number, %3 function label"
 msgid "%1 (%2%) temporary allocations in %3 and below."
-msgstr "%1 (%2%) asignaciones temporales en %3 y por debajo."
+msgstr "%1 (%2 %) asignaciones temporales en %3 y por debajo."
 
 #: gui/flamegraph.cpp:244
 #, kde-format
 msgctxt ""
 "%1: peak consumption in bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) contribution to peak consumption in %3 and below."
-msgstr "%1 (%2%) contribución al consumo pico en %3 y por debajo."
+msgstr "%1 (%2 %) contribución al consumo pico en %3 y por debajo."
 
 #: gui/flamegraph.cpp:248
 #, kde-format
 msgctxt "%1: leaked bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) leaked in %3 and below."
-msgstr "%1 (%2%) de fugas en %3 y por debajo."
+msgstr "%1 (%2 %) de fugas en %3 y por debajo."
 
 #: gui/flamegraph.cpp:428
 #, kde-format
@@ -623,12 +623,12 @@ msgstr "generando gráfico de llamas…"
 #: gui/flamegraph.cpp:773
 #, kde-format
 msgid "%1 (%2% of total of %3) allocations matched by search."
-msgstr "%1 (%2% de un total de %3) asignaciones coinciden con la búsqueda."
+msgstr "%1 (%2 % de un total de %3) asignaciones coinciden con la búsqueda."
 
 #: gui/flamegraph.cpp:778
 #, kde-format
 msgid "%1 (%2% of total of %3) matched by search."
-msgstr "%1 (%2% de un total de %3) coinciden con la búsqueda."
+msgstr "%1 (%2 % de un total de %3) coinciden con la búsqueda."
 
 #: gui/gui.cpp:63
 #, kde-format
@@ -772,7 +772,7 @@ msgstr "<dt><b>llamadas a funciones de asignación</b>:</dt><dd>%1 (%2/s)</dd>"
 #: gui/mainwindow.cpp:418
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
-msgstr "<dt><b>asignaciones temporales</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
+msgstr "<dt><b>asignaciones temporales</b>:</dt><dd>%1 (%2 %, %3/s)</dd>"
 
 #: gui/mainwindow.cpp:428
 #, kde-format
@@ -1149,7 +1149,7 @@ msgstr "Filtro"
 #: gui/parser.cpp:388
 #, kde-format
 msgid "merging allocations... %1%"
-msgstr "fusionando asignaciones… %1%"
+msgstr "fusionando asignaciones… %1 %"
 
 #: gui/parser.cpp:559
 #, kde-format
@@ -1289,22 +1289,22 @@ msgstr ""
 #: gui/treemodel.cpp:159
 #, kde-format
 msgid "peak contribution: %1 (%2% of total)\n"
-msgstr "contribución pico: %1 (%2% del total)\n"
+msgstr "contribución pico: %1 (%2 % del total)\n"
 
 #: gui/treemodel.cpp:160
 #, kde-format
 msgid "leaked: %1 (%2% of total)\n"
-msgstr "fugada: %1 (%2% del total)\n"
+msgstr "fugada: %1 (%2 % del total)\n"
 
 #: gui/treemodel.cpp:161
 #, kde-format
 msgid "allocations: %1 (%2% of total)\n"
-msgstr "asignaciones: %1 (%2% del total)\n"
+msgstr "asignaciones: %1 (%2 % del total)\n"
 
 #: gui/treemodel.cpp:162
 #, kde-format
 msgid "temporary: %1 (%2% of allocations, %3% of total)\n"
-msgstr "temporales: %1 (%2% de las asignaciones, %3% del total)\n"
+msgstr "temporales: %1 (%2 % de las asignaciones, %3 % del total)\n"
 
 #: gui/treemodel.cpp:168
 #, kde-format
@@ -1326,17 +1326,17 @@ msgstr "??"
 #: gui/util.cpp:108
 #, kde-format
 msgid "%1: %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr "%1: %2<br/>&nbsp;&nbsp;%4% de un total de %3"
+msgstr "%1: %2<br/>&nbsp;&nbsp;%4 % de un total de %3"
 
 #: gui/util.cpp:134 gui/util.cpp:163
 #, kde-format
 msgid "%1 (self): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr "%1 (self): %2<br/>&nbsp;&nbsp;%4% de un total de %3"
+msgstr "%1 (self): %2<br/>&nbsp;&nbsp;%4 % de un total de %3"
 
 #: gui/util.cpp:137 gui/util.cpp:166
 #, kde-format
 msgid "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4% de un total de %3"
+msgstr "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4 % de un total de %3"
 
 #: gui/util.cpp:183
 #, kde-format
