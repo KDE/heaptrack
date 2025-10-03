@@ -37,7 +37,7 @@
 ///   peak snippet, replace if that is the case
 ///
 /// Populating allocations.peak is deferred until the end of the core parsing loop.
-/// To do this, we "replay" the peak snippet, starting with the "snapshoted" memory values,
+/// To do this, we "replay" the peak snippet, starting with the "snapshotted" memory values,
 /// and process previously recorded allocation events in order until the peak time index.
 ///
 /// This approach works by amortising both the memory & runtime cost of taking a complete "snapshot"

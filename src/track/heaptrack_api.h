@@ -138,7 +138,7 @@ void heaptrack_init_api()
 #endif // HEAPTRACK_API_DLSYM
 
 /**
- * Optionally, you can let heaptrack mimick the Valgrind pool-allocator API.
+ * Optionally, you can let heaptrack mimic the Valgrind pool-allocator API.
  *
  * This won't work nicely when you want to enable both, Valgrind and heaptrack.
  * Otherwise, it's an easy way to make your code ready for both tools.
