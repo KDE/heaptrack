@@ -4,6 +4,7 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-2.0-or-later</project_license>
   <name>Heaptrack</name>
+  <name xml:lang="ar">Heaptrack</name>
   <name xml:lang="ca">Heaptrack</name>
   <name xml:lang="ca-valencia">Heaptrack</name>
   <name xml:lang="cs">Heaptrack</name>
@@ -34,6 +35,7 @@
   <name xml:lang="uk">Heaptrack</name>
   <name xml:lang="zh-CN">堆栈追踪</name>
   <summary>A heap memory profiler for Linux</summary>
+  <summary xml:lang="ar">أداة لتشكيلة ذاكرة الكومة في لينكس</summary>
   <summary xml:lang="ca">Un analitzador del rendiment de la memòria en monticles per al Linux</summary>
   <summary xml:lang="ca-valencia">Un analitzador del rendiment de la memòria en monticles per a Linux</summary>
   <summary xml:lang="da">En heap-hukommelsesprofilering til Linux</summary>
@@ -64,6 +66,7 @@
     <p>
       Heaptrack traces all memory allocations and annotates these events with stack traces. Dedicated analysis tools then allow you to interpret the heap memory profile to:
     </p>
+    <p xml:lang="ar">يتتبع Heaptrack كل تخصيصات الذاكرة ويوسم هذه الأحداث بتتبعات المكدس. تسمح لك بعد ذلك أدوات التحليل المخصصة بتفسير تشكيلة ذاكرة الكومة من أجل:</p>
     <p xml:lang="ca">El «heaptrack» rastreja totes les assignacions de memòria i anota aquests esdeveniments amb seguiments de pila. Les eines d'anàlisi dedicades que hi ha a continuació, us permetran interpretar l'anàlisi de rendiment de la memòria en monticles:</p>
     <p xml:lang="ca-valencia">«heaptrack» rastreja totes les assignacions de memòria i anota estos esdeveniments amb seguiments de pila. Les eines d'anàlisi dedicades que hi ha a continuació, vos permetran interpretar l'anàlisi de rendiment de la memòria en monticles:</p>
     <p xml:lang="da">Heaptrack sporer alle hukommelsesallokeringer og anmærker begivenhederne med stakspor. Dedikerede analyseværktøjer som giver dig mulighed for at fortolke heapens hukommelsesprofil til:</p>
@@ -91,6 +94,7 @@
     <p xml:lang="zh-CN">Heaptrack跟踪所有内存分配，并使用堆栈跟踪注释这些事件。专用的分析工具允许你解释堆内存配置文件:</p>
     <ul>
       <li>find hotspots that need to be optimized to reduce the memory footprint of your application</li>
+      <li xml:lang="ar">اعثر على النقاط الساخنة التي تحتاج إلى تحسين لتقليل بصمة الذاكرة لتطبيقك</li>
       <li xml:lang="ca">troba els punts crítics que necessiten optimitzar-se per a reduir el consum de memòria de la vostra aplicació</li>
       <li xml:lang="ca-valencia">troba els punts crítics que necessiten optimitzar-se per a reduir el consum de memòria de la vostra aplicació</li>
       <li xml:lang="da">find hotspots som behøver optimering for at reducere dit programs hukommelsesfodaftryk</li>
@@ -117,6 +121,7 @@
       <li xml:lang="uk">Виявлення проблемних місць, які має бути оптимізовано з метою зменшення споживання пам'яті вашою програмою.</li>
       <li xml:lang="zh-CN">寻找需要优化的热点，以减少应用程序的内存占用</li>
       <li>find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
+      <li xml:lang="ar">اعثر على تسربات الذاكرة، أي المواقع التي تخصص ذاكرة ولا يتم تحريرها مطلقًا</li>
       <li xml:lang="ca">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai es desassignarà</li>
       <li xml:lang="ca-valencia">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai es desassignarà</li>
       <li xml:lang="da">find hukommelseslæk, dvs. positioner som allokerer hukommelse som aldrig deallokeres</li>
@@ -143,6 +148,7 @@
       <li xml:lang="uk">Виявлення витоків пам'яті, тобто розміщень даних у пам'яті без відповідних вивільнень, коли дані стають непотрібними.</li>
       <li xml:lang="zh-CN">查找内存泄漏，即分配内存的位置永远不会被释放</li>
       <li>find allocation hotspots, i.e. code locations that trigger a lot of memory allocation calls</li>
+      <li xml:lang="ar">اعثر على نقاط تخصيص ساخنة، أي مواقع تعليمات برمجية تطلق الكثير من استدعاءات تخصيص الذاكرة</li>
       <li xml:lang="ca">troba els punts crítics d'assignació, és a dir, les ubicacions al codi que desencadenen un munt de crides d'assignació de memòria</li>
       <li xml:lang="ca-valencia">troba els punts crítics d'assignació, és a dir, les ubicacions al codi que desencadenen un munt de crides d'assignació de memòria</li>
       <li xml:lang="da">find allokerede hotspots, dvs. kodepositioner som udløser en masse kald for hukommelsesallokering</li>
@@ -169,6 +175,7 @@
       <li xml:lang="uk">Виявлення проблемних місць розміщення, тобто місць у програмному коді, які призводять до багатьох викликів щодо розміщення у пам'яті.</li>
       <li xml:lang="zh-CN">找到分配热点，即触发大量内存分配调用的代码位置</li>
       <li>find temporary allocations, which are allocations that are directly followed by their deallocation</li>
+      <li xml:lang="ar">اعثر على تخصيصات مؤقتة، وهي تخصيصات تتبعها مباشرة عمليات إلغاء تخصيصها</li>
       <li xml:lang="ca">troba les assignacions temporals, són les assignacions que són seguides directament per la cancel·lació de la seva assignació</li>
       <li xml:lang="ca-valencia">troba les assignacions temporals, són les assignacions que són seguides directament per la cancel·lació de la seua assignació</li>
       <li xml:lang="da">find midlertidige allokeringer, som er allokeringer der direkte følges af deres deallokering</li>
@@ -203,6 +210,7 @@
     <screenshot type="default">
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_summary.png</image>
       <caption>Summary of tracked heap memory allocation data</caption>
+      <caption xml:lang="ar">ملخص لبيانات تخصيص ذاكرة الكومة المتتبعة</caption>
       <caption xml:lang="ca">Resum del seguiment de les dades d'assignació de la memòria en monticles</caption>
       <caption xml:lang="ca-valencia">Resum del seguiment de les dades d'assignació de la memòria en monticles</caption>
       <caption xml:lang="en-GB">Summary of tracked heap memory allocation data</caption>
@@ -230,6 +238,7 @@
     <screenshot>
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_flamegraph.png</image>
       <caption>Flamegraph visualization of number of heap memory allocations</caption>
+      <caption xml:lang="ar">تصور Flamegraph لعدد تخصيصات ذاكرة الكومة</caption>
       <caption xml:lang="ca">Visualització del gràfic de flames del nombre d'assignacions de memòria en monticles</caption>
       <caption xml:lang="ca-valencia">Visualització del gràfic de flames del nombre d'assignacions de memòria en monticles</caption>
       <caption xml:lang="en-GB">Flamegraph visualisation of number of heap memory allocations</caption>
@@ -257,6 +266,7 @@
     <screenshot>
       <image>https://cdn.kde.org/screenshots/heaptrack/gui_allocations_chart.png</image>
       <caption>Chart of heap memory allocations over time</caption>
+      <caption xml:lang="ar">مخطط لتخصيصات ذاكرة الكومة على مدى الخط الزمني</caption>
       <caption xml:lang="ca">Gràfic de les assignacions de memòria en monticles al llarg del temps</caption>
       <caption xml:lang="ca-valencia">Gràfic de les assignacions de memòria en monticles al llarg del temps</caption>
       <caption xml:lang="en-GB">Chart of heap memory allocations over time</caption>
