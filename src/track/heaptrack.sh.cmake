@@ -370,6 +370,11 @@ fi
 debuggee=$!
 
 cleanup() {
+    # Not run for the second time
+    # (bash calls "trap ... INT EXIT" two times when interrupted)
+    cleanup() {
+      :
+    }
     if [ ! -z "$pid" ] && [ -d "/proc/$pid" ]; then
         echo "removing heaptrack injection via GDB, this might take some time..."
         gdb --batch-silent -n -iex="set auto-solib-add off" \
@@ -412,7 +417,7 @@ cleanup() {
         "$EXE_PATH/heaptrack_gui" "$output"
     fi
 }
-trap cleanup EXIT
+trap cleanup EXIT INT TERM
 
 if [ -z ${quiet} ]; then
   echo "heaptrack output will be written to \"$output\""
