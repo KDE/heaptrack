@@ -18,6 +18,7 @@ if (ZSTD_FOUND AND NOT BOOST_IOSTREAMS_HAS_ZSTD)
     mark_as_system_target(boost-zstd)
 endif()
 
-add_subdirectory(robin-map)
-
-mark_as_system_target(robin_map)
+if(NOT HEAPTRACK_USE_SYSTEM_ROBINMAP)
+    add_subdirectory(robin-map)
+    mark_as_system_target(robin_map)
+endif()
