@@ -99,6 +99,12 @@ option(
   ON
 )
 
+option(
+  HEAPTRACK_USE_SYSTEM_ROBINMAP
+  "Use system robin-map instead of bundled"
+  OFF
+)
+
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if (NOT MSVC)
@@ -156,6 +162,10 @@ if (HEAPTRACK_BUILD_TRACK)
     if (NOT HAVE_LINUX_HEADERS)
         message(FATAL_ERROR "You are missing some Linux/BSD headers required to compile heaptrack.")
     endif()
+endif()
+
+if (HEAPTRACK_USE_SYSTEM_ROBINMAP)
+    find_package(tsl-robin-map CONFIG REQUIRED)
 endif()
 
 add_subdirectory(3rdparty)
