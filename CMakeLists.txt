@@ -25,18 +25,12 @@ if (APPIMAGE_BUILD)
 endif()
 
 include(FeatureSummary)
-find_package(Boost 1.60.0 ${REQUIRED_IN_APPIMAGE} COMPONENTS filesystem iostreams container)
-# boost_system no longer exists in 1.89
-if (Boost_VERSION VERSION_LESS 1.89.0)
-    find_package(Boost ${REQUIRED_IN_APPIMAGE} COMPONENTS system)
-else()
-    set(Boost_SYSTEM_FOUND TRUE)
-endif()
+find_package(Boost 1.70.0 CONFIG ${REQUIRED_IN_APPIMAGE} COMPONENTS filesystem iostreams container)
 set_package_properties(Boost PROPERTIES TYPE RECOMMENDED PURPOSE "Boost container libraries can greatly improve performance (via pmr allocators)")
 find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 
-if (${Boost_IOSTREAMS_FOUND})
+if (Boost_IOSTREAMS_FOUND)
     find_package(ZSTD ${REQUIRED_IN_APPIMAGE})
 
     include(CheckCXXSourceCompiles)
