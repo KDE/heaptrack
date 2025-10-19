@@ -11,7 +11,7 @@ include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../../src/track
 )
 
-if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
+if (Boost_FILESYSTEM_FOUND)
     if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
         set(LIBUTIL_LIBRARY "util")
     endif()
@@ -44,7 +44,7 @@ add_test(NAME tst_trace COMMAND tst_trace)
 configure_file(tst_heaptrack_interpret.cmake.sh ${CMAKE_CURRENT_BINARY_DIR}/tst_heaptrack_interpret.sh @ONLY)
 add_test(NAME tst_heaptrack_interpret COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tst_heaptrack_interpret.sh)
 
-if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
+if (Boost_FILESYSTEM_FOUND)
     add_executable(tst_libheaptrack
         tst_libheaptrack.cpp
         ../../src/track/libheaptrack.cpp)
@@ -56,7 +56,6 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
             ${LIBUTIL_LIBRARY}
             heaptrack_unwind
             rt
-            ${Boost_SYSTEM_LIBRARY}
             ${Boost_FILESYSTEM_LIBRARY}
     )
     add_test(NAME tst_libheaptrack COMMAND tst_libheaptrack)
@@ -64,7 +63,6 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
     add_executable(tst_io tst_io.cpp)
     set_target_properties(tst_io PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
     target_link_libraries(tst_io
-            ${Boost_SYSTEM_LIBRARY}
             ${Boost_FILESYSTEM_LIBRARY}
     )
     add_test(NAME tst_io COMMAND tst_io)
@@ -75,7 +73,6 @@ if ("${Boost_FILESYSTEM_FOUND}" AND "${Boost_SYSTEM_FOUND}")
             add_executable(tst_parser tst_parser.cpp)
             set_target_properties(tst_parser PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
             target_link_libraries(tst_parser
-                    ${Boost_SYSTEM_LIBRARY}
                     ${Boost_FILESYSTEM_LIBRARY}
                     heaptrack_gui_private
                     Qt6::Test
