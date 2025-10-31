@@ -29,7 +29,6 @@
 #include <QVBoxLayout>
 #include <QWheelEvent>
 
-#include <KColorScheme>
 #include <KLocalizedString>
 #include <KStandardAction>
 #include <ThreadWeaver/ThreadWeaver>
@@ -373,12 +372,9 @@ FrameGraphicsItem* parseData(const TreeData& data, CostType type, double costThr
 
     const auto totalCost = data.resultData->totalCosts().*member;
 
-    KColorScheme scheme(QPalette::Active);
-    const QPen pen(scheme.foreground().color());
-
     auto rootItem = new FrameGraphicsItem(totalCost, type, {}, data.resultData);
-    rootItem->setBrush(scheme.background());
-    rootItem->setPen(pen);
+    rootItem->setBrush(qApp->palette().base());
+    rootItem->setPen(qApp->palette().text().color());
     toGraphicsItems(data.resultData, data.rows, rootItem, member, totalCost * costThreshold / 100., collapseRecursion);
     return rootItem;
 }

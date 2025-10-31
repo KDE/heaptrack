@@ -20,7 +20,6 @@
 #include <KChartHeaderFooter>
 #include <KChartLegend>
 
-#include <KColorScheme>
 #include <KLocalizedString>
 
 #include "histogrammodel.h"
@@ -86,8 +85,7 @@ HistogramWidget::HistogramWidget(QWidget* parent)
     {
         m_total->setAntiAliasing(true);
 
-        KColorScheme scheme(QPalette::Active, KColorScheme::Window);
-        QPen foreground(scheme.foreground().color());
+        QPen foreground(palette().windowText().color());
         auto bottomAxis = new CartesianAxis(m_total);
         auto axisTextAttributes = bottomAxis->textAttributes();
         axisTextAttributes.setPen(foreground);

@@ -33,7 +33,6 @@
 #include <KChartLegend>
 #include <KMessageBox>
 
-#include <KColorScheme>
 #include <KLocalizedString>
 
 #include "chartmodel.h"
@@ -273,8 +272,7 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
         coordinatePlane->setGlobalGridAttributes(grid);
     }
 
-    KColorScheme scheme(QPalette::Active, KColorScheme::Window);
-    QPen foreground(scheme.foreground().color());
+    QPen foreground(palette().windowText().color());
 
     {
         KChart::GridAttributes grid = coordinatePlane->gridAttributes(Qt::Horizontal);
@@ -299,7 +297,8 @@ void ChartWidget::setModel(ChartModel* model, bool minimalMode)
         m_chart->addLegend(m_legend);
 
         BackgroundAttributes bkgAtt = m_legend->backgroundAttributes();
-        QColor background = scheme.background(KColorScheme::AlternateBackground).color();
+        QColor background = palette().alternateBase().color();
+
         background.setAlpha(200);
         bkgAtt.setBrush(QBrush(background));
         bkgAtt.setVisible(true);
