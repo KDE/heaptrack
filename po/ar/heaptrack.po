@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2025-06-26 00:45+0000\n"
+"POT-Creation-Date: 2025-11-09 00:45+0000\n"
 "PO-Revision-Date: 2025-10-05 14:11+0400\n"
 "Last-Translator: Zayed Al-Saidi <zayed.alsaidi@gmail.com>\n"
 "Language-Team: ar\n"
@@ -169,13 +169,13 @@ msgstr "المستدعَي"
 msgid "Peak"
 msgstr "الذروة"
 
-#: gui/callercalleemodel.h:158 gui/flamegraph.cpp:433 gui/treemodel.cpp:71
+#: gui/callercalleemodel.h:158 gui/flamegraph.cpp:429 gui/treemodel.cpp:71
 #: gui/util.cpp:113 gui/util.cpp:142 gui/util.cpp:171
 #, kde-format
 msgid "Leaked"
 msgstr "تسرّب"
 
-#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:438 gui/mainwindow.cpp:477
+#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:434 gui/mainwindow.cpp:477
 #: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
 #, kde-format
 msgid "Allocations"
@@ -212,13 +212,13 @@ msgstr "تخصيصات الذاكرة"
 msgid "Memory Consumed"
 msgstr "الذاكرة المستهلكة"
 
-#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:443 gui/mainwindow.cpp:479
+#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:439 gui/mainwindow.cpp:479
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
 msgstr "التخصيصات المؤقتة"
 
-#: gui/chartmodel.cpp:76 gui/chartwidget.cpp:458
+#: gui/chartmodel.cpp:76 gui/chartwidget.cpp:457
 #, kde-format
 msgid "Elapsed Time"
 msgstr "الوقت المنقضي"
@@ -284,84 +284,84 @@ msgstr "<qt>%2 تخصيصات مؤقتة بعد %3 من:<p style='margin-left:10
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
 msgstr "<qt>%2 استهلاك بعد %3 من:<p style='margin-left:10px'>%1</p></qt>"
 
-#: gui/chartwidget.cpp:154
+#: gui/chartwidget.cpp:153
 #, kde-format
 msgid "Export As..."
 msgstr "صدّر كـ..."
 
-#: gui/chartwidget.cpp:157
+#: gui/chartwidget.cpp:156
 #, kde-format
 msgid "Show legend"
 msgstr "أظهِر دليل الرسوم"
 
-#: gui/chartwidget.cpp:164
+#: gui/chartwidget.cpp:163
 #, kde-format
 msgid "Show total cost graph"
 msgstr "أظهِر رسم التكلفة الإجمالية"
 
-#: gui/chartwidget.cpp:172
+#: gui/chartwidget.cpp:171
 #, kde-format
 msgid "Show detailed cost graph"
 msgstr "أظهِر رسم التكلفة المفصلة"
 
-#: gui/chartwidget.cpp:179
+#: gui/chartwidget.cpp:178
 #, kde-format
 msgid "Stacked diagrams:"
 msgstr "الرسوم البيانية المكدسة:"
 
-#: gui/chartwidget.cpp:226
+#: gui/chartwidget.cpp:225
 #, kde-format
 msgid "Filter In On Selection"
 msgstr "صفِّ باختيار التحديد"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
-#: gui/chartwidget.cpp:236 gui/mainwindow.ui:895
+#: gui/chartwidget.cpp:235 gui/mainwindow.ui:895
 #, kde-format
 msgid "Reset Filter"
 msgstr "أعِد ضبط المصفي"
 
-#: gui/chartwidget.cpp:375
+#: gui/chartwidget.cpp:374
 #, kde-format
 msgid "Save %1"
 msgstr "احفظ %1"
 
-#: gui/chartwidget.cpp:376
+#: gui/chartwidget.cpp:375
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
 msgstr "صورة نقطية (*.png *.jpg *.tiff);;صورة متجهة (*.svg)"
 
-#: gui/chartwidget.cpp:392
+#: gui/chartwidget.cpp:391
 #, kde-format
 msgid "Failed to save the image to %1"
 msgstr "فشَلَ حفظ الصورة في %1"
 
-#: gui/chartwidget.cpp:412
+#: gui/chartwidget.cpp:411
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
 msgstr "<tr><th></th><th>البداية</th><th>النهاية</th><th>الفرق</th></tr>"
 
-#: gui/chartwidget.cpp:413
+#: gui/chartwidget.cpp:412
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>الوقت</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:417
+#: gui/chartwidget.cpp:416
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>المستهلك</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:421
+#: gui/chartwidget.cpp:420
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>التخصيصات</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:425
+#: gui/chartwidget.cpp:424
 #, kde-format
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 msgstr "<tr><th>التخصيصات المؤقتة</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
-#: gui/chartwidget.cpp:433
+#: gui/chartwidget.cpp:432
 #, kde-format
 msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
@@ -370,7 +370,7 @@ msgstr ""
 "<qt>أظهِر استهلاك ذاكرة الكومة بمرور الوقت.<br>انقر واسحب لتحديد نطاق زمني "
 "للمصفي.</qt>"
 
-#: gui/chartwidget.cpp:437
+#: gui/chartwidget.cpp:436
 #, kde-format
 msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
@@ -379,7 +379,7 @@ msgstr ""
 "<qt>أظهِر عدد تخصيصات الذاكرة بمرور الوقت.<br>انقر واسحب لتحديد نطاق زمني "
 "للمصفي.</qt>"
 
-#: gui/chartwidget.cpp:441
+#: gui/chartwidget.cpp:440
 #, kde-format
 msgid ""
 "<qt>Shows number of temporary memory allocations over time. A temporary "
@@ -391,92 +391,92 @@ msgstr ""
 "يتبعه مباشرة إلغاء تخصيصه الموافق، دون وقوع تخصيصات أخرى بينهما.<br>انقر "
 "واسحب لتحديد نطاق زمني للمصفي.</qt>"
 
-#: gui/chartwidget.cpp:463
+#: gui/chartwidget.cpp:462
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
 msgstr "%1 (صفّي من %2 إلى %3، Δ%4)"
 
-#: gui/chartwidget.cpp:467
+#: gui/chartwidget.cpp:466
 #, kde-format
 msgid "%1 (filtered delta)"
 msgstr "%1 (فرق مصّفى)"
 
-#: gui/chartwidget.cpp:556
+#: gui/chartwidget.cpp:555
 #, kde-format
 msgid "Click and drag to select time range for filtering."
 msgstr "انقر واسحب لتحديد نطاق زمني للمصفي."
 
-#: gui/chartwidget.cpp:562
+#: gui/chartwidget.cpp:561
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
 msgstr "الزمن = %1، المستهلك: %2. انقر واسحب لتحديد نطاق زمني للمصفي."
 
-#: gui/chartwidget.cpp:566
+#: gui/chartwidget.cpp:565
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
 msgstr "الزمن = %1، التخصيصات: %2. انقر واسحب لتحديد نطاق زمني للمصفي."
 
-#: gui/chartwidget.cpp:570
+#: gui/chartwidget.cpp:569
 #, kde-format
 msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
 "filtering."
 msgstr "الزمن = %1، التخصيصات المؤقتة: %2. انقر واسحب لتحديد نطاق زمني للمصفي."
 
-#: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
+#: gui/flamegraph.cpp:174 gui/histogrammodel.cpp:63
 #, kde-format
 msgid "%1 allocations in total"
 msgstr "إجمالي %1 من التخصيصات"
 
-#: gui/flamegraph.cpp:177
+#: gui/flamegraph.cpp:176
 #, kde-format
 msgid "%1 temporary allocations in total"
 msgstr "إجمالي %1 من التخصيصات المؤقتة"
 
-#: gui/flamegraph.cpp:179
+#: gui/flamegraph.cpp:178
 #, kde-format
 msgid "%1 peak memory consumption"
 msgstr "ذروة استهلاك الذاكرة %1"
 
-#: gui/flamegraph.cpp:181
+#: gui/flamegraph.cpp:180
 #, kde-format
 msgid "%1 leaked in total"
 msgstr "إجمالي %1 تسرّب"
 
-#: gui/flamegraph.cpp:234
+#: gui/flamegraph.cpp:233
 #, kde-format
 msgctxt "%1: number of allocations, %2: relative number, %3: function label"
 msgid "%1 (%2%) allocations in %3 and below."
 msgstr "%1 (%2٪) تخصيصات في %3 وما دونه."
 
-#: gui/flamegraph.cpp:239
+#: gui/flamegraph.cpp:238
 #, kde-format
 msgctxt ""
 "%1: number of temporary allocations, %2: relative number, %3 function label"
 msgid "%1 (%2%) temporary allocations in %3 and below."
 msgstr "%1 (%2٪) تخصيصات مؤقتة في %3 وما دونه."
 
-#: gui/flamegraph.cpp:244
+#: gui/flamegraph.cpp:243
 #, kde-format
 msgctxt ""
 "%1: peak consumption in bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) contribution to peak consumption in %3 and below."
 msgstr "%1 (%2٪) مساهمة في ذروة الاستهلاك في %3 وما دونه."
 
-#: gui/flamegraph.cpp:248
+#: gui/flamegraph.cpp:247
 #, kde-format
 msgctxt "%1: leaked bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) leaked in %3 and below."
 msgstr "%1 (%2٪) تسرّب في %3 وما دونه."
 
-#: gui/flamegraph.cpp:428
+#: gui/flamegraph.cpp:424
 #, kde-format
 msgid "Memory Peak"
 msgstr "ذروة الذاكرة"
 
-#: gui/flamegraph.cpp:430
+#: gui/flamegraph.cpp:426
 #, kde-format
 msgid ""
 "Show a flame graph over the contributions to the peak heap memory "
@@ -484,7 +484,7 @@ msgid ""
 msgstr ""
 "أظهِر رسمًا بيانيًا شعلًا يوضح المساهمات في ذروة استهلاك ذاكرة الكومة لتطبيقك."
 
-#: gui/flamegraph.cpp:435
+#: gui/flamegraph.cpp:431
 #, kde-format
 msgid ""
 "Show a flame graph over the leaked heap memory of your application. Memory "
@@ -493,14 +493,14 @@ msgstr ""
 "أظهِر رسمًا بيانيًا شعلًا يوضح ذاكرة الكومة التي تسرّبت من تطبيقك. تعتبر الذاكرة "
 "متسربة إذا لَمْ يُلْغَ تخصيصها قط. "
 
-#: gui/flamegraph.cpp:440
+#: gui/flamegraph.cpp:436
 #, kde-format
 msgid ""
 "Show a flame graph over the number of allocations triggered by functions in "
 "your code."
 msgstr "أظهِر رسمًا بيانيًا شعلًا يوضح عدد التخصيصات التي أطلقتها دوال في شيفرتك."
 
-#: gui/flamegraph.cpp:445
+#: gui/flamegraph.cpp:441
 #, kde-format
 msgid ""
 "Show a flame graph over the number of temporary allocations triggered by "
@@ -510,17 +510,17 @@ msgstr ""
 "أظهِر رسمًا بيانيًا شعلًا يوضح عدد التخصيصات المؤقتة التي أطلقتها دوال في "
 "شيفرتك. التخصيصات تُعْلَم كمؤقتة عندما يتبعها مباشرة إلغاء تخصيصها."
 
-#: gui/flamegraph.cpp:452
+#: gui/flamegraph.cpp:448
 #, kde-format
 msgid "Select the data source that should be visualized in the flame graph."
 msgstr "اختر مصدر البيانات الذي يجب تصويره في الرسم البياني الشعلي."
 
-#: gui/flamegraph.cpp:467
+#: gui/flamegraph.cpp:463
 #, kde-format
 msgid "Bottom-Up View"
 msgstr "عرض من الأسفل للأعلى"
 
-#: gui/flamegraph.cpp:468
+#: gui/flamegraph.cpp:464
 #, kde-format
 msgid ""
 "Enable the bottom-up flame graph view. When this is unchecked, the top-down "
@@ -529,12 +529,12 @@ msgstr ""
 "فعِّل عرض الرسم البياني الشعلي من الأسفل للأعلى. عند إلغاء تحديده، يُفَعَّل العرض "
 "من الأعلى للأسفل مبدئياً."
 
-#: gui/flamegraph.cpp:476
+#: gui/flamegraph.cpp:472
 #, kde-format
 msgid "Collapse Recursion"
 msgstr "اطوِ العودية"
 
-#: gui/flamegraph.cpp:478
+#: gui/flamegraph.cpp:474
 #, kde-format
 msgid ""
 "Collapse stack frames for functions calling themselves. When this is "
@@ -543,12 +543,12 @@ msgstr ""
 "اطوِ إطارات الكدسة للدوال التي تستدعي نفسها. عند إلغاء تحديده، تُصَوَّر الإطارات "
 "العودية بشكل منفصل."
 
-#: gui/flamegraph.cpp:490
+#: gui/flamegraph.cpp:486
 #, kde-format
 msgid "Cost Threshold: "
 msgstr "عتبة التكلفة: "
 
-#: gui/flamegraph.cpp:494
+#: gui/flamegraph.cpp:490
 #, kde-format
 msgid ""
 "<qt>The cost threshold defines a fractional cut-off value. Items with a "
@@ -562,37 +562,37 @@ msgstr ""
 "بيانية سريعة لمجموعات بيانات كبيرة مع حمل زائد منخفض في الذاكرة. إنْ احتَجْتَ "
 "المزيد من التفاصيل، قلّل قيمة العتبة، أو اضبطها على صفر.</qt>"
 
-#: gui/flamegraph.cpp:506
+#: gui/flamegraph.cpp:502
 #, kde-format
 msgid "Search..."
 msgstr "ابحث..."
 
-#: gui/flamegraph.cpp:507
+#: gui/flamegraph.cpp:503
 #, kde-format
 msgid "<qt>Search the flame graph for a symbol.</qt>"
 msgstr "<qt>ابحث في الرسم البياني الشعلي عن وسم.</qt>"
 
-#: gui/flamegraph.cpp:545
+#: gui/flamegraph.cpp:541
 #, kde-format
 msgid "Reset View"
 msgstr "أعِد ضبط العرض"
 
-#: gui/flamegraph.cpp:555 gui/mainwindow.cpp:142
+#: gui/flamegraph.cpp:551 gui/mainwindow.cpp:142
 #, kde-format
 msgid "View Caller/Callee"
 msgstr "اعرض المستدعِي/المستدعَي"
 
-#: gui/flamegraph.cpp:696
+#: gui/flamegraph.cpp:692
 #, kde-format
 msgid "generating flame graph..."
 msgstr "أَنشِئ الرسم البياني الشعلي..."
 
-#: gui/flamegraph.cpp:773
+#: gui/flamegraph.cpp:769
 #, kde-format
 msgid "%1 (%2% of total of %3) allocations matched by search."
 msgstr "%1 (%2٪ من إجمالي %3) تخصيصات تطابقت مع البحث."
 
-#: gui/flamegraph.cpp:778
+#: gui/flamegraph.cpp:774
 #, kde-format
 msgid "%1 (%2% of total of %3) matched by search."
 msgstr "%1 (%2٪ من إجمالي %3) تطابقت مع البحث."
@@ -677,12 +677,12 @@ msgid ""
 "allocation"
 msgstr "%1 تخصيصات من %2، مجموعها %3 مخصصة بمتوسط %4 لكل تخصيص"
 
-#: gui/histogramwidget.cpp:99
+#: gui/histogramwidget.cpp:97
 #, kde-format
 msgid "Requested Allocation Size"
 msgstr "حجم التخصيص المطلوب"
 
-#: gui/histogramwidget.cpp:105
+#: gui/histogramwidget.cpp:103
 #, kde-format
 msgid "Number of Allocations"
 msgstr "عدد التخصيصات"
