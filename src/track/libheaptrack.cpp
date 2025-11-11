@@ -298,8 +298,8 @@ public:
         }
 
         // do some once-only initializations
-        static once_flag once;
-        call_once(once, [] {
+        static std::once_flag once;
+        std::call_once(once, [] {
             debugLog<MinimalOutput>("%s", "doing once-only initialization");
 
             Trace::setup();
