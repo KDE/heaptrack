@@ -564,7 +564,8 @@ MainWindow::MainWindow(QWidget* parent)
     };
 
     const QString heaptrackFileFilter = QStringLiteral("heaptrack.*.*.gz heaptrack.*.*.zst");
-    const QStringList heaptrackFileFilters = {heaptrackFileFilter};
+    const QString allFilesFilter = QStringLiteral("All files (*)");
+    const QStringList heaptrackFileFilters = {heaptrackFileFilter, allFilesFilter};
     m_ui->openFile->setNameFilters(heaptrackFileFilters);
     m_ui->compareTo->setNameFilters(heaptrackFileFilters);
 
