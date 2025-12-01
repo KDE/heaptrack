@@ -1362,6 +1362,3 @@ msgstr "%1 a %2"
 #, kde-format
 msgid "<unresolved function>"
 msgstr "<fu nció no resolta>"
-
-#~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
-#~ msgstr "heaptrack.*.*.gz heaptrack.*.*.zst"
