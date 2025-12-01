@@ -35,6 +35,7 @@ public:
 
 protected:
     bool eventFilter(QObject* object, QEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
 
 private slots:
     void setData(FrameGraphicsItem* rootItem);

@@ -617,6 +617,21 @@ bool FlameGraph::eventFilter(QObject* object, QEvent* event)
     return ret;
 }
 
+void FlameGraph::mouseReleaseEvent(QMouseEvent* event)
+{
+    switch (event->button()) {
+        case Qt::BackButton:
+            navigateBack();
+            break;
+        case Qt::ForwardButton:
+            navigateForward();
+            break;
+        default:
+            QWidget::mousePressEvent(event);
+            break;
+    }
+}
+
 void FlameGraph::setTopDownData(const TreeData& topDownData)
 {
     m_topDownData = topDownData;
