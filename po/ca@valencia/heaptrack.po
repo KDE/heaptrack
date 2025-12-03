@@ -359,7 +359,7 @@ msgstr "Imatge ràster (*.png *.jpg *.tiff);;Imatge vectorial (*.svg)"
 #: gui/chartwidget.cpp:400
 #, kde-format
 msgid "Failed to save the image to %1"
-msgstr "No s'ha pogut guardar la imatge a %1"
+msgstr "Ha fallat mentre es guardava la imatge a %1"
 
 #: gui/chartwidget.cpp:420
 #, kde-format
@@ -696,9 +696,8 @@ msgstr ""
 "dades de Heaptrack. De manera predeterminada, Heaptrack copiarà les "
 "supressions definides de manera opcional mitjançant un símbol «const char "
 "*__lsan_default_suppressions()» en l'aplicació de depuració. Estes "
-"s'aplicaran sempre en l'anàlisi sintàctica de les dades, llevat que "
-"s'inhabilite explícitament esta característica mitjançant esta opció de la "
-"línia d'ordres."
+"s'aplicaran sempre en analitzar les dades, llevat que s'inhabilite "
+"explícitament esta característica mitjançant esta opció de la línia d'ordres."
 
 #: gui/gui.cpp:105
 #, kde-format
@@ -816,7 +815,7 @@ msgstr "<dt><b>memòria total perduda</b>:</dt><dd>%1</dd>"
 #: gui/mainwindow.cpp:470
 #, kde-format
 msgid "Failed to parse file %1."
-msgstr "No s'ha pogut analitzar el fitxer %1."
+msgstr "Ha fallat durant l'anàlisi sintàctica del fitxer %1."
 
 #: gui/mainwindow.cpp:475
 #, kde-format
@@ -846,7 +845,7 @@ msgstr "La dada d'entrada %1 no es pot llegir."
 #: gui/mainwindow.cpp:597
 #, kde-format
 msgid "Failed to parse suppression file."
-msgstr "No s'ha pogut analitzar la supressió del fitxer."
+msgstr "Ha fallat durant l'anàlisi la supressió del fitxer."
 
 #: gui/mainwindow.cpp:612
 #, kde-format
