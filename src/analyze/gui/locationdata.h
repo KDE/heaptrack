@@ -75,7 +75,7 @@ struct hash<Symbol>
 };
 }
 
-inline uint qHash(const Symbol& symbol, uint seed = 0)
+inline unsigned int qHash(const Symbol& symbol, unsigned int seed = 0)
 {
     QtPrivate::QHashCombine hash;
     seed = hash(seed, symbol.functionId);
@@ -83,7 +83,7 @@ inline uint qHash(const Symbol& symbol, uint seed = 0)
     return seed;
 }
 
-inline uint qHash(const FileLine& location, uint seed = 0)
+inline unsigned int qHash(const FileLine& location, unsigned int seed = 0)
 {
     QtPrivate::QHashCombine hash;
     seed = hash(seed, location.fileId);
