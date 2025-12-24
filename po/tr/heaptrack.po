@@ -7,15 +7,15 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-11-17 14:42+0000\n"
-"PO-Revision-Date: 2025-06-29 17:30+0300\n"
-"Last-Translator: Emir SARI <emir_sari@îcloud.com>\n"
+"PO-Revision-Date: 2025-12-23 12:31+0300\n"
+"Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 25.04.2\n"
+"X-Generator: Lokalize 25.12.0\n"
 "X-POOTLE-MTIME: 1502202299.000000\n"
 
 #, kde-format
@@ -294,7 +294,7 @@ msgstr ""
 #: gui/chartwidget.cpp:162
 #, kde-format
 msgid "Export As..."
-msgstr "Farklı Dışa Aktar..."
+msgstr "Farklı Dışa Aktar…"
 
 #: gui/chartwidget.cpp:165
 #, kde-format
@@ -583,7 +583,7 @@ msgstr ""
 #: gui/flamegraph.cpp:506
 #, kde-format
 msgid "Search..."
-msgstr "Ara..."
+msgstr "Ara…"
 
 #: gui/flamegraph.cpp:507
 #, kde-format
@@ -603,7 +603,7 @@ msgstr "Çağıranı/Çağrılanı Görüntüle"
 #: gui/flamegraph.cpp:696
 #, kde-format
 msgid "generating flame graph..."
-msgstr "alev grafiği oluşturuluyor..."
+msgstr "alev grafiği üretiliyor…"
 
 #: gui/flamegraph.cpp:773
 #, kde-format
@@ -688,7 +688,7 @@ msgstr "Yüklenecek dosyalar"
 #: gui/gui.cpp:108
 #, kde-format
 msgid "[FILE...]"
-msgstr "[DOSYA...]"
+msgstr "[DOSYA…]"
 
 #: gui/histogrammodel.cpp:65
 #, kde-format
@@ -839,7 +839,7 @@ msgstr ""
 #: gui/mainwindow.cpp:682
 #, kde-format
 msgid "Loading file %1, please wait..."
-msgstr "%1 dosyası yükleniyor, lütfen bekleyin..."
+msgstr "%1 dosyası yükleniyor, lütfen bekleyin…"
 
 #: gui/mainwindow.cpp:684
 #, kde-format
