@@ -216,8 +216,8 @@ TEST_CASE ("symbolizing") {
     REQUIRE(data.mod);
 
     DwarfDieCache cache(data.mod);
-    uint j = 0;
-    for (uint i = 0; i < 6 + j; ++i) {
+    size_t j = 0;
+    for (size_t i = 0; i < 6 + j; ++i) {
         auto addr = reinterpret_cast<Dwarf_Addr>(trace[i]);
 
         auto cuDie = cache.findCuDie(addr);
