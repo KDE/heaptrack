@@ -222,7 +222,10 @@ std::string demangle(const std::string& mangledName)
 
 std::string absoluteSourcePath(const char* path, Dwarf_Die* cuDie)
 {
-    if (!path || !cuDie || path[0] == '/')
+    if (!path)
+        return "";
+
+    if (!cuDie || path[0] == '/')
         return path;
 
     Dwarf_Attribute attr;
