@@ -845,7 +845,7 @@ msgstr "La dada d'entrada %1 no es pot llegir."
 #: gui/mainwindow.cpp:597
 #, kde-format
 msgid "Failed to parse suppression file."
-msgstr "Ha fallat durant l'anàlisi la supressió del fitxer."
+msgstr "Ha fallat durant l'anàlisi de la supressió del fitxer."
 
 #: gui/mainwindow.cpp:612
 #, kde-format
