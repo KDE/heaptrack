@@ -1,13 +1,13 @@
-# Copyright (C) YEAR This file is copyright:
+# Copyright (C) 2026 This file is copyright:
 # This file is distributed under the same license as the heaptrack package.
 #
-# Giovanni Sora <g.sora@tiscali.it>, 2020, 2021, 2022.
+# SPDX-FileCopyrightText: 2020, 2021, 2022, 2026 Giovanni Sora <g.sora@tiscali.it>
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-11-17 11:54+0000\n"
-"PO-Revision-Date: 2022-12-13 23:18+0100\n"
+"PO-Revision-Date: 2026-01-14 11:06+0100\n"
 "Last-Translator: giovanni <g.sora@tiscali.it>\n"
 "Language-Team: Interlingua <kde-i18n-doc@kde.org>\n"
 "Language: ia\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 22.12.0\n"
+"X-Generator: Lokalize 23.08.5\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -143,7 +143,7 @@ msgstr ""
 #: gui/callercalleemodel.cpp:202
 #, kde-format
 msgid "Caller"
-msgstr ""
+msgstr " Appellante"
 
 #: gui/callercalleemodel.cpp:214
 #, kde-format
@@ -154,7 +154,7 @@ msgstr ""
 #: gui/util.cpp:141 gui/util.cpp:170
 #, kde-format
 msgid "Peak"
-msgstr ""
+msgstr "Picco"
 
 #: gui/callercalleemodel.h:158 gui/flamegraph.cpp:429 gui/treemodel.cpp:71
 #: gui/util.cpp:113 gui/util.cpp:142 gui/util.cpp:171
@@ -320,7 +320,7 @@ msgstr ""
 #: gui/chartwidget.cpp:391
 #, kde-format
 msgid "Failed to save the image to %1"
-msgstr ""
+msgstr "Falleva a salveguardar le image a %1"
 
 #: gui/chartwidget.cpp:411
 #, kde-format
@@ -543,7 +543,7 @@ msgstr ""
 #: gui/flamegraph.cpp:541
 #, kde-format
 msgid "Reset View"
-msgstr ""
+msgstr "Reinitialisa vista"
 
 #: gui/flamegraph.cpp:551 gui/mainwindow.cpp:142
 #, kde-format
@@ -717,7 +717,7 @@ msgstr ""
 #: gui/mainwindow.cpp:470
 #, kde-format
 msgid "Failed to parse file %1."
-msgstr ""
+msgstr "Falleva a analyusar file: %1."
 
 #: gui/mainwindow.cpp:475
 #, kde-format
@@ -1011,7 +1011,7 @@ msgstr ""
 #: gui/mainwindow.ui:810
 #, kde-format
 msgid "S&tacks"
-msgstr ""
+msgstr "&Pilas"
 
 #. i18n: ectx: property (text), widget (QLabel, stackSpinnerLabel)
 #: gui/mainwindow.ui:835
