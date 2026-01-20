@@ -28,6 +28,7 @@ add_definitions(-DQT_NO_URL_CAST_FROM_STRING
 add_library(heaptrack_gui_private STATIC
     util.cpp
     parser.cpp
+    middleelide.cpp
 )
 target_link_libraries(heaptrack_gui_private PUBLIC
     KF6::I18n
@@ -81,6 +82,8 @@ set(LIBRARIES
     sharedprint
     heaptrack_gui_private
 )
+
+add_subdirectory(tests)
 
 if (KChart_FOUND)
     list(APPEND SRCFILES
