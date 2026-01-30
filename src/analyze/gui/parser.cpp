@@ -567,7 +567,7 @@ HistogramData buildSizeHistogram(ParserData& data, std::shared_ptr<const ResultD
                                                {512, i18n("257B to 512B")},
                                                {1024, i18n("512B to 1KB")},
                                                {numeric_limits<uint64_t>::max(), i18n("more than 1KB")}};
-    uint bucketIndex = 0;
+    size_t bucketIndex = 0;
     row.size = buckets[bucketIndex].first;
     row.sizeLabel = buckets[bucketIndex].second;
     vector<MergedHistogramColumnData> columnData;

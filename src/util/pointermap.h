@@ -60,7 +60,7 @@ struct AllocationInfoSet
 
     bool add(uint64_t size, TraceIndex traceIndex, AllocationInfoIndex* allocationIndex)
     {
-        allocationIndex->index = static_cast<uint>(set.size());
+        allocationIndex->index = static_cast<uint32_t>(set.size());
         IndexedAllocationInfo info = {size, traceIndex, *allocationIndex};
         auto it = set.find(info);
         if (it != set.end()) {
