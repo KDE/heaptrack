@@ -35,6 +35,7 @@
 
 #include "resultdata.h"
 #include "util.h"
+#include "middleelide.h"
 
 enum CostType
 {
@@ -182,10 +183,12 @@ void FrameGraphicsItem::paint(QPainter* painter, const QStyleOptionGraphicsItem*
         Q_UNREACHABLE();
     }();
 
+    QString middleElidedLabel = MiddleElide::elideAngleBracket(label);
+
     const int height = rect().height();
     painter->drawText(margin + rect().x(), rect().y(), width, height,
                       Qt::AlignVCenter | Qt::AlignLeft | Qt::TextSingleLine,
-                      option->fontMetrics.elidedText(label, Qt::ElideRight, width));
+                      option->fontMetrics.elidedText(middleElidedLabel, Qt::ElideRight, width));
 
     if (m_searchMatch == NoMatch) {
         painter->setPen(oldPen);
