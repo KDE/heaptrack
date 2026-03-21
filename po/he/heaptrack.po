@@ -1,13 +1,13 @@
 # Copyright (C) 2025 This file is copyright:
 # This file is distributed under the same license as the heaptrack package.
 #
-# SPDX-FileCopyrightText: 2025 Yaron Shahrabani <sh.yaron@gmail.com>
+# SPDX-FileCopyrightText: 2025, 2026 Yaron Shahrabani <sh.yaron@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-11-17 11:54+0000\n"
-"PO-Revision-Date: 2025-06-11 11:07+0300\n"
+"PO-Revision-Date: 2026-03-20 08:13+0200\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n == 1) ? 0 : ((n == 2) ? 1 : ((n > 10 && "
 "n % 10 == 0) ? 2 : 3));\n"
-"X-Generator: Lokalize 25.04.1\n"
+"X-Generator: Lokalize 25.12.3\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -762,7 +762,7 @@ msgstr "<dt><b>סך כל הזיכרון שזלג</b>:</dt><dd>%1</dd>"
 #: gui/mainwindow.cpp:470
 #, kde-format
 msgid "Failed to parse file %1."
-msgstr "פענוח הקובץ %1 נכשל."
+msgstr "פיענוח הקובץ %1 נכשל."
 
 #: gui/mainwindow.cpp:475
 #, kde-format
@@ -792,7 +792,7 @@ msgstr "נתוני הקלט %1 אינם קריאים."
 #: gui/mainwindow.cpp:592
 #, kde-format
 msgid "Failed to parse suppression file."
-msgstr "פענוח קובץ ההדחקות נכשל."
+msgstr "פיענוח קובץ ההדחקות נכשל."
 
 #: gui/mainwindow.cpp:607
 #, kde-format
