@@ -874,7 +874,7 @@ msgstr ""
 #: gui/mainwindow.ui:14
 #, kde-format
 msgid "MainWindow"
-msgstr "النافذة الرئيسية"
+msgstr "النافذة الرئيسة"
 
 #. i18n: ectx: property (toolTip), widget (QMainWindow, MainWindow)
 #. i18n: ectx: property (toolTip), widget (QLabel, suppressionsLabel)
