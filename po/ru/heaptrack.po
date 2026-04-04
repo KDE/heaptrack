@@ -2,13 +2,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 #
 # Alexander Potashev <aspotashev@gmail.com>, 2015, 2017.
+# SPDX-FileCopyrightText: 2026 Alexander Yavorskiy <kekcuha@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-11-17 11:54+0000\n"
-"PO-Revision-Date: 2017-09-14 15:13+0300\n"
-"Last-Translator: Alexander Potashev <aspotashev@gmail.com>\n"
+"PO-Revision-Date: 2026-03-08 22:25+0200\n"
+"Last-Translator: Alexander Yavorskiy <kekcuha@gmail.com>\n"
 "Language-Team: Russian <kde-russian@lists.kde.ru>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
 "%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Lokalize 2.0\n"
+"X-Generator: Lokalize 25.12.2\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -35,108 +36,88 @@ msgid "Location"
 msgstr "Место"
 
 #: gui/callercalleemodel.cpp:42 gui/callercalleemodel.h:335
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid "Allocations (Self)"
-msgstr "Выделения"
+msgstr "Выделения (собственные)"
 
 #: gui/callercalleemodel.cpp:44 gui/callercalleemodel.h:337
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid "Temporary (Self)"
-msgstr "Выделения"
+msgstr "Временные (собственные)"
 
 #: gui/callercalleemodel.cpp:46 gui/callercalleemodel.h:339
-#, fuzzy, kde-format
-#| msgid "Leaked"
+#, kde-format
 msgid "Peak (Self)"
-msgstr "Объём утечки"
+msgstr "Пиковое значение (собственное)"
 
 #: gui/callercalleemodel.cpp:48 gui/callercalleemodel.h:341
-#, fuzzy, kde-format
-#| msgid "Leaked"
+#, kde-format
 msgid "Leaked (Self)"
-msgstr "Объём утечки"
+msgstr "Объём утечки (собственная)"
 
 #: gui/callercalleemodel.cpp:50 gui/callercalleemodel.h:343
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid "Allocations (Incl.)"
-msgstr "Выделения"
+msgstr "Выделения (включ.)"
 
 #: gui/callercalleemodel.cpp:52 gui/callercalleemodel.h:345
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid "Temporary (Incl.)"
-msgstr "Выделения"
+msgstr "Временные (включ.)"
 
 #: gui/callercalleemodel.cpp:54 gui/callercalleemodel.h:347
-#, fuzzy, kde-format
-#| msgid "Leaked"
+#, kde-format
 msgid "Peak (Incl.)"
-msgstr "Объём утечки"
+msgstr "Пиковый объём (включ.)"
 
 #: gui/callercalleemodel.cpp:56 gui/callercalleemodel.h:349
-#, fuzzy, kde-format
-#| msgid "Leaked"
+#, kde-format
 msgid "Leaked (Incl.)"
-msgstr "Объём утечки"
+msgstr "Объём утечки (включ.)"
 
 #: gui/callercalleemodel.cpp:63
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The number of times an allocation function was called from this "
-#| "location.</qt>"
+#, kde-format
 msgid ""
 "<qt>The parent symbol that called an allocation function. The function name "
 "may be unresolved when debug information is missing.</qt>"
 msgstr ""
-"<qt>Число вызовов функции выделения, совершённых из указанного места.</qt>"
+"<qt>Родительский символ, вызвавший функцию выделения памяти. Имя функции "
+"может остаться неразрешённым при отсутствии отладочной информации.</qt>"
 
 #: gui/callercalleemodel.cpp:66 gui/callercalleemodel.h:359
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The number of times an allocation function was called from this "
-#| "location.</qt>"
+#, kde-format
 msgid ""
 "<qt>The number of times an allocation function was directly called from this "
 "location.</qt>"
-msgstr ""
-"<qt>Число вызовов функции выделения, совершённых из указанного места.</qt>"
+msgstr "<qt>Число прямых вызовов функции выделения памяти из этого места.</qt>"
 
 #: gui/callercalleemodel.cpp:69 gui/callercalleemodel.h:362
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The number of times an allocation function was called from this "
-#| "location.</qt>"
+#, kde-format
 msgid ""
 "<qt>The number of direct temporary allocations. These allocations are "
 "directly followed by a free without any other allocations in-between.</qt>"
 msgstr ""
-"<qt>Число вызовов функции выделения, совершённых из указанного места.</qt>"
+"<qt>Число прямых временных выделений. Эти выделения памяти непосредственно "
+"освобождаются без каких-либо других операций выделения между ними.</qt>"
 
 #: gui/callercalleemodel.cpp:73 gui/callercalleemodel.h:366
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The maximum heap memory in bytes consumed from allocations "
-#| "originating at this location. This takes deallocations into account.</qt>"
+#, kde-format
 msgid ""
 "<qt>The maximum heap memory in bytes consumed from allocations originating "
 "directly at this location. This takes deallocations into account.</qt>"
 msgstr ""
 "<qt>Максимальный объём использованной памяти, затребованной всеми операциями "
-"выделения из указанного места. Операции освобождения памяти учитываются и "
-"уменьшают данное значение.</qt>"
+"выделения непосредственно из указанного места. Операции освобождения памяти "
+"учитываются и уменьшают данное значение.</qt>"
 
 #: gui/callercalleemodel.cpp:78 gui/callercalleemodel.h:371
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The bytes allocated at this location that have not been deallocated.</"
-#| "qt>"
+#, kde-format
 msgid ""
 "<qt>The bytes allocated directly at this location that have not been "
 "deallocated.</qt>"
-msgstr "<qt>Объём памяти, выделенной в указанном месте, но не очищенной.</qt>"
+msgstr ""
+"<qt>Объём памяти, выделенной непосредственно в указанном месте, но не "
+"очищенной.</qt>"
 
 #: gui/callercalleemodel.cpp:81 gui/callercalleemodel.h:181
 #: gui/callercalleemodel.h:374
@@ -187,19 +168,18 @@ msgstr "<qt>Объём памяти, выделенной в указанном 
 #: gui/callercalleemodel.cpp:202
 #, kde-format
 msgid "Caller"
-msgstr ""
+msgstr "Вызывающая функция"
 
 #: gui/callercalleemodel.cpp:214
 #, kde-format
 msgid "Callee"
-msgstr ""
+msgstr "Вызываемая функция"
 
 #: gui/callercalleemodel.h:156 gui/treemodel.cpp:69 gui/util.cpp:112
 #: gui/util.cpp:141 gui/util.cpp:170
-#, fuzzy, kde-format
-#| msgid "Peak [B]"
+#, kde-format
 msgid "Peak"
-msgstr "Пик [Б]"
+msgstr "Пик"
 
 #: gui/callercalleemodel.h:158 gui/flamegraph.cpp:429 gui/treemodel.cpp:71
 #: gui/util.cpp:113 gui/util.cpp:142 gui/util.cpp:171
@@ -334,49 +314,49 @@ msgstr ""
 #: gui/chartwidget.cpp:153
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Экспортировать как..."
 
 #: gui/chartwidget.cpp:156
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Показать легенду"
 
 #: gui/chartwidget.cpp:163
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "Показать график суммарных затрат"
 
 #: gui/chartwidget.cpp:171
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "Выводить подробный график стоимости"
 
 #: gui/chartwidget.cpp:178
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "Число срезов:"
 
 #: gui/chartwidget.cpp:225
-#, fuzzy, kde-format
-#| msgid "filter by function..."
+#, kde-format
 msgid "Filter In On Selection"
-msgstr "Фильтр по функциям..."
+msgstr "Фильтр по выбору"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
 #: gui/chartwidget.cpp:235 gui/mainwindow.ui:895
 #, kde-format
 msgid "Reset Filter"
-msgstr ""
+msgstr "Очистить условия фильтра"
 
 #: gui/chartwidget.cpp:374
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Сохранение «%1»"
 
 #: gui/chartwidget.cpp:375
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
 msgstr ""
+"Растровое изображение (*.png *.jpg *.tiff);;Векторное изображение (*.svg)"
 
 #: gui/chartwidget.cpp:391
 #, kde-format
