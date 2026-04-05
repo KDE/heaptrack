@@ -1,7 +1,7 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 # Vincent Pinon <vpinon@kde.org>, 2015.
-# SPDX-FileCopyrightText: 2020, 2021, 2022, 2023, 2024 Xavier Besnard <xavier.besnard@kde.org>
+# SPDX-FileCopyrightText: 2020, 2021, 2022, 2023, 2024, 2026 Xavier Besnard <xavier.besnard@kde.org>
 # Xavier Besnard <xavier.besnard@kde.org>, 2023.
 #
 msgid ""
@@ -9,15 +9,15 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-11-17 14:42+0000\n"
-"PO-Revision-Date: 2024-04-29 15:44+0200\n"
+"PO-Revision-Date: 2026-04-03 20:25+0200\n"
 "Last-Translator: Xavier Besnard <xavier.besnard@kde.org>\n"
-"Language-Team: French <French <kde-francophone@kde.org>>\n"
+"Language-Team: fr\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 23.08.5\n"
+"X-Generator: Lokalize 25.12.3\n"
 "X-Environment: kde\n"
 "X-Accelerator-Marker: &\n"
 "X-Text-Markup: kde4\n"
@@ -104,7 +104,7 @@ msgid ""
 "directly followed by a free without any other allocations in-between.</qt>"
 msgstr ""
 "<qt>Le nombre d'allocations temporaires. Ces allocations sont directement "
-"suivies par leur désallocation, sans aucune autre allocation entre.</qt>"
+"suivies par leur déallocation, sans aucune autre allocation entre.</qt>"
 
 #: gui/callercalleemodel.cpp:73 gui/callercalleemodel.h:366
 #, kde-format
@@ -143,7 +143,7 @@ msgid ""
 "directly followed by a free without any other allocations in-between.</qt>"
 msgstr ""
 "<qt>Le nombre d'allocations temporaires. Ces allocations sont directement "
-"suivies par leur désallocation, sans aucune autre allocation entre.</qt>"
+"suivies par leur déallocation, sans aucune autre allocation entre.</qt>"
 
 #: gui/callercalleemodel.cpp:89 gui/callercalleemodel.h:173
 #: gui/callercalleemodel.h:382
@@ -155,7 +155,7 @@ msgid ""
 msgstr ""
 "<qt>La mémoire maximale en octets du tas local inclus et consommé par des "
 "allocations provenant de cet emplacement pour des fonctions appelés ici. "
-"Ceci prend en compte les désallocations.</qt>"
+"Ceci prend en compte les déallocations.</qt>"
 
 #: gui/callercalleemodel.cpp:94 gui/callercalleemodel.h:178
 #: gui/callercalleemodel.h:387 gui/treemodel.cpp:91
@@ -412,7 +412,7 @@ msgid ""
 msgstr ""
 "<qt>Affiche le nombre d'allocations temporaires de mémoire sur une période "
 "donnée. Une allocation temporaire est celle qui est suivie directement par "
-"sa désallocation, sans autre allocation réalisée entre les deux. <br>Cliquez "
+"sa déallocation, sans autre allocation réalisée entre les deux. <br>Cliquez "
 "et faites glisser pour sélectionner l'intervalle de temps pour le filtrage.</"
 "qt>"
 
@@ -547,7 +547,7 @@ msgstr ""
 "Afficher un graphique en flammes concernant le nombre d'allocations "
 "demandées par les fonctions de votre code. Les allocations sont marquées "
 "comme temporaires quand elles sont immédiatement suivies par une "
-"désallocation."
+"déallocation."
 
 #: gui/flamegraph.cpp:452
 #, kde-format
@@ -1266,7 +1266,7 @@ msgid ""
 "followed by a free without any other allocations in-between.</qt>"
 msgstr ""
 "<qt>Le nombre d'allocations temporaires. Ces allocations sont directement "
-"suivies par leur désallocation, sans aucune autre allocation entre.</qt>"
+"suivies par leur déallocation, sans aucune autre allocation entre.</qt>"
 
 #: gui/treemodel.cpp:87
 #, kde-format
