@@ -188,7 +188,7 @@
       <li xml:lang="eo">trovi provizorajn asignojn, kiuj estas asignoj, kiuj estas rekte sekvataj de sia malasignado</li>
       <li xml:lang="es">encontrar asignaciones de memoria temporales, que son asignaciones que son inmediatamente seguidas por sus correspondientes liberaciones</li>
       <li xml:lang="eu">aldi baterako esleipenak aurkitzea, esleipena egin eta jarraian askatzen duten kasuak</li>
-      <li xml:lang="fr">trouver les allocations transitoires, c'est-à-dire enchaînant une allocation suivie directement par une désallocation.</li>
+      <li xml:lang="fr">trouver les allocations transitoires, c'est-à-dire enchaînant une allocation suivie directement par une dé-allocation.</li>
       <li xml:lang="gl">Atopar asignacións temporais, asignacións que se liberan no momento.</li>
       <li xml:lang="he">לאתר הקצאות זמניות, שאלו הקצאות שמיד לאחריהן מגיע שחרור הקצאה</li>
       <li xml:lang="id">menemukan alokasi sementara, yaitu alokasi yang langsung diikuti oleh alokasi mereka</li>
