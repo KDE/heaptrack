@@ -13,8 +13,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 18.12.1\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Lokalize 18.12.1\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -73,10 +73,7 @@ msgid "Leaked (Incl.)"
 msgstr "Uniknuté (vrátane)"
 
 #: gui/callercalleemodel.cpp:63
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The parent function that called an allocation function. May be "
-#| "unknown when debug information is missing.</qt>"
+#, kde-format
 msgid ""
 "<qt>The parent symbol that called an allocation function. The function name "
 "may be unresolved when debug information is missing.</qt>"
@@ -189,28 +186,22 @@ msgid "Temporary"
 msgstr "Dočasné"
 
 #: gui/callercalleemodel.h:170
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The parent function that called an allocation function. May be "
-#| "unknown when debug information is missing.</qt>"
+#, kde-format
 msgid ""
 "The location of the %1. The function name may be unresolved when debug "
 "information is missing."
 msgstr ""
-"<qt>Rodičovská funkcia, ktorá volala alokačnú funkciu. Môže byť neznáma, ak "
-"chýbajú ladiace informácie.</qt>"
+"Umiestnenie %1. Názov funkcie môže byť neznámy, ak chýbajú ladiace "
+"informácie."
 
 #: gui/callercalleemodel.h:356
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The parent function that called an allocation function. May be "
-#| "unknown when debug information is missing.</qt>"
+#, kde-format
 msgid ""
 "<qt>The source code location that called an allocation function. May be "
 "unknown when debug information is missing.</qt>"
 msgstr ""
-"<qt>Rodičovská funkcia, ktorá volala alokačnú funkciu. Môže byť neznáma, ak "
-"chýbajú ladiace informácie.</qt>"
+"<qt>Umiestnenie v zdrojovom kóde, ktoré volalo alokačnú funkciu. Môže byť "
+"neznáme, ak chýbajú ladiace informácie.</qt>"
 
 #: gui/chartmodel.cpp:52
 #, kde-format
@@ -234,27 +225,24 @@ msgid "Elapsed Time"
 msgstr "Uplynutý čas"
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "Most Memory Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "Najviac alokácií pamäte"
+msgstr "Celkový počet alokácií pamäte"
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "%1 peak memory consumption"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "%1 vrchol spotreby pamäte"
+msgstr "Celková spotreba pamäte"
 
 #: gui/chartmodel.cpp:87
-#, fuzzy, kde-format
-#| msgid "Most Temporary Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "Najviac dočasných alokácií"
+msgstr "Celkový počet dočasných alokácií"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:166
 #, kde-format
@@ -301,142 +289,141 @@ msgstr "<qt>%2 spotrebované po %3 od:<p style='margin-left:10px'>%1</p></qt>"
 #: gui/chartwidget.cpp:153
 #, kde-format
 msgid "Export As..."
-msgstr ""
+msgstr "Exportovať ako..."
 
 #: gui/chartwidget.cpp:156
 #, kde-format
 msgid "Show legend"
-msgstr ""
+msgstr "Ukázať legendu"
 
 #: gui/chartwidget.cpp:163
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "Zobraziť graf celkových nákladov"
 
 #: gui/chartwidget.cpp:171
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "Zobraziť graf podrobných nákladov"
 
 #: gui/chartwidget.cpp:178
 #, kde-format
 msgid "Stacked diagrams:"
-msgstr ""
+msgstr "Vrstvené diagramy:"
 
 #: gui/chartwidget.cpp:225
-#, fuzzy, kde-format
-#| msgid "filter by function..."
+#, kde-format
 msgid "Filter In On Selection"
-msgstr "filtrovať podľa funkcie..."
+msgstr "Filtrovať podľa výberu"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
 #: gui/chartwidget.cpp:235 gui/mainwindow.ui:895
-#, fuzzy, kde-format
-#| msgid "Reset View"
+#, kde-format
 msgid "Reset Filter"
-msgstr "Znovunastaviť pohľad"
+msgstr "Znovunastaviť filter"
 
 #: gui/chartwidget.cpp:374
 #, kde-format
 msgid "Save %1"
-msgstr ""
+msgstr "Uložiť %1"
 
 #: gui/chartwidget.cpp:375
 #, kde-format
 msgid "Raster Image (*.png *.jpg *.tiff);;Vector Image (*.svg)"
-msgstr ""
+msgstr "Rastrový obrázok (*.png *.jpg *.tiff);;Vektorový obrázok (*.svg)"
 
 #: gui/chartwidget.cpp:391
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to save the image to %1"
-msgstr "Zlyhalo spracovanie súboru %1."
+msgstr "Zlyhalo uloženie obrázka do %1"
 
 #: gui/chartwidget.cpp:411
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
-msgstr ""
+msgstr "<tr><th></th><th>Začiatok</th><th>Koniec</th><th>Delta</th></tr>"
 
 #: gui/chartwidget.cpp:412
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>Čas</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:416
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>Spotrebované</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:420
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>Alokácie</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:424
-#, fuzzy, kde-format
-#| msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
+#, kde-format
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr "<dt><b>dočasné alokácie</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
+msgstr "<tr><th>Dočasné alokácie</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:432
-#, fuzzy, kde-format
-#| msgid "<qt>Shows the heap memory consumption over time.</qt>"
+#, kde-format
 msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
 "a time range for filtering.</qt>"
-msgstr "<qt>Zobrazí spotebu pamäte haldy v čase.</qt>"
+msgstr ""
+"<qt>Zobrazí spotrebu pamäte haldy v čase.<br>Kliknutím a ťahaním vyberte "
+"časový rozsah na filtrovanie.</qt>"
 
 #: gui/chartwidget.cpp:436
-#, fuzzy, kde-format
-#| msgid "<qt>Shows number of memory allocations over time.</qt>"
+#, kde-format
 msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
 "select a time range for filtering.</qt>"
-msgstr "<qt>Zobrazí počet pamätových alokácií v čase.</qt> "
+msgstr ""
+"<qt>Zobrazí počet pamäťových alokácií v čase.<br>Kliknutím a ťahaním vyberte "
+"časový rozsah na filtrovanie.</qt>"
 
 #: gui/chartwidget.cpp:440
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>Shows number of temporary memory allocations over time. A temporary "
-#| "allocation is one that is followed immediately by its corresponding "
-#| "deallocation, without other allocations happening in-between.</qt>"
+#, kde-format
 msgid ""
 "<qt>Shows number of temporary memory allocations over time. A temporary "
 "allocation is one that is followed immediately by its corresponding "
 "deallocation, without other allocations happening in-between.<br>Click and "
 "drag to select a time range for filtering.</qt>"
 msgstr ""
-"<qt>Zobrazí počet dočasných pamäťových alokácií v čase. Dočasná alokácie je "
-"taká, ktorá je nasledovaná dealokáciou bez iných alokáci medzi nimi.</qt>"
+"<qt>Zobrazí počet dočasných pamäťových alokácií v čase. Dočasná alokácia je "
+"taká, ktorá je okamžite nasledovaná zodpovedajúcou dealokáciou bez iných "
+"alokácií medzi nimi.<br>Kliknutím a ťahaním vyberte časový rozsah na "
+"filtrovanie.</qt>"
 
 #: gui/chartwidget.cpp:462
-#, fuzzy, kde-format
-#| msgid "%1 allocations from %2 in %3 (%4)"
+#, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
-msgstr "%1 alokácií od %2 v %3 (%4)"
+msgstr "%1 (filtrované od %2 do %3, Δ%4)"
 
 #: gui/chartwidget.cpp:466
 #, kde-format
 msgid "%1 (filtered delta)"
-msgstr ""
+msgstr "%1 (filtrovaná delta)"
 
 #: gui/chartwidget.cpp:555
 #, kde-format
 msgid "Click and drag to select time range for filtering."
-msgstr ""
+msgstr "Kliknutím a potiahnutím vyberte časový rozsah na filtrovanie."
 
 #: gui/chartwidget.cpp:561
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
 msgstr ""
+"T = %1, Spotrebované: %2. Kliknutím a potiahnutím vyberte časový rozsah na "
+"filtrovanie."
 
 #: gui/chartwidget.cpp:565
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
 msgstr ""
+"T = %1, Alokácie: %2. Kliknutím a potiahnutím vyberte časový rozsah na "
+"filtrovanie."
 
 #: gui/chartwidget.cpp:569
 #, kde-format
@@ -444,6 +431,8 @@ msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
 "filtering."
 msgstr ""
+"T = %1, Dočasné alokácie: %2. Kliknutím a potiahnutím vyberte časový rozsah "
+"na filtrovanie."
 
 #: gui/flamegraph.cpp:174 gui/histogrammodel.cpp:63
 #, kde-format
@@ -539,22 +528,18 @@ msgid "Select the data source that should be visualized in the flame graph."
 msgstr "Vybrať zdroj údajov, ktorý sa má vizualizovať v plamennom grafe."
 
 #: gui/flamegraph.cpp:463
-#, fuzzy, kde-format
-#| msgid "Bottom-Down View"
+#, kde-format
 msgid "Bottom-Up View"
-msgstr "Podľad dolu"
+msgstr "Pohľad zdola nahor"
 
 #: gui/flamegraph.cpp:464
-#, fuzzy, kde-format
-#| msgid ""
-#| "Enable the bottom-down flame graph view. When this is unchecked, the top-"
-#| "down view is enabled by default."
+#, kde-format
 msgid ""
 "Enable the bottom-up flame graph view. When this is unchecked, the top-down "
 "view is enabled by default."
 msgstr ""
-"Povoliť spodný-dolný podľad plamenného grafu. Ak je odznačené, predvolene je "
-"povolený pohľad vrch-spodok."
+"Povoliť pohľad plameňového grafu zdola nahor. Ak je odznačené, predvolene je "
+"povolený pohľad zhora nadol."
 
 #: gui/flamegraph.cpp:472
 #, kde-format
@@ -662,6 +647,9 @@ msgid ""
 "suppression per line, and start each line with 'leak:', i.e. use the LSAN "
 "suppression file format."
 msgstr ""
+"Načítať zoznam potlačení únikov z určeného súboru. Zadajte jedno potlačenie "
+"na riadok a každý riadok začnite reťazcom 'leak:', t. j. použite formát "
+"súboru potlačení LSAN."
 
 #: gui/gui.cpp:91 gui/mainwindow.cpp:637
 #, kde-format
@@ -672,6 +660,11 @@ msgid ""
 "application.  These are then always applied when analyzing the data, unless "
 "this feature is explicitly disabled using this command line option."
 msgstr ""
+"Ignorovať definície potlačení vložené do dátového súboru heaptrack. V "
+"predvolenom nastavení heaptrack skopíruje potlačenia voliteľne definované "
+"prostredníctvom symbolu `const char *__lsan_default_suppressions()` v "
+"ladenom programe. Tieto sa potom vždy použijú pri analýze dát, pokiaľ táto "
+"funkcia nie je výslovne zakázaná pomocou tohto parametra príkazového riadka."
 
 #: gui/gui.cpp:99
 #, kde-format
@@ -679,6 +672,9 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks in common system libraries."
 msgstr ""
+"Ignorovať definície potlačení zabudované v heaptrack. V predvolenom "
+"nastavení heaptrack potlačí určité známe úniky v bežných systémových "
+"knižniciach."
 
 #: gui/gui.cpp:102
 #, kde-format
@@ -695,7 +691,7 @@ msgstr "[SÚBOR...]"
 msgid ""
 "%1 allocations from %2, totalling %3 allocated with an average of %4 per "
 "allocation"
-msgstr ""
+msgstr "%1 alokácií z %2, celkovo %3 alokovaných s priemerom %4 na alokáciu"
 
 #: gui/histogramwidget.cpp:97
 #, kde-format
@@ -727,16 +723,15 @@ msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 msgstr "<dt><b>ladený</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 
 #: gui/mainwindow.cpp:401
-#, fuzzy, kde-format
-#| msgid "<dt><b>total runtime</b>:</dt><dd>%1s</dd>"
+#, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
-msgstr "<dt><b>celkový čas behu</b>:</dt><dd>%1s</dd>"
+msgstr ""
+"<dt><b>celkový čas behu</b>:</dt><dd>%1, filtrované od %2 do %3 (%4)</dd>"
 
 #: gui/mainwindow.cpp:406
-#, fuzzy, kde-format
-#| msgid "<dt><b>total runtime</b>:</dt><dd>%1s</dd>"
+#, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
-msgstr "<dt><b>celkový čas behu</b>:</dt><dd>%1s</dd>"
+msgstr "<dt><b>celkový čas behu</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:408
 #, kde-format
@@ -754,10 +749,9 @@ msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 msgstr "<dt><b>dočasné alokácie</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 
 #: gui/mainwindow.cpp:428
-#, fuzzy, kde-format
-#| msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2s</dd>"
+#, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
-msgstr "<dt><b>vrcholná spotreba pamäte haldy</b>:</dt><dd>%1 po %2s</dd>"
+msgstr "<dt><b>vrcholná spotreba pamäte haldy</b>:</dt><dd>%1 po %2</dd>"
 
 #: gui/mainwindow.cpp:431
 #, kde-format
@@ -765,16 +759,14 @@ msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
 msgstr "<dt><b>vrchol RSS</b> (vrátane overheadu heaptrack):</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:435
-#, fuzzy, kde-format
-#| msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2s</dd>"
+#, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
-msgstr "<dt><b>vrcholná spotreba pamäte haldy</b>:</dt><dd>%1 po %2s</dd>"
+msgstr "<dt><b>zmena spotreby pamäte</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:439
-#, fuzzy, kde-format
-#| msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
+#, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
-msgstr "<dt><b>celková uniknutá pamäť</b>:</dt><dd>%1</dd>"
+msgstr "<dt><b>celková uniknutá pamäť</b>:</dt><dd>%1 (%2 potlačených)</dd>"
 
 #: gui/mainwindow.cpp:442
 #, kde-format
@@ -812,10 +804,9 @@ msgid "Input data %1 is not readable."
 msgstr "Vstupné dáta %1 nie sú čitateľné."
 
 #: gui/mainwindow.cpp:592
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to parse suppression file."
-msgstr "Zlyhalo spracovanie súboru %1."
+msgstr "Zlyhalo spracovanie súboru potlačení."
 
 #: gui/mainwindow.cpp:607
 #, kde-format
@@ -825,12 +816,12 @@ msgstr "Heaptrack"
 #: gui/mainwindow.cpp:635
 #, kde-format
 msgid "Disable Embedded Suppressions"
-msgstr ""
+msgstr "Zakázať vložené potlačenia"
 
 #: gui/mainwindow.cpp:647
 #, kde-format
 msgid "Disable Builtin Suppressions"
-msgstr ""
+msgstr "Zakázať zabudované potlačenia"
 
 #: gui/mainwindow.cpp:649
 #, kde-format
@@ -838,6 +829,8 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks from common system libraries."
 msgstr ""
+"Ignorovať definície potlačení zabudované v heaptrack. V predvolenom "
+"nastavení heaptrack potlačí určité známe úniky z bežných systémových knižníc."
 
 #: gui/mainwindow.cpp:677
 #, kde-format
@@ -857,10 +850,9 @@ msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1 porovnané s %2"
 
 #: gui/mainwindow.cpp:698
-#, fuzzy, kde-format
-#| msgid "Loading file %1, please wait..."
+#, kde-format
 msgid "Reparsing file, please wait..."
-msgstr "Načítavam súbor %1, prosím čakajte..."
+msgstr "Opätovne spracúvam súbor, prosím čakajte..."
 
 #: gui/mainwindow.cpp:741
 #, kde-format
@@ -870,22 +862,22 @@ msgstr " / %1"
 #: gui/mainwindow.cpp:781
 #, kde-format
 msgid "Code Navigation"
-msgstr ""
+msgstr "Navigácia v kóde"
 
 #: gui/mainwindow.cpp:808
 #, kde-format
 msgid "Custom..."
-msgstr ""
+msgstr "Vlastné..."
 
 #: gui/mainwindow.cpp:820
 #, kde-format
 msgid "Automatic (No Line numbers)"
-msgstr ""
+msgstr "Automaticky (bez čísel riadkov)"
 
 #: gui/mainwindow.cpp:840
 #, kde-format
 msgid "Custom Code Navigation"
-msgstr ""
+msgstr "Vlastná navigácia v kóde"
 
 #: gui/mainwindow.cpp:841
 #, kde-format
@@ -893,6 +885,8 @@ msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
 "file name, '%l' by the line number and '%c' by the column number."
 msgstr ""
+"Zadajte príkaz, ktorý sa má použiť na navigáciu v kóde. '%f' sa nahradí "
+"názvom súboru, '%l' číslom riadka a '%c' číslom stĺpca."
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
@@ -906,6 +900,7 @@ msgstr "MainWindow"
 #, kde-format
 msgid "Path to a file containing leak suppression rules in the LSAN format."
 msgstr ""
+"Cesta k súboru obsahujúcemu pravidlá potlačenia únikov vo formáte LSAN."
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: gui/mainwindow.ui:63
@@ -915,15 +910,7 @@ msgstr "Otvoriť údaje Heaptrack"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, openFile)
 #: gui/mainwindow.ui:72
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt><p>This field specifies the primary heaptrack data file. These files "
-#| "are called <tt>heaptrack.$APP.$PID.gz</tt>. You can produce such a file "
-#| "by profiling your application, e.g. via:</p>\n"
-#| "<pre><code>heaptrack &lt;yourapplication&gt; ...</code></pre>\n"
-#| "<p>Or, alternatively, you can attach to a running process via</p>\n"
-#| "<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></"
-#| "qt>"
+#, kde-format
 msgid ""
 "<qt><p>This field specifies the primary heaptrack data file. These files are "
 "called <tt>heaptrack.$APP.$PID.gz</tt> or <tt>heaptrack.$APP.$PID.zst</tt>. "
@@ -933,19 +920,19 @@ msgid ""
 "<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
 msgstr ""
 "<qt><p>Toto pole určuje hlavný dátový súbor heaptrack. Tieto súbory sú "
-"pomenované <tt>heaptrack.$APP.$PID.gz</tt>. Takýto súbor môžete vytvoriť "
-"profilovaním vašej aplikácie, teda cez:</p>\n"
+"pomenované <tt>heaptrack.$APP.$PID.gz</tt> alebo <tt>heaptrack.$APP.$PID."
+"zst</tt>. Takýto súbor môžete vytvoriť profilovaním vašej aplikácie, teda "
+"cez:</p>\n"
 "<pre><code>heaptrack &lt;vašaaplikácia&gt; ...</code></pre>\n"
-"<p>Alebo alternatívne môžete pripoiť k bežiacemu procesu cez</p>\n"
-"<pre><code>heaptrack --pid $(pidvašej &lt;aplikácie&gt;)</code></pre></qt>"
+"<p>Alebo alternatívne môžete pripojiť k bežiacemu procesu cez</p>\n"
+"<pre><code>heaptrack --pid $(pidof &lt;vašaaplikácia&gt;)</code></pre></qt>"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, openFile)
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, compareTo)
 #: gui/mainwindow.ui:75 gui/mainwindow.ui:85
-#, fuzzy, kde-format
-#| msgid "path/to/heaptrack.$APP.$PID.gz"
+#, kde-format
 msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
-msgstr "cesta/ku/heaptrack.$APP.$PID.gz"
+msgstr "cesta/ku/heaptrack.$APP.$PID.{gz,zst}"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
 #: gui/mainwindow.ui:82
@@ -975,13 +962,13 @@ msgstr "Porovnať s:"
 #: gui/mainwindow.ui:115
 #, kde-format
 msgid "Suppressions:"
-msgstr ""
+msgstr "Potlačenia:"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
 #: gui/mainwindow.ui:125
 #, kde-format
 msgid "path/to/lsan_suppressions.txt"
-msgstr ""
+msgstr "cesta/k/lsan_suppressions.txt"
 
 #. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
 #: gui/mainwindow.ui:241
@@ -1046,7 +1033,7 @@ msgstr "Najviac dočasných alokácií"
 #: gui/mainwindow.ui:498
 #, kde-format
 msgid "Suppressions"
-msgstr ""
+msgstr "Potlačenia"
 
 #. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
 #: gui/mainwindow.ui:530
@@ -1123,13 +1110,12 @@ msgstr "Nastavenia"
 #: gui/mainwindow.ui:882
 #, kde-format
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #: gui/parser.cpp:388
-#, fuzzy, kde-format
-#| msgid "merging allocations..."
+#, kde-format
 msgid "merging allocations... %1%"
-msgstr "zlučujem alokácie..."
+msgstr "zlučujem alokácie... %1%"
 
 #: gui/parser.cpp:559
 #, kde-format
@@ -1182,21 +1168,19 @@ msgid "more than 1KB"
 msgstr "viac ako 1KB"
 
 #: gui/parser.cpp:647
-#, fuzzy, kde-format
-#| msgid "parsing data..."
+#, kde-format
 msgid "reparsing data"
-msgstr "spracúvam údaje..."
+msgstr "opätovne spracúvam údaje..."
 
 #: gui/parser.cpp:647
-#, fuzzy, kde-format
-#| msgid "parsing data..."
+#, kde-format
 msgid "parsing data"
 msgstr "spracúvam údaje..."
 
 #: gui/parser.cpp:661
 #, kde-format
 msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
-msgstr ""
+msgstr "%1 priechod: %2/%3  strávený čas: %4  zostáva: %5"
 
 #: gui/parser.cpp:719
 #, kde-format
@@ -1320,7 +1304,7 @@ msgstr "%1 (vrátane): %2<br/>&nbsp;&nbsp;%4% z %3 celkovo"
 #: gui/util.cpp:183
 #, kde-format
 msgid "symbol: <tt>%1</tt><br/>binary: <tt>%2 (%3)</tt>"
-msgstr ""
+msgstr "symbol: <tt>%1</tt><br/>binárka: <tt>%2 (%3)</tt>"
 
 #: gui/util.cpp:187
 #, kde-format
@@ -1334,7 +1318,6 @@ msgid "<unresolved function>"
 msgstr "<nevyriešená funkcia>"
 
 #, fuzzy
-#~| msgid "heaptrack.*.*.gz"
 #~ msgid "heaptrack.*.*.gz heaptrack.*.*.zst"
 #~ msgstr "heaptrack.*.*.gz"
 
@@ -1357,7 +1340,6 @@ msgstr "<nevyriešená funkcia>"
 #~ msgstr "Qt Creator"
 
 #, fuzzy
-#~| msgid "%1 allocations from %2 in %3 (%4)"
 #~ msgid "%1 allocations from %2"
 #~ msgstr "%1 alokácií od %2 v %3 (%4)"
 
@@ -1375,9 +1357,6 @@ msgstr "<nevyriešená funkcia>"
 #~ msgstr "Binárne číslo"
 
 #, fuzzy
-#~| msgid ""
-#~| "<qt>The parent function that called an allocation function. May be "
-#~| "unknown when debug information is missing.</qt>"
 #~ msgid ""
 #~ "<qt>The parent function that called an allocation function. May be "
 #~ "unresolved when debug information is missing.</qt>"
@@ -1393,9 +1372,6 @@ msgstr "<nevyriešená funkcia>"
 #~ "alokačná funkcia.</qt>"
 
 #, fuzzy
-#~| msgid ""
-#~| "<qt>The parent function that called an allocation function. May be "
-#~| "unknown when debug information is missing.</qt>"
 #~ msgid ""
 #~ "The function name of the %1. May be unresolved when debug information is "
 #~ "missing."
@@ -1417,10 +1393,6 @@ msgstr "<nevyriešená funkcia>"
 #~ "ak chýbajú ladiace informácie.</qt>"
 
 #, fuzzy
-#~| msgctxt "1: function, 2: module"
-#~| msgid ""
-#~| "%1\n"
-#~| "  in %2"
 #~ msgctxt "1: function, 2: module, 3: module path"
 #~ msgid ""
 #~ "%1\n"
@@ -1567,7 +1539,6 @@ msgstr "<nevyriešená funkcia>"
 #~ msgstr "Alokácie [-]"
 
 #, fuzzy
-#~| msgid "Allocations [-]"
 #~ msgid "Temporary Allocations [-]"
 #~ msgstr "Alokácie [-]"
 
