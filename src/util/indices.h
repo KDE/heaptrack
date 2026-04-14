@@ -57,7 +57,7 @@ struct Index
 };
 
 template <typename Base>
-unsigned int qHash(const Index<Base> index, unsigned int seed = 0) noexcept
+size_t qHash(const Index<Base> index, size_t seed = 0) noexcept
 {
     return qHash(index.index, seed);
 }

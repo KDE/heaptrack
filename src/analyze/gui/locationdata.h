@@ -75,7 +75,7 @@ struct hash<Symbol>
 };
 }
 
-inline uint qHash(const Symbol& symbol, uint seed = 0)
+inline size_t qHash(const Symbol& symbol, size_t seed = 0)
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 10, 0)
     QtPrivate::QHashCombine hash;
@@ -88,7 +88,7 @@ inline uint qHash(const Symbol& symbol, uint seed = 0)
     return seed;
 }
 
-inline uint qHash(const FileLine& location, uint seed = 0)
+inline size_t qHash(const FileLine& location, size_t seed = 0)
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 10, 0)
     QtPrivate::QHashCombine hash;
