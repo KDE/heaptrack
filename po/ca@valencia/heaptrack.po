@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2025-11-17 11:54+0000\n"
+"POT-Creation-Date: 2026-04-15 00:49+0000\n"
 "PO-Revision-Date: 2023-05-30 11:03+0200\n"
 "Last-Translator: Josep M. Ferrer <txemaq@gmail.com>\n"
 "Language-Team: Catalan <kde-i18n-ca@kde.org>\n"
@@ -626,17 +626,17 @@ msgstr "Restaura la vista"
 msgid "View Caller/Callee"
 msgstr "Vista del Cridador / Cridat"
 
-#: gui/flamegraph.cpp:692
+#: gui/flamegraph.cpp:707
 #, kde-format
 msgid "generating flame graph..."
 msgstr "s'està generant el gràfic de flames…"
 
-#: gui/flamegraph.cpp:769
+#: gui/flamegraph.cpp:784
 #, kde-format
 msgid "%1 (%2% of total of %3) allocations matched by search."
 msgstr "%1 (%2% d'un total de %3) assignacions coincidixen en la busca."
 
-#: gui/flamegraph.cpp:774
+#: gui/flamegraph.cpp:789
 #, kde-format
 msgid "%1 (%2% of total of %3) matched by search."
 msgstr "%1 (%2% d'un total de %3) coincidixen en la busca."
@@ -683,7 +683,7 @@ msgstr ""
 "dir, utilitzeu el format de fitxer per a la supressió LSAN."
 
 # skip-rule: t-apo1,rst-link0italic,rst-italic2
-#: gui/gui.cpp:91 gui/mainwindow.cpp:637
+#: gui/gui.cpp:91 gui/mainwindow.cpp:638
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -842,27 +842,27 @@ msgstr "La dada d'entrada %1 no és cap fitxer."
 msgid "Input data %1 is not readable."
 msgstr "La dada d'entrada %1 no es pot llegir."
 
-#: gui/mainwindow.cpp:592
+#: gui/mainwindow.cpp:593
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr "Ha fallat durant l'anàlisi de la supressió del fitxer."
 
-#: gui/mainwindow.cpp:607
+#: gui/mainwindow.cpp:608
 #, kde-format
 msgid "Heaptrack"
 msgstr "Heaptrack"
 
-#: gui/mainwindow.cpp:635
+#: gui/mainwindow.cpp:636
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr "Inhabilita les supressions incrustades"
 
-#: gui/mainwindow.cpp:647
+#: gui/mainwindow.cpp:648
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr "Inhabilita les supressions integrades"
 
-#: gui/mainwindow.cpp:649
+#: gui/mainwindow.cpp:650
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -872,54 +872,54 @@ msgstr ""
 "manera predeterminada, Heaptrack suprimirà certes pèrdues conegudes de les "
 "biblioteques habituals del de sistema."
 
-#: gui/mainwindow.cpp:677
+#: gui/mainwindow.cpp:678
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "S'està carregant el fitxer %1. Espereu…"
 
-#: gui/mainwindow.cpp:679
+#: gui/mainwindow.cpp:680
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "Heaptrack - %1"
 
-#: gui/mainwindow.cpp:682
+#: gui/mainwindow.cpp:683
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1 comparat amb %2"
 
-#: gui/mainwindow.cpp:698
+#: gui/mainwindow.cpp:699
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "S'està tornant a analitzar el fitxer. Espereu…"
 
-#: gui/mainwindow.cpp:741
+#: gui/mainwindow.cpp:742
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:781
+#: gui/mainwindow.cpp:782
 #, kde-format
 msgid "Code Navigation"
 msgstr "Navegueu pel codi"
 
-#: gui/mainwindow.cpp:808
+#: gui/mainwindow.cpp:809
 #, kde-format
 msgid "Custom..."
 msgstr "Personalitzada…"
 
-#: gui/mainwindow.cpp:820
+#: gui/mainwindow.cpp:821
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "Automàtic (Sense nombre de línies)"
 
-#: gui/mainwindow.cpp:840
+#: gui/mainwindow.cpp:841
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "Navegació personalitzada pel codi"
 
-#: gui/mainwindow.cpp:841
+#: gui/mainwindow.cpp:842
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "

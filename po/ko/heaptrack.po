@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2025-11-17 11:54+0000\n"
+"POT-Creation-Date: 2026-04-15 00:49+0000\n"
 "PO-Revision-Date: 2023-04-21 23:40+0200\n"
 "Last-Translator: Shinjo Park <kde@peremen.name>\n"
 "Language-Team: Korean <kde-kr@kde.org>\n"
@@ -593,17 +593,17 @@ msgstr "보기 초기화"
 msgid "View Caller/Callee"
 msgstr "호출자/피호출자 보기"
 
-#: gui/flamegraph.cpp:692
+#: gui/flamegraph.cpp:707
 #, kde-format
 msgid "generating flame graph..."
 msgstr "불꽃 그래프 생성 중..."
 
-#: gui/flamegraph.cpp:769
+#: gui/flamegraph.cpp:784
 #, kde-format
 msgid "%1 (%2% of total of %3) allocations matched by search."
 msgstr "검색과 일치하는 할당이 총 %1회(전체 %3회 중 %2%) 있습니다."
 
-#: gui/flamegraph.cpp:774
+#: gui/flamegraph.cpp:789
 #, kde-format
 msgid "%1 (%2% of total of %3) matched by search."
 msgstr "검색과 일치하는 항목이 총 %1(전체 %3 중 %2%) 있습니다."
@@ -648,7 +648,7 @@ msgstr ""
 "지정한 파일에서 누수 억제 목록을 불러옵니다. 한 줄에 하나씩 지정하십시오. 각 "
 "줄은 'leak:'으로 시작하는 LSAN 억제 파일 형식이어야 합니다."
 
-#: gui/gui.cpp:91 gui/mainwindow.cpp:637
+#: gui/gui.cpp:91 gui/mainwindow.cpp:638
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -798,27 +798,27 @@ msgstr "입력 데이터 %1이(가) 파일이 아닙니다."
 msgid "Input data %1 is not readable."
 msgstr "입력 데이터 %1에서 읽을 수 없습니다."
 
-#: gui/mainwindow.cpp:592
+#: gui/mainwindow.cpp:593
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr "억제 파일을 해석할 수 없습니다."
 
-#: gui/mainwindow.cpp:607
+#: gui/mainwindow.cpp:608
 #, kde-format
 msgid "Heaptrack"
 msgstr "힙 추적"
 
-#: gui/mainwindow.cpp:635
+#: gui/mainwindow.cpp:636
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr "임베드된 억제 비활성화"
 
-#: gui/mainwindow.cpp:647
+#: gui/mainwindow.cpp:648
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr "내장된 억제 비활성화"
 
-#: gui/mainwindow.cpp:649
+#: gui/mainwindow.cpp:650
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -827,54 +827,54 @@ msgstr ""
 "힙 추적에 내장된 억제 정의를 무시합니다. 기본값으로 힙 추적에서는 시스템 라이"
 "브러리에 있는 알려진 메모리 누수를 무시합니다."
 
-#: gui/mainwindow.cpp:677
+#: gui/mainwindow.cpp:678
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "파일 %1 불러오는 중, 잠시 기다려 주십시오..."
 
-#: gui/mainwindow.cpp:679
+#: gui/mainwindow.cpp:680
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "힙 추적 - %1"
 
-#: gui/mainwindow.cpp:682
+#: gui/mainwindow.cpp:683
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "힙 추적 - %1, %2 비교"
 
-#: gui/mainwindow.cpp:698
+#: gui/mainwindow.cpp:699
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "파일 다시 분석하는 중, 잠시 기다려 주십시오..."
 
-#: gui/mainwindow.cpp:741
+#: gui/mainwindow.cpp:742
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:781
+#: gui/mainwindow.cpp:782
 #, kde-format
 msgid "Code Navigation"
 msgstr "코드 탐색"
 
-#: gui/mainwindow.cpp:808
+#: gui/mainwindow.cpp:809
 #, kde-format
 msgid "Custom..."
 msgstr "사용자 정의..."
 
-#: gui/mainwindow.cpp:820
+#: gui/mainwindow.cpp:821
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "자동(줄 번호 없음)"
 
-#: gui/mainwindow.cpp:840
+#: gui/mainwindow.cpp:841
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "사용자 정의 코드 탐색"
 
-#: gui/mainwindow.cpp:841
+#: gui/mainwindow.cpp:842
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2025-11-17 11:54+0000\n"
+"POT-Creation-Date: 2026-04-15 00:49+0000\n"
 "PO-Revision-Date: 2023-06-07 10:42+0200\n"
 "Last-Translator: Adrián Chaves (Gallaecio) <adrian@chaves.io>\n"
 "Language-Team: Galician <proxecto@trasno.gal>\n"
@@ -609,17 +609,17 @@ msgstr "Restaurar a vista"
 msgid "View Caller/Callee"
 msgstr "Ver o chamador e o chamado"
 
-#: gui/flamegraph.cpp:692
+#: gui/flamegraph.cpp:707
 #, kde-format
 msgid "generating flame graph..."
 msgstr "Xerando o gráfico de chamas…"
 
-#: gui/flamegraph.cpp:769
+#: gui/flamegraph.cpp:784
 #, kde-format
 msgid "%1 (%2% of total of %3) allocations matched by search."
 msgstr "%1 (%2% dun total de %3) asignacións que coinciden coa busca."
 
-#: gui/flamegraph.cpp:774
+#: gui/flamegraph.cpp:789
 #, kde-format
 msgid "%1 (%2% of total of %3) matched by search."
 msgstr "%1 (%2% dun total de %3) que coinciden coa busca."
@@ -665,7 +665,7 @@ msgstr ""
 "supresión por liña, e comece cada liña con «leak:», é dicir, use o formato "
 "de ficheiro de supresión de LSAN."
 
-#: gui/gui.cpp:91 gui/mainwindow.cpp:637
+#: gui/gui.cpp:91 gui/mainwindow.cpp:638
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -823,27 +823,27 @@ msgstr "O dato de entrada %1 non é un ficheiro."
 msgid "Input data %1 is not readable."
 msgstr "O dato de entrada %1 non pode lerse."
 
-#: gui/mainwindow.cpp:592
+#: gui/mainwindow.cpp:593
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr "Non foi posíbel analizar o ficheiro de supresión."
 
-#: gui/mainwindow.cpp:607
+#: gui/mainwindow.cpp:608
 #, kde-format
 msgid "Heaptrack"
 msgstr "Heaptrack"
 
-#: gui/mainwindow.cpp:635
+#: gui/mainwindow.cpp:636
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr "Desactivar as supresións incluídas"
 
-#: gui/mainwindow.cpp:647
+#: gui/mainwindow.cpp:648
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr "Desactivar as supresións de serie"
 
-#: gui/mainwindow.cpp:649
+#: gui/mainwindow.cpp:650
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -853,54 +853,54 @@ msgstr ""
 "predeterminada, Heaptrack suprime certas perdas coñecidas de bibliotecas de "
 "sistema comúns."
 
-#: gui/mainwindow.cpp:677
+#: gui/mainwindow.cpp:678
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "Cargando o ficheiro %1…"
 
-#: gui/mainwindow.cpp:679
+#: gui/mainwindow.cpp:680
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "Heaptrack - %1"
 
-#: gui/mainwindow.cpp:682
+#: gui/mainwindow.cpp:683
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1 en comparación con %2"
 
-#: gui/mainwindow.cpp:698
+#: gui/mainwindow.cpp:699
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "Analizando de novo o ficheiro…"
 
-#: gui/mainwindow.cpp:741
+#: gui/mainwindow.cpp:742
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:781
+#: gui/mainwindow.cpp:782
 #, kde-format
 msgid "Code Navigation"
 msgstr "Navegación de código"
 
-#: gui/mainwindow.cpp:808
+#: gui/mainwindow.cpp:809
 #, kde-format
 msgid "Custom..."
 msgstr "Personalizada…"
 
-#: gui/mainwindow.cpp:820
+#: gui/mainwindow.cpp:821
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "Automático (sen números de liña)"
 
-#: gui/mainwindow.cpp:840
+#: gui/mainwindow.cpp:841
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "Navegación personalizada de código"
 
-#: gui/mainwindow.cpp:841
+#: gui/mainwindow.cpp:842
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
