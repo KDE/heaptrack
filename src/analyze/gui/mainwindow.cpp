@@ -11,6 +11,7 @@
 #include <cmath>
 
 #include <KConfigGroup>
+#include <KIO/CommandLauncherJob>
 #include <KLocalizedString>
 #include <KShell>
 #include <KStandardAction>
@@ -67,53 +68,36 @@ const char IDE[] = "IDE";
 }
 }
 
-enum IDE
-{
-    KDevelop,
-    Kate,
-    KWrite,
-    GEdit,
-    GVim,
-    QtCreator,
-    LAST_IDE
-};
 struct IdeSettings
 {
-    QString app;
-    QString args;
-    QString name;
-
-    bool isAppAvailable() const
-    {
-        return !QStandardPaths::findExecutable(app).isEmpty();
-    }
+    const char* const app;
+    const char* const args;
+    const char* const name;
+    const char* const desktopEntryName;
 };
 
-IdeSettings ideSettings(IDE ide)
+const IdeSettings ideSettings[] = {
+#if !defined(Q_OS_WIN) && !defined(Q_OS_OSX)
+    {"kdevelop", "%f:%l:%c", QT_TRANSLATE_NOOP("MainWindow", "KDevelop"), "org.kde.kdevelop"},
+    {"kate", "%f --line %l --column %c", QT_TRANSLATE_NOOP("MainWindow", "Kate"), "org.kde.kate"},
+    {"kwrite", "%f --line %l --column %c", QT_TRANSLATE_NOOP("MainWindow", "KWrite"), "org.kde.kwrite"},
+    {"gedit", "%f +%l:%c", QT_TRANSLATE_NOOP("MainWindow", "gedit"), "org.gnome.gedit"},
+    {"gvim", "%f +%l", QT_TRANSLATE_NOOP("MainWindow", "gvim"), "gvim"},
+    {"qtcreator", "-client %f:%l", QT_TRANSLATE_NOOP("MainWindow", "Qt Creator"), "org.qt-project.qtcreator"},
+#endif
+    {"code", "-g %f:%l:%c", QT_TRANSLATE_NOOP("MainWindow", "Visual Studio Code"), "code"},
+    {"codium", "-g %f:%l:%c", QT_TRANSLATE_NOOP("MainWindow", "VSCodium"), "codium"}};
+const int ideSettingsSize = sizeof(ideSettings) / sizeof(IdeSettings);
+
+bool isAppAvailable(const char* app)
 {
-    switch (ide) {
-    case KDevelop:
-        return {QStringLiteral("kdevelop"), QStringLiteral("%f:%l:%c"), MainWindow::tr("KDevelop")};
-    case Kate:
-        return {QStringLiteral("kate"), QStringLiteral("%f --line %l --column %c"), MainWindow::tr("Kate")};
-    case KWrite:
-        return {QStringLiteral("kwrite"), QStringLiteral("%f --line %l --column %c"), MainWindow::tr("KWrite")};
-    case GEdit:
-        return {QStringLiteral("gedit"), QStringLiteral("%f +%l:%c"), MainWindow::tr("gedit")};
-    case GVim:
-        return {QStringLiteral("gvim"), QStringLiteral("%f +%l"), MainWindow::tr("gvim")};
-    case QtCreator:
-        return {QStringLiteral("qtcreator"), QStringLiteral("-client %f:%l"), MainWindow::tr("Qt Creator")};
-    case LAST_IDE:
-        break;
-    };
-    Q_UNREACHABLE();
-};
+    return !QStandardPaths::findExecutable(QString::fromUtf8(app)).isEmpty();
+}
 
 int firstAvailableIde()
 {
-    for (int i = 0; i < LAST_IDE; ++i) {
-        if (ideSettings(static_cast<IDE>(i)).isAppAvailable()) {
+    for (int i = 0; i < ideSettingsSize; ++i) {
+        if (isAppAvailable(ideSettings[i].app)) {
             return i;
         }
     }
@@ -787,11 +771,10 @@ void MainWindow::setupCodeNavigationMenu()
     const auto settings = m_config->group(Config::Groups::CodeNavigation());
     const auto currentIdx = settings.readEntry(Config::Entries::IDE, firstAvailableIde());
 
-    for (int i = 0; i < LAST_IDE; ++i) {
+    for (int i = 0; i < ideSettingsSize; ++i) {
         auto action = new QAction(menu);
-        auto ide = ideSettings(static_cast<IDE>(i));
-        action->setText(ide.name);
-        auto icon = QIcon::fromTheme(ide.app);
+        action->setText(tr(ideSettings[i].name));
+        auto icon = QIcon::fromTheme(QString::fromUtf8(ideSettings[i].app));
         if (icon.isNull()) {
             icon = QIcon::fromTheme(QStringLiteral("application-x-executable"));
         }
@@ -799,7 +782,7 @@ void MainWindow::setupCodeNavigationMenu()
         action->setCheckable(true);
         action->setChecked(currentIdx == i);
         action->setData(i);
-        action->setEnabled(ide.isAppAvailable());
+        action->setEnabled(isAppAvailable(ideSettings[i].app));
         group->addAction(action);
         menu->addAction(action);
     }
@@ -859,20 +842,37 @@ void MainWindow::navigateToCode(const QString& filePath, int lineNumber, int col
     const auto ideIdx = settings.readEntry(Config::Entries::IDE, firstAvailableIde());
 
     QString command;
-    if (ideIdx >= 0 && ideIdx < LAST_IDE) {
-        auto ide = ideSettings(static_cast<IDE>(ideIdx));
-        command = ide.app + QLatin1Char(' ') + ide.args;
+    QString desktopEntryName;
+    if (ideIdx >= 0 && ideIdx < ideSettingsSize) {
+        command = QString::fromUtf8(ideSettings[ideIdx].app) + QLatin1Char(' ')
+            + QString::fromUtf8(ideSettings[ideIdx].args);
+        desktopEntryName = QString::fromUtf8(ideSettings[ideIdx].desktopEntryName);
     } else if (ideIdx == -1) {
         command = settings.readEntry(Config::Entries::CustomCommand);
     }
 
     if (!command.isEmpty()) {
-        command.replace(QStringLiteral("%f"), filePath);
-        command.replace(QStringLiteral("%l"), QString::number(std::max(1, lineNumber)));
-        command.replace(QStringLiteral("%c"), QString::number(std::max(1, columnNumber)));
+        KShell::Errors errors = KShell::NoError;
+        auto args = KShell::splitArgs(command, KShell::TildeExpand | KShell::AbortOnMeta, &errors);
+        if (errors || args.isEmpty()) {
+            showError(i18n("Failed to parse command: %1", command));
+            return;
+        }
+        command = args.takeFirst();
+        for (auto& arg : args) {
+            arg.replace(QLatin1String("%f"), filePath);
+            arg.replace(QLatin1String("%l"), QString::number(std::max(1, lineNumber)));
+            arg.replace(QLatin1String("%c"), QString::number(std::max(1, columnNumber)));
+        }
 
-        auto splitted = KShell::splitArgs(command);
-        QProcess::startDetached(splitted.takeFirst(), splitted);
+        auto* job = new KIO::CommandLauncherJob(command, args);
+        job->setDesktopName(desktopEntryName);
+        connect(job, &KJob::finished, this, [this, command, args](KJob* job) {
+            if (job->error()) {
+                showError(i18n("Failed to launch command: %1 %2", command, args.join(QLatin1Char(' '))));
+            }
+        });
+        job->start();
     } else {
         QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
     }
