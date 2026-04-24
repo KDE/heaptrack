@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2026-04-15 00:49+0000\n"
+"POT-Creation-Date: 2026-04-24 00:46+0000\n"
 "PO-Revision-Date: 2022-10-06 09:04+0200\n"
 "Last-Translator: Matjaž Jeran <matjaz.jeran@amis.net>\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
@@ -182,7 +182,7 @@ msgstr "Vrhunec"
 msgid "Leaked"
 msgstr "Uhajanja"
 
-#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:434 gui/mainwindow.cpp:477
+#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:434 gui/mainwindow.cpp:461
 #: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
 #, kde-format
 msgid "Allocations"
@@ -221,7 +221,7 @@ msgstr "Dodelitve pomnilnika"
 msgid "Memory Consumed"
 msgstr "Porabljen pomnilnik"
 
-#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:439 gui/mainwindow.cpp:479
+#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:439 gui/mainwindow.cpp:463
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
@@ -600,7 +600,7 @@ msgstr "<qt>Preiščite plamenski graf za simbol.</qt>"
 msgid "Reset View"
 msgstr "Ponastavi pogled"
 
-#: gui/flamegraph.cpp:551 gui/mainwindow.cpp:142
+#: gui/flamegraph.cpp:551 gui/mainwindow.cpp:126
 #, kde-format
 msgid "View Caller/Callee"
 msgstr "Pokaži klicatelja/klicanega"
@@ -661,7 +661,7 @@ msgstr ""
 "zatiranje na vrstico in začnite vsako vrstico z »leak:«, t.j. uporabite "
 "obliko datoteke za zatiranje LSAN."
 
-#: gui/gui.cpp:91 gui/mainwindow.cpp:638
+#: gui/gui.cpp:91 gui/mainwindow.cpp:622
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -713,12 +713,12 @@ msgstr "Zahtevana velikost dodelitev"
 msgid "Number of Allocations"
 msgstr "Število dodelitev"
 
-#: gui/mainwindow.cpp:171
+#: gui/mainwindow.cpp:155
 #, kde-format
 msgid "Open file in editor"
 msgstr "Odpri datoteko v urejevalniku"
 
-#: gui/mainwindow.cpp:394
+#: gui/mainwindow.cpp:378
 #, kde-format
 msgid ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
@@ -727,115 +727,115 @@ msgstr ""
 "<dt><b>razhroščevanec:</b></dt><dd style='font-family:monospace;'>%1 "
 "<i>(priloženo)</i></dd>"
 
-#: gui/mainwindow.cpp:397
+#: gui/mainwindow.cpp:381
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 msgstr ""
 "<dt><b>razhroščevanec:</b></dt><dd style='font-family:monospace;'>%1</dd>"
 
-#: gui/mainwindow.cpp:401
+#: gui/mainwindow.cpp:385
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
 msgstr ""
 "<dt><b>skupni čas izvajanja:</b></dt><dd>%1, filtrirano od %2 do %3 (%4)</dd>"
 
-#: gui/mainwindow.cpp:406
+#: gui/mainwindow.cpp:390
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>skupni čas izvajanja:</b></dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:408
+#: gui/mainwindow.cpp:392
 #, kde-format
 msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>skupni sistemski pomnilnik:</b></dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:415
+#: gui/mainwindow.cpp:399
 #, kde-format
 msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
 msgstr "<dt><b>klici funkcij dodelitev:</b></dt><dd>%1 (%2/s)</dd>"
 
-#: gui/mainwindow.cpp:418
+#: gui/mainwindow.cpp:402
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 msgstr "<dt><b>začasne dodelitve:</b></dt><dd>%1 ( %2% , %3/s)</dd>"
 
-#: gui/mainwindow.cpp:428
+#: gui/mainwindow.cpp:412
 #, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
 msgstr "<dt><b>vrh porabe pomnilnika kopice</b>:</dt><dd>%1 po %2</dd>"
 
-#: gui/mainwindow.cpp:431
+#: gui/mainwindow.cpp:415
 #, kde-format
 msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
 msgstr ""
 "<dt><b>vrh RSS</b> (vključno z režijskimi stroški heaptrack):</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:435
+#: gui/mainwindow.cpp:419
 #, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>delta porabe pomnilnika</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:439
+#: gui/mainwindow.cpp:423
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
 msgstr "<dt><b>skupno uhajanje pomnilnika</b>:</dt><dd>%1 (%2 zatrto)</dd>"
 
-#: gui/mainwindow.cpp:442
+#: gui/mainwindow.cpp:426
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>skupno uhajanje pomnilnika</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:470
+#: gui/mainwindow.cpp:454
 #, kde-format
 msgid "Failed to parse file %1."
 msgstr "Razčlenjevanje datoteke %1 ni uspelo."
 
-#: gui/mainwindow.cpp:475
+#: gui/mainwindow.cpp:459
 #, kde-format
 msgid "Consumed"
 msgstr "Porabljeno"
 
-#: gui/mainwindow.cpp:491
+#: gui/mainwindow.cpp:475
 #, kde-format
 msgid "Sizes"
 msgstr "Velikosti"
 
-#: gui/mainwindow.cpp:555
+#: gui/mainwindow.cpp:539
 #, kde-format
 msgid "Input data %1 does not exist."
 msgstr "Vhodni podatki %1 ne obstajajo."
 
-#: gui/mainwindow.cpp:557
+#: gui/mainwindow.cpp:541
 #, kde-format
 msgid "Input data %1 is not a file."
 msgstr "Vhodni podatki %1 niso datoteka."
 
-#: gui/mainwindow.cpp:559
+#: gui/mainwindow.cpp:543
 #, kde-format
 msgid "Input data %1 is not readable."
 msgstr "Vhodni podatki %1 niso berljivi."
 
-#: gui/mainwindow.cpp:593
+#: gui/mainwindow.cpp:577
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr "Datoteke za zatiranje ni bilo mogoče razčleniti."
 
-#: gui/mainwindow.cpp:608
+#: gui/mainwindow.cpp:592
 #, kde-format
 msgid "Heaptrack"
 msgstr "Heaptrack"
 
-#: gui/mainwindow.cpp:636
+#: gui/mainwindow.cpp:620
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr "Onemogoči vdelana zatiranja"
 
-#: gui/mainwindow.cpp:648
+#: gui/mainwindow.cpp:632
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr "Onemogoči vgrajena zatiranja"
 
-#: gui/mainwindow.cpp:650
+#: gui/mainwindow.cpp:634
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -844,54 +844,54 @@ msgstr ""
 "Prezri definicije zatiranja, ki so vgrajene v heaptrack. Privzeto bo "
 "heaptrack zatiral nekatera znana uhajanja iz skupnih sistemskih knjižnic."
 
-#: gui/mainwindow.cpp:678
+#: gui/mainwindow.cpp:662
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "Nalaganje datoteke %1, počakajte ..."
 
-#: gui/mainwindow.cpp:680
+#: gui/mainwindow.cpp:664
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "Heaptrack - %1"
 
-#: gui/mainwindow.cpp:683
+#: gui/mainwindow.cpp:667
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1, primerjano z %2"
 
-#: gui/mainwindow.cpp:699
+#: gui/mainwindow.cpp:683
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "Ponovno razčlenjevanje datoteke, počakajte ..."
 
-#: gui/mainwindow.cpp:742
+#: gui/mainwindow.cpp:726
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:782
+#: gui/mainwindow.cpp:766
 #, kde-format
 msgid "Code Navigation"
 msgstr "Krmarjenje po kodi"
 
-#: gui/mainwindow.cpp:809
+#: gui/mainwindow.cpp:792
 #, kde-format
 msgid "Custom..."
 msgstr "Po meri …"
 
-#: gui/mainwindow.cpp:821
+#: gui/mainwindow.cpp:804
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "Samodejno (brez številk vrstic)"
 
-#: gui/mainwindow.cpp:841
+#: gui/mainwindow.cpp:824
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "Krmarjenje po kodi po meri"
 
-#: gui/mainwindow.cpp:842
+#: gui/mainwindow.cpp:825
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
@@ -900,6 +900,17 @@ msgstr ""
 "Določite ukaz, ki ga želite uporabiti za krmarjenje po kodi, »%f« bo "
 "nadomeščen z imenom datoteke, »%l« s številko vrstice in »%c« s številko "
 "stolpca."
+
+#: gui/mainwindow.cpp:858
+#, fuzzy, kde-format
+#| msgid "Failed to parse file %1."
+msgid "Failed to parse command: %1"
+msgstr "Razčlenjevanje datoteke %1 ni uspelo."
+
+#: gui/mainwindow.cpp:872
+#, kde-format
+msgid "Failed to launch command: %1 %2"
+msgstr ""
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14

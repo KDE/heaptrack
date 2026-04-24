@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2026-04-15 00:49+0000\n"
+"POT-Creation-Date: 2026-04-24 00:46+0000\n"
 "PO-Revision-Date: 2023-07-30 16:11+0200\n"
 "Last-Translator: Stefan Asserhäll <stefan.asserhall@gmail.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
@@ -179,7 +179,7 @@ msgstr "Störst"
 msgid "Leaked"
 msgstr "Läckt"
 
-#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:434 gui/mainwindow.cpp:477
+#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:434 gui/mainwindow.cpp:461
 #: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
 #, kde-format
 msgid "Allocations"
@@ -218,7 +218,7 @@ msgstr "Minnestilldelningar"
 msgid "Memory Consumed"
 msgstr "Använt minne"
 
-#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:439 gui/mainwindow.cpp:479
+#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:439 gui/mainwindow.cpp:463
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
@@ -598,7 +598,7 @@ msgstr "<qt>Sök i efter en symbol i flamdiagrammet.</qt>"
 msgid "Reset View"
 msgstr "Återställ vy"
 
-#: gui/flamegraph.cpp:551 gui/mainwindow.cpp:142
+#: gui/flamegraph.cpp:551 gui/mainwindow.cpp:126
 #, kde-format
 msgid "View Caller/Callee"
 msgstr "Visa anropare och anropad"
@@ -659,7 +659,7 @@ msgstr ""
 "en undertryckning per rad, och börja varje rad med 'leak:', dvs. använd LSAN-"
 "filformatet för undertryckningar."
 
-#: gui/gui.cpp:91 gui/mainwindow.cpp:638
+#: gui/gui.cpp:91 gui/mainwindow.cpp:622
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -712,12 +712,12 @@ msgstr "Begärd tilldelningsstorlek"
 msgid "Number of Allocations"
 msgstr "Antal tilldelningar"
 
-#: gui/mainwindow.cpp:171
+#: gui/mainwindow.cpp:155
 #, kde-format
 msgid "Open file in editor"
 msgstr "Öppna fil i editor"
 
-#: gui/mainwindow.cpp:394
+#: gui/mainwindow.cpp:378
 #, kde-format
 msgid ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
@@ -726,115 +726,115 @@ msgstr ""
 "<dt><b>avlusat program</b>:</dt><dd style='font-family:monospace;'>"
 "%1<i>(anslutet)</i></dd>"
 
-#: gui/mainwindow.cpp:397
+#: gui/mainwindow.cpp:381
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 msgstr ""
 "<dt><b>avlusat program</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 
-#: gui/mainwindow.cpp:401
+#: gui/mainwindow.cpp:385
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
 msgstr ""
 "<dt><b>total körtid</b>:</dt><dd>%1, filtrerad från %2 till %3 (%4)</dd>"
 
-#: gui/mainwindow.cpp:406
+#: gui/mainwindow.cpp:390
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>total körtid</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:408
+#: gui/mainwindow.cpp:392
 #, kde-format
 msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>totalt systemminne</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:415
+#: gui/mainwindow.cpp:399
 #, kde-format
 msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
 msgstr "<dt><b>anrop till tilldelningsfunktioner</b>:</dt><dd>%1 (%2/s)</dd>"
 
-#: gui/mainwindow.cpp:418
+#: gui/mainwindow.cpp:402
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 msgstr "<dt><b>tillfälliga tilldelningar</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 
-#: gui/mainwindow.cpp:428
+#: gui/mainwindow.cpp:412
 #, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
 msgstr "<dt><b>största heap-minnesanvändning</b>:</dt><dd>%1 efter %2</dd>"
 
-#: gui/mainwindow.cpp:431
+#: gui/mainwindow.cpp:415
 #, kde-format
 msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
 msgstr ""
 "<dt><b>topp-RSS</b> (inklusive overhead från heaptrack):</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:435
+#: gui/mainwindow.cpp:419
 #, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>deltaminnesanvändning</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:439
+#: gui/mainwindow.cpp:423
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
 msgstr "<dt><b>totalt läckt minne</b>:</dt><dd>%1 (%2 undertryckt)</dd>"
 
-#: gui/mainwindow.cpp:442
+#: gui/mainwindow.cpp:426
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>totalt läckt minne</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:470
+#: gui/mainwindow.cpp:454
 #, kde-format
 msgid "Failed to parse file %1."
 msgstr "Misslyckades tolka filen %1."
 
-#: gui/mainwindow.cpp:475
+#: gui/mainwindow.cpp:459
 #, kde-format
 msgid "Consumed"
 msgstr "Använt"
 
-#: gui/mainwindow.cpp:491
+#: gui/mainwindow.cpp:475
 #, kde-format
 msgid "Sizes"
 msgstr "Storlekar"
 
-#: gui/mainwindow.cpp:555
+#: gui/mainwindow.cpp:539
 #, kde-format
 msgid "Input data %1 does not exist."
 msgstr "Indata %1 finns inte."
 
-#: gui/mainwindow.cpp:557
+#: gui/mainwindow.cpp:541
 #, kde-format
 msgid "Input data %1 is not a file."
 msgstr "Indata %1 är inte en fil."
 
-#: gui/mainwindow.cpp:559
+#: gui/mainwindow.cpp:543
 #, kde-format
 msgid "Input data %1 is not readable."
 msgstr "Indata %1 är inte läsbar."
 
-#: gui/mainwindow.cpp:593
+#: gui/mainwindow.cpp:577
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr "Misslyckades tolka undertryckningsfil."
 
-#: gui/mainwindow.cpp:608
+#: gui/mainwindow.cpp:592
 #, kde-format
 msgid "Heaptrack"
 msgstr "Heaptrack"
 
-#: gui/mainwindow.cpp:636
+#: gui/mainwindow.cpp:620
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr "Inaktivera inbäddade undertryckningar"
 
-#: gui/mainwindow.cpp:648
+#: gui/mainwindow.cpp:632
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr "Inaktivera inbyggda undertryckningar"
 
-#: gui/mainwindow.cpp:650
+#: gui/mainwindow.cpp:634
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -843,54 +843,54 @@ msgstr ""
 "Ignorera undertryckningsdefinitioner som är inbyggda i heaptrack. Normalt "
 "undertrycker heaptrack vissa kända läckor från vanliga systembibliotek."
 
-#: gui/mainwindow.cpp:678
+#: gui/mainwindow.cpp:662
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "Läser in filen %1. Vänta..."
 
-#: gui/mainwindow.cpp:680
+#: gui/mainwindow.cpp:664
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "Heaptrack - %1"
 
-#: gui/mainwindow.cpp:683
+#: gui/mainwindow.cpp:667
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1 jämförd med %2"
 
-#: gui/mainwindow.cpp:699
+#: gui/mainwindow.cpp:683
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "Tolkar filen igen. Vänta..."
 
-#: gui/mainwindow.cpp:742
+#: gui/mainwindow.cpp:726
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:782
+#: gui/mainwindow.cpp:766
 #, kde-format
 msgid "Code Navigation"
 msgstr "Kodnavigering"
 
-#: gui/mainwindow.cpp:809
+#: gui/mainwindow.cpp:792
 #, kde-format
 msgid "Custom..."
 msgstr "Egen..."
 
-#: gui/mainwindow.cpp:821
+#: gui/mainwindow.cpp:804
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "Automatisk (inga radnummer)"
 
-#: gui/mainwindow.cpp:841
+#: gui/mainwindow.cpp:824
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "Egen kodnavigering"
 
-#: gui/mainwindow.cpp:842
+#: gui/mainwindow.cpp:825
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
@@ -898,6 +898,17 @@ msgid ""
 msgstr ""
 "Ange kommando för att använda för kodnavigering, '%f' ersätts av filnamnet, "
 "'%l' av radnumret och '%c' av kolumnnumret."
+
+#: gui/mainwindow.cpp:858
+#, fuzzy, kde-format
+#| msgid "Failed to parse file %1."
+msgid "Failed to parse command: %1"
+msgstr "Misslyckades tolka filen %1."
+
+#: gui/mainwindow.cpp:872
+#, kde-format
+msgid "Failed to launch command: %1 %2"
+msgstr ""
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
