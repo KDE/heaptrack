@@ -4,20 +4,21 @@
 #
 # André Marcelo Alvarenga <alvarenga@kde.org>, 2015, 2016.
 # Luiz Fernando Ranghetti <elchevive@opensuse.org>, 2017, 2018, 2019, 2020, 2021, 2022, 2023.
+# SPDX-FileCopyrightText: 2026 Marcus Gama <marcus.gama@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2026-04-24 00:46+0000\n"
-"PO-Revision-Date: 2023-05-31 14:33-0300\n"
-"Last-Translator: Luiz Fernando Ranghetti <elchevive@opensuse.org>\n"
+"PO-Revision-Date: 2026-04-24 08:54-0300\n"
+"Last-Translator: Marcus Gama <marcus.gama@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <kde-i18n-pt_BR@kde.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 21.12.3\n"
+"X-Generator: Lokalize 26.04.0\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -910,15 +911,14 @@ msgstr ""
 "número da coluna."
 
 #: gui/mainwindow.cpp:858
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to parse command: %1"
-msgstr "Não foi possível processar o arquivo %1."
+msgstr "Não foi possível analisar o comando: %1"
 
 #: gui/mainwindow.cpp:872
 #, kde-format
 msgid "Failed to launch command: %1 %2"
-msgstr ""
+msgstr "Não foi possível executar o comando: %1 %2"
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14

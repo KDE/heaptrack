@@ -844,10 +844,9 @@ msgstr ""
 "替换成列号。"
 
 #: gui/mainwindow.cpp:858
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to parse command: %1"
-msgstr "解析文件 %1 失败。"
+msgstr ""
 
 #: gui/mainwindow.cpp:872
 #, kde-format

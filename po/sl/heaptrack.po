@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2026-04-24 00:46+0000\n"
-"PO-Revision-Date: 2022-10-06 09:04+0200\n"
+"PO-Revision-Date: 2026-04-24 07:13+0200\n"
 "Last-Translator: Matjaž Jeran <matjaz.jeran@amis.net>\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Language: sl\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 || n"
 "%100==4 ? 3 : 0);\n"
-"X-Generator: Poedit 3.1.1\n"
+"X-Generator: Poedit 3.9\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -902,15 +902,14 @@ msgstr ""
 "stolpca."
 
 #: gui/mainwindow.cpp:858
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to parse command: %1"
-msgstr "Razčlenjevanje datoteke %1 ni uspelo."
+msgstr "Neuspelo razčlenjevanje ukaza: %1"
 
 #: gui/mainwindow.cpp:872
 #, kde-format
 msgid "Failed to launch command: %1 %2"
-msgstr ""
+msgstr "Neuspel zagon ukaza: %1 %2"
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14

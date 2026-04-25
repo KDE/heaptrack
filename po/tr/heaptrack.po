@@ -1,13 +1,13 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 #
-# SPDX-FileCopyrightText: 2022, 2025 Emir SARI <emir_sari@icloud.com>
+# SPDX-FileCopyrightText: 2022, 2025, 2026 Emir SARI <emir_sari@icloud.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2026-04-24 00:46+0000\n"
-"PO-Revision-Date: 2025-12-23 12:31+0300\n"
+"PO-Revision-Date: 2026-04-24 16:05+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 25.12.0\n"
+"X-Generator: Lokalize 25.12.3\n"
 "X-POOTLE-MTIME: 1502202299.000000\n"
 
 #, kde-format
@@ -893,15 +893,14 @@ msgstr ""
 "satır numarası ile ve “%c”, sütun numarası ile değiştirilir."
 
 #: gui/mainwindow.cpp:858
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to parse command: %1"
-msgstr "%1 dosyası ayrıştırılamadı."
+msgstr "Komut ayrıştırılamadı: %1"
 
 #: gui/mainwindow.cpp:872
 #, kde-format
 msgid "Failed to launch command: %1 %2"
-msgstr ""
+msgstr "Komut başlatılamadı: %1 %2"
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
