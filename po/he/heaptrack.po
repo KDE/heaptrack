@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2026-04-24 00:46+0000\n"
-"PO-Revision-Date: 2026-03-20 08:13+0200\n"
+"PO-Revision-Date: 2026-04-25 07:51+0300\n"
 "Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
 "Language-Team: צוות התרגום של KDE ישראל\n"
 "Language: he\n"
@@ -875,15 +875,14 @@ msgstr ""
 "‚‎%c’ במספר העמודה."
 
 #: gui/mainwindow.cpp:858
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to parse command: %1"
-msgstr "פיענוח הקובץ %1 נכשל."
+msgstr "פיענוח הפקודה נכשל: %1"
 
 #: gui/mainwindow.cpp:872
 #, kde-format
 msgid "Failed to launch command: %1 %2"
-msgstr ""
+msgstr "הרצת הפקודה נכשלה: %1 %2"
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14

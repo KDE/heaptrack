@@ -889,15 +889,14 @@ msgstr ""
 "názvom súboru, '%l' číslom riadka a '%c' číslom stĺpca."
 
 #: gui/mainwindow.cpp:858
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to parse command: %1"
-msgstr "Zlyhalo spracovanie súboru %1."
+msgstr "Zlyhalo spracovanie príkazu: %1"
 
 #: gui/mainwindow.cpp:872
 #, kde-format
 msgid "Failed to launch command: %1 %2"
-msgstr ""
+msgstr "Zlyhalo spustenie príkazu: %1 %2"
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
