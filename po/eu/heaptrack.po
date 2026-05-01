@@ -1,16 +1,16 @@
 # Translation for heaptrack.po to Euskara/Basque (eu).
-# Copyright (C) 2023-2025 This file is copyright:
+# Copyright (C) 2023-2026 This file is copyright:
 # This file is distributed under the same license as the heaptrack package.
-# SPDX-FileCopyrightText: 2025 KDE euskaratzeko proiektuaren arduraduna <xalba@ni.eus>
+# SPDX-FileCopyrightText: 2025-2026 KDE euskaratzeko proiektuaren arduraduna <xalba@ni.eus>
 #
 # Translators:
-# Iñigo Salvador Azurmendi <xalba@ni.eus>, 2023, 2025.
+# Iñigo Salvador Azurmendi <xalba@ni.eus>, 2023, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-11-17 14:42+0000\n"
-"PO-Revision-Date: 2025-07-20 21:00+0200\n"
+"PO-Revision-Date: 2026-04-30 23:51+0200\n"
 "Last-Translator: Iñigo Salvador Azurmendi <xalba@ni.eus>\n"
 "Language-Team: Basque <kde-i18n-eu@kde.org>\n"
 "Language: eu\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Lokalize 25.04.3\n"
+"X-Generator: Lokalize 26.04.0\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -793,7 +793,7 @@ msgstr "<dt><b>ihes egin duen memoria osoa</b>:</dt><dd>%1</dd>"
 #: gui/mainwindow.cpp:470
 #, kde-format
 msgid "Failed to parse file %1."
-msgstr "Fitxategiak ez du sintaxi azterketa gainditu: %1."
+msgstr "Fitxategiak ez du analisia gainditu: %1."
 
 #: gui/mainwindow.cpp:475
 #, kde-format
@@ -823,7 +823,7 @@ msgstr "%1 sarrera-datuak ez dira irakurgarriak."
 #: gui/mainwindow.cpp:597
 #, kde-format
 msgid "Failed to parse suppression file."
-msgstr "Ezabatze-fitxategiak ez du sintaxi azterketa gainditu"
+msgstr "Ezabatze-fitxategiak ez du analisia gainditu."
 
 #: gui/mainwindow.cpp:612
 #, kde-format
@@ -1189,17 +1189,17 @@ msgstr "1KB baino gehiago"
 #: gui/parser.cpp:645
 #, kde-format
 msgid "reparsing data"
-msgstr "datuen sintaxia berraztertzen"
+msgstr "datuen sintaxia berranalizatzen"
 
 #: gui/parser.cpp:645
 #, kde-format
 msgid "parsing data"
-msgstr "datuen sintaxia aztertzen"
+msgstr "datuen sintaxia analizatzen"
 
 #: gui/parser.cpp:659
 #, kde-format
 msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
-msgstr "%1 pasatu: %2/%3  gastatuta: %4  gainerakoa: %5"
+msgstr "%1 pasaldia: %2/%3  igarotakoa: %4  geratzen dena: %5"
 
 #: gui/parser.cpp:715
 #, kde-format
