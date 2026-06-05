@@ -920,7 +920,7 @@ msgstr "path/to/lsan_suppressions.txt"
 #: gui/mainwindow.ui:241
 #, kde-format
 msgid "Summary"
-msgstr "总计"
+msgstr "概要"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topPeakLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topPeak)
