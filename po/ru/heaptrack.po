@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-11-17 14:42+0000\n"
-"PO-Revision-Date: 2026-03-08 22:25+0200\n"
+"PO-Revision-Date: 2026-06-18 20:00+0200\n"
 "Last-Translator: Alexander Yavorskiy <kekcuha@gmail.com>\n"
 "Language-Team: Russian <kde-russian@lists.kde.ru>\n"
 "Language: ru\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=4; plural=n==1 ? 3 : n%10==1 && n%100!=11 ? 0 : n"
 "%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Lokalize 25.12.2\n"
+"X-Generator: Lokalize 26.04.2\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -121,42 +121,36 @@ msgstr ""
 
 #: gui/callercalleemodel.cpp:81 gui/callercalleemodel.h:181
 #: gui/callercalleemodel.h:374
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The number of times an allocation function was called from this "
-#| "location.</qt>"
+#, kde-format
 msgid ""
 "<qt>The inclusive number of times an allocation function was called from "
 "this location or any functions called from here.</qt>"
 msgstr ""
-"<qt>Число вызовов функции выделения, совершённых из указанного места.</qt>"
+"<qt>Число вызовов функции выделения, совершённых из указанного места или из "
+"любых функций, вызванных отсюда.</qt>"
 
 #: gui/callercalleemodel.cpp:85 gui/callercalleemodel.h:185
 #: gui/callercalleemodel.h:378
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The number of times an allocation function was called from this "
-#| "location.</qt>"
+#, kde-format
 msgid ""
 "<qt>The number of inclusive temporary allocations. These allocations are "
 "directly followed by a free without any other allocations in-between.</qt>"
 msgstr ""
-"<qt>Число вызовов функции выделения, совершённых из указанного места.</qt>"
+"<qt>Число включающих временных выделений. Эти выделения памяти "
+"непосредственно освобождаются без каких-либо других операций выделения между "
+"ними.</qt>"
 
 #: gui/callercalleemodel.cpp:89 gui/callercalleemodel.h:173
 #: gui/callercalleemodel.h:382
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The maximum heap memory in bytes consumed from allocations "
-#| "originating at this location. This takes deallocations into account.</qt>"
+#, kde-format
 msgid ""
 "<qt>The inclusive maximum heap memory in bytes consumed from allocations "
 "originating at this location or from functions called from here. This takes "
 "deallocations into account.</qt>"
 msgstr ""
 "<qt>Максимальный объём использованной памяти, затребованной всеми операциями "
-"выделения из указанного места. Операции освобождения памяти учитываются и "
-"уменьшают данное значение.</qt>"
+"выделения из указанного места и из вызываемых отсюда функций (включительно). "
+"Операции освобождения памяти учитываются и уменьшают данное значение.</qt>"
 
 #: gui/callercalleemodel.cpp:94 gui/callercalleemodel.h:178
 #: gui/callercalleemodel.h:387 gui/treemodel.cpp:91
@@ -194,38 +188,32 @@ msgid "Allocations"
 msgstr "Выделения"
 
 #: gui/callercalleemodel.h:162 gui/treemodel.cpp:67
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid "Temporary"
-msgstr "Выделения"
+msgstr "Временные"
 
 #: gui/callercalleemodel.h:170
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The number of times an allocation function was called from this "
-#| "location.</qt>"
+#, kde-format
 msgid ""
 "The location of the %1. The function name may be unresolved when debug "
 "information is missing."
 msgstr ""
-"<qt>Число вызовов функции выделения, совершённых из указанного места.</qt>"
+"Расположение %1. Имя функции может остаться неразрешённым при отсутствии "
+"отладочной информации."
 
 #: gui/callercalleemodel.h:356
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The number of times an allocation function was called from this "
-#| "location.</qt>"
+#, kde-format
 msgid ""
 "<qt>The source code location that called an allocation function. May be "
 "unknown when debug information is missing.</qt>"
 msgstr ""
-"<qt>Число вызовов функции выделения, совершённых из указанного места.</qt>"
+"<qt>Место в исходном коде, из которого была вызвана функция выделения "
+"памяти. При отсутствии отладочной информации может быть неизвестно.</qt>"
 
 #: gui/chartmodel.cpp:52
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid "Memory Allocations"
-msgstr "Выделения"
+msgstr "Выделения памяти"
 
 #: gui/chartmodel.cpp:54
 #, kde-format
@@ -241,30 +229,27 @@ msgstr "Временные выделения"
 #: gui/chartmodel.cpp:76 gui/chartwidget.cpp:466
 #, kde-format
 msgid "Elapsed Time"
-msgstr ""
+msgstr "Затраченное время"
 
 #: gui/chartmodel.cpp:83
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid "Total Memory Allocations"
-msgstr "Выделения"
+msgstr "Всего выделений памяти"
 
 #: gui/chartmodel.cpp:85
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid "Total Memory Consumption"
-msgstr "Выделения"
+msgstr "Общее потребление памяти"
 
 #: gui/chartmodel.cpp:87
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid "Total Temporary Allocations"
-msgstr "Выделения"
+msgstr "Всего временных выделений"
 
 #: gui/chartmodel.cpp:113
 #, kde-format
 msgid "%1"
-msgstr ""
+msgstr "%1"
 
 #: gui/chartmodel.cpp:166
 #, kde-format
@@ -272,44 +257,42 @@ msgctxt ""
 "%1: the formatted byte size, e.g. \"1.2KB\", %2: the raw byte size, e.g. "
 "\"1300\""
 msgid "%1 (%2 bytes)"
-msgstr ""
+msgstr "%1 (%2 байт)"
 
 #: gui/chartmodel.cpp:174
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid "<qt>%1 allocations in total after %2</qt>"
-msgstr "Выделения"
+msgstr "<qt>Всего выделений: %1 после %2</qt>"
 
 #: gui/chartmodel.cpp:176
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid "<qt>%1 temporary allocations in total after %2</qt>"
-msgstr "Выделения"
+msgstr "<qt>%1 временных выделений всего после %2</qt>"
 
 #: gui/chartmodel.cpp:178
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid "<qt>%1 consumed in total after %2</qt>"
-msgstr "Выделения"
+msgstr "<qt>После %2 всего занято %1</qt>"
 
 #: gui/chartmodel.cpp:184
 #, kde-format
 msgid ""
 "<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>"
-msgstr ""
+msgstr "<qt>%2 выделений после %3 из:<p style='margin-left:10px;'>%1</p></qt>"
 
 #: gui/chartmodel.cpp:188
-#, fuzzy, kde-format
-#| msgid "Allocations"
+#, kde-format
 msgid ""
 "<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
 "p></qt>"
-msgstr "Выделения"
+msgstr ""
+"<qt>%2 временных выделений после %3 из:<p style='margin-left:10px'>%1</ p></"
+"qt>"
 
 #: gui/chartmodel.cpp:192
 #, kde-format
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
-msgstr ""
+msgstr "<qt>Занято %2 после %3 из:<p style='margin-left:10px'>%1</p></qt>"
 
 #: gui/chartwidget.cpp:162
 #, kde-format
@@ -361,56 +344,51 @@ msgstr ""
 #: gui/chartwidget.cpp:400
 #, kde-format
 msgid "Failed to save the image to %1"
-msgstr ""
+msgstr "Не удалось сохранить изображение в %1"
 
 #: gui/chartwidget.cpp:420
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
-msgstr ""
+msgstr "<tr><th></th><th>Начало</th><th>Конец</th><th>Изменение</th></tr>"
 
 #: gui/chartwidget.cpp:421
 #, kde-format
 msgid "<tr><th>Time</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>Время</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:425
 #, kde-format
 msgid "<tr><th>Consumed</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>Занято</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:429
 #, kde-format
 msgid "<tr><th>Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr ""
+msgstr "<tr><th>Выделения</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:433
-#, fuzzy, kde-format
-#| msgid "<strong>calls to allocation functions</strong>: %1 (%2/s)"
+#, kde-format
 msgid ""
 "<tr><th>Temporary Allocations</th><td>%1</td><td>%2</td><td>%3</td></tr>"
-msgstr "<strong>Вызовов функций выделения памяти</strong>: %1 (%2/с)"
+msgstr "<tr><th>Временные выделения</th><td>%1</td><td>%2</td><td>%3</td></tr>"
 
 #: gui/chartwidget.cpp:441
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The number of times an allocation function was called from this "
-#| "location.</qt>"
+#, kde-format
 msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
 "a time range for filtering.</qt>"
 msgstr ""
-"<qt>Число вызовов функции выделения, совершённых из указанного места.</qt>"
+"<qt>Показано потребление памяти кучи с течением времени.<br>Для фильтрации "
+"выделите временной диапазон перетаскиванием.</qt>"
 
 #: gui/chartwidget.cpp:445
-#, fuzzy, kde-format
-#| msgid ""
-#| "<qt>The number of times an allocation function was called from this "
-#| "location.</qt>"
+#, kde-format
 msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
 "select a time range for filtering.</qt>"
 msgstr ""
-"<qt>Число вызовов функции выделения, совершённых из указанного места.</qt>"
+"<qt>Показывает количество выделений памяти с течением времени.<br>Щёлкните и "
+"перетащите для выбора временного диапазона для фильтрации.</qt>"
 
 #: gui/chartwidget.cpp:449
 #, fuzzy, kde-format
@@ -434,18 +412,19 @@ msgstr "Выделения"
 #: gui/chartwidget.cpp:475
 #, kde-format
 msgid "%1 (filtered delta)"
-msgstr ""
+msgstr "%1 (отфильтрованная дельта)"
 
 #: gui/chartwidget.cpp:564
 #, kde-format
 msgid "Click and drag to select time range for filtering."
 msgstr ""
+"Щёлкните и перетащите, чтобы выбрать временной диапазон для фильтрации."
 
 #: gui/chartwidget.cpp:570
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
-msgstr ""
+msgstr "Время = %1, Занято: %2. Выделите временной диапазон для фильтрации."
 
 #: gui/chartwidget.cpp:574
 #, kde-format
