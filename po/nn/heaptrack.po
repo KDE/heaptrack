@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-11-17 14:42+0000\n"
-"PO-Revision-Date: 2024-09-26 18:41+0200\n"
+"PO-Revision-Date: 2026-06-26 17:22+0200\n"
 "Last-Translator: Karl Ove Hufthammer <karl@huftis.org>\n"
 "Language-Team: Norwegian Nynorsk <l10n-no@nuug.no>\n"
 "Language: nn\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 24.11.70\n"
+"X-Generator: Lokalize 26.07.70\n"
 "X-Environment: kde\n"
 "X-Accelerator-Marker: &\n"
 "X-Text-Markup: kde4\n"
@@ -674,6 +674,11 @@ msgid ""
 "application.  These are then always applied when analyzing the data, unless "
 "this feature is explicitly disabled using this command line option."
 msgstr ""
+"Ignorer undertrykkingsdefinisjonar som er innebygde i heaptrack-datafila. "
+"Som standard vil heaptrack kopiera undertrykkingar definerte via eit «const "
+"char *__lsan_default_suppressions()»-symbol i programmet som vert feilsøkt. "
+"Desse vert så automatisk brukte ved analysering av dataa, med mindre denne "
+"funksjonen er eksplisitt slått av med dette kommandolinjevalet."
 
 #: gui/gui.cpp:105
 #, kde-format
@@ -681,6 +686,9 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks in common system libraries."
 msgstr ""
+"Ignorer undertrykkingsdefinisjonar som er innebygde i heaptrack. Som "
+"standard vil heaptrack undertrykkja viss kjende lekkasjar i vanlege "
+"systembibliotek."
 
 #: gui/gui.cpp:108
 #, kde-format
@@ -698,6 +706,8 @@ msgid ""
 "%1 allocations from %2, totalling %3 allocated with an average of %4 per "
 "allocation"
 msgstr ""
+"%1 reserveringar frå %2, i alt %3 reservert med, med i snitt %4 per "
+"reservasjon"
 
 #: gui/histogramwidget.cpp:99
 #, kde-format
@@ -822,12 +832,12 @@ msgstr "Heaptrack"
 #: gui/mainwindow.cpp:640
 #, kde-format
 msgid "Disable Embedded Suppressions"
-msgstr ""
+msgstr "Slå av innebygde undertrykkingar"
 
 #: gui/mainwindow.cpp:652
 #, kde-format
 msgid "Disable Builtin Suppressions"
-msgstr ""
+msgstr "Slå av innebygde undertrykkingar"
 
 #: gui/mainwindow.cpp:654
 #, kde-format
@@ -835,6 +845,9 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks from common system libraries."
 msgstr ""
+"Ignorer undertrykkingsdefinisjonar som er innebygde i heaptrack. Som "
+"standard vil heaptrack undertrykkja viss kjende lekkasjar i vanlege "
+"systembibliotek."
 
 #: gui/mainwindow.cpp:682
 #, kde-format
