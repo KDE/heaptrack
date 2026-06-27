@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2026-04-24 00:46+0000\n"
-"PO-Revision-Date: 2026-06-19 21:00+0200\n"
+"PO-Revision-Date: 2026-06-26 20:42+0200\n"
 "Last-Translator: Alexander Yavorskiy <kekcuha@gmail.com>\n"
 "Language-Team: Russian <kde-russian@lists.kde.ru>\n"
 "Language: ru\n"
@@ -904,12 +904,12 @@ msgstr ""
 #: gui/mainwindow.cpp:858
 #, kde-format
 msgid "Failed to parse command: %1"
-msgstr ""
+msgstr "Не удалось разобрать команду %1"
 
 #: gui/mainwindow.cpp:872
 #, kde-format
 msgid "Failed to launch command: %1 %2"
-msgstr ""
+msgstr "Не удалось запустить команду: %1 %2"
 
 # BUGME: notr please --aspotashev
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
