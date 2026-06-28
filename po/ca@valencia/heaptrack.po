@@ -881,13 +881,13 @@ msgstr "S'està carregant el fitxer %1. Espereu…"
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
-msgstr "Heaptrack - %1"
+msgstr "Heaptrack – %1"
 
 #: gui/mainwindow.cpp:687
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
-msgstr "Heaptrack - %1 comparat amb %2"
+msgstr "Heaptrack – %1 comparat amb %2"
 
 #: gui/mainwindow.cpp:703
 #, kde-format
