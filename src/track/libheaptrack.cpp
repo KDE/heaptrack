@@ -39,6 +39,7 @@
 #include <string>
 #include <thread>
 
+#include "trace_cache.h"
 #include "tracetree.h"
 #include "util/config.h"
 #include "util/libunwind_config.h"
@@ -112,6 +113,13 @@ struct RecursionGuard
 };
 
 thread_local bool RecursionGuard::isActive = false;
+
+/**
+ * Per-thread cache of backtrace → TraceTree index mappings.
+ * Avoids the shared TraceTree trie walk for repeated backtraces
+ * without any lock contention.
+ */
+static thread_local TraceCache t_traceCache;
 
 enum DebugVerbosity
 {
@@ -526,15 +534,21 @@ public:
         }
         updateModuleCache();
 
-        const auto index = s_data->traceTree.index(trace, [](uintptr_t ip, uint32_t index) {
-            // decrement addresses by one - otherwise we misattribute the cost to the wrong instruction
-            // for some reason, it seems like we always get the instruction _after_ the one we are interested in
-            // see also: https://github.com/libunwind/libunwind/issues/287
-            // and https://bugs.kde.org/show_bug.cgi?id=439897
-            --ip;
+        uint32_t index = t_traceCache.lookup(trace);
+        if (!index) {
+            index = s_data->traceTree.index(trace, [](uintptr_t ip, uint32_t idx) {
+                // decrement addresses by one - otherwise we misattribute the cost to the wrong instruction
+                // for some reason, it seems like we always get the instruction _after_ the one we are interested in
+                // see also: https://github.com/libunwind/libunwind/issues/287
+                // and https://bugs.kde.org/show_bug.cgi?id=439897
+                --ip;
 
-            return s_data->out.writeHexLine('t', ip, index);
-        });
+                return s_data->out.writeHexLine('t', ip, idx);
+            });
+            if (index) {
+                t_traceCache.store(trace, index);
+            }
+        }
 
 #ifdef DEBUG_MALLOC_PTRS
         auto it = s_data->known.find(ptr);
