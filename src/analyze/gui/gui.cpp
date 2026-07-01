@@ -9,7 +9,6 @@
 
 #include <KAboutData>
 #include <KLocalizedString>
-#include <kcoreaddons_version.h>
 
 #include "analyze/suppressions.h"
 #include "util/config.h"

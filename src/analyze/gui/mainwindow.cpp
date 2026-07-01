@@ -15,7 +15,6 @@
 #include <KLocalizedString>
 #include <KShell>
 #include <KStandardAction>
-#include <kio_version.h>
 
 #include <QAction>
 #include <QActionGroup>
