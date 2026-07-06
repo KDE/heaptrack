@@ -1,13 +1,13 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 #
-# Stefan Asserhäll <stefan.asserhall@gmail.com>, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2023.
+# SPDX-FileCopyrightText: 2015-2021, 2023, 2026 Stefan Asserhäll <stefan.asserhall@gmail.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2026-04-24 00:46+0000\n"
-"PO-Revision-Date: 2023-07-30 16:11+0200\n"
+"PO-Revision-Date: 2026-07-05 16:37+0200\n"
 "Last-Translator: Stefan Asserhäll <stefan.asserhall@gmail.com>\n"
 "Language-Team: Swedish <kde-i18n-doc@kde.org>\n"
 "Language: sv\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Lokalize 20.08.1\n"
+"X-Generator: Lokalize 26.04.2\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -900,15 +900,14 @@ msgstr ""
 "'%l' av radnumret och '%c' av kolumnnumret."
 
 #: gui/mainwindow.cpp:858
-#, fuzzy, kde-format
-#| msgid "Failed to parse file %1."
+#, kde-format
 msgid "Failed to parse command: %1"
-msgstr "Misslyckades tolka filen %1."
+msgstr "Misslyckades tolka kommando: %1"
 
 #: gui/mainwindow.cpp:872
 #, kde-format
 msgid "Failed to launch command: %1 %2"
-msgstr ""
+msgstr "Misslyckades starta kommando: %1 %2"
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
