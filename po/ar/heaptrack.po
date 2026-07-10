@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
-"POT-Creation-Date: 2026-04-24 00:46+0000\n"
+"POT-Creation-Date: 2026-07-10 00:47+0000\n"
 "PO-Revision-Date: 2026-04-30 09:11+0400\n"
 "Last-Translator: Zayed Al-Saidi <zayed.alsaidi@gmail.com>\n"
 "Language-Team: ar\n"
@@ -175,7 +175,7 @@ msgstr "الذروة"
 msgid "Leaked"
 msgstr "تسرّب"
 
-#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:434 gui/mainwindow.cpp:461
+#: gui/callercalleemodel.h:160 gui/flamegraph.cpp:434 gui/mainwindow.cpp:460
 #: gui/treemodel.cpp:65 gui/util.cpp:114 gui/util.cpp:143 gui/util.cpp:172
 #, kde-format
 msgid "Allocations"
@@ -212,7 +212,7 @@ msgstr "تخصيصات الذاكرة"
 msgid "Memory Consumed"
 msgstr "الذاكرة المستهلكة"
 
-#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:439 gui/mainwindow.cpp:463
+#: gui/chartmodel.cpp:56 gui/flamegraph.cpp:439 gui/mainwindow.cpp:462
 #: gui/util.cpp:115 gui/util.cpp:144 gui/util.cpp:173
 #, kde-format
 msgid "Temporary Allocations"
@@ -577,7 +577,7 @@ msgstr "<qt>ابحث في الرسم البياني الشعلي عن وسم.</q
 msgid "Reset View"
 msgstr "أعِد ضبط العرض"
 
-#: gui/flamegraph.cpp:551 gui/mainwindow.cpp:126
+#: gui/flamegraph.cpp:551 gui/mainwindow.cpp:125
 #, kde-format
 msgid "View Caller/Callee"
 msgstr "اعرض المستدعِي/المستدعَي"
@@ -597,37 +597,37 @@ msgstr "%1 (%2٪ من إجمالي %3) تخصيصات تطابقت مع البح
 msgid "%1 (%2% of total of %3) matched by search."
 msgstr "%1 (%2٪ من إجمالي %3) تطابقت مع البحث."
 
-#: gui/gui.cpp:63
+#: gui/gui.cpp:62
 #, kde-format
 msgid "Heaptrack GUI"
 msgstr "الواجهة الرسومية لـ Heaptrack"
 
-#: gui/gui.cpp:64
+#: gui/gui.cpp:63
 #, kde-format
 msgid "A visualizer for heaptrack data files."
 msgstr "مُصوّر لملفات بيانات heaptrack."
 
-#: gui/gui.cpp:65
+#: gui/gui.cpp:64
 #, kde-format
 msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
 msgstr "حقوق النشر 2015، Milian Wolff <mail@milianw.de>"
 
-#: gui/gui.cpp:68
+#: gui/gui.cpp:67
 #, kde-format
 msgid "Milian Wolff"
 msgstr "Milian Wolff"
 
-#: gui/gui.cpp:68
+#: gui/gui.cpp:67
 #, kde-format
 msgid "Original author, maintainer"
 msgstr "المؤلف الأصلي، المشرف"
 
-#: gui/gui.cpp:80
+#: gui/gui.cpp:79
 #, kde-format
 msgid "Base profile data to compare other files to."
 msgstr "بيانات تشكيلة أساسية لمقارنة الملفات الأخرى بها."
 
-#: gui/gui.cpp:85
+#: gui/gui.cpp:84
 #, kde-format
 msgid ""
 "Load list of leak suppressions from the specified file. Specify one "
@@ -637,7 +637,7 @@ msgstr ""
 "حمّل قائمة حجب التسرّب من الملف المحدد. حدّد حجبًا واحدًا لكل سطر، وابدأ كل سطر "
 "بـ «leak:»، أي استخدم صيغة ملف حجب LSAN."
 
-#: gui/gui.cpp:91 gui/mainwindow.cpp:622
+#: gui/gui.cpp:90 gui/mainwindow.cpp:621
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are embedded into the heaptrack data "
@@ -651,7 +651,7 @@ msgstr ""
 "*__lsan_default_suppressions()` في تطبيق التنقيح. تطبق هذه دائماً عند تحليل "
 "البيانات، ما لم يُعطّل هذه الميزة صراحة باستخدام خيار سطر الأوامر هذا."
 
-#: gui/gui.cpp:99
+#: gui/gui.cpp:98
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -660,12 +660,12 @@ msgstr ""
 "تجاهَل تعاريف الحجب المضمنة في heaptrack. مبدئياً، يحجب heaptrack بعض التسرّبات "
 "المعروفة في مكتبات النظام الشائعة."
 
-#: gui/gui.cpp:102
+#: gui/gui.cpp:101
 #, kde-format
 msgid "Files to load"
 msgstr "ملفات للتحميل"
 
-#: gui/gui.cpp:102
+#: gui/gui.cpp:101
 #, kde-format
 msgid "[FILE...]"
 msgstr "[ملف...]"
@@ -687,12 +687,12 @@ msgstr "حجم التخصيص المطلوب"
 msgid "Number of Allocations"
 msgstr "عدد التخصيصات"
 
-#: gui/mainwindow.cpp:155
+#: gui/mainwindow.cpp:154
 #, kde-format
 msgid "Open file in editor"
 msgstr "افتح الملف في المحرر"
 
-#: gui/mainwindow.cpp:378
+#: gui/mainwindow.cpp:377
 #, kde-format
 msgid ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
@@ -700,112 +700,112 @@ msgid ""
 msgstr ""
 "<dt><b>منقَّح</b>:</dt><dd style='font-family:monospace;'>%1 <i>(مرفَق)</i></dd>"
 
-#: gui/mainwindow.cpp:381
+#: gui/mainwindow.cpp:380
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 msgstr "<dt><b>منقَّح</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 
-#: gui/mainwindow.cpp:385
+#: gui/mainwindow.cpp:384
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
 msgstr "<dt><b>إجمالي وقت التشغيل</b>:</dt><dd>%1، صُفِّيَ من %2 إلى %3 (%4)</dd>"
 
-#: gui/mainwindow.cpp:390
+#: gui/mainwindow.cpp:389
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>إجمالي وقت التشغيل</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:392
+#: gui/mainwindow.cpp:391
 #, kde-format
 msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>إجمالي ذاكرة النظام</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:399
+#: gui/mainwindow.cpp:398
 #, kde-format
 msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
 msgstr "<dt><b>استدعاءات لدوال التخصيص</b>:</dt><dd>%1 (%2/ث)</dd>"
 
-#: gui/mainwindow.cpp:402
+#: gui/mainwindow.cpp:401
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 msgstr "<dt><b>تخصيصات مؤقتة</b>:</dt><dd>%1 (%2٪، %3/ث)</dd>"
 
-#: gui/mainwindow.cpp:412
+#: gui/mainwindow.cpp:411
 #, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
 msgstr "<dt><b>ذروة استهلاك ذاكرة الكومة</b>:</dt><dd>%1 بعد %2</dd>"
 
-#: gui/mainwindow.cpp:415
+#: gui/mainwindow.cpp:414
 #, kde-format
 msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
 msgstr "<dt><b>ذروة RSS</b> (شاملًا حمل heaptrack الزائد):</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:419
+#: gui/mainwindow.cpp:418
 #, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>فرق استهلاك الذاكرة</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:423
+#: gui/mainwindow.cpp:422
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
 msgstr "<dt><b>إجمالي الذاكرة المتسرّبة</b>:</dt><dd>%1 (%2 محجوبة)</dd>"
 
-#: gui/mainwindow.cpp:426
+#: gui/mainwindow.cpp:425
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
 msgstr "<dt><b>إجمالي الذاكرة المتسرّبة</b>:</dt><dd>%1</dd>"
 
-#: gui/mainwindow.cpp:454
+#: gui/mainwindow.cpp:453
 #, kde-format
 msgid "Failed to parse file %1."
 msgstr "فشَلَ تحليل الملف %1."
 
-#: gui/mainwindow.cpp:459
+#: gui/mainwindow.cpp:458
 #, kde-format
 msgid "Consumed"
 msgstr "المستهلك"
 
-#: gui/mainwindow.cpp:475
+#: gui/mainwindow.cpp:474
 #, kde-format
 msgid "Sizes"
 msgstr "الأحجام"
 
-#: gui/mainwindow.cpp:539
+#: gui/mainwindow.cpp:538
 #, kde-format
 msgid "Input data %1 does not exist."
 msgstr "بيانات الإدخال %1 غير موجودة."
 
-#: gui/mainwindow.cpp:541
+#: gui/mainwindow.cpp:540
 #, kde-format
 msgid "Input data %1 is not a file."
 msgstr "بيانات الإدخال %1 ليست ملفًا."
 
-#: gui/mainwindow.cpp:543
+#: gui/mainwindow.cpp:542
 #, kde-format
 msgid "Input data %1 is not readable."
 msgstr "بيانات الإدخال %1 غير قابلة للقراءة."
 
-#: gui/mainwindow.cpp:577
+#: gui/mainwindow.cpp:576
 #, kde-format
 msgid "Failed to parse suppression file."
 msgstr "فشَلَ تحليل ملف الحجب."
 
-#: gui/mainwindow.cpp:592
+#: gui/mainwindow.cpp:591
 #, kde-format
 msgid "Heaptrack"
 msgstr "Heaptrack"
 
-#: gui/mainwindow.cpp:620
+#: gui/mainwindow.cpp:619
 #, kde-format
 msgid "Disable Embedded Suppressions"
 msgstr "عطّل عمليات الحجب المضمنة"
 
-#: gui/mainwindow.cpp:632
+#: gui/mainwindow.cpp:631
 #, kde-format
 msgid "Disable Builtin Suppressions"
 msgstr "عطّل عمليات الحجب المبنِيَّة"
 
-#: gui/mainwindow.cpp:634
+#: gui/mainwindow.cpp:633
 #, kde-format
 msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
@@ -814,54 +814,54 @@ msgstr ""
 "تجاهَل تعاريف الحجب المضمنة في heaptrack. مبدئياً، يحجب heaptrack بعض التسرّبات "
 "المعروفة في مكتبات النظام الشائعة."
 
-#: gui/mainwindow.cpp:662
+#: gui/mainwindow.cpp:661
 #, kde-format
 msgid "Loading file %1, please wait..."
 msgstr "حمّل الملف %1، من فضلك انتظر..."
 
-#: gui/mainwindow.cpp:664
+#: gui/mainwindow.cpp:663
 #, kde-format
 msgctxt "%1: file name that is open"
 msgid "Heaptrack - %1"
 msgstr "Heaptrack - %1"
 
-#: gui/mainwindow.cpp:667
+#: gui/mainwindow.cpp:666
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
 msgstr "Heaptrack - %1 مقارنة بـ %2"
 
-#: gui/mainwindow.cpp:683
+#: gui/mainwindow.cpp:682
 #, kde-format
 msgid "Reparsing file, please wait..."
 msgstr "أعِد تحليل الملف، من فضلك انتظر..."
 
-#: gui/mainwindow.cpp:726
+#: gui/mainwindow.cpp:725
 #, kde-format
 msgid " / %1"
 msgstr " / %1"
 
-#: gui/mainwindow.cpp:766
+#: gui/mainwindow.cpp:765
 #, kde-format
 msgid "Code Navigation"
 msgstr "ملاحة الشيفرة"
 
-#: gui/mainwindow.cpp:792
+#: gui/mainwindow.cpp:791
 #, kde-format
 msgid "Custom..."
 msgstr "مخصص..."
 
-#: gui/mainwindow.cpp:804
+#: gui/mainwindow.cpp:803
 #, kde-format
 msgid "Automatic (No Line numbers)"
 msgstr "آلي (بلا أرقام أسطر)"
 
-#: gui/mainwindow.cpp:824
+#: gui/mainwindow.cpp:823
 #, kde-format
 msgid "Custom Code Navigation"
 msgstr "ملاحة شيفرة مخصصة"
 
-#: gui/mainwindow.cpp:825
+#: gui/mainwindow.cpp:824
 #, kde-format
 msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
@@ -870,12 +870,12 @@ msgstr ""
 "حدّد الأمر الذي يجب استخدامه لملاحة الشيفرة، يُستبدل '%f' باسم الملف، و '%l' "
 "برقم السطر، و '%c' برقم العمود."
 
-#: gui/mainwindow.cpp:858
+#: gui/mainwindow.cpp:857
 #, kde-format
 msgid "Failed to parse command: %1"
 msgstr "فشل تحليل الأمر: %1"
 
-#: gui/mainwindow.cpp:872
+#: gui/mainwindow.cpp:871
 #, kde-format
 msgid "Failed to launch command: %1 %2"
 msgstr "فشل تنفيذ الأمر: %1 %2"
