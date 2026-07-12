@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-11-17 14:42+0000\n"
-"PO-Revision-Date: 2026-07-10 23:14+0200\n"
+"PO-Revision-Date: 2026-07-11 23:12+0200\n"
 "Last-Translator: Libor Filípek <libor.filipek@gmail.com>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
 "Language: cs\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Lokalize 26.04.3\n"
+"X-Generator: Poedit 3.9\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -275,7 +275,7 @@ msgstr "<qt>Celkem se spotřebovalo %1 po %2</qt>"
 #, kde-format
 msgid ""
 "<qt>%2 allocations after %3 from:<p style='margin-left:10px;'>%1</p></qt>"
-msgstr ""
+msgstr "<qt>%2 alokací po %3 z:<p style='margin-left:10px;'>%1</p></qt>"
 
 #: gui/chartmodel.cpp:188
 #, kde-format
@@ -283,11 +283,12 @@ msgid ""
 "<qt>%2 temporary allocations after %3 from:<p style='margin-left:10px'>%1</"
 "p></qt>"
 msgstr ""
+"<qt>%2 dočasných alokací po %3 z:<p style='margin-left:10px'>%1</p></qt>"
 
 #: gui/chartmodel.cpp:192
 #, kde-format
 msgid "<qt>%2 consumed after %3 from:<p style='margin-left:10px'>%1</p></qt>"
-msgstr ""
+msgstr "<qt>%2 spotřebováno po %3 z:<p style='margin-left:10px'>%1</p></qt>"
 
 #: gui/chartwidget.cpp:162
 #, kde-format
@@ -302,12 +303,12 @@ msgstr "Zobrazit vysvětlivky"
 #: gui/chartwidget.cpp:172
 #, kde-format
 msgid "Show total cost graph"
-msgstr ""
+msgstr "Zobrazit graf celkové spotřeby"
 
 #: gui/chartwidget.cpp:180
 #, kde-format
 msgid "Show detailed cost graph"
-msgstr ""
+msgstr "Zobrazit detailní graf spotřeby"
 
 #: gui/chartwidget.cpp:187
 #, kde-format
@@ -317,7 +318,7 @@ msgstr "Skládané grafy:"
 #: gui/chartwidget.cpp:234
 #, kde-format
 msgid "Filter In On Selection"
-msgstr ""
+msgstr "Filtrovat při výběru"
 
 #. i18n: ectx: property (text), widget (QMenu, menuFilter)
 #: gui/chartwidget.cpp:244 gui/mainwindow.ui:895
@@ -343,7 +344,7 @@ msgstr "Chyba při ukládání obrázku do %1"
 #: gui/chartwidget.cpp:420
 #, kde-format
 msgid "<tr><th></th><th>Start</th><th>End</th><th>Delta</th></tr>"
-msgstr ""
+msgstr "<tr><th></th><th>Start</th><th>Konec</th><th>Delta</th></tr>"
 
 #: gui/chartwidget.cpp:421
 #, kde-format
@@ -372,6 +373,8 @@ msgid ""
 "<qt>Shows the heap memory consumption over time.<br>Click and drag to select "
 "a time range for filtering.</qt>"
 msgstr ""
+"<qt>Zobrazuje spotřebu paměti v haldě v průběhu času.<br>Kliknutím a tažením "
+"vyberte časové období, podle kterého chcete filtrovat.</qt>"
 
 #: gui/chartwidget.cpp:445
 #, kde-format
@@ -379,6 +382,8 @@ msgid ""
 "<qt>Shows number of memory allocations over time.<br>Click and drag to "
 "select a time range for filtering.</qt>"
 msgstr ""
+"<qt>Zobrazuje počet alokací paměti v průběhu času.<br>Kliknutím a tažením "
+"vyberte časové období, podle kterého chcete filtrovat.</qt>"
 
 #: gui/chartwidget.cpp:449
 #, kde-format
@@ -388,33 +393,42 @@ msgid ""
 "deallocation, without other allocations happening in-between.<br>Click and "
 "drag to select a time range for filtering.</qt>"
 msgstr ""
+"<qt>Zobrazuje počet dočasných alokací paměti v průběhu času. Dočasná alokace "
+"je taková, po které bezprostředně následuje odpovídající uvolnění paměti, "
+"aniž by mezi nimi došlo k jiným alokacím.<br>Kliknutím a tažením vyberte "
+"časové období pro filtrování.</qt>"
 
 #: gui/chartwidget.cpp:471
 #, kde-format
 msgid "%1 (filtered from %2 to %3, Δ%4)"
-msgstr ""
+msgstr "%1 (filtrováno od %2 do %3, Δ%4)"
 
 #: gui/chartwidget.cpp:475
 #, kde-format
 msgid "%1 (filtered delta)"
-msgstr ""
+msgstr "%1 (filtrovaná delta)"
 
 #: gui/chartwidget.cpp:564
 #, kde-format
 msgid "Click and drag to select time range for filtering."
 msgstr ""
+"Kliknutím a tažením vyberte časové období, podle kterého chcete filtrovat."
 
 #: gui/chartwidget.cpp:570
 #, kde-format
 msgid ""
 "T = %1, Consumed: %2. Click and drag to select time range for filtering."
 msgstr ""
+"T = %1, spotřebováno: %2. Kliknutím a tažením vyberte časové rozmezí pro "
+"filtrování."
 
 #: gui/chartwidget.cpp:574
 #, kde-format
 msgid ""
 "T = %1, Allocations: %2. Click and drag to select time range for filtering."
 msgstr ""
+"T = %1, alokace: %2. Kliknutím a tažením vyberte časové rozmezí pro "
+"filtrování."
 
 #: gui/chartwidget.cpp:578
 #, kde-format
@@ -422,57 +436,59 @@ msgid ""
 "T = %1, Temporary Allocations: %2. Click and drag to select time range for "
 "filtering."
 msgstr ""
+"T = %1, dočasné alokace: %2. Kliknutím a tažením vyberte časové období pro "
+"filtrování."
 
 #: gui/flamegraph.cpp:175 gui/histogrammodel.cpp:63
 #, kde-format
 msgid "%1 allocations in total"
-msgstr ""
+msgstr "%1 alokací celkem"
 
 #: gui/flamegraph.cpp:177
 #, kde-format
 msgid "%1 temporary allocations in total"
-msgstr ""
+msgstr "%1 dočasných alokací celkem"
 
 #: gui/flamegraph.cpp:179
 #, kde-format
 msgid "%1 peak memory consumption"
-msgstr "%1 spotřeba paměti ve špičce"
+msgstr "%1 spotřeby paměti ve špičce"
 
 #: gui/flamegraph.cpp:181
 #, kde-format
 msgid "%1 leaked in total"
-msgstr ""
+msgstr "%1 uniklo celkem"
 
 #: gui/flamegraph.cpp:234
 #, kde-format
 msgctxt "%1: number of allocations, %2: relative number, %3: function label"
 msgid "%1 (%2%) allocations in %3 and below."
-msgstr ""
+msgstr "%1 (%2 %) alokací v %3 a nižších."
 
 #: gui/flamegraph.cpp:239
 #, kde-format
 msgctxt ""
 "%1: number of temporary allocations, %2: relative number, %3 function label"
 msgid "%1 (%2%) temporary allocations in %3 and below."
-msgstr ""
+msgstr "%1 (%2 %) dočasných alokací v %3 a nižších."
 
 #: gui/flamegraph.cpp:244
 #, kde-format
 msgctxt ""
 "%1: peak consumption in bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) contribution to peak consumption in %3 and below."
-msgstr ""
+msgstr "%1 (%2 %) podílu spotřeby ve špičce v %3 a nižších."
 
 #: gui/flamegraph.cpp:248
 #, kde-format
 msgctxt "%1: leaked bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) leaked in %3 and below."
-msgstr ""
+msgstr "%1 (%2 %) uniklo v %3 a nižších."
 
 #: gui/flamegraph.cpp:428
 #, kde-format
 msgid "Memory Peak"
-msgstr ""
+msgstr "Únik paměti"
 
 #: gui/flamegraph.cpp:430
 #, kde-format
@@ -480,6 +496,8 @@ msgid ""
 "Show a flame graph over the contributions to the peak heap memory "
 "consumption of your application."
 msgstr ""
+"Zobrazit plamenný graf znázorňující podíl jednotlivých složek na špičkové "
+"spotřebě paměti haldy ve vaší aplikaci."
 
 #: gui/flamegraph.cpp:435
 #, kde-format
@@ -487,6 +505,8 @@ msgid ""
 "Show a flame graph over the leaked heap memory of your application. Memory "
 "is considered to be leaked when it never got deallocated. "
 msgstr ""
+"Zobrazit plamenný graf znázorňující úniky paměti v haldě vaší aplikace. O "
+"úniku paměti se mluví v případě, že paměť nebyla nikdy uvolněna. "
 
 #: gui/flamegraph.cpp:440
 #, kde-format
@@ -494,6 +514,8 @@ msgid ""
 "Show a flame graph over the number of allocations triggered by functions in "
 "your code."
 msgstr ""
+"Zobrazit plamenný graf znázorňující počet alokací vyvolaných funkcemi ve "
+"vašem kódu."
 
 #: gui/flamegraph.cpp:445
 #, kde-format
@@ -502,6 +524,9 @@ msgid ""
 "functions in your code. Allocations are marked as temporary when they are "
 "immediately followed by their deallocation."
 msgstr ""
+"Zobrazit plamenný graf znázorňující počet dočasných alokací vyvolaných "
+"funkcemi ve vašem kódu. Alokace jsou označeny jako dočasné, pokud "
+"bezprostředně po nich následuje jejich uvolnění."
 
 #: gui/flamegraph.cpp:452
 #, kde-format
@@ -511,7 +536,7 @@ msgstr "Vyberte zdroj dat, která by měla být vyobrazena v plamenném grafu."
 #: gui/flamegraph.cpp:467
 #, kde-format
 msgid "Bottom-Up View"
-msgstr ""
+msgstr "Zobrazení zdola nahoru"
 
 #: gui/flamegraph.cpp:468
 #, kde-format
@@ -519,6 +544,8 @@ msgid ""
 "Enable the bottom-up flame graph view. When this is unchecked, the top-down "
 "view is enabled by default."
 msgstr ""
+"Zapnout zobrazení plamenného grafu zdola nahoru. Pokud není tato možnost "
+"zaškrtnuta, je ve výchozím nastavení zapnuto zobrazení shora dolů."
 
 #: gui/flamegraph.cpp:476
 #, kde-format
@@ -531,11 +558,13 @@ msgid ""
 "Collapse stack frames for functions calling themselves. When this is "
 "unchecked, recursive frames will be visualized separately."
 msgstr ""
+"Sbalit zásobníkové rámce u funkcí, které volají samy sebe. Pokud není tato "
+"možnost zaškrtnuta, budou rekurzivní rámce zobrazeny samostatně."
 
 #: gui/flamegraph.cpp:490
 #, kde-format
 msgid "Cost Threshold: "
-msgstr ""
+msgstr "Limit spotřeby: "
 
 #: gui/flamegraph.cpp:494
 #, kde-format
@@ -546,6 +575,12 @@ msgid ""
 "low memory overhead. If you need more details, decrease the threshold value, "
 "or set it to zero.</qt>"
 msgstr ""
+"<qt>Limit spotřeby definuje mezní hodnotu vyjádřenou jako zlomek. Položky, "
+"jejichž relativní spotřeba je nižší než tato hodnota, se ve plamenném grafu "
+"nezobrazí. Jedná se o optimalizaci, která umožňuje rychlé generování grafů "
+"pro rozsáhlé datové sady s nízkou paměťovou náročností. Pokud potřebujete "
+"více podrobností, snižte hodnotu prahové hodnoty nebo ji nastavte na nulu.</"
+"qt>"
 
 #: gui/flamegraph.cpp:506
 #, kde-format
@@ -555,7 +590,7 @@ msgstr "Hledat..."
 #: gui/flamegraph.cpp:507
 #, kde-format
 msgid "<qt>Search the flame graph for a symbol.</qt>"
-msgstr ""
+msgstr "<qt>Vyhledat symbol v plamenném grafu.</qt>"
 
 #: gui/flamegraph.cpp:545
 #, kde-format
@@ -565,32 +600,33 @@ msgstr "Přenastavit pohled"
 #: gui/flamegraph.cpp:555 gui/mainwindow.cpp:142
 #, kde-format
 msgid "View Caller/Callee"
-msgstr ""
+msgstr "Zobrazit volajícího/volaného"
 
 #: gui/flamegraph.cpp:696
 #, kde-format
 msgid "generating flame graph..."
-msgstr ""
+msgstr "generování plamenného grafu..."
 
 #: gui/flamegraph.cpp:773
 #, kde-format
 msgid "%1 (%2% of total of %3) allocations matched by search."
 msgstr ""
+"%1 (%2 % z celkových %3) alokací, které odpovídají výsledkům vyhledávání."
 
 #: gui/flamegraph.cpp:778
 #, kde-format
 msgid "%1 (%2% of total of %3) matched by search."
-msgstr ""
+msgstr "%1 (%2 % z celkových %3) nalezeno při vyhledávání."
 
 #: gui/gui.cpp:67
 #, kde-format
 msgid "Heaptrack GUI"
-msgstr ""
+msgstr "Grafické rozhraní Heaptrack"
 
 #: gui/gui.cpp:68
 #, kde-format
 msgid "A visualizer for heaptrack data files."
-msgstr ""
+msgstr "Vizualizátor pro datové soubory heaptrack."
 
 #: gui/gui.cpp:69
 #, kde-format
@@ -619,6 +655,9 @@ msgid ""
 "suppression per line, and start each line with 'leak:', i.e. use the LSAN "
 "suppression file format."
 msgstr ""
+"Načíst seznam potlačení úniků ze zadaného souboru. Každé potlačení uveďte na "
+"samostatném řádku a každý řádek začněte výrazem 'leak:', tj. použijte formát "
+"souboru pro potlačení úniků LSAN."
 
 #: gui/gui.cpp:97 gui/mainwindow.cpp:642
 #, kde-format
@@ -629,6 +668,12 @@ msgid ""
 "application.  These are then always applied when analyzing the data, unless "
 "this feature is explicitly disabled using this command line option."
 msgstr ""
+"Ignorujte definice potlačení, které jsou zabudovány do datového souboru "
+"programu heaptrack. Ve výchozím nastavení program heaptrack zkopíruje "
+"potlačení, která jsou volitelně definována prostřednictvím symbolu `const "
+"char *__lsan_default_suppressions()` v laděné aplikaci.  Tyto definice se "
+"pak při analýze dat vždy použijí, pokud není tato funkce výslovně "
+"deaktivována pomocí této volby příkazového řádku."
 
 #: gui/gui.cpp:105
 #, kde-format
@@ -636,6 +681,9 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks in common system libraries."
 msgstr ""
+"Ignorujte definice potlačení, které jsou zabudovány do programu heaptrack. "
+"Ve výchozím nastavení program heaptrack potlačuje určité známé úniky paměti "
+"v běžných systémových knihovnách."
 
 #: gui/gui.cpp:108
 #, kde-format
@@ -652,12 +700,12 @@ msgstr "[Soubor...]"
 msgid ""
 "%1 allocations from %2, totalling %3 allocated with an average of %4 per "
 "allocation"
-msgstr ""
+msgstr "%1 alokací z %2, celkem %3 alokováno, v průměru %4 na jednu alokaci"
 
 #: gui/histogramwidget.cpp:99
 #, kde-format
 msgid "Requested Allocation Size"
-msgstr ""
+msgstr "Požadovaná velikost alokace"
 
 #: gui/histogramwidget.cpp:105
 #, kde-format
@@ -667,7 +715,7 @@ msgstr "Počet alokací"
 #: gui/mainwindow.cpp:171
 #, kde-format
 msgid "Open file in editor"
-msgstr "Otevřít soubor v editoru."
+msgstr "Otevřít soubor v editoru"
 
 #: gui/mainwindow.cpp:394
 #, kde-format
@@ -675,26 +723,29 @@ msgid ""
 "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
 "<i>(attached)</i></dd>"
 msgstr ""
+"<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1 "
+"<i>(připojeno)</i></dd>"
 
 #: gui/mainwindow.cpp:397
 #, kde-format
 msgid "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
-msgstr ""
+msgstr "<dt><b>debuggee</b>:</dt><dd style='font-family:monospace;'>%1</dd>"
 
 #: gui/mainwindow.cpp:401
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1, filtered from %2 to %3 (%4)</dd>"
 msgstr ""
+"<dt><b>celková doba běhu</b>:</dt><dd>%1, filtrováno od %2 do %3 (%4)</dd>"
 
 #: gui/mainwindow.cpp:406
 #, kde-format
 msgid "<dt><b>total runtime</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>celková doba běhu</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:408
 #, kde-format
 msgid "<dt><b>total system memory</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>celkem systémové paměti</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:415
 #, kde-format
@@ -734,7 +785,7 @@ msgstr ""
 #: gui/mainwindow.cpp:470
 #, kde-format
 msgid "Failed to parse file %1."
-msgstr "Selhala analýza souboru %1"
+msgstr "Selhala analýza souboru %1."
 
 #: gui/mainwindow.cpp:475
 #, kde-format
@@ -1142,7 +1193,7 @@ msgstr ""
 #: gui/stacksmodel.cpp:99
 #, kde-format
 msgid "Backtrace"
-msgstr "Backtrace:"
+msgstr "Backtrace"
 
 #: gui/treemodel.cpp:80
 #, kde-format
