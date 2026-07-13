@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2025-11-17 14:42+0000\n"
-"PO-Revision-Date: 2026-07-11 23:12+0200\n"
+"PO-Revision-Date: 2026-07-12 11:21+0200\n"
 "Last-Translator: Libor Filípek <libor.filipek@gmail.com>\n"
 "Language-Team: Czech <kde-i18n-doc@kde.org>\n"
 "Language: cs\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Poedit 3.9\n"
+"X-Generator: Lokalize 26.04.3\n"
 
 #, kde-format
 msgctxt "NAME OF TRANSLATORS"
@@ -750,37 +750,38 @@ msgstr "<dt><b>celkem systémové paměti</b>:</dt><dd>%1</dd>"
 #: gui/mainwindow.cpp:415
 #, kde-format
 msgid "<dt><b>calls to allocation functions</b>:</dt><dd>%1 (%2/s)</dd>"
-msgstr ""
+msgstr "<dt><b>volání alokačních funkcí</b>:</dt><dd>%1 (%2/s)</dd>"
 
 #: gui/mainwindow.cpp:418
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
-msgstr ""
+msgstr "<dt><b>dočasné alokace:</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
 
 #: gui/mainwindow.cpp:428
 #, kde-format
 msgid "<dt><b>peak heap memory consumption</b>:</dt><dd>%1 after %2</dd>"
-msgstr ""
+msgstr "<dt><b>maximální spotřeba paměti v haldě</b>:</dt><dd>%1 po %2</dd>"
 
 #: gui/mainwindow.cpp:431
 #, kde-format
 msgid "<dt><b>peak RSS</b> (including heaptrack overhead):</dt><dd>%1</dd>"
 msgstr ""
+"<dt><b>maximální hodnota RSS</b> (včetně režie heaptracku):</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:435
 #, kde-format
 msgid "<dt><b>memory consumption delta</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>delta spotřeba paměti</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:439
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1 (%2 suppressed)</dd>"
-msgstr ""
+msgstr "<dt><b>celková velikost úniku paměti</b>:</dt><dd>%1 (%2 skryto)</dd>"
 
 #: gui/mainwindow.cpp:442
 #, kde-format
 msgid "<dt><b>total memory leaked</b>:</dt><dd>%1</dd>"
-msgstr ""
+msgstr "<dt><b>celková velikost úniku paměti</b>:</dt><dd>%1</dd>"
 
 #: gui/mainwindow.cpp:470
 #, kde-format
@@ -815,7 +816,7 @@ msgstr "Vstupní data \"%1\" nelze přečíst."
 #: gui/mainwindow.cpp:597
 #, kde-format
 msgid "Failed to parse suppression file."
-msgstr ""
+msgstr "Nepodařilo se analyzovat soubor potlačení."
 
 #: gui/mainwindow.cpp:612
 #, kde-format
@@ -825,7 +826,7 @@ msgstr "Heaptrack"
 #: gui/mainwindow.cpp:640
 #, kde-format
 msgid "Disable Embedded Suppressions"
-msgstr ""
+msgstr "Deaktivovat vestavěná potlačení"
 
 #: gui/mainwindow.cpp:652
 #, kde-format
@@ -838,11 +839,14 @@ msgid ""
 "Ignore suppression definitions that are built into heaptrack. By default, "
 "heaptrack will suppress certain known leaks from common system libraries."
 msgstr ""
+"Ignorovat definice potlačení, které jsou zabudovány do programu heaptrack. "
+"Ve výchozím nastavení program heaptrack potlačuje určité známé úniky paměti "
+"z běžných systémových knihoven."
 
 #: gui/mainwindow.cpp:682
 #, kde-format
 msgid "Loading file %1, please wait..."
-msgstr ""
+msgstr "Načítání souboru %1, prosím čekejte..."
 
 #: gui/mainwindow.cpp:684
 #, kde-format
@@ -854,12 +858,12 @@ msgstr "Heaptrack - %1"
 #, kde-format
 msgctxt "%1, %2: file names that are open"
 msgid "Heaptrack - %1 compared to %2"
-msgstr ""
+msgstr "Heaptrack – %1 ve srovnání s %2"
 
 #: gui/mainwindow.cpp:703
 #, kde-format
 msgid "Reparsing file, please wait..."
-msgstr ""
+msgstr "Probíhá opětovná analýza souboru, prosím čekejte..."
 
 #: gui/mainwindow.cpp:746
 #, kde-format
@@ -892,6 +896,8 @@ msgid ""
 "Specify command to use for code navigation, '%f' will be replaced by the "
 "file name, '%l' by the line number and '%c' by the column number."
 msgstr ""
+"Zadejte příkaz, který se má použít pro navigaci v kódu; '%f' bude nahrazeno "
+"názvem souboru, '%l' číslem řádku a '%c' číslem sloupce."
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
@@ -905,12 +911,13 @@ msgstr "MainWindow"
 #, kde-format
 msgid "Path to a file containing leak suppression rules in the LSAN format."
 msgstr ""
+"Cesta k souboru obsahujícímu pravidla pro potlačení úniků ve formátu LSAN."
 
 #. i18n: ectx: property (title), widget (QGroupBox, groupBox)
 #: gui/mainwindow.ui:63
 #, kde-format
 msgid "Open Heaptrack Data"
-msgstr ""
+msgstr "Otevřít data Heaptracku"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, openFile)
 #: gui/mainwindow.ui:72
@@ -923,13 +930,20 @@ msgid ""
 "<p>Or, alternatively, you can attach to a running process via</p>\n"
 "<pre><code>heaptrack --pid $(pidof &lt;yourapplication&gt;)</code></pre></qt>"
 msgstr ""
+"<qt><p>Toto pole určuje primární datový soubor nástroje heaptrack. Tyto "
+"soubory se nazývají <tt>heaptrack.$APP.$PID.gz</tt> nebo <tt>heaptrack.$APP."
+"$PID.zst</tt>. Takový soubor můžete vytvořit profilováním své aplikace, "
+"např. pomocí:</p>\n"
+"<pre><code>heaptrack &lt;vašeaplikace&gt; ...</code></pre>\n"
+"<p>Alternativně se můžete připojit k běžícímu procesu pomocí</p>\n"
+"<pre><code>heaptrack --pid $(pidof &lt;vašeaplikace&gt;)</code></pre></qt>"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, openFile)
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, compareTo)
 #: gui/mainwindow.ui:75 gui/mainwindow.ui:85
 #, kde-format
 msgid "path/to/heaptrack.$APP.$PID.{gz,zst}"
-msgstr ""
+msgstr "path/to/heaptrack.$APP.$PID.{gz,zst}"
 
 #. i18n: ectx: property (toolTip), widget (KUrlRequester, compareTo)
 #: gui/mainwindow.ui:82
@@ -939,6 +953,9 @@ msgid ""
 "If set, this file will be used as a base and its cost gets subtracted from "
 "the primary data costs.</qt>"
 msgstr ""
+"<qt>Volitelně můžete zadat druhý datový soubor typu heaptrack, se kterým se "
+"má provést srovnání. Pokud je tento soubor nastaven, bude použit jako základ "
+"a jeho spotřeba se odečte od spotřeby primárních dat.</qt>"
 
 #. i18n: ectx: property (text), widget (QLabel, openFileLabel)
 #: gui/mainwindow.ui:92
@@ -956,13 +973,13 @@ msgstr "Porovnat s:"
 #: gui/mainwindow.ui:115
 #, kde-format
 msgid "Suppressions:"
-msgstr ""
+msgstr "Potlačení:"
 
 #. i18n: ectx: property (placeholderText), widget (KUrlRequester, suppressions)
 #: gui/mainwindow.ui:125
 #, kde-format
 msgid "path/to/lsan_suppressions.txt"
-msgstr ""
+msgstr "path/to/lsan_suppressions.txt"
 
 #. i18n: ectx: attribute (title), widget (QWidget, summaryTab)
 #: gui/mainwindow.ui:241
@@ -975,33 +992,33 @@ msgstr "Shrnutí"
 #: gui/mainwindow.ui:342 gui/mainwindow.ui:355
 #, kde-format
 msgid "List of functions that allocated the most memory at a given time."
-msgstr ""
+msgstr "Seznam funkcí, které v daném okamžiku zabíraly nejvíce paměti."
 
 #. i18n: ectx: property (text), widget (QLabel, topPeakLabel)
 #: gui/mainwindow.ui:345
 #, kde-format
 msgid "Peak Contributions"
-msgstr ""
+msgstr "Příspěvky ve špičce"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topLeakedLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topLeaked)
 #: gui/mainwindow.ui:381 gui/mainwindow.ui:394
 #, kde-format
 msgid "List of functions that leak the most memory."
-msgstr ""
+msgstr "Seznam funkcí, které způsobují největší únik paměti."
 
 #. i18n: ectx: property (text), widget (QLabel, topLeakedLabel)
 #: gui/mainwindow.ui:384
 #, kde-format
 msgid "Largest Memory Leaks"
-msgstr ""
+msgstr "Největší paměťové úniky"
 
 #. i18n: ectx: property (toolTip), widget (QLabel, topAllocationsLabel)
 #. i18n: ectx: property (toolTip), widget (QTreeView, topAllocations)
 #: gui/mainwindow.ui:420 gui/mainwindow.ui:433
 #, kde-format
 msgid "List of functions that allocate memory most often."
-msgstr ""
+msgstr "Seznam funkcí, které nejčastěji alokují paměť."
 
 #. i18n: ectx: property (text), widget (QLabel, topAllocationsLabel)
 #: gui/mainwindow.ui:423
@@ -1014,7 +1031,7 @@ msgstr "Nejvíc alokací paměti"
 #: gui/mainwindow.ui:462 gui/mainwindow.ui:475
 #, kde-format
 msgid "List of functions that produced the most temporary memory allocations."
-msgstr ""
+msgstr "Seznam funkcí, které vygenerovaly nejvíce dočasných alokací paměti."
 
 #. i18n: ectx: property (text), widget (QLabel, topTemporaryLabel)
 #: gui/mainwindow.ui:465
@@ -1026,13 +1043,13 @@ msgstr "Nejvíce dočasných alokací"
 #: gui/mainwindow.ui:498
 #, kde-format
 msgid "Suppressions"
-msgstr ""
+msgstr "Potlačení"
 
 #. i18n: ectx: attribute (title), widget (QWidget, bottomUpTab)
 #: gui/mainwindow.ui:530
 #, kde-format
 msgid "Bottom-Up"
-msgstr ""
+msgstr "Zdola nahoru"
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFunction)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterFunction)
@@ -1040,14 +1057,14 @@ msgstr ""
 #: gui/mainwindow.ui:554 gui/mainwindow.ui:622 gui/mainwindow.ui:750
 #, kde-format
 msgid "filter by function..."
-msgstr ""
+msgstr "filtrovat podle funkce..."
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterFile)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, topDownFilterFile)
 #: gui/mainwindow.ui:561 gui/mainwindow.ui:757
 #, kde-format
 msgid "filter by file..."
-msgstr ""
+msgstr "filtrovat podle souboru..."
 
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, bottomUpFilterModule)
 #. i18n: ectx: property (placeholderText), widget (QLineEdit, callerCalleeFilterModule)
@@ -1055,13 +1072,13 @@ msgstr ""
 #: gui/mainwindow.ui:568 gui/mainwindow.ui:629 gui/mainwindow.ui:764
 #, kde-format
 msgid "filter by module..."
-msgstr ""
+msgstr "filtrovat podle modulu..."
 
 #. i18n: ectx: attribute (title), widget (QWidget, callerCalleeTab)
 #: gui/mainwindow.ui:598
 #, kde-format
 msgid "Caller / Callee"
-msgstr ""
+msgstr "Volající / Volaný"
 
 #. i18n: ectx: attribute (title), widget (QWidget, topDownTab)
 #: gui/mainwindow.ui:729
@@ -1085,7 +1102,7 @@ msgstr "&Zásobníky"
 #: gui/mainwindow.ui:835
 #, kde-format
 msgid "Selected Stack:"
-msgstr ""
+msgstr "Vybraný zásobník:"
 
 #. i18n: ectx: property (title), widget (QMenu, menu_File)
 #: gui/mainwindow.ui:872
@@ -1163,32 +1180,32 @@ msgstr "více než 1KB"
 #: gui/parser.cpp:645
 #, kde-format
 msgid "reparsing data"
-msgstr ""
+msgstr "nové zpracování dat"
 
 #: gui/parser.cpp:645
 #, kde-format
 msgid "parsing data"
-msgstr "zpracovávám data"
+msgstr "zpracování dat"
 
 #: gui/parser.cpp:659
 #, kde-format
 msgid "%1 pass: %2/%3  spent: %4  remaining: %5"
-msgstr ""
+msgstr "%1 úspěšných: %2/%3  využito: %4  zbývá: %5"
 
 #: gui/parser.cpp:715
 #, kde-format
 msgid "merging allocations..."
-msgstr "slučuji alokace..."
+msgstr "slučování alokací..."
 
 #: gui/parser.cpp:726
 #, kde-format
 msgid "building size histogram..."
-msgstr ""
+msgstr "vytváření histogramu velikostí..."
 
 #: gui/parser.cpp:739
 #, kde-format
 msgid "building charts..."
-msgstr ""
+msgstr "vytváření grafů..."
 
 #: gui/stacksmodel.cpp:99
 #, kde-format
@@ -1200,7 +1217,7 @@ msgstr "Backtrace"
 msgid ""
 "<qt>The number of times an allocation function was called from this location."
 "</qt>"
-msgstr ""
+msgstr "<qt>Počet volání alokační funkce z tohoto místa.</qt>"
 
 #: gui/treemodel.cpp:83
 #, kde-format
@@ -1208,6 +1225,8 @@ msgid ""
 "<qt>The number of temporary allocations. These allocations are directly "
 "followed by a free without any other allocations in-between.</qt>"
 msgstr ""
+"<qt>Počet dočasných alokací. Na tyto alokace bezprostředně navazuje uvolnění "
+"paměti, přičemž mezi nimi nejsou žádné další alokace.</qt>"
 
 #: gui/treemodel.cpp:87
 #, kde-format
@@ -1215,6 +1234,8 @@ msgid ""
 "<qt>The contributions from a given location to the maximum heap memory "
 "consumption in bytes. This takes deallocations into account.</qt>"
 msgstr ""
+"<qt>Podíl daného umístění na maximální spotřebě paměti haldy v bajtech. "
+"Zohledňuje se zde uvolnění paměti.</qt>"
 
 #: gui/treemodel.cpp:94
 #, kde-format
@@ -1223,6 +1244,9 @@ msgid ""
 "symbol and file information may be unknown when debug information was "
 "missing when heaptrack was run.</qt>"
 msgstr ""
+"<qt>Místo, odkud byla volána alokační funkce. Symbol funkce a informace o "
+"souboru mohou být neznámé, pokud při spuštění nástroje heaptrack chyběly "
+"ladicí informace.</qt>"
 
 #: gui/treemodel.cpp:149 gui/treemodel.cpp:173
 #, kde-format
@@ -1237,22 +1261,22 @@ msgstr ""
 #: gui/treemodel.cpp:159
 #, kde-format
 msgid "peak contribution: %1 (%2% of total)\n"
-msgstr ""
+msgstr "příspěvek ve špičce: %1 (%2% z celkového objemu)\n"
 
 #: gui/treemodel.cpp:160
 #, kde-format
 msgid "leaked: %1 (%2% of total)\n"
-msgstr ""
+msgstr "únik: %1 (%2% z celkového objemu)\n"
 
 #: gui/treemodel.cpp:161
 #, kde-format
 msgid "allocations: %1 (%2% of total)\n"
-msgstr ""
+msgstr "alokace: %1 (%2% z celkového objemu)\n"
 
 #: gui/treemodel.cpp:162
 #, kde-format
 msgid "temporary: %1 (%2% of allocations, %3% of total)\n"
-msgstr ""
+msgstr "dočasné: %1 (%2% z alokací, %3% z celkového objemu)\n"
 
 #: gui/treemodel.cpp:168
 #, kde-format
@@ -1263,9 +1287,9 @@ msgstr "backtrace:"
 #, kde-format
 msgid "called from one location"
 msgid_plural "called from %1 locations"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "voláno z jednoho místa"
+msgstr[1] "voláno ze %1 míst"
+msgstr[2] "voláno z %1 míst"
 
 #: gui/util.cpp:32
 #, kde-format
@@ -1280,12 +1304,12 @@ msgstr "%1: %2<br/>&nbsp;&nbsp;%4% z %3 celkem"
 #: gui/util.cpp:134 gui/util.cpp:163
 #, kde-format
 msgid "%1 (self): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr ""
+msgstr "%1 (vlastní): %2<br/>&nbsp;&nbsp;%4% z celkového objemu %3"
 
 #: gui/util.cpp:137 gui/util.cpp:166
 #, kde-format
 msgid "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr ""
+msgstr "%1 (včetně): %2<br/>&nbsp;&nbsp;%4% z celkového objemu %3"
 
 #: gui/util.cpp:183
 #, kde-format
@@ -1301,4 +1325,4 @@ msgstr "%1 v %2"
 #: gui/util.cpp:209
 #, kde-format
 msgid "<unresolved function>"
-msgstr ""
+msgstr "<nevyřešená funkce>"
