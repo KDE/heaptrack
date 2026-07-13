@@ -304,6 +304,16 @@ public:
 
             Trace::setup();
 
+            if (const char* depthStr = getenv("HEAPTRACK_UNWIND_DEPTH")) {
+                const int depth = atoi(depthStr);
+                if (depth >= 1 && depth <= Trace::MAX_SIZE) {
+                    Trace::setMaxDepth(depth);
+                } else {
+                    fprintf(stderr, "heaptrack: ignoring invalid HEAPTRACK_UNWIND_DEPTH=%s (expected 1..%d)\n",
+                            depthStr, Trace::MAX_SIZE);
+                }
+            }
+
             // do not trace forked child processes
             // TODO: make this configurable
             pthread_atfork(&prepare_fork, &parent_fork, &child_fork);

@@ -71,8 +71,17 @@ struct Trace
 
     static void print();
 
+    /// limit the number of frames captured per backtrace, must be in [1, MAX_SIZE]
+    static void setMaxDepth(int depth)
+    {
+        assert(depth >= 1 && depth <= MAX_SIZE);
+        s_maxDepth = depth;
+    }
+
 private:
     static int unwind(void** data);
+
+    inline static int s_maxDepth = MAX_SIZE;
 
 private:
     int m_size = 0;
