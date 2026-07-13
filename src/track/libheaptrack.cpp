@@ -661,7 +661,8 @@ private:
     };
 
     /**
-     * To prevent deadlocks on shutdown, we try to lock from the timer thread
+     * To prevent deadlocks on shutdown, we periodically give up waiting for
+     * the lock to run the stopLockCheck.
      *
      * TODO: c++17 return std::optional<HeapTrack>
      */
@@ -669,11 +670,14 @@ private:
     static LockStatus tryLock(StopLockCheck stopLockCheck)
     {
         debugLog<VeryVerboseOutput>("%s", "trying to acquire lock");
-        while (!s_lock.try_lock()) {
+        // wait on the lock via a futex instead of polling with tiny sleeps:
+        // the kernel's default timer slack inflates a 1us sleep to ~50us,
+        // which heavily delays contended allocations. The timeout only
+        // bounds how long a pending shutdown can go unnoticed.
+        while (!s_lock.try_lock_for(chrono::milliseconds(1))) {
             if (stopLockCheck()) {
                 return false;
             }
-            this_thread::sleep_for(chrono::microseconds(1));
         }
         debugLog<VeryVerboseOutput>("%s", "lock acquired");
         return true;
@@ -791,14 +795,14 @@ private:
 #endif
     };
 
-    static std::mutex s_lock;
+    static std::timed_mutex s_lock;
     static LockedData* s_data;
 
 private:
     static std::atomic<bool> s_paused;
 };
 
-std::mutex HeapTrack::s_lock;
+std::timed_mutex HeapTrack::s_lock;
 HeapTrack::LockedData* HeapTrack::s_data {nullptr};
 std::atomic<bool> HeapTrack::s_paused {false};
 }
