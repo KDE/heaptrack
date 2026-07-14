@@ -36,6 +36,10 @@ usage() {
     echo
     echo "Optional arguments to heaptrack:"
     echo "  -r, --raw      Only record raw data, do not interpret it."
+    echo " --unwind-depth DEPTH"
+    echo "                 Limit backtraces to DEPTH frames per allocation (1..64, default: 64)."
+    echo "                 Smaller depths reduce the tracking overhead."
+    echo "                 Only takes effect for newly started processes, not with --pid."
     echo "  -d, --debug    Run the debuggee in GDB and heaptrack."
     echo " --use-inject    Use the same heaptrack_inject symbol interception mechanism instead of relying on"
     echo "                 the dynamic linker and LD_PRELOAD. This is an experimental flag for now."
@@ -72,6 +76,7 @@ pid=
 client=
 use_inject_lib=
 write_raw_data=
+unwind_depth=
 record_only=
 asan=
 asan_ld_preload=
@@ -168,6 +173,20 @@ while true; do
         "-r" | "--raw")
             write_raw_data=1
             shift 1
+            ;;
+        "--unwind-depth")
+            case "$2" in
+                ''|*[!0-9]*)
+                    echo "Invalid --unwind-depth argument: \"$2\" (expected 1..64)"
+                    exit 1
+                    ;;
+            esac
+            if [ "$2" -lt 1 ] || [ "$2" -gt 64 ]; then
+                echo "Invalid --unwind-depth argument: \"$2\" (expected 1..64)"
+                exit 1
+            fi
+            unwind_depth=$2
+            shift 2
             ;;
         "--asan")
             asan=1
@@ -426,6 +445,10 @@ trap cleanup EXIT INT TERM
 
 if [ -z ${quiet} ]; then
   echo "heaptrack output will be written to \"$output\""
+fi
+
+if [ ! -z "$unwind_depth" ]; then
+    export HEAPTRACK_UNWIND_DEPTH="$unwind_depth"
 fi
 
 if [ -z "$debug" ] && [ -z "$pid" ]; then

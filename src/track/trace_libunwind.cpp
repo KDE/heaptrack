@@ -64,5 +64,5 @@ void Trace::setup()
 
 int Trace::unwind(void** data)
 {
-    return unw_backtrace(data, MAX_SIZE);
+    return unw_backtrace(data, s_maxDepth);
 }
