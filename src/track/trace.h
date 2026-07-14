@@ -8,6 +8,7 @@
 #define TRACE_H
 
 #include <cassert>
+#include <cstddef>
 #include <cstdint>
 
 /**
@@ -42,6 +43,11 @@ struct Trace
         return m_size;
     }
 
+    size_t hashkey() const
+    {
+        return m_key;
+    }
+
     bool fill(int skip)
     {
         int size = unwind(m_data);
@@ -52,6 +58,7 @@ struct Trace
         }
         m_size = size > skip ? size - skip : 0;
         m_skip = skip;
+        m_key = getHashKey();
         return m_size > 0;
     }
 
@@ -65,6 +72,7 @@ struct Trace
 
         m_size = static_cast<int>(n + 1);
         m_skip = 0;
+        m_key = getHashKey();
     }
 
     static void setup();
@@ -77,7 +85,16 @@ private:
 private:
     int m_size = 0;
     int m_skip = 0;
+    size_t m_key = 0;
     ip_t m_data[MAX_SIZE];
+
+    size_t getHashKey() const
+    {
+        size_t h = (size_t)m_size * 0xbb67ae8584caa73bULL;
+        for (int i = 0; i < m_size; ++i)
+            h = h * 0xbb67ae8584caa73bULL + ((uintptr_t)m_data[m_skip + i] >> 4);
+        return h;
+    }
 };
 
 #endif // TRACE_H
