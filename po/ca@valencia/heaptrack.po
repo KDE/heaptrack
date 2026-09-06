@@ -3,8 +3,8 @@
 # This file is distributed under the license LGPL version 2.1 or
 # version 3 or later versions approved by the membership of KDE e.V.
 #
-# SPDX-FileCopyrightText: 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2026 Josep M. Ferrer <txemaq@gmail.com>
-# SPDX-FileCopyrightText: 2015, 2016, 2017, 2020, 2021 Antoni Bella Pérez <antonibella5@yahoo.com>
+# SPDX-FileCopyrightText: 2015-2023, 2026 Josep M. Ferrer <txemaq@gmail.com>
+# SPDX-FileCopyrightText: 2015-2017, 2020-2021 Antoni Bella Pérez <antonibella5@yahoo.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
@@ -126,8 +126,8 @@ msgid ""
 "<qt>The bytes allocated directly at this location that have not been "
 "deallocated.</qt>"
 msgstr ""
-"<qt>Els bytes assignats directament en esta ubicació que no s'han "
-"desassignat.</qt>"
+"<qt>Els bytes assignats directament en esta ubicació que no s'han tret "
+"l'assignació.</qt>"
 
 #: gui/callercalleemodel.cpp:81 gui/callercalleemodel.h:181
 #: gui/callercalleemodel.h:374
@@ -169,7 +169,7 @@ msgstr ""
 msgid ""
 "<qt>The bytes allocated at this location that have not been deallocated.</qt>"
 msgstr ""
-"<qt>Els bytes assignats en esta ubicació que no s'han desassignat.</qt>"
+"<qt>Els bytes assignats en esta ubicació que no s'han tret l'assignació.</qt>"
 
 #: gui/callercalleemodel.cpp:202
 #, kde-format
