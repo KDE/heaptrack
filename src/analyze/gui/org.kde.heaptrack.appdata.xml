@@ -130,7 +130,7 @@
       <li>find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
       <li xml:lang="ar">اعثر على تسربات الذاكرة، أي المواقع التي تخصص ذاكرة ولا يتم تحريرها مطلقًا</li>
       <li xml:lang="ca">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai es desassignarà</li>
-      <li xml:lang="ca-valencia">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai es desassignarà</li>
+      <li xml:lang="ca-valencia">troba les fuites de memòria, és a dir, llocs que assignen memòria que mai es traurà l'assignació</li>
       <li xml:lang="cs">vyhledat úniky paměti, tj. místa, kde je alokována paměť, která není nikdy uvolněna</li>
       <li xml:lang="da">find hukommelseslæk, dvs. positioner som allokerer hukommelse som aldrig deallokeres</li>
       <li xml:lang="en-GB">find memory leaks, i.e. locations that allocate memory which is never deallocated</li>
