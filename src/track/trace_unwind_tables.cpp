@@ -54,7 +54,7 @@ int Trace::unwind(void** data)
 {
     backtrace trace;
     trace.data = data;
-    trace.max_size = MAX_SIZE;
+    trace.max_size = s_maxDepth;
 
     _Unwind_Backtrace(unwind_backtrace_callback, &trace);
     return trace.ctr;
