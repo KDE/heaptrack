@@ -46,16 +46,10 @@ add_test(NAME tst_heaptrack_interpret COMMAND ${CMAKE_CURRENT_BINARY_DIR}/tst_he
 
 if (Boost_FILESYSTEM_FOUND)
     add_executable(tst_libheaptrack
-        tst_libheaptrack.cpp
-        ../../src/track/libheaptrack.cpp)
+        tst_libheaptrack.cpp)
     set_target_properties(tst_libheaptrack PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${BIN_INSTALL_DIR}")
-    target_link_libraries(tst_libheaptrack
-        LINK_PRIVATE
-            ${CMAKE_DL_LIBS}
-            ${CMAKE_THREAD_LIBS_INIT}
-            ${LIBUTIL_LIBRARY}
-            heaptrack_unwind
-            rt
+    target_link_libraries(tst_libheaptrack PRIVATE
+            heaptrack_common
             ${Boost_FILESYSTEM_LIBRARY}
     )
     add_test(NAME tst_libheaptrack COMMAND tst_libheaptrack)
