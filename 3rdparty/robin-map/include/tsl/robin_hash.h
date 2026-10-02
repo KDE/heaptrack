@@ -66,12 +66,6 @@ template <std::size_t GrowthFactor>
 struct is_power_of_two_policy<tsl::rh::power_of_two_growth_policy<GrowthFactor>>
     : std::true_type {};
 
-// Only available in C++17, we need to be compatible with C++11
-template <class T>
-const T& clamp(const T& v, const T& lo, const T& hi) {
-  return std::min(hi, std::max(lo, v));
-}
-
 template <typename T, typename U>
 static T numeric_cast(U value,
                       const char* error_message = "numeric_cast() failed.") {
@@ -254,22 +248,14 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
 
   value_type& value() noexcept {
     tsl_rh_assert(!empty());
-#if defined(__cplusplus) && __cplusplus >= 201703L
     return *std::launder(
         reinterpret_cast<value_type*>(std::addressof(m_value)));
-#else
-    return *reinterpret_cast<value_type*>(std::addressof(m_value));
-#endif
   }
 
   const value_type& value() const noexcept {
     tsl_rh_assert(!empty());
-#if defined(__cplusplus) && __cplusplus >= 201703L
     return *std::launder(
         reinterpret_cast<const value_type*>(std::addressof(m_value)));
-#else
-    return *reinterpret_cast<const value_type*>(std::addressof(m_value));
-#endif
   }
 
   distance_type dist_from_ideal_bucket() const noexcept {
@@ -541,7 +527,6 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   };
 
  public:
-#if defined(__cplusplus) && __cplusplus >= 201402L
   robin_hash(size_type bucket_count, const Hash& hash, const KeyEqual& equal,
              const Allocator& alloc,
              float min_load_factor = DEFAULT_MIN_LOAD_FACTOR,
@@ -569,47 +554,6 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     this->min_load_factor(min_load_factor);
     this->max_load_factor(max_load_factor);
   }
-#else
-  /**
-   * C++11 doesn't support the creation of a std::vector with a custom allocator
-   * and 'count' default-inserted elements. The needed contructor `explicit
-   * vector(size_type count, const Allocator& alloc = Allocator());` is only
-   * available in C++14 and later. We thus must resize after using the
-   * `vector(const Allocator& alloc)` constructor.
-   *
-   * We can't use `vector(size_type count, const T& value, const Allocator&
-   * alloc)` as it requires the value T to be copyable.
-   */
-  robin_hash(size_type bucket_count, const Hash& hash, const KeyEqual& equal,
-             const Allocator& alloc,
-             float min_load_factor = DEFAULT_MIN_LOAD_FACTOR,
-             float max_load_factor = DEFAULT_MAX_LOAD_FACTOR)
-      : Hash(hash),
-        KeyEqual(equal),
-        GrowthPolicy(bucket_count),
-        m_buckets_data(alloc),
-        m_buckets(static_empty_bucket_ptr()),
-        m_bucket_count(bucket_count),
-        m_nb_elements(0),
-        m_grow_on_next_insert(false),
-        m_try_shrink_on_next_insert(false) {
-    if (bucket_count > max_bucket_count()) {
-      TSL_RH_THROW_OR_TERMINATE(std::length_error,
-                                "The map exceeds its maximum bucket count.");
-    }
-
-    if (m_bucket_count > 0) {
-      m_buckets_data.resize(m_bucket_count);
-      m_buckets = m_buckets_data.data();
-
-      tsl_rh_assert(!m_buckets_data.empty());
-      m_buckets_data.back().set_as_last_bucket();
-    }
-
-    this->min_load_factor(min_load_factor);
-    this->max_load_factor(max_load_factor);
-  }
-#endif
 
   robin_hash(const robin_hash& other)
       : Hash(other),
@@ -1073,13 +1017,13 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   float max_load_factor() const { return m_max_load_factor; }
 
   void min_load_factor(float ml) {
-    m_min_load_factor = clamp(ml, float(MINIMUM_MIN_LOAD_FACTOR),
-                              float(MAXIMUM_MIN_LOAD_FACTOR));
+    m_min_load_factor = std::clamp(ml, float(MINIMUM_MIN_LOAD_FACTOR),
+                                   float(MAXIMUM_MIN_LOAD_FACTOR));
   }
 
   void max_load_factor(float ml) {
-    m_max_load_factor = clamp(ml, float(MINIMUM_MAX_LOAD_FACTOR),
-                              float(MAXIMUM_MAX_LOAD_FACTOR));
+    m_max_load_factor = std::clamp(ml, float(MINIMUM_MAX_LOAD_FACTOR),
+                                   float(MAXIMUM_MAX_LOAD_FACTOR));
     m_load_threshold = size_type(float(bucket_count()) * m_max_load_factor);
     tsl_rh_assert(bucket_count() == 0 || m_load_threshold < bucket_count());
   }
@@ -1524,6 +1468,9 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     } else {
       m_bucket_count = numeric_cast<size_type>(
           bucket_count_ds, "Deserialized bucket_count is too big.");
+      // Recompute m_load_threshold, during max_load_factor() the bucket count
+      // was still 0 which would trigger rehash on first insert
+      m_load_threshold = size_type(float(bucket_count()) * m_max_load_factor);
 
       GrowthPolicy::operator=(GrowthPolicy(m_bucket_count));
       // GrowthPolicy should not modify the bucket count we got from

@@ -1,8 +1,17 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.10)
 
-project(tsl-robin-map VERSION 1.3.0 LANGUAGES CXX)
+project(tsl-robin-map VERSION 1.4.1 LANGUAGES CXX)
 
 include(GNUInstallDirs)
+
+
+set(IS_MAIN_PROJECT FALSE)
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  set(IS_MAIN_PROJECT TRUE)
+endif()
+
+# Enable the install target if the project is used main project (disable by default if subproject)
+option(TSL_ROBIN_MAP_ENABLE_INSTALL "Enable install target" ${IS_MAIN_PROJECT})
 
 
 add_library(robin_map INTERFACE)
@@ -25,16 +34,8 @@ if(MSVC)
                    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_DATAROOTDIR}/tsl-robin-map.natvis>")
 endif()
 
-
-
-
-set(IS_SUBPROJECT TRUE)
-if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-  set(IS_SUBPROJECT FALSE)
-endif()
-
 # Installation
-if(NOT IS_SUBPROJECT)
+if(TSL_ROBIN_MAP_ENABLE_INSTALL)
     include(CMakePackageConfigHelpers)
 
     ## Install include directory and potential natvis file
