@@ -27,6 +27,7 @@ else()
     add_library(heaptrack_unwind STATIC trace_unwind_tables.cpp)
 endif()
 
+target_link_libraries(heaptrack_unwind PUBLIC xxHash::xxhash)
 set_property(TARGET heaptrack_unwind PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # heaptrack_common: shared libheaptrack code
@@ -36,6 +37,8 @@ set_property(TARGET heaptrack_common PROPERTY POSITION_INDEPENDENT_CODE ON)
 if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
     set(LIBUTIL_LIBRARY "util")
 endif()
+
+find_package(xxHash REQUIRED)
 
 target_link_libraries(heaptrack_common PUBLIC
     ${CMAKE_DL_LIBS}

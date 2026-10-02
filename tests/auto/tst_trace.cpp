@@ -64,6 +64,14 @@ void validateTrace(const Trace& trace, int expectedSize)
     {
         REQUIRE(find(trace.begin(), trace.end(), Trace::ip_t(0)) == trace.end());
     }
+    SUBCASE("validate hash")
+    {
+        if (expectedSize > 0) {
+            REQUIRE(trace.hash() != Trace::hash_t());
+        } else {
+            REQUIRE(trace.hash() == Trace::hash_t());
+        }
+    }
 }
 }
 
