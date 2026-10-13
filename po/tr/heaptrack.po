@@ -1,13 +1,13 @@
 # Copyright (C) YEAR This_file_is_part_of_KDE
 # This file is distributed under the same license as the PACKAGE package.
 #
-# SPDX-FileCopyrightText: 2022, 2025, 2026 Emir SARI <emir_sari@icloud.com>
+# SPDX-FileCopyrightText: 2022, 2025-2026 Emir SARI <emir_sari@icloud.com>
 msgid ""
 msgstr ""
 "Project-Id-Version: heaptrack\n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2026-07-10 00:47+0000\n"
-"PO-Revision-Date: 2026-04-24 16:05+0300\n"
+"PO-Revision-Date: 2026-10-12 11:30+0300\n"
 "Last-Translator: Emir SARI <emir_sari@icloud.com>\n"
 "Language-Team: Turkish <kde-l10n-tr@kde.org>\n"
 "Language: tr\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Lokalize 25.12.3\n"
+"X-Generator: Lokalize 26.08.0\n"
 "X-POOTLE-MTIME: 1502202299.000000\n"
 
 #, kde-format
@@ -628,7 +628,7 @@ msgstr "Heaptrack veri dosyaları için bir görselleştirici."
 #: gui/gui.cpp:64
 #, kde-format
 msgid "Copyright 2015, Milian Wolff <mail@milianw.de>"
-msgstr "Telif hakkı 2015, Milian Wolff <mail@milianw.de>"
+msgstr "© 2015, Milian Wolff <mail@milianw.de>"
 
 #: gui/gui.cpp:67
 #, kde-format
