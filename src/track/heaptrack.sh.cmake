@@ -136,7 +136,7 @@ interpretRawHeaptrackDataFile() {
             $ZSTD_UNCOMPRESSOR < "$input" | "$INTERPRETER" "$@" | $COMPRESSOR > "$output"
             ;;
         *)
-            "$INTERPRETER" "$@" | $COMPRESSOR > "$output"
+            "$INTERPRETER" "$@" < "$input" | $COMPRESSOR > "$output"
             ;;
     esac
 
