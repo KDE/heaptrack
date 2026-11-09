@@ -33,6 +33,7 @@
 
 #include <atomic>
 #include <cinttypes>
+#include <climits>
 #include <memory>
 #include <mutex>
 #include <sstream>
@@ -179,6 +180,60 @@ atomic<bool> s_atexit {false};
  */
 atomic<bool> s_forceCleanup {false};
 
+/**
+ * Set from HEAPTRACK_FOLLOW_CHILDREN. A forked child then writes a trace of its own, to the
+ * output file name with $$ replaced by the pid of the child.
+ */
+atomic<bool> s_followChildren {false};
+
+/**
+ * Unwinding takes locks inside the unwinder. A thread that holds one at a fork leaves it locked
+ * forever in the child, so a child that traces cannot unwind. When following children, a fork
+ * waits until no thread unwinds, and no thread starts to unwind until the fork is done.
+ * s_forkPending counts the forks in progress, as several threads can fork at once.
+ */
+atomic<int> s_unwinding {0};
+atomic<int> s_forkPending {0};
+
+class UnwindGuard
+{
+public:
+    UnwindGuard()
+        : m_active(s_followChildren.load(memory_order_relaxed))
+    {
+        if (!m_active) {
+            return;
+        }
+        while (true) {
+            s_unwinding.fetch_add(1);
+            if (s_forkPending.load() == 0) {
+                return;
+            }
+            s_unwinding.fetch_sub(1);
+            while (s_forkPending.load() != 0) {
+                this_thread::yield();
+            }
+        }
+    }
+
+    ~UnwindGuard()
+    {
+        if (m_active) {
+            s_unwinding.fetch_sub(1);
+        }
+    }
+
+    UnwindGuard(const UnwindGuard&) = delete;
+    UnwindGuard& operator=(const UnwindGuard&) = delete;
+
+private:
+    bool m_active;
+};
+
+/// The output file name as given, with $$ not yet replaced, for the trace of a forked child.
+/// A fixed array: a forked child reads it, and a fork can happen during static destruction.
+char s_childOutputFileNamePattern[PATH_MAX] = {};
+
 // based on: https://stackoverflow.com/a/24315631/35250
 void replaceAll(string& str, const string& search, const string& replace)
 {
@@ -220,9 +275,23 @@ int createFile(const char* fileName)
         outputFileName = "heaptrack.$$";
     }
 
-    replaceAll(outputFileName, "$$", to_string(getpid()));
-
-    auto out = open(outputFileName.c_str(), O_CREAT | O_WRONLY | O_CLOEXEC, 0644);
+    int out = -1;
+    if (s_followChildren) {
+        // exec() keeps the pid, so each program that a process executes gets a file of its own:
+        // PID, then PID.1, PID.2
+        const auto pattern = outputFileName;
+        for (int execCount = 0; execCount < 100; ++execCount) {
+            outputFileName = pattern;
+            replaceAll(outputFileName, "$$", to_string(getpid()) + (execCount ? "." + to_string(execCount) : string()));
+            out = open(outputFileName.c_str(), O_CREAT | O_EXCL | O_WRONLY | O_CLOEXEC, 0644);
+            if (out != -1 || errno != EEXIST) {
+                break;
+            }
+        }
+    } else {
+        replaceAll(outputFileName, "$$", to_string(getpid()));
+        out = open(outputFileName.c_str(), O_CREAT | O_WRONLY | O_CLOEXEC, 0644);
+    }
     debugLog<VerboseOutput>("will write to %s/%p\n", outputFileName.c_str(), out);
     // we do our own locking, this speeds up the writing significantly
     if (out == -1) {
@@ -299,7 +368,7 @@ public:
 
         // do some once-only initializations
         static std::once_flag once;
-        std::call_once(once, [] {
+        std::call_once(once, [fileName] {
             debugLog<MinimalOutput>("%s", "doing once-only initialization");
 
             Trace::setup();
@@ -314,8 +383,21 @@ public:
                 }
             }
 
-            // do not trace forked child processes
-            // TODO: make this configurable
+            // a forked child process is traced only when asked for, into a file of its own
+            const char* follow = getenv("HEAPTRACK_FOLLOW_CHILDREN");
+            if (follow && follow[0] && strcmp(follow, "0") != 0) {
+                if (!fileName || !strstr(fileName, "$$")) {
+                    fprintf(stderr,
+                            "heaptrack: ignoring HEAPTRACK_FOLLOW_CHILDREN, the output file name has no $$ "
+                            "to give each process a file of its own\n");
+                } else if (strlen(fileName) >= sizeof(s_childOutputFileNamePattern)) {
+                    fprintf(stderr,
+                            "heaptrack: ignoring HEAPTRACK_FOLLOW_CHILDREN, the output file name is too long\n");
+                } else {
+                    s_followChildren = true;
+                    strcpy(s_childOutputFileNamePattern, fileName);
+                }
+            }
             pthread_atfork(&prepare_fork, &parent_fork, &child_fork);
 
             atexit([]() {
@@ -452,6 +534,13 @@ public:
         //       the RSS numbers with heaptrack-internal data
 
         s_data->out.writeHexLine('R', rss);
+    }
+
+    void flush()
+    {
+        if (s_data && s_data->out.canWrite()) {
+            s_data->out.flush();
+        }
     }
 
     void writeVersion()
@@ -616,11 +705,24 @@ private:
         debugLog<MinimalOutput>("%s", "prepare_fork()");
         // don't do any custom malloc handling while inside fork
         RecursionGuard::isActive = true;
+        if (s_followChildren) {
+            // a child that traces needs the unwinder and this lock free, so no other thread may
+            // hold them at the fork
+            s_forkPending.fetch_add(1);
+            while (s_unwinding.load() != 0) {
+                this_thread::yield();
+            }
+            s_lock.lock();
+        }
     }
 
     static void parent_fork()
     {
         debugLog<MinimalOutput>("%s", "parent_fork()");
+        if (s_followChildren) {
+            s_lock.unlock();
+            s_forkPending.fetch_sub(1);
+        }
         // the parent process can now continue its custom malloc tracking
         RecursionGuard::isActive = false;
     }
@@ -628,10 +730,55 @@ private:
     static void child_fork()
     {
         debugLog<MinimalOutput>("%s", "child_fork()");
-        // but the forked child process cleans up itself
-        // this is important to prevent two processes writing to the same file
+        // the data of the parent stays with the parent: its buffer must not be written to the
+        // file of the parent, and its timer thread does not exist in the child, so it is leaked
+        auto* parentData = s_data;
         s_data = nullptr;
-        RecursionGuard::isActive = true;
+        if (s_followChildren) {
+            // the threads that waited to unwind do not exist in the child
+            s_unwinding.store(0);
+            s_forkPending.store(0);
+            if (parentData) {
+                // the parent keeps its file locked while it writes, and only the parent may
+                // hold it; this closes without flushing the buffer of the parent
+                parentData->out.close();
+            }
+        }
+        if (!s_followChildren || !parentData) {
+            RecursionGuard::isActive = true;
+            if (s_followChildren) {
+                s_lock.unlock();
+            }
+            return;
+        }
+
+        // still holding the lock that prepare_fork() took, which the destructor releases
+        HeapTrack heaptrack(LockStatus(true));
+        heaptrack.startChildTrace();
+        RecursionGuard::isActive = false;
+    }
+
+    /**
+     * Start the trace of a forked child, in a file of its own. This runs right after the fork,
+     * so the file is opened before the child can call chroot(), after which the path of the
+     * file may not exist, as in the jailed workers of Collabora Online.
+     */
+    void startChildTrace()
+    {
+        const auto out = createFile(s_childOutputFileNamePattern);
+        if (out == -1) {
+            return;
+        }
+
+        s_data = new LockedData(out, nullptr);
+
+        writeVersion();
+        writeExe();
+        writeCommandLine();
+        writeSystemInfo();
+        writeSuppressions();
+        // the child starts with the allocations of its parent, which this trace never saw
+        s_data->out.write("A\n");
     }
 
     void updateModuleCache()
@@ -747,6 +894,10 @@ private:
                     HeapTrack heaptrack(locked);
                     heaptrack.writeTimestamp();
                     heaptrack.writeRSS();
+                    if (s_followChildren) {
+                        // a child often ends in _exit() or is killed, which skips the flush at exit
+                        heaptrack.flush();
+                    }
                 }
             });
 
@@ -825,6 +976,7 @@ static void heaptrack_realloc_impl(void* ptr_in, size_t size, void* ptr_out)
         debugLog<VeryVerboseOutput>("heaptrack_realloc(%p, %zu, %p)", ptr_in, size, ptr_out);
 
         Trace trace;
+        UnwindGuard unwindGuard;
         trace.fill(2 + HEAPTRACK_DEBUG_BUILD * 3);
 
         HeapTrack::op(guard, [&](HeapTrack& heaptrack) {
@@ -889,6 +1041,7 @@ void heaptrack_malloc(void* ptr, size_t size)
         debugLog<VeryVerboseOutput>("heaptrack_malloc(%p, %zu)", ptr, size);
 
         Trace trace;
+        UnwindGuard unwindGuard;
         trace.fill(2 + HEAPTRACK_DEBUG_BUILD * 2);
 
         HeapTrack::op(guard, [&](HeapTrack& heaptrack) { heaptrack.handleMalloc(ptr, size, trace); });

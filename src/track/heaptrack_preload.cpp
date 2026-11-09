@@ -206,9 +206,13 @@ void init()
             hooks::GC_free_profiler_hook.init();
             hooks::GC_posix_memalign.init();
 
-            // cleanup environment to prevent tracing of child apps
-            unsetenv("LD_PRELOAD");
-            unsetenv("DUMP_HEAPTRACK_OUTPUT");
+            // cleanup environment to prevent tracing of child apps, unless they are traced too
+            const char* follow = getenv("HEAPTRACK_FOLLOW_CHILDREN");
+            const char* output = getenv("DUMP_HEAPTRACK_OUTPUT");
+            if (!follow || !follow[0] || strcmp(follow, "0") == 0 || !output || !strstr(output, "$$")) {
+                unsetenv("LD_PRELOAD");
+                unsetenv("DUMP_HEAPTRACK_OUTPUT");
+            }
         },
         nullptr, nullptr);
 }
