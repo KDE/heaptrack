@@ -44,6 +44,21 @@ Alternatively, you can attach to an already running process:
 
         heaptrack --analyze "/tmp/heaptrack.APP.PID.gz"
 
+### Profiling an application with child processes
+
+By default only the launched process is traced. To also trace the processes that it forks or executes, such as the
+workers of a server, pass `--follow-children`:
+
+    heaptrack --follow-children <your application and its parameters>
+
+Every traced process writes a data file of its own, named after the pid of that process, e.g.
+`/tmp/heaptrack.APP.PID.CHILD_PID.zst`. A process started by `exec` keeps the pid of the process it replaces, and its
+data file gets a further `.1` in its name. The data is recorded raw while the application runs and interpreted once it
+ends.
+
+A forked child starts with the heap of its parent, and its data only covers what it allocates after the fork, like
+the data of a process that heaptrack was attached to.
+
 ### Profiling on embedded machines
 
 When you are trying to profile a system where you do not have direct access to debug symbols, which is commonly the case

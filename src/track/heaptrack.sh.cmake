@@ -40,6 +40,11 @@ usage() {
     echo "                 Limit backtraces to DEPTH frames per allocation (1..64, default: 64)."
     echo "                 Smaller depths reduce the tracking overhead."
     echo "                 Only takes effect for newly started processes, not with --pid."
+    echo " --follow-children"
+    echo "                 Also trace the processes that the debuggee forks or executes, each into a"
+    echo "                 data file of its own, named after the output file and the pid of the process."
+    echo "                 The data is recorded raw while the debuggee runs, and interpreted once it ends."
+    echo "                 Cannot be combined with --pid, --debug, --use-inject or --asan."
     echo "  -d, --debug    Run the debuggee in GDB and heaptrack."
     echo " --use-inject    Use the same heaptrack_inject symbol interception mechanism instead of relying on"
     echo "                 the dynamic linker and LD_PRELOAD. This is an experimental flag for now."
@@ -77,6 +82,7 @@ client=
 use_inject_lib=
 write_raw_data=
 unwind_depth=
+follow_children=
 record_only=
 asan=
 asan_ld_preload=
@@ -187,6 +193,10 @@ while true; do
             fi
             unwind_depth=$2
             shift 2
+            ;;
+        "--follow-children")
+            follow_children=1
+            shift 1
             ;;
         "--asan")
             asan=1
@@ -300,6 +310,11 @@ while true; do
     esac
 done
 
+if [ ! -z "$follow_children" ] && { [ ! -z "$pid" ] || [ ! -z "$debug" ] || [ ! -z "$use_inject_lib" ]; }; then
+    echo "--follow-children cannot be combined with --pid, --debug, --use-inject or --asan."
+    exit 1
+fi
+
 # put output into current pwd
 if [ -z "$output" ]; then
     output=$(pwd)/heaptrack.$(basename "$client").$$
@@ -344,7 +359,9 @@ fi
 
 # setup named pipe to read data from
 pipe=/tmp/heaptrack_fifo$$
-mkfifo $pipe
+if [ -z "$follow_children" ]; then
+    mkfifo $pipe
+fi
 
 # if root is profiling a process for non root
 # give profiled process write access to the pipe
@@ -382,7 +399,10 @@ fi
 
 # interpret the data and compress the output on the fly
 output="$output.$output_suffix"
-if [ -z "$write_raw_data" ]; then
+if [ ! -z "$follow_children" ]; then
+    # every process writes a raw file of its own, which is interpreted once the debuggee ends
+    debuggee=
+elif [ -z "$write_raw_data" ]; then
     if  [ ! -f "$INTERPRETER" ]; then
         echo "Could not find heaptrack interpreter executable: $INTERPRETER"
         exit 1
@@ -391,7 +411,59 @@ if [ -z "$write_raw_data" ]; then
 else
     $COMPRESSOR < $pipe > "$output" &
 fi
-debuggee=$!
+if [ -z "$follow_children" ]; then
+    debuggee=$!
+fi
+
+# interpret or compress the raw file of every process traced with --follow-children
+finishFollowedChildren() {
+    outputs=
+    running=
+    seen=
+    # a traced process keeps its raw file locked until it exits, so wait a little for the
+    # processes that still run, then leave their raw files as they are
+    deadline=$(($(date +%s) + 10))
+    # a process can fork another while the script waits, so look again until nothing is new
+    found=1
+    while [ ! -z "$found" ]; do
+        found=
+        for raw in "$output_no_suffix".*.raw; do
+            if [ ! -f "$raw" ]; then
+                continue
+            fi
+            case " $seen " in
+                *" $raw "*) continue ;;
+            esac
+            seen="$seen $raw"
+            found=1
+            if command -v flock > /dev/null; then
+                wait=$((deadline - $(date +%s)))
+                if [ "$wait" -gt 0 ]; then
+                    flock -w "$wait" "$raw" true
+                else
+                    flock -n "$raw" true
+                fi
+                if [ $? -ne 0 ]; then
+                    running="$running $raw"
+                    continue
+                fi
+            fi
+            if [ ! -s "$raw" ]; then
+                # a forked child that executed another program before its data was written
+                rm -f "$raw"
+                continue
+            fi
+            base="${raw%.raw}"
+            if [ -z "$write_raw_data" ]; then
+                "$INTERPRETER" < "$raw" | $COMPRESSOR > "$base.$output_suffix" && rm -f "$raw"
+                outputs="$outputs $base.$output_suffix"
+            else
+                $COMPRESSOR < "$raw" > "$raw.${output_suffix#raw.}" && rm -f "$raw"
+                outputs="$outputs $raw.${output_suffix#raw.}"
+            fi
+        done
+    done
+}
 
 cleanup() {
     # Not run for the second time
@@ -410,12 +482,50 @@ cleanup() {
         #       crashes in the debuggee. So instead, we keep heaptrack loaded.
     fi
     rm -f "$pipe"
+    if [ ! -z "$follow_children" ]; then
+        finishFollowedChildren
+    fi
     case $(uname) in
         FreeBSD*)
             rm -f "$pipe.lock"
         ;;
     esac
-    kill "$debuggee" 2> /dev/null
+    if [ ! -z "$debuggee" ]; then
+        kill "$debuggee" 2> /dev/null
+    fi
+
+    if [ ! -z "$follow_children" ]; then
+        if [ -z ${quiet} ]; then
+            echo "Heaptrack finished! One data file was written for each traced process:"
+            echo
+            for file in $outputs; do
+                echo "  $file"
+            done
+            echo
+            if [ ! -z "$write_raw_data" ]; then
+                echo "First, interpret the raw data of a process (possibly specifying the sysroot etc):"
+                echo
+                echo "  heaptrack --interpret FILE"
+                echo
+            fi
+            echo "To analyze the data of a process, run:"
+            echo
+            echo "  heaptrack --analyze FILE"
+            if [ ! -z "$running" ]; then
+                echo
+                echo "These processes still run, and their raw data is left as is:"
+                echo
+                for file in $running; do
+                    echo "  $file"
+                done
+                echo
+                echo "Once they exit, interpret it with:"
+                echo
+                echo "  heaptrack --interpret FILE"
+            fi
+        fi
+        return
+    fi
 
     if [ -z ${quiet} ]; then
       echo "Heaptrack finished! Now run the following to investigate the data:"
@@ -444,11 +554,21 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 if [ -z ${quiet} ]; then
-  echo "heaptrack output will be written to \"$output\""
+  if [ -z "$follow_children" ]; then
+    echo "heaptrack output will be written to \"$output\""
+  else
+    echo "heaptrack output will be written to \"$output_no_suffix.<pid>.*\", one file for each process"
+  fi
 fi
 
 if [ ! -z "$unwind_depth" ]; then
     export HEAPTRACK_UNWIND_DEPTH="$unwind_depth"
+fi
+
+if [ ! -z "$follow_children" ]; then
+    export HEAPTRACK_FOLLOW_CHILDREN=1
+    # the library replaces $$ with the pid of each process
+    pipe="$output_no_suffix.\$\$.raw"
 fi
 
 if [ -z "$debug" ] && [ -z "$pid" ]; then
@@ -496,7 +616,9 @@ else
   fi
 fi
 
-wait $debuggee
+if [ ! -z "$debuggee" ]; then
+    wait $debuggee
+fi
 exit $EXIT_CODE
 
 # kate: hl Bash
