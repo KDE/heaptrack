@@ -187,6 +187,13 @@ atomic<bool> s_forceCleanup {false};
 atomic<bool> s_followChildren {false};
 
 /**
+ * Set from HEAPTRACK_NO_TIMER_THREAD. A process that checks that it has a single thread, for
+ * instance before it forks, then sees no thread of heaptrack, and the allocation hooks write
+ * the timestamp and the RSS instead of the timer thread.
+ */
+atomic<bool> s_noTimerThread {false};
+
+/**
  * Unwinding takes locks inside the unwinder. A thread that holds one at a fork leaves it locked
  * forever in the child, so a child that traces cannot unwind. When following children, a fork
  * waits until no thread unwinds, and no thread starts to unwind until the fork is done.
@@ -383,6 +390,9 @@ public:
                 }
             }
 
+            const char* noTimerThread = getenv("HEAPTRACK_NO_TIMER_THREAD");
+            s_noTimerThread = noTimerThread && noTimerThread[0] && strcmp(noTimerThread, "0") != 0;
+
             // a forked child process is traced only when asked for, into a file of its own
             const char* follow = getenv("HEAPTRACK_FOLLOW_CHILDREN");
             if (follow && follow[0] && strcmp(follow, "0") != 0) {
@@ -543,6 +553,26 @@ public:
         }
     }
 
+    /// Without a timer thread, the allocation hooks write the timestamp and the RSS at most
+    /// every 10ms. A process that does not allocate writes neither meanwhile.
+    void tick()
+    {
+        if (!s_noTimerThread) {
+            return;
+        }
+        const auto elapsed = elapsedTime();
+        if (elapsed < s_data->nextTick) {
+            return;
+        }
+        s_data->nextTick = elapsed + chrono::milliseconds(10);
+        writeTimestamp();
+        writeRSS();
+        if (s_followChildren) {
+            // a child often ends in _exit() or is killed, which skips the flush at exit
+            flush();
+        }
+    }
+
     void writeVersion()
     {
         s_data->out.writeHexLine('v', static_cast<size_t>(HEAPTRACK_VERSION),
@@ -642,6 +672,7 @@ public:
 #endif
 
         s_data->out.writeHexLine('+', size, index, reinterpret_cast<uintptr_t>(ptr));
+        tick();
     }
 
     void handleFree(void* ptr)
@@ -657,6 +688,7 @@ public:
 #endif
 
         s_data->out.writeHexLine('-', reinterpret_cast<uintptr_t>(ptr));
+        tick();
     }
 
     static bool isPaused()
@@ -863,6 +895,11 @@ private:
             }
 #endif
 
+            // the allocation hooks do the work of the timer instead, see tick()
+            if (s_noTimerThread) {
+                return;
+            }
+
             // ensure this utility thread is not handling any signals
             // our host application may assume only one specific thread
             // will handle the threads, if that's not the case things
@@ -948,6 +985,10 @@ private:
 
         atomic<bool> stopTimerThread {false};
         std::thread timerThread;
+
+        /// Without a timer thread: the elapsed time at which an allocation hook next writes the
+        /// timestamp and the RSS.
+        chrono::milliseconds nextTick {0};
 
         heaptrack_callback_t stopCallback = nullptr;
 

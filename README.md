@@ -59,6 +59,16 @@ ends.
 A forked child starts with the heap of its parent, and its data only covers what it allocates after the fork, like
 the data of a process that heaptrack was attached to.
 
+### Profiling an application that checks its thread count
+
+heaptrack starts a thread in the traced process, which records the timestamp and the RSS every 10ms. An application
+that checks that it has a single thread, for instance before it forks, then sees two and may take another path. Pass
+`--no-timer-thread` to start no thread; the timestamps and the RSS are then recorded while the application allocates:
+
+    heaptrack --no-timer-thread <your application and its parameters>
+
+It combines with `--follow-children`, e.g. for a server that forks its workers only while it has a single thread.
+
 ### Profiling on embedded machines
 
 When you are trying to profile a system where you do not have direct access to debug symbols, which is commonly the case

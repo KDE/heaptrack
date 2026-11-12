@@ -45,6 +45,10 @@ usage() {
     echo "                 data file of its own, named after the output file and the pid of the process."
     echo "                 The data is recorded raw while the debuggee runs, and interpreted once it ends."
     echo "                 Cannot be combined with --pid, --debug, --use-inject or --asan."
+    echo " --no-timer-thread"
+    echo "                 Start no thread in the debuggee: the timestamps and the RSS are recorded"
+    echo "                 while it allocates. For applications that check that they have a single thread."
+    echo "                 Only takes effect for newly started processes, not with --pid."
     echo "  -d, --debug    Run the debuggee in GDB and heaptrack."
     echo " --use-inject    Use the same heaptrack_inject symbol interception mechanism instead of relying on"
     echo "                 the dynamic linker and LD_PRELOAD. This is an experimental flag for now."
@@ -83,6 +87,7 @@ use_inject_lib=
 write_raw_data=
 unwind_depth=
 follow_children=
+no_timer_thread=
 record_only=
 asan=
 asan_ld_preload=
@@ -196,6 +201,10 @@ while true; do
             ;;
         "--follow-children")
             follow_children=1
+            shift 1
+            ;;
+        "--no-timer-thread")
+            no_timer_thread=1
             shift 1
             ;;
         "--asan")
@@ -563,6 +572,10 @@ fi
 
 if [ ! -z "$unwind_depth" ]; then
     export HEAPTRACK_UNWIND_DEPTH="$unwind_depth"
+fi
+
+if [ ! -z "$no_timer_thread" ]; then
+    export HEAPTRACK_NO_TIMER_THREAD=1
 fi
 
 if [ ! -z "$follow_children" ]; then

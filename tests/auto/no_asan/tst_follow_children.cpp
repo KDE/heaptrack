@@ -12,6 +12,7 @@
 
 #include <benchutil.h>
 
+#include <dirent.h>
 #include <dlfcn.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -36,10 +37,26 @@ std::string readFile(const std::string& fileName)
 
 // a size that nothing else in this test allocates, to find in the data of a process
 constexpr size_t childAllocationSize = 0x1092;
+
+int threadCount()
+{
+    int count = 0;
+    if (auto* dir = opendir("/proc/self/task")) {
+        while (auto* entry = readdir(dir)) {
+            if (entry->d_name[0] != '.') {
+                ++count;
+            }
+        }
+        closedir(dir);
+    }
+    return count;
+}
 }
 
 TEST_CASE ("follow forked children") {
     REQUIRE(setenv("HEAPTRACK_FOLLOW_CHILDREN", "1", 1) == 0);
+    // like a server that forks only while it has a single thread
+    REQUIRE(setenv("HEAPTRACK_NO_TIMER_THREAD", "1", 1) == 0);
 
     dlerror(); // clear error
     auto* handle = dlopen(HEAPTRACK_LIB_INJECT_SO, RTLD_NOW);
@@ -55,6 +72,9 @@ TEST_CASE ("follow forked children") {
 
     const TempFile base;
     heaptrack_inject((base.fileName + ".$$").c_str());
+
+    // heaptrack started no thread
+    REQUIRE(threadCount() == 1);
 
     // a thread that keeps allocating, so that the forks happen while it unwinds
     std::atomic<bool> stop {false};
