@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://bugs.kde.org\n"
 "POT-Creation-Date: 2026-07-10 00:47+0000\n"
-"PO-Revision-Date: 2026-06-26 20:42+0200\n"
-"Last-Translator: Alexander Yavorskiy <kekcuha@gmail.com>\n"
+"PO-Revision-Date: 2026-11-11 22:59+0200\n"
+"Last-Translator: Alexander Yavorsky <kekcuha@gmail.com>\n"
 "Language-Team: Russian <kde-russian@lists.kde.ru>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -465,27 +465,27 @@ msgstr "Итоговый объём утечки: %1"
 #, kde-format
 msgctxt "%1: number of allocations, %2: relative number, %3: function label"
 msgid "%1 (%2%) allocations in %3 and below."
-msgstr "%1 (%2%) выделений в %3 и ниже."
+msgstr "%1 (%2 %) выделений в %3 и ниже."
 
 #: gui/flamegraph.cpp:238
 #, kde-format
 msgctxt ""
 "%1: number of temporary allocations, %2: relative number, %3 function label"
 msgid "%1 (%2%) temporary allocations in %3 and below."
-msgstr "%1 (%2%) временных выделений в %3 и ниже."
+msgstr "%1 (%2 %) временных выделений в %3 и ниже."
 
 #: gui/flamegraph.cpp:243
 #, kde-format
 msgctxt ""
 "%1: peak consumption in bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) contribution to peak consumption in %3 and below."
-msgstr "%1 (%2%) вклад в пиковое потребление в %3 и ниже."
+msgstr "%1 (%2 %) вклад в пиковое потребление в %3 и ниже."
 
 #: gui/flamegraph.cpp:247
 #, kde-format
 msgctxt "%1: leaked bytes, %2: relative number, %3: function label"
 msgid "%1 (%2%) leaked in %3 and below."
-msgstr "%1 (%2%) утечки в %3 и ниже."
+msgstr "%1 (%2 %) утечки в %3 и ниже."
 
 #: gui/flamegraph.cpp:424
 #, kde-format
@@ -610,12 +610,12 @@ msgstr "создание графика пламени…"
 #: gui/flamegraph.cpp:784
 #, kde-format
 msgid "%1 (%2% of total of %3) allocations matched by search."
-msgstr "%1 (%2% от общего числа %3) выделений, соответствующих поиску."
+msgstr "%1 (%2 % от общего числа %3) выделений, соответствующих поиску."
 
 #: gui/flamegraph.cpp:789
 #, kde-format
 msgid "%1 (%2% of total of %3) matched by search."
-msgstr "%1 (%2% от всего %3) найдено при поиске."
+msgstr "%1 (%2 % от всего %3) найдено при поиске."
 
 #: gui/gui.cpp:62
 #, kde-format
@@ -756,7 +756,7 @@ msgstr "<dt><b>Вызовов функций выделения памяти</b>
 #: gui/mainwindow.cpp:401
 #, kde-format
 msgid "<dt><b>temporary allocations</b>:</dt><dd>%1 (%2%, %3/s)</dd>"
-msgstr "<dt><b>Временные выделения</b>:</dt><dd>%1 (%2%, %3/с)</dd>"
+msgstr "<dt><b>Временные выделения</b>:</dt><dd>%1 (%2 %, %3/с)</dd>"
 
 #: gui/mainwindow.cpp:411
 #, kde-format
@@ -1138,7 +1138,7 @@ msgstr "Фильтр"
 #: gui/parser.cpp:388
 #, kde-format
 msgid "merging allocations... %1%"
-msgstr "объединение выделений… %1%"
+msgstr "объединение выделений… %1 %"
 
 #: gui/parser.cpp:559
 #, kde-format
@@ -1275,22 +1275,22 @@ msgstr ""
 #: gui/treemodel.cpp:159
 #, kde-format
 msgid "peak contribution: %1 (%2% of total)\n"
-msgstr "пиковое выделение: %1 (%2% от общего)\n"
+msgstr "пиковое выделение: %1 (%2 % от общего)\n"
 
 #: gui/treemodel.cpp:160
 #, kde-format
 msgid "leaked: %1 (%2% of total)\n"
-msgstr "объём утечки: %1 (%2% от общего)\n"
+msgstr "объём утечки: %1 (%2 % от общего)\n"
 
 #: gui/treemodel.cpp:161
 #, kde-format
 msgid "allocations: %1 (%2% of total)\n"
-msgstr "выделения: %1 (%2% от общего)\n"
+msgstr "выделения: %1 (%2 % от общего)\n"
 
 #: gui/treemodel.cpp:162
 #, kde-format
 msgid "temporary: %1 (%2% of allocations, %3% of total)\n"
-msgstr "временные: %1 (%2% выделений, %3% от общего)\n"
+msgstr "временные: %1 (%2 % выделений, %3 % от общего)\n"
 
 #: gui/treemodel.cpp:168
 #, kde-format
@@ -1314,17 +1314,17 @@ msgstr "??"
 #: gui/util.cpp:108
 #, kde-format
 msgid "%1: %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr "%1: %2<br/>&nbsp;&nbsp;%4% из %3 всего"
+msgstr "%1: %2<br/>&nbsp;&nbsp;%4 % из %3 всего"
 
 #: gui/util.cpp:134 gui/util.cpp:163
 #, kde-format
 msgid "%1 (self): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr "%1 (собственные): %2<br/>&nbsp;&nbsp;%4% из %3 всего"
+msgstr "%1 (собственные): %2<br/>&nbsp;&nbsp;%4 % из %3 всего"
 
 #: gui/util.cpp:137 gui/util.cpp:166
 #, kde-format
 msgid "%1 (inclusive): %2<br/>&nbsp;&nbsp;%4% out of %3 total"
-msgstr "%1 (включительно): %2<br/>&nbsp;&nbsp;%4% из общего числа %3"
+msgstr "%1 (включительно): %2<br/>&nbsp;&nbsp;%4 % из общего числа %3"
 
 #: gui/util.cpp:183
 #, kde-format
