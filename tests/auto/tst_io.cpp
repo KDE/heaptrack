@@ -93,6 +93,59 @@ TEST_CASE ("buffered writeHex") {
     REQUIRE(file.readContents() == expectedContents);
 }
 
+TEST_CASE ("write oversized formatted message")
+{
+    TempFile file;
+    REQUIRE(file.open());
+
+    LineWriter writer(file.fd);
+    REQUIRE(writer.canWrite());
+
+    // a formatted message that does not fit into the buffer capacity. It
+    // used to assert in debug builds and silently drop the data in release
+    // builds, see https://bugs.kde.org/show_bug.cgi?id=425838
+    const string longPath(LineWriter::BUFFER_CAPACITY * 2, '/');
+    REQUIRE(writer.write("m %s %x\n", longPath.c_str(), 42));
+    // the next line must come after the oversized one and not be
+    // interleaved with it
+    REQUIRE(writer.write("t 42\n"));
+    REQUIRE(writer.writeHexLine('i', 0x123u, 0x456u));
+
+    REQUIRE(writer.flush());
+
+    ostringstream expectedContents;
+    expectedContents << "m " << longPath << " 2a\n";
+    expectedContents << "t 42\n";
+    expectedContents << "i 123 456\n";
+
+    REQUIRE(file.readContents() == expectedContents.str());
+}
+
+TEST_CASE ("read bool at end of line")
+{
+    // the bool field is the last one on the line: reading it must not run
+    // past the end of the string (iterating to cend and dereferencing it
+    // there used to be undefined behaviour)
+    const string contents = "s 1\n"
+                            "s 1\n";
+    stringstream stream(contents);
+    LineReader reader;
+    bool flag = false;
+
+    REQUIRE(reader.getLine(stream));
+    REQUIRE(reader.mode() == 's');
+    REQUIRE((reader >> flag));
+    REQUIRE(flag == true);
+    REQUIRE(!(reader >> flag));
+    REQUIRE(!(reader >> flag));
+
+    REQUIRE(reader.getLine(stream));
+    REQUIRE(reader.mode() == 's');
+    REQUIRE((reader >> flag));
+    REQUIRE(flag == true);
+    REQUIRE(!(reader >> flag));
+}
+
 TEST_CASE ("write flush") {
     TempFile file;
     REQUIRE(file.open());
