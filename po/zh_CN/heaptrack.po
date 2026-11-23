@@ -846,12 +846,12 @@ msgstr ""
 #: gui/mainwindow.cpp:857
 #, kde-format
 msgid "Failed to parse command: %1"
-msgstr ""
+msgstr "无法解析命令：%1"
 
 #: gui/mainwindow.cpp:871
 #, kde-format
 msgid "Failed to launch command: %1 %2"
-msgstr ""
+msgstr "无法启动命令：%1 %2"
 
 #. i18n: ectx: property (windowTitle), widget (QMainWindow, MainWindow)
 #: gui/mainwindow.ui:14
