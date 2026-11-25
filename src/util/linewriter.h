@@ -51,12 +51,7 @@ public:
     template <typename... T>
     bool write(const char* fmt, T... args)
     {
-        enum
-        {
-            FirstTry,
-            SecondTry
-        };
-        for (auto i : {FirstTry, SecondTry}) {
+        for (int remainingTries = 2; remainingTries > 0; --remainingTries) {
             const auto available = availableSpace();
             int ret = snprintf(out(), available, fmt, args...);
 
@@ -70,11 +65,27 @@ public:
             }
 
             // message didn't fit into available space
-            if (i == SecondTry || static_cast<unsigned>(ret) > BUFFER_CAPACITY) {
-                // message doesn't fit into BUFFER_CAPACITY - this should never happen
-                assert(false && "message doesn't fit into buffer");
-                errno = EFBIG;
-                return false;
+            if (static_cast<size_t>(ret) + 1 > BUFFER_CAPACITY) {
+                // the message doesn't fit into the buffer capacity at all.
+                // This can happen e.g. when the interpreted module path or
+                // function string is excessively long, see
+                // https://bugs.kde.org/show_bug.cgi?id=425838 . Buffering it
+                // is impossible, and asserting (debug builds) or silently
+                // dropping the data (release builds) is much worse than
+                // writing it out directly. Flush the buffer first to keep
+                // the output in order, then write the complete message.
+                if (!flush()) {
+                    return false;
+                }
+                std::unique_ptr<char[]> msg(new char[ret + 1]);
+                ret = snprintf(msg.get(), ret + 1, fmt, args...);
+                if (ret < 0) {
+                    return false;
+                }
+                if (!writeAll(msg.get(), ret)) {
+                    return false;
+                }
+                return true;
             }
 
             if (!flush()) {
@@ -122,11 +133,10 @@ public:
                 return false;
             }
             if (availableSpace() < length) {
-                ssize_t ret = 0;
-                do {
-                    ret = ::write(fd, line.data(), length);
-                } while (ret < 0 && errno == EINTR);
-                return ret >= 0;
+                // ::write may return after having written only part of the
+                // data, e.g. when interrupted by a signal, so keep writing
+                // until everything was sent
+                return writeAll(line.data(), length);
             }
         }
         memcpy(out(), line.data(), length);
@@ -252,12 +262,7 @@ public:
             return true;
         }
 
-        ssize_t ret = 0;
-        do {
-            ret = ::write(fd, buffer.get(), bufferSize);
-        } while (ret < 0 && errno == EINTR);
-
-        if (ret < 0) {
+        if (!writeAll(buffer.get(), bufferSize)) {
             return false;
         }
 
@@ -280,6 +285,28 @@ public:
     }
 
 private:
+    /**
+     * write the complete data to the file descriptor, retrying on
+     * interruptions and handling partial writes
+     */
+    bool writeAll(const char* data, size_t length)
+    {
+        while (length > 0) {
+            ssize_t ret = ::write(fd, data, length);
+            if (ret < 0) {
+                if (errno == EINTR) {
+                    continue;
+                }
+                return false;
+            } else if (ret == 0) {
+                return false;
+            }
+            data += ret;
+            length -= ret;
+        }
+        return true;
+    }
+
     size_t availableSpace() const
     {
         return BUFFER_CAPACITY - bufferSize;

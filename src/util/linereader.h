@@ -148,7 +148,7 @@ public:
         if (m_it != m_line.cend()) {
             flag = *m_it;
             m_it++;
-            if (*m_it == ' ') {
+            if (m_it != m_line.cend() && *m_it == ' ') {
                 ++m_it;
             }
             return true;
