@@ -1116,7 +1116,7 @@ msgstr "&Dosya"
 #: gui/mainwindow.ui:877
 #, kde-format
 msgid "Setti&ngs"
-msgstr "&Ayarlar"
+msgstr "Ayar&lar"
 
 #. i18n: ectx: property (title), widget (QMenu, menuFilter)
 #: gui/mainwindow.ui:882
