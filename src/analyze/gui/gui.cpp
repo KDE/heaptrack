@@ -22,7 +22,7 @@
 #include <QResource>
 
 // FIXME: patch KIconTheme so that this isn't needed here
-void Q_DECL_UNUSED initRCCIconTheme()
+void initRCCIconTheme()
 {
     const QString iconThemeRcc = qApp->applicationDirPath() + QStringLiteral("/../share/icons/breeze/breeze-icons.rcc");
     if (!QFile::exists(iconThemeRcc)) {
